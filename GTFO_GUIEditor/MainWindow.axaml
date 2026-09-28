@@ -2,8 +2,425 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        xmlns:vm="using:GTFO_GUIEditor.ViewModels"
+        xmlns:models="using:GTFO_GUIEditor.Models"
+        mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
         x:Class="GTFO_GUIEditor.MainWindow"
-        Title="GTFO_GUIEditor">
-    Welcome to Avalonia!
+        x:DataType="vm:MainWindowViewModel"
+        Title="GTFO Level Editor">
+    <Grid ColumnDefinitions="*,*">
+        <!-- Left Half -->
+        <Border Grid.Column="0" BorderBrush="#333333" BorderThickness="0,0,1,0" Padding="10">
+            <DockPanel>
+                <TextBlock DockPanel.Dock="Top" Text="Level Layout" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                <Panel Background="#1E1E1E">
+                    <TextBlock Text="Level Layout View" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
+                </Panel>
+            </DockPanel>
+        </Border>
+
+        <!-- Right Half -->
+        <TabControl Grid.Column="1" SelectedIndex="0" Margin="5">
+            <TabItem Header="Home">
+                <ScrollViewer Margin="10">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Home" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="Welcome to the GTFO Level Editor, created by Tgb03 and Boston54." TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Alarms">
+                <ScrollViewer Margin="10">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Alarms Configuration" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="Configure security door alarms and scan settings." TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Complex Resource Sets">
+                <Panel DataContext="{Binding ComplexResourceSets}" x:DataType="vm:ComplexResourceSetsViewModel">
+                    <Grid RowDefinitions="Auto,*" Margin="10">
+                        <!-- Top Bar: Block Selection and Creation -->
+                        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding Blocks}"
+                                          SelectedItem="{Binding SelectedBlock, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ComplexResourceSetBlock">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <Button Grid.Column="2"
+                                        Content="+ Create New Block"
+                                        Command="{Binding OpenCreateBlockDialog}"
+                                        Margin="10,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+
+                                <Button Grid.Column="3"
+                                        Content="- Delete Block"
+                                        Command="{Binding RequestDeleteSelectedBlock}"
+                                        IsEnabled="{Binding HasSelectedBlock}"
+                                        Margin="8,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+                                        
+                                <TextBlock Grid.Column="4"
+                                           Text="{Binding StatusText}"
+                                           VerticalAlignment="Center"
+                                           Margin="12,0,0,0"
+                                           Foreground="#AAAAAA"
+                                           FontSize="12"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Main Editor Area (when a block is selected) -->
+                        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedBlock}">
+                            <TabControl Margin="0">
+                                <TabItem Header="General &amp; Level Gen">
+                                    <ScrollViewer Margin="5">
+                                        <StackPanel Spacing="16">
+                                            <!-- Block Properties Group -->
+                                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                                <StackPanel Spacing="10">
+                                                    <TextBlock Text="Block Properties" FontWeight="Bold" FontSize="14"/>
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,5,0,0">
+                                                        <!-- Row 0: Name & Persistent ID -->
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedBlock.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
+                                                        
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedBlock.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                        <!-- Row 1: Complex Type & Bundle Name -->
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Complex Type:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <ComboBox Grid.Row="1" Grid.Column="1"
+                                                                  ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableComplexTypes}"
+                                                                  SelectedItem="{Binding SelectedBlock.ComplexType, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  Margin="0,0,16,8"/>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Bundle Name:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <ComboBox Grid.Row="1" Grid.Column="3"
+                                                                  ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableBundleNames}"
+                                                                  SelectedItem="{Binding SelectedBlock.BundleName, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  Margin="0,0,0,8"/>
+
+                                                        <!-- Row 2: Primary Sub-Complex & Randomize Geomorph Order -->
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Primary Sub-Complex:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <ComboBox Grid.Row="2" Grid.Column="1"
+                                                                  ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableSubComplexTypes}"
+                                                                  SelectedItem="{Binding SelectedBlock.PrimareSubComplexUsed, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  Margin="0,0,16,8"/>
+
+                                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Randomize Geomorphs:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding SelectedBlock.RandomizeGeomorphOrder, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,0,8"/>
+
+                                                        <!-- Row 3: Internal Enabled -->
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Internal Enabled:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding SelectedBlock.InternalEnabled, Mode=TwoWay}" VerticalAlignment="Center"/>
+
+                                                        <!-- Row 4: Duplicate Persistent ID Warning Banner -->
+                                                        <Border Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="4"
+                                                                Background="#3A1C1C" BorderBrush="#FF6B6B" BorderThickness="1"
+                                                                CornerRadius="4" Padding="10,6" Margin="0,8,0,0"
+                                                                IsVisible="{Binding HasDuplicatePersistentId}">
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="{Binding DuplicatePersistentIdWarning}" Foreground="#FF6B6B" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </Border>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+
+                                            <!-- Level Generation Config Group -->
+                                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                                <StackPanel Spacing="10">
+                                                    <TextBlock Text="Level Generation Configuration" FontWeight="Bold" FontSize="14"/>
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                                        <!-- Row 0: Grid Size & Cell Dimension -->
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Grid Size:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedBlock.LevelGenConfig.GridSize, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Cell Dimension:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedBlock.LevelGenConfig.CellDimension, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                        <!-- Row 1: Altitude Offset & Transition Direction -->
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Altitude Offset:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedBlock.LevelGenConfig.AltitudeOffset, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Transition Direction:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <ComboBox Grid.Row="1" Grid.Column="3"
+                                                                  ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableTransitionDirections}"
+                                                                  SelectedItem="{Binding SelectedBlock.LevelGenConfig.TransitionDirection, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  Margin="0,0,0,8"/>
+
+                                                        <!-- Row 2: Level Progression -->
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Level Progression:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <ComboBox Grid.Row="2" Grid.Column="1"
+                                                                  ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableLevelProgressions}"
+                                                                  SelectedItem="{Binding SelectedBlock.LevelGenConfig.LevelProgression, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"/>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Border>
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </TabItem>
+
+                                <TabItem Header="Geomorphs &amp; Prefabs">
+                                    <Grid RowDefinitions="Auto,*,Auto" Margin="5">
+                                        <!-- Category Selector and Controls -->
+                                        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,10">
+                                            <TextBlock Grid.Column="0" Text="Category:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                            <ComboBox Grid.Column="1"
+                                                      ItemsSource="{Binding Categories}"
+                                                      SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                                      HorizontalAlignment="Stretch"
+                                                      VerticalAlignment="Center"/>
+                                            <Button Grid.Column="2"
+                                                    Content="+ Add Prefab"
+                                                    Command="{Binding AddPrefabItem}"
+                                                    Margin="10,0,0,0"/>
+                                            <Button Grid.Column="3"
+                                                    Content="- Remove Selected"
+                                                    Command="{Binding RemoveSelectedPrefabItem}"
+                                                    Margin="6,0,0,0"/>
+                                        </Grid>
+
+                                        <!-- Prefabs DataGrid -->
+                                        <Border Grid.Row="1" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+                                            <DataGrid ItemsSource="{Binding CurrentCategoryItems}"
+                                                      SelectedItem="{Binding SelectedPrefabItem, Mode=TwoWay}"
+                                                      AutoGenerateColumns="False"
+                                                      GridLinesVisibility="All"
+                                                      CanUserResizeColumns="True"
+                                                      CanUserSortColumns="True">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Prefab Asset Path" Binding="{Binding Prefab, Mode=TwoWay}" Width="3*"/>
+                                                    <DataGridTemplateColumn Header="Sub-Complex" Width="*">
+                                                        <DataGridTemplateColumn.CellTemplate>
+                                                            <DataTemplate x:DataType="models:PrefabItem">
+                                                                <ComboBox ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableSubComplexTypes}"
+                                                                          SelectedItem="{Binding SubComplex, Mode=TwoWay}"
+                                                                          HorizontalAlignment="Stretch"
+                                                                          VerticalAlignment="Center"/>
+                                                            </DataTemplate>
+                                                        </DataGridTemplateColumn.CellTemplate>
+                                                    </DataGridTemplateColumn>
+                                                    <DataGridTemplateColumn Header="Shard" Width="90">
+                                                        <DataGridTemplateColumn.CellTemplate>
+                                                            <DataTemplate x:DataType="models:PrefabItem">
+                                                                <ComboBox ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableShards}"
+                                                                          SelectedItem="{Binding Shard, Mode=TwoWay}"
+                                                                          HorizontalAlignment="Stretch"
+                                                                          VerticalAlignment="Center"/>
+                                                            </DataTemplate>
+                                                        </DataGridTemplateColumn.CellTemplate>
+                                                    </DataGridTemplateColumn>
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </Border>
+
+                                        <TextBlock Grid.Row="2"
+                                                   Text="{Binding CurrentCategoryItems.Count, StringFormat='Count: {0} items'}"
+                                                   Foreground="Gray"
+                                                   FontSize="11"
+                                                   Margin="0,6,0,0"/>
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                        </Grid>
+
+                        <!-- Create Block Modal Prompt / Overlay -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsCreatingBlock}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#1E1E1E"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="20"
+                                    Width="480"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 16 0 #000000">
+                                <StackPanel Spacing="14">
+                                    <TextBlock Text="Create New Complex Resource Set Block"
+                                               FontWeight="Bold"
+                                               FontSize="16"/>
+                                               
+                                    <TextBlock Text="Choose how you want to create the new block:"
+                                               Foreground="LightGray"
+                                               FontSize="12"/>
+
+                                    <!-- Options: Fresh vs Template -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                                        <StackPanel Spacing="10">
+                                            <RadioButton Content="Create a new fresh (blank) block"
+                                                         IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                                                         
+                                            <RadioButton Content="Use a vanilla block as a template"
+                                                         IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+
+                                            <!-- Template Selector (visible when template is selected) -->
+                                            <StackPanel Margin="24,4,0,0"
+                                                        Spacing="6"
+                                                        IsVisible="{Binding IsCreatingFromTemplate}">
+                                                <TextBlock Text="Select Template Block:"
+                                                           FontSize="12"
+                                                           Foreground="Gray"/>
+                                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:ComplexResourceSetBlock">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Block Name & ID Inputs -->
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Watermark="Block name..." Margin="0,0,0,10"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}"/>
+                                    </Grid>
+
+                                    <!-- Error message if any -->
+                                    <TextBlock Text="{Binding CreationErrorMessage}"
+                                               Foreground="#FF6B6B"
+                                               FontSize="12"
+                                               IsVisible="{Binding HasCreationErrorMessage}"/>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                        <Button Content="Cancel"
+                                                Command="{Binding CancelCreateBlock}"
+                                                Padding="14,6"/>
+                                        <Button Content="Create Block"
+                                                Command="{Binding ConfirmCreateBlock}"
+                                                Classes="accent"
+                                                Padding="14,6"
+                                                FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+
+                        <!-- Delete Block Modal Confirmation Overlay -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsConfirmingDelete}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#1E1E1E"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="20"
+                                    Width="440"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 16 0 #000000">
+                                <StackPanel Spacing="14">
+                                    <TextBlock Text="Confirm Delete Block"
+                                               FontWeight="Bold"
+                                               FontSize="16"
+                                               Foreground="#FF6B6B"/>
+
+                                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                                               TextWrapping="Wrap"
+                                               FontSize="13"/>
+
+                                    <TextBlock Text="This action will remove the block from the datablock. This cannot be undone."
+                                               Foreground="Gray"
+                                               TextWrapping="Wrap"
+                                               FontSize="12"/>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                                        <Button Content="Cancel"
+                                                Command="{Binding CancelDeleteBlock}"
+                                                Padding="14,6"/>
+                                        <Button Content="Delete"
+                                                Command="{Binding ConfirmDeleteBlock}"
+                                                Background="#D32F2F"
+                                                Foreground="White"
+                                                Padding="14,6"
+                                                FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </Panel>
+            </TabItem>
+            <TabItem Header="Geomorphs">
+                <ScrollViewer Margin="10">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Geomorphs" FontWeight="Bold" FontSize="16"/>
+                        <TextBlock Text="View vanilla Geomorphs and add custom prefabs." TextWrapping="Wrap"/>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Sounds">
+                <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="10" DataContext="{Binding Sounds}" x:DataType="vm:SoundsViewModel">
+                    <TextBlock Grid.Row="0" Text="Sounds" FontWeight="Bold" FontSize="16" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="1" Text="Search the list of all sounds in GTFO. Click an ID to copy it to clipboard." TextWrapping="Wrap" Margin="0,0,0,10"/>
+                    <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="0" Text="Search:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <TextBox Grid.Column="1" 
+                                 Text="{Binding SearchText, Mode=TwoWay}" 
+                                 Watermark="Search by ID, name, path, or keyword..."
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{Binding StatusText}" 
+                                   VerticalAlignment="Center" 
+                                   Margin="10,0,0,0" 
+                                   Foreground="Gray"
+                                   FontSize="12"/>
+                    </Grid>
+
+                    <Border Grid.Row="3" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+                        <DataGrid x:Name="SoundsDataGrid"
+                                  ItemsSource="{Binding FilteredSounds}"
+                                  SelectedItem="{Binding SelectedSound, Mode=TwoWay}"
+                                  AutoGenerateColumns="False"
+                                  IsReadOnly="True"
+                                  GridLinesVisibility="All"
+                                  CanUserResizeColumns="True"
+                                  CanUserReorderColumns="True"
+                                  CanUserSortColumns="True"
+                                  CellPointerPressed="SoundsDataGrid_CellPointerPressed">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="120"/>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                                <DataGridTextColumn Header="Wwise Object Path" Binding="{Binding WwisePath}" Width="3*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+    </Grid>
 </Window>
