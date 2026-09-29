@@ -278,7 +278,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         uint id;
         do
         {
-            id = (uint)Random.Shared.Next(1000, 1000000);
+            id = (uint)Random.Shared.Next(1000, 100000000);
         } while (existingIds.Contains(id));
         return id;
     }

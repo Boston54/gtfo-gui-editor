@@ -1,0 +1,3252 @@
+{
+  "mining": {
+    "complexId": 1,
+    "digsite": {
+      "elevators": [
+        {
+          "name": "Digsite Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"
+              ],
+              "description": "Connects to the next room in 2 paths, split by a large pillar. Boxes can often spawn to the right side.",
+              "images": [
+                "img-0001.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_02.prefab"
+              ],
+              "description": "Small but open area.",
+              "images": [
+                "img-0002.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_03.prefab"
+              ],
+              "description": "Expansive area with a ramp leading up, then stairs going down into the next room.",
+              "images": [
+                "img-0003.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Elevator 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_05.prefab"
+              ],
+              "description": "Much more compact version of Elevator 2 with a cave-like entrance to the next room.",
+              "images": [
+                "img-0004.png"
+              ]
+            }
+          ],
+          "description": "Looking for elevator 4? Look in the custom geo section."
+        }
+      ],
+      "standard": [
+        {
+          "name": "Digsite HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_01.prefab"
+              ],
+              "description": "Leads to many side rooms. A tunnel connects the main left hallway to the midsize right room. The stairs and ladder lead to another large room. A rare tiny room spawn further to the right than the picture shows. It's a very short hallway.",
+              "images": [
+                "img-0005.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_02.prefab"
+              ],
+              "description": "The pit room. A long path leads around the edges of the room and connects to ramps leading to the center area. The side room behind the picture contains a ramp leading to the high part of the edge of the pit. The tower on the left side may or may not spawn. Changing the marker subseed for the zone can remove it.",
+              "images": [
+                "img-0006.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_03.prefab"
+              ],
+              "description": "The big tunnel room. There is a large double ramp room to the right and small tunnels connect the main tunnel room to the side rooms.",
+              "images": [
+                "img-0007.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_04.prefab"
+              ],
+              "description": "Very vertical tile. The overlapping rooms can actually be different zones on completely different sections of the map if executed correctly. The ramp leads to both a lower and upper room. The upper room is much smaller, while the lower room is very large. On the opposite size of the tile is a similar room to the picture but has catwalks leading down with a ladder instead of a rock ramp.",
+              "images": [
+                "img-0008.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_05.prefab"
+              ],
+              "description": "One of the most simple tiles. It contains 2 large rooms and a connecting hallway. Markers will significantly change the room fillings from mostly empty to large crates or structures.",
+              "images": [
+                "img-0009.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_06.prefab"
+              ],
+              "description": "The left side has 2 doors leading to the left side room, and the right door leads to another side room. Behind the barrels is the main room that each of the 3 side rooms connects to.",
+              "images": [
+                "img-0010.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_07.prefab"
+              ],
+              "description": "The infamous surge alarm tile from R2E1. The ramp from the left side leads to a raised platform in the right room before going down a staircase. The central room changes drastically depending on the Marker used. The far side of the tile has a small square storage room and another hallway room.",
+              "images": [
+                "img-0011.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite AS 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab"
+              ],
+              "description": "The left and right sides of the zone have nearly identical long hallways. The far ends of each hallway connect to the center room.",
+              "images": [
+                "img-0012.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite AS 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_02.prefab"
+              ],
+              "description": "The maze tile. Many smaller intersecting rooms connect to one another, forming a confusing maze. Each corner of the tile has a room with either ramps or stairs.",
+              "images": [
+                "img-0013.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite AS 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_04.prefab"
+              ],
+              "description": "The massive double layered room. To the left is a small room leading to a double ladder down to the bottom. The far room is a short hallway. To the right are 2 small hallways leading to a cool ladder pit, which then leads to another hallway back to the main room. Depending on the Marker subseed, the ladder and ramp can spawn as a structure with 2 ladders leading to the top and bottom sections of the room.",
+              "images": [
+                "img-0014.png"
+              ]
+            }
+          ],
+          "description": "Looking for AS 3? Doesn't exist."
+        }
+      ],
+      "custom": [
+        {
+          "name": "Digsite hub HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab"
+              ],
+              "description": "Valid Generator Cluster tile. A large open room with a central platform. Short bridges, stairs, and ramps lead up to the middle area. A large vertical structure or a generator cluster can spawn in the middle area. This tile had been modified in R7 and ALT:R2, with the central platform going down a bit. Contains a broken boss spawn align. R2D1, Generator cluster room R3A2, Generator cluster room R4C3, Extreme, Generator cluster room R5B3, High, third zone R6C3, Secondary, Generator cluster room",
+              "images": [
+                "img-0015.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite hub HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_02.prefab"
+              ],
+              "description": "Valid Generator Cluster tile. Very large room full of interconnected tunnels. A generator cluster or a tower can spawn in the large open area. R2E1, fog and scout room R4B2, High, generator cluster room R5A3, Overload, generator cluster room R5B1, High, charger and scout room",
+              "images": [
+                "img-0016.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite hub HA 3 / V2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_03.prefab"
+              ],
+              "description": "The room contains many raised ledges around trenches. A tower spawn in the upper corner of the room.",
+              "images": [
+                "img-0017.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_03_v2.prefab"
+              ],
+              "description": "In V2 an evil ceiling is used. Besides, there's no difference. R2E1, second zone R4B2, Overload, first zone R5E1, High, third zone R6A1, Main, first zone",
+              "images": [
+                "img-0017.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite hub SF 1 / AW",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_SF_01.prefab"
+              ],
+              "description": "A very large room with limited walking space. 4 catwalks connect in the middle, each leading to different sections of the room. You can't enter the space below, but it resembles a large cave.",
+              "images": [
+                "img-0018.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_SF_01_AW.prefab"
+              ],
+              "description": "AW variant: Bridges to the left, right hand side of the platforms are broken (thereby inaccessible), making it an I-tile. Contains 1 static bioscan point, on the platform. R5A3, High, second zone",
+              "images": [
+                "img-0018.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite hub SF 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_SF_02.prefab"
+              ],
+              "description": "The first tile used for the teleportation event in rundown 6. Big pickup items can spawn on the center pedestal. R6A1, Main, second last zone with the MWP",
+              "images": [
+                "img-0019.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_I_HA_01.prefab"
+              ],
+              "description": "A long tunnel. It looks very similar to the digsite HA 3. You can connect these tiles by putting this custom geo into the standard geo section for a very long tunnel. R4E1, Extreme, zone before reactor R6A1, Main, third last zone",
+              "images": [
+                "img-0020.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Reactor Tunnel I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_reactor_tunnel_I_HA_01.prefab"
+              ],
+              "description": "A tunnel that is intended to connect to reactors for digsite maps. It looks similar to a refinery tile with silo shaped structures in the middle area. R4A3, Overload, first zone R5B3, Extreme, first zone",
+              "images": [
+                "img-0021.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Reactor Tunnel I HA 1 R8E2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_reactor_tunnel_I_HA_01_R8E2.prefab"
+              ],
+              "description": "R8E2 variant of the reactor tunnel. Contains initially enabled built-in security sensors.",
+              "images": [
+                "img-0022.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite Elevator 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+              ],
+              "description": "You read the name correctly. This massive pit room is partially set up as a drop elevator, but does not function as one and instead spawns as a custom tile. Though unlikely, it may be used in the future as the spawning area for players. R5D1, Extreme, first zone",
+              "images": [
+                "img-0023.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Digsite HA 02 R8B3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_02_R8B3.prefab"
+              ],
+              "description": "Custom-geo version of HA 02, with doors separating side room and main hub removed.",
+              "images": [
+                "img-0024.png",
+                "img-0025.png",
+                "img-0026.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining HSU Exit 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_HSU_exit_02.prefab"
+              ],
+              "description": "R8E2 finals.",
+              "images": [
+                "img-0027.png",
+                "img-0028.png",
+                "img-0029.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining HSU Exit 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_HSU_exit_03.prefab"
+              ],
+              "description": "The mega-huge tile for fighting kraken in R8E2.",
+              "images": [
+                "img-0030.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "refinery": {
+      "elevators": [
+        {
+          "name": "Refinery Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_01.prefab"
+              ],
+              "description": "Large area with pillars in the middle, and large machines on either side.",
+              "images": [
+                "img-0031.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_02.prefab"
+              ],
+              "description": "Very similar to the first one, but with taller machines.",
+              "images": [
+                "img-0032.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_03.prefab"
+              ],
+              "description": "Notorious for having terrible enemy pathfinding on the left side connecting to the right when next to the elevator pit.",
+              "images": [
+                "img-0033.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Refinery HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_01.prefab"
+              ],
+              "description": "The middle and left doors lead to an open area with a P shape. The right door leads to a winding tunnel with stairs leading to the right room and P shaped rooms. The right room is determined entirely by the Marker subseed and changes drastically.",
+              "images": [
+                "img-0034.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_02.prefab"
+              ],
+              "description": "The stairs lead to a raised platform in the corner of the room with another staircase leading back down on the left side. The left room is a long hallway. The far room changes significantly depending on the Marker seed.",
+              "images": [
+                "img-0035.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_03.prefab"
+              ],
+              "description": "A U shaped hallway leads to the big center room and a long hallway on the left side of the room. The middle room changes significantly depending on the marker seed.",
+              "images": [
+                "img-0036.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_04.prefab"
+              ],
+              "description": "The big catwalk bridge room. Stairs on the far sides of the room lead up and down, with side rooms that change significantly depending on Marker subseed. Noticing a theme?",
+              "images": [
+                "img-0037.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_05.prefab"
+              ],
+              "description": "The left door leads to a large open area, while the middle door leads to a very long hallway leading to the end of the tile. The right door leads to another large open area.",
+              "images": [
+                "img-0038.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_06.prefab"
+              ],
+              "description": "Similar to HA 3 but with 2 long hallway side rooms instead of 1, and a small corner room. The middle room also changes significantly depending on the marker seed, using similar structures to HA 3.",
+              "images": [
+                "img-0039.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_07.prefab"
+              ],
+              "description": "Stacked tunnel tile. On the far side of the pit is a double staircase and a very tall ladder leading up. The path then winds to the right, leading to the lower side of the upper hallway. The door in the middle of the pit leads to a winding tunnel up to the upper hallway. The remaining rooms change depending on the Marker subseed. This tile can cause overlapping zones.",
+              "images": [
+                "img-0040.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery JG 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_JG_01.prefab"
+              ],
+              "description": "An awesome collapsed elevator. A winding staircase leads around the room from top to bottom. The top leads to a large square room. Long hallways connect around the huge elevator. R6C3, Main, past the checkpoint",
+              "images": [
+                "img-0041.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery JG 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_JG_02.prefab"
+              ],
+              "description": "Big 4 floor jungle. Big middle room is surrounded on three sides by large 3-storey staircases, each of which has a different passage to the main room. Some of the markers in this tile might be undesired. R7C3, Overload",
+              "images": [
+                "img-0042.jpeg"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Refinery X HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_01.prefab"
+              ],
+              "description": "A bridge connects opposite sides of the room, with catwalks in each corner and an underpass leading under the bridge. R1D1, the bridge zone R4A3, High, second last zone R5D1, High, the bridge zone",
+              "images": [
+                "img-0043.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_02.prefab"
+              ],
+              "description": "The big jungle gym room. Many winding platforms lead up and down all over the room. R1D1, second last zone before reactor R4D1, High, the last code zone R5B1, High, the first zone R5D1, High, second last zone before reactor",
+              "images": [
+                "img-0044.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_03.prefab"
+              ],
+              "description": "2 staircases lead up to catwalks that form a large 8 shape around the middle of the room. There is also a lower floor with a similar 8 shape. Staircases lead to each outer side of the room. R2B2, the zone before the zone with 4 scouts R4E1, Extreme, the fourth zone with 4 mothers",
+              "images": [
+                "img-0045.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_04.prefab"
+              ],
+              "description": "Boss Align Tile. Another jungle gym room. Catwalks lead around the outer sides of the big pit in the middle. Stairs and ramps lead to the large pit in the middle, with a central tower connecting to one side. This tile has a static boss spawn align point if set up correctly. R3B2, the first area R4C2, Extreme, second zone R5D1, High, the West hub with babies and 2 scouts",
+              "images": [
+                "img-0046.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_07.prefab"
+              ],
+              "description": "Boss Align Tile. Same as the normal version of the tile, but now it's a Valid Generator Cluster Tile. Important to note is that if the gen cluster does not spawn there will be a black empty void in the middle. R7C2, the second zone, generator cluster",
+              "images": [
+                "img-0047.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 04",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_04_test.prefab"
+              ],
+              "description": "This \"test\" version is the one used in the official release. Possesses an unused version with a different central tower that contains just 1 ladder instead of several",
+              "images": [
+                "img-0048.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_04_R8B3.prefab"
+              ],
+              "description": "R8B3 uplink terminal tile.",
+              "images": [
+                "img-0048.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_05.prefab"
+              ],
+              "description": "The doughnut room. gunk is on the ceiling  nope. R2D2, one of the last zones R4C2, High, the first area R5D1, High, the East zone with babies and 2 scouts",
+              "images": [
+                "img-0049.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X HA 6 / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_06.prefab"
+              ],
+              "description": "Boss Align Tile. A big open area with a raised platform around the middle area. This tile was used as a boss room, with a special static spawn point in the center if you set it up correctly.",
+              "images": [
+                "img-0050.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_06_v2.prefab"
+              ],
+              "description": "V2: The rundown 6 version does not have eggs all over the room. \"SpawnPlacementType\": 1 will cause the enemy to appear in the center of the circle in the picture. In v2, there's a built-in broken bulkhead DC and a World Event Animation Trigger for probably removing it. R3B2, the mother zone R6D3, zone with first checkpoint",
+              "images": [
+                "img-0051.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_01.prefab"
+              ],
+              "description": "Straight room with ramps on either side. Nasty gunk in the ceiling again. R4C2, Extreme, first zone",
+              "images": [
+                "img-0052.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 1_V2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_01_v2.prefab"
+              ],
+              "description": "Straight room with 3 bridges leading from one end to the other. Just a cool variant of the original. Contains 6 static bioscan points, but the first 2 scan points seem to be at the same position. R7C2, Main, first zone",
+              "images": [
+                "img-0053.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_02.prefab"
+              ],
+              "description": "Straight tunnel room, usually used as a leadup to reactors. R1D1, zone before reactor R4D1, High, East zone from reactor R5D1, High, zone before reactor",
+              "images": [
+                "img-0054.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_03.prefab"
+              ],
+              "description": "Staircases lead up to an 8 shaped catwalk that goes across the room, with ladders in the middle of the tunnel. Contains 4 static bioscan points. R3A3, zone before reactor R4E1, Extreme, first terminal code zone R6D3, zone before reactor",
+              "images": [
+                "img-0055.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 3 AW",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_03_AW.prefab"
+              ],
+              "description": "Actually a T-tile. Modified version of Refinery I HA 3. 90 degrees rotated- the first screenshot below shows the entrance. The third screenshot shows the bridge, with 2 additional entries lying on the bottom, left and right hand side of the bridge.",
+              "images": [
+                "img-0056.png",
+                "img-0057.png",
+                "img-0058.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 3 R8E2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_03_R8E2.prefab"
+              ],
+              "description": "R8E2 variant of HA 3. Contains initially disabled built-in security sensors. Stairs, ladders to the 2f of the bridge are removed.",
+              "images": [
+                "img-0059.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_04.prefab"
+              ],
+              "description": "Probably the most expansive I shaped tile. There used to be small rooms on the left and right side, but they were removed. The Rundown 6 version does not have eggs in the room. There is a static boss spawn point on this tile when set up correctly. R2D2, one of the last zones R4D1, Extreme, room of the first mother R5E1, High, zone with two mothers",
+              "images": [
+                "img-0060.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 5 / V2 / V3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_05.prefab"
+              ],
+              "description": "Bridge tile.",
+              "images": [
+                "img-0061.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_05_v2.prefab"
+              ],
+              "description": "V2: An additional, inaccessible bridge was added subjacent to the main bridge.",
+              "images": [
+                "img-0061.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_05_v3.prefab"
+              ],
+              "description": "V3: An additional, inaccessible bridge was added superjacent to the main bridge. Added some stone walls to make the bridge look more primal. R2D2, the zone before reactor R4D1, High, the zone before reactor R5B1, Overload, the zone before reactor R6D3, Main, the North zone from the reactor",
+              "images": [
+                "img-0061.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_06.prefab"
+              ],
+              "description": "It looks more like the Storage vault than a refinery tile, but is listed as Refinery. R5E1, High, the second last zone",
+              "images": [
+                "img-0062.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 6 AW",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_06_AW.prefab"
+              ],
+              "description": "Actually an X-tile. AW version of I HA 6, with 2 caves added to the left,right hand side of the passage. There's also a Shuttlebox at the end of the passage on the left side, where Data Cubes are inserted in R8E1.",
+              "images": [
+                "img-0063.png",
+                "img-0064.png",
+                "img-0065.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery I HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_I_HA_07.prefab"
+              ],
+              "description": "Modified from I HA 6. Added markers for spawning resource containers.",
+              "images": [
+                "img-0066.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery L HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_L_HA_01.prefab"
+              ],
+              "description": "An L shaped room that goes forward then to the side, with a bridge going across the top half of the room. R2D2, first zone R6D3, Overload, first zone",
+              "images": [
+                "img-0067.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery Dead End HA 1 - Event Tile",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_dead_end_HA_01.prefab"
+              ],
+              "description": "The depressurizer room. Used to transform objective items. R3B2, the last zone R5B3, High, North from the second zone",
+              "images": [
+                "img-0068.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery Dead End HA 1 R8B3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_dead_end_HA_01_R8B3.prefab"
+              ],
+              "description": "The depressurizer room with depressurizer removed as a standard dead end room (or am I missing any world event relevant stuff?)",
+              "images": [
+                "img-0069.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Refinery X VS 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_VS_01.prefab"
+              ],
+              "description": "Note: this is an L-tile. The R8B2 event room, with 2 small rooms on the sides which are for spawning enemy waves. Contains flyer spawnpoints. There're 3 built-in broken terminals, which you need to interact with in R8B2. The first one is initially interactable even if its corresponding world event is not configured. The other 2 are initially hidden, and require triggering the World Event Animation Trigger to make them show up.",
+              "images": [
+                "img-0070.png",
+                "img-0071.png",
+                "img-0072.png",
+                "img-0073.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "storage": {
+      "elevators": [
+        {
+          "name": "Storage Mining Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_01.prefab"
+              ],
+              "description": "A wall blocks line of sight to the next room, with paths leading around either side.",
+              "images": [
+                "img-0074.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage Mining Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_02.prefab"
+              ],
+              "description": "A wide entry space leads to a narrow hallway to the next room.",
+              "images": [
+                "img-0075.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage Mining Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_03.prefab"
+              ],
+              "description": "An open square space leading to the next room.",
+              "images": [
+                "img-0076.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_storage_01.prefab"
+              ],
+              "description": "The biggest storage entry area. Littered with rubble. There's a dead end small hallway on the left side.",
+              "images": [
+                "img-0077.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Storage HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_01.prefab"
+              ],
+              "description": "The main room is a long hallway with a raised platform on one side. The left room is another long hallway connected to the middle room by 3 doors. The right side has 2 smaller rooms.",
+              "images": [
+                "img-0078.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_02.prefab"
+              ],
+              "description": "Large pit room. The stairs on the right side can instead be a much higher platform with a ladder leading up. The left room is a medium sized hallway.",
+              "images": [
+                "img-0079.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_03.prefab"
+              ],
+              "description": "THE TUBE! Long tunnel tile with a big open room in the middle.",
+              "images": [
+                "img-0080.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_04.prefab"
+              ],
+              "description": "More of the tube. The main tunnel has a catwalk bridge leading to a side room.",
+              "images": [
+                "img-0081.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_05.prefab"
+              ],
+              "description": "Collapsed tunnels lead to the big open middle room, as well as some side rooms.",
+              "images": [
+                "img-0082.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_06.prefab"
+              ],
+              "description": "Different collapsed tunnels. Pairing this tile with HA 5 results in a very nice tunnel section of a level. Similarly leads to a big open middle room.",
+              "images": [
+                "img-0083.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_07.prefab"
+              ],
+              "description": "You thought there were no more tubes? You were wrong. Standard storage tiles are 30% tube. The dead end of the tunnel leads to a staircase leading up.",
+              "images": [
+                "img-0084.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage HA 8",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_08.prefab"
+              ],
+              "description": "The long hallway. There are 2 narrow hallways on the left and right sides.",
+              "images": [
+                "img-0085.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Storage hub HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_HA_01.prefab"
+              ],
+              "description": "Simple storage hub room with a central raised platform connecting to opposite sides of the room. 2 sides of the room can only be reached by climbing either stairs or a ladder R1B1, first zone R4C3, High, second last zone R5B3, Extreme, second zone R6B2, Main, zone with first checkpoint",
+              "images": [
+                "img-0086.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage hub HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_HA_02.prefab"
+              ],
+              "description": "Huge room with halls leading around from the left then front to right sides of the room. The middle space contains a raised structure. Several staircases lead up and down to different sections of the room. R4A2, Extreme, second zone (first zone after second Extreme bulkhead door)",
+              "images": [
+                "img-0087.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage hub HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_HA_03.prefab"
+              ],
+              "description": "The well-known R2B1 Alarm tile. Road-like paths lead around the middle platform. There are many ramps all over the room with shelving units in the center and many markers surround the perimeter of the room. In OG R2B1, this tile contained a Class IX Alarm, and in ALT R2B1, now contains a Class VII Alarm. R2B1, Apex Door Alarm zone R6D3, Main, the respawn zone with two tanks",
+              "images": [
+                "img-0088.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage hub HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_HA_04.prefab"
+              ],
+              "description": "3 story room. A tower with staircases leading to each floor. Catwalks go around the edges and through the center of the room. There's a hallway for the left room, and a 2 story room on the right. R2C1, first area after the unpowered door R3B1, hub area with apex door R5D1, Extreme/Secondary, hub area before the pMother",
+              "images": [
+                "img-0089.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage hub HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_HA_05.prefab"
+              ],
+              "description": "Despite being listed as a hub tile, it is actually an I tile. There are 2 small rooms on the left and right sides. R2E1, that really big room",
+              "images": [
+                "img-0090.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage hub VS 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_hub_VS_01.prefab"
+              ],
+              "description": "Basically hub HA 1's cooler brother. The tile is functionally the same in shape, but there is a large open space beneath the center platform. When viewing this tile in Unity, it contains an unused subgate in the bottom middle area of the tile. R6B2, Bulkhead room",
+              "images": [
+                "img-0091.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tutorial VS 02",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_tutorial_VS_02.prefab"
+              ],
+              "description": "Basically two boring storage rooms with a cool digsite-like tunnel in between. Important note: all the tiles created for the tutorial are very simple and bare bones, but this one has broken terminal spawns. R7 first tutorial room",
+              "images": [
+                "img-0092.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tutorial VS 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_tutorial_VS_01.prefab"
+              ],
+              "description": "Two basic storage rooms again, but this time it has a small extension with one very lonely spawn point for the locker. Probably the most \"playable\" of tutorial tiles. R7 Tutorial room with \"find the keycard\" minigame",
+              "images": [
+                "img-0093.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tutorial VS 03",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_tutorial_VS_03.prefab"
+              ],
+              "description": "A lot of rooms, and even more doors, but no spawn points for terminals and lockers. At least you can use it for ground spawns, right? R7 Tutorial room with sleepers",
+              "images": [
+                "img-0094.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Tutorial VS 04",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_tutorial_VS_04.prefab"
+              ],
+              "description": "Has a funky spawn for lockers where they all line up on the same wall. Also, there is no spawns for the terminals, sooo... R7 Tutorial room with the alarm",
+              "images": [
+                "img-0095.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage I HA 01 tutorial",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_I_HA_01_tutorial.prefab"
+              ],
+              "description": "Ctrl + C Ctrl + v of I HA 01 but without that spooky black mass on the ceiling. R7 Tutorial room before exp",
+              "images": [
+                "img-0096.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_I_HA_01.prefab"
+              ],
+              "description": "The \"charger room.\" The ceiling has a large hole in it with gunk in the ceiling. R4C3, High, final zone with fog turbine R5B3, High, first zone",
+              "images": [
+                "img-0097.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage Vault HA 1 v1 / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_vault_HA_01.prefab"
+              ],
+              "description": "The \"baby room.\" The tile has been modified and no longer has the Neonate HSU racks.",
+              "images": [
+                "img-0098.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_vault_v2_HA_01.prefab"
+              ],
+              "description": "Identical to version 1. Probably a mistake on 10cc's end. I believe they unintentionally overwrote the Neonate racks. R2E1, baby zone R5B3, Extreme, the blood door zones R6D1, Main, the third and last code R6D3, Overload, the last zone",
+              "images": [
+                "img-0098.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Storage Vault HA 1 v3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_vault_v3_HA_01.prefab"
+              ],
+              "description": "Destroyed version of the vault. Contains a proper spawn point for Flyer enemies. Also could be used as enemy spawn point. R6D3, Main, shadow error zone",
+              "images": [
+                "img-0099.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining Portal HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_portal_HA_01.prefab"
+              ],
+              "description": "Event Tile. Portal room. Using the MWP item will allow players to activate a teleport event. There's a possible passage forward, so in the way it's an I tile as well. R7C2, Extreme, First zone",
+              "images": [
+                "img-0100.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining Exit 1 / V2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_exit_01.prefab"
+              ],
+              "description": "Standard mining exit tile. Last zone of R2B1, R2B2, R3B1, R4A3, R4E1, R5A3, R5B3, R6A1, R6C3, and probably more",
+              "images": [
+                "img-0101.png",
+                "img-0102.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_exit_02.prefab"
+              ],
+              "description": "Extraction zone of R8B2, with some sands (assumably from dimension) added. Contains flyer spawnpoint behind the extraction scan.",
+              "images": [
+                "img-0101.png",
+                "img-0102.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining \"challenge\" Exit 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_challenge_01.prefab"
+              ],
+              "description": "This tile was used during demo testing. It is never used in the main game and the security door is an old model. The door can not be opened and it leads to a very narrow catwalk to a dead end. The door does *not* divide the rooms into 2 separate Nodes. The entire tile is a single Node, so alerting enemies on one side will alert both sides of the door. Extraction will spawn in front of the door.",
+              "images": [
+                "img-0103.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining HSU Exit 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_HSU_exit_01.prefab"
+              ],
+              "description": "An extraction tile filled with HSUs. Last zone of R5E1",
+              "images": [
+                "img-0104.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining HSU Exit R8E1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_HSU_exit_R8E1.prefab"
+              ],
+              "description": "R8E1 destroyed version of HSU Exit. The terminal at the center of the first screenshot below is built-in, and it's broken, not interactable. The green glow on the left hand side of the screenshot corresponds to a Shuttlebox. Although it's marked as an exit tile, I'm not sure if there's an align for extraction scan. I think there isn't.",
+              "images": [
+                "img-0105.png",
+                "img-0106.png",
+                "img-0107.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining Reactor Open HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_reactor_open_HA_01.prefab"
+              ],
+              "description": "Expansive room with no major structures. Reactor shutdown objective won't work on this tile without the aid of a plugin. This tile has a variant for R8E2, but I don't see any difference between them. Reactor in R3A3, R4E1 Extreme, R6D3 Main",
+              "images": [
+                "img-0108.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Mining Reactor HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_reactor_HA_02.prefab"
+              ],
+              "description": "Similar to the open reactor but with catwalks going all over the room. Reactor in R1D1, R2D2, R4D1, R5D1, R6D3 Overload",
+              "images": [
+                "img-0109.png"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "tech": {
+    "complexId": 3,
+    "data_center": {
+      "elevators": [
+        {
+          "name": "Data Center Tech Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab"
+              ],
+              "description": "There's a small looping path on the left side and an open space on the right side.",
+              "images": [
+                "img-0110.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Tech Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_02.prefab"
+              ],
+              "description": "Large open space on either side of the room. Not much can spawn in here. Elevator in R4A1, R6D1",
+              "images": [
+                "img-0111.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Tech Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_03.prefab"
+              ],
+              "description": "Narrow space with a double tunnel to the next room. Elevator in R4B3, R4C1, R5C3, R6D4",
+              "images": [
+                "img-0112.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Data Center HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab"
+              ],
+              "description": "The center room is a long hallway with varying structures. The left side has a series of linear hallways connecting the start and end of the center room. The right side is a mess of small rooms.",
+              "images": [
+                "img-0113.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_02.prefab"
+              ],
+              "description": "A hallway with ramps leading above the center path. This tile actually has 2 of this same room, with various smaller rooms around them.",
+              "images": [
+                "img-0114.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_03.prefab"
+              ],
+              "description": "This tile is the one with the huge destroyed pit in the middle, but depending on the marker it may look like this instead, and not be destroyed at all.",
+              "images": [
+                "img-0115.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_04.prefab"
+              ],
+              "description": "Winding tunnels wrap around a large rectangular center room.",
+              "images": [
+                "img-0116.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_05.prefab"
+              ],
+              "description": "The center has this long hallway, with a narrow hallway for the right side room. The left side has a more open room with a D shape.",
+              "images": [
+                "img-0117.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_06.prefab"
+              ],
+              "description": "A staircase leads above a door to the next room. To the left is a smaller room with a split tunnel leading to the end of the central room. The center room makes up most of the tile. There is a wide angled hallway on the right side.",
+              "images": [
+                "img-0118.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_07.prefab"
+              ],
+              "description": "Big J shaped room with several smaller rooms around the edges.",
+              "images": [
+                "img-0119.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 8",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_08.prefab"
+              ],
+              "description": "Large rectangular room. The middle room can spawn completely destroyed, but it has undamaged versions depending on Marker seeds.",
+              "images": [
+                "img-0120.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center HA 9",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_09.prefab"
+              ],
+              "description": "Large q shaped room next to a D shaped room. Tiny room in the corner.",
+              "images": [
+                "img-0121.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Data Center Destroyed HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_destroyed_HA_01.prefab"
+              ],
+              "description": "Massive pit in the center with gunk in the ceiling above. The paths around the room are severely damaged. Contains T-Scan path. R4C1, High, bulkhead hub zone R5A2, High, second zone R6D4, Main, third dimension, second zone",
+              "images": [
+                "img-0122.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Destroyed HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_destroyed_HA_02.prefab"
+              ],
+              "description": "Bridge tile over a large pit. Stairs lead up to the top floor with winding paths leading around the room. There's more ceiling juice. R4B3, Extreme, first zone R5A2, second last zone R6D4, Main, third dimension, first zone",
+              "images": [
+                "img-0123.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Hub SF 1 | ConduitVersion",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_SF_01.prefab"
+              ],
+              "description": "The picture says it all.",
+              "images": [
+                "img-0124.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_SF_ConduitVersion.prefab"
+              ],
+              "description": "Smaller version of the SF 1. It has one less floor, and a dead specimen on the middle tower v1: R5C3, High, last zone ConduitVersion: R6DX, Main, last zone",
+              "images": [
+                "img-0124.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center JG 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_JG_01.prefab"
+              ],
+              "description": "There are many floors to this room. The different paths eventually lead to a raised middle platform leading forward to the next room. It's very difficult to learn this tile and even harder to not get lost. Contains static bioscan points. R6D1, Main, second zone",
+              "images": [
+                "img-0125.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center JG 02 / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_JG_02_v2.prefab"
+              ],
+              "description": "R8C1 timed-terminal sequence tile. Similar to Data Center JG 1, the room is highly stratified. I don't notice if there's any difference between v1 and v2. V1: R8C1 main V2: R8C1 secondary",
+              "images": [
+                "img-0126.png",
+                "img-0127.png",
+                "img-0128.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_JG_02.prefab"
+              ],
+              "description": "V2:",
+              "images": [
+                "img-0126.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_02_JG.prefab"
+              ],
+              "description": "Straight room with two paths forward. Can only connect one zone, so it's just an I tile. R7D2, Main, first real zone",
+              "images": [
+                "img-0129.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_03_JG.prefab"
+              ],
+              "description": "Big forward transition room. Can only connect one zone, so it's just an I tile again. R7D2, Main, zone before blood door",
+              "images": [
+                "img-0130.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_04_JG.prefab"
+              ],
+              "description": "Basic data center hub. This geo is a bit broken and doesn't support every type of transition between room|zones, so be prepared to roll seeds when using this. R7D2, Main, hub zone with password terminal",
+              "images": [
+                "img-0131.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_05_JG.prefab"
+              ],
+              "description": "Forward, data center, but with blood. R7D2, Main, last rush zone before mainframe.",
+              "images": [
+                "img-0132.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_06_JG.prefab"
+              ],
+              "description": "Fun fact: this is actually a variation of HA_03 with a collapsed marker, but now there is a bridge and it is one room. It's also a hub. R7D2, Main, cell hunt zone",
+              "images": [
+                "img-0133.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition JG 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_07_JG.prefab"
+              ],
+              "description": "A long hallway with a speaker world event object. R7C1, main.",
+              "images": [
+                "img-0134.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center transition LF 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_07_LF.prefab"
+              ],
+              "description": "NOTE: this is actually a dead-end tile. Another long hallway, also with a speaker world event object. On the other side of the tile is a built-in fake sec door that you can't connect to an actual new zone. R7C2, main.",
+              "images": [
+                "img-0135.png",
+                "img-0136.png",
+                "img-0137.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Dead End HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_dead_end_HA_01.prefab"
+              ],
+              "description": "Causes many lines of this to spam in your console: [Warning:     Unity] The character used for Ellipsis is not available in font asset [Perfect DOS VGA 437 Win SDF]. These warnings do not actually negatively impact anything. R5A2, last zone with cargo R6C2, first objective terminal",
+              "images": [
+                "img-0138.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Data Center Mainframe Room 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_MainframeRoom_01.prefab"
+              ],
+              "description": "Dead end zone for mainframe objectives. This tile is weird and there are a lot of bugs with it. Also, it looks more like a garden than a data center. R7D2, last zone with mainframe",
+              "images": [
+                "img-0139.jpeg"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "labs": {
+      "elevators": [
+        {
+          "name": "Lab Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_01.prefab"
+              ],
+              "description": "The simplest of the lab elevators. A staircase leads to a dead end. Elevator to R5B2",
+              "images": [
+                "img-0140.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_02.prefab"
+              ],
+              "description": "Cylindrical lab structures fill the left side of the room, with an arched hallway on the right side. Elevator to R3A1, R4B2, R5C2",
+              "images": [
+                "img-0141.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_03.prefab"
+              ],
+              "description": "Big open space with a raised platform on one side and structures on the opposite side. Elevator to R3D1, R4D2, R6B1",
+              "images": [
+                "img-0142.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Lab HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_01.prefab"
+              ],
+              "description": "Big open space leading to a hallway on the opposite side.",
+              "images": [
+                "img-0143.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_02.prefab"
+              ],
+              "description": "Valid Generator Cluster tile. The edges of the main room have narrow walkways with railings, with ladders and stairs leading up both sides. While this tile is a standard tile, generator clusters actually can spawn if you change the Marker.",
+              "images": [
+                "img-0144.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_03.prefab"
+              ],
+              "description": "Valid Generator Cluster tile. Two very large open spaces separated by a trench. On the far end of the zone is a T shaped hallway, leading to a small hallway on the right side, then back to the main room. This tile can also have a generator cluster spawn if you change the marker.",
+              "images": [
+                "img-0145.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_04.prefab"
+              ],
+              "description": "Huge rectangular room with raised walkways around the edges. The right side room has the underground tunnel leading across the tile. The left room has a catwalk leading to the front room.",
+              "images": [
+                "img-0146.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 5",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_05.prefab"
+              ],
+              "description": "Stacked tile. The lower room has staircases leading to a double bridge, then leads up more stairs. The upper room has ramps leading up a raised central area, then dips back down on the other side. This tile can be used to have overlapping zones.",
+              "images": [
+                "img-0147.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 6 / Two R8 variants",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_06.prefab"
+              ],
+              "description": "Standard lab geomorph.",
+              "images": [
+                "img-0148.png",
+                "img-0149.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_06_R8B1.prefab"
+              ],
+              "description": "R8 variant: With more built-in corpses.",
+              "images": [
+                "img-0148.png",
+                "img-0149.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_06_R8B1_v2.prefab"
+              ],
+              "description": "R8 variant v2: Two narrow hallways lead to this large open space. The pillars don't always spawn, depending on the Marker seed used. R8 variant, with the 2 narrow hallways removed, making it an I-tile instead of X.",
+              "images": [
+                "img-0148.png",
+                "img-0149.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_07.prefab"
+              ],
+              "description": "Big T shaped room with a grid patterned walkway. To the right is a smaller square room, and to the left is a C shaped room.",
+              "images": [
+                "img-0150.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 8",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_08.prefab"
+              ],
+              "description": "Another large open room but with a smaller trench than in HA 3. There's a long hallway to the right side and a rectangular room on the front side.",
+              "images": [
+                "img-0151.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 9",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_09.prefab"
+              ],
+              "description": "A series of arched hallways around a square room.",
+              "images": [
+                "img-0152.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab HA 10 / R8 variant",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_10.prefab",
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_10_R8B1.prefab"
+              ],
+              "description": "Arched hallways connect each of the main rooms. To the right is a J shaped room connecting to the front of the tile. The left side has a triangle shaped room and a very short hallway. In its R8 variant, seemingly, the room on the right hand side of the picture below is removed. Not 100% sure if this is correct.",
+              "images": [
+                "img-0153.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Lab hub HA 1 v1 / v2 / R8B1 variant / v3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_01.prefab"
+              ],
+              "description": "Huge lab pillar room.",
+              "images": [
+                "img-0154.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_01_V2.prefab"
+              ],
+              "description": "Identical to v1 of the tile. One of them used to have a huge open space in the middle, but there is no difference in the current state.",
+              "images": [
+                "img-0154.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_01_R8B1.prefab"
+              ],
+              "description": "I don't see any notable difference comparing to v1, v2.",
+              "images": [
+                "img-0154.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_01_V3_LF.prefab"
+              ],
+              "description": "Pillars are replaced by datasphere shelves. v1 can have zones behind and in front only, whereas v2 can have zone branching from all sides v1: R3D1, pMother room R5A2, Overload, mother room v2: R5C2, Overload, S scan room v4: R8B4 datasphere room",
+              "images": [
+                "img-0154.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab hub HA 2 v1 / v2 / R8B1 variant",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_02.prefab"
+              ],
+              "description": "Valid Generator Cluster Tile. The generator cluster for tech maps. If the generator does not spawn, changing the Marker seed can fix it.",
+              "images": [
+                "img-0155.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_02_V2.prefab"
+              ],
+              "description": "The second version does not have the side rooms making it one big zone.",
+              "images": [
+                "img-0155.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_02_R8B1.prefab"
+              ],
+              "description": "The R8 variant is modified based on v1. It's added with some evil tentacles on the ceiling, and more corpses. v1: R4B3, Overload, first zone R4D2, Extreme, first zone, generator cluster zone R5C2, High, second zone, generator cluster zone R6D4, Main, second dimension, last zone R6D4, Main, third dimension, third v2: R7C1, Main, S scan alarm zone. Contains 1 static bioscan point.",
+              "images": [
+                "img-0155.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab hub HA 3 v1 / v2 / R8 variant",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_03.prefab"
+              ],
+              "description": "The huge room with 8 ladders.",
+              "images": [
+                "img-0156.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_03_V2.prefab"
+              ],
+              "description": "The second version does not have the side rooms, and the front room no longer has a door, making the entire tile a single Node instead of 6.",
+              "images": [
+                "img-0156.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_03_R8B1.prefab"
+              ],
+              "description": "The R8 version does not have side rooms as well, but the door separating front and back rooms is kept. v1: R4D2, High, third last zone, with many big chargers R5D2, High, zone with the Class IX diminished R6D4, Main, first dimension, third zone with cell R6D4, Main, third dimension, last zone with big chargers v2: R6C2, Secondary, first zone with the S scan. Contains 1 static bioscan point.",
+              "images": [
+                "img-0156.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab hub HA 4 v1 / v2 / v3 / v4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_04.prefab"
+              ],
+              "description": "Boss Align Tile. A central tower is connected to other raised parts of the room with stairs and bridges. \"SpawnPlacementType\": 1 will cause the enemy to appear in front of the bridge on the right side of the picture.",
+              "images": [
+                "img-0157.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_04_V2.prefab"
+              ],
+              "description": "The second version has added side areas on the left and right sides that are normally not present in version 1. It is currently untested if the boss align works in this version of the tile.",
+              "images": [
+                "img-0157.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_04_V3.prefab"
+              ],
+              "description": "Similar to v2, but it has extra stairs and paths on the sides. Why does this geo have so many versions?",
+              "images": [
+                "img-0157.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_04_V4_LF.prefab"
+              ],
+              "description": "Similar to v3, but added with T-scan points and probably Terminals that spawns with `SpecificTerminalSpawnsData` in levellayoutDB. v1: R4C1, High, second last zone with tank R5C2, Extreme, zone before last code v2: R6B1, Main, zone after first checkpoint V3: R7E1, Main, zone with Z scan",
+              "images": [
+                "img-0157.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab hub SF 02",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_SF_02.prefab"
+              ],
+              "description": "Broken tube in the middle with paths looping around it. And as you can see there is a lot of blood and ded pepes. R7C1, Main, \"Monster\" room. Contains 1 static bioscan point, positioned at the center of this tile.",
+              "images": [
+                "img-0158.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_I_HA_01.prefab"
+              ],
+              "description": "Straight room with various raised platforms around the room. Added a boss spawn align and a static bioscan spawnpoint (as shown in R8B1 Secondary). R4B1, Extreme, first zone, zone before reactor R5C2, Extreme, first zone, zone before reactor R6B1, Main, zone before portal R8B1, Secondary.",
+              "images": [
+                "img-0159.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab I HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_I_HA_02.prefab"
+              ],
+              "description": "HSU room filled with corpses. R4D2, Main, second to last zone",
+              "images": [
+                "img-0160.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab I HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_I_HA_03.prefab"
+              ],
+              "description": "The cool reactor bridge. Contains valid spawn points for Flyers, from below the bridge. The spawn points are probably removed in R7. R5D2, High, zone before reactor R6D1, Main, zone before reactor",
+              "images": [
+                "img-0161.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Dead End Room 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_Lab_dead_end_room_01.prefab"
+              ],
+              "description": "Event Tile. Used to transform objective items. 1 of the containers is randomly selected to be activated. R3A1, last zone",
+              "images": [
+                "img-0162.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Dead End Room 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_Lab_dead_end_room_02.prefab"
+              ],
+              "description": "Event Tile. Used to extract objective item data. Depending on the objective, you may either leave the item or take it with you.",
+              "images": [
+                "img-0163.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_Lab_dead_end_room_02_R8C2.prefab"
+              ],
+              "description": "R8C2 variant: R3D1, where you place the baby R4C1, High, where you place the datasphere R5C3, Extreme, last zone, where you place the datasphere",
+              "images": [
+                "img-0163.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Dead End 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_dead_end_HA_03.prefab"
+              ],
+              "description": "Simple dead end room. R5C2, Overload, the lockdown zones R6C2, Main, the disinfection station zone R6D4, Main, first dimension, the disinfection zone Also is littered everywhere in R6D4 as zones in lockdown",
+              "images": [
+                "img-0164.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Dead End 3 R7E1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_dead_end_HA_03_R7E1_03.prefab"
+              ],
+              "description": "Dirty dead end varian of HA_03, but with enemy spawn point. You can also see that the gunk is floating for some reason. R7E1, Main, zone after the bridge where you defend",
+              "images": [
+                "img-0165.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Hub LF 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_LF_01.prefab"
+              ],
+              "description": "X-tile. Notable R8B4 T-scan hub. Pretty huge, and stratified. Contains T-scan path. Contains flyer spawnpoint. Contains Specific terminals that could spawn via `SpecificTerminalSpawnDatas`",
+              "images": [
+                "img-0166.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab hub LF 03 R8C2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_LF_03_R8C2.prefab"
+              ],
+              "description": "Valid Generator Cluster tile. Notable R8C2 generator cluster. Needless to say, cool af.",
+              "images": [
+                "img-0167.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Portal HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_portal_HA_01.prefab"
+              ],
+              "description": "Event Tile. Portal room. Using the MWP item will allow players to activate a teleport event. There's a few corpses lying around.",
+              "images": [
+                "img-0168.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_portal_HA_02.prefab"
+              ],
+              "description": "Deprecated HA 02 tile. Identical to portal HA 1. Not tested to see if it functions. R6B1, Main, last zone",
+              "images": [
+                "img-0168.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Portal HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_portal_HA_03.prefab"
+              ],
+              "description": "Portal room. Using the MWP item will allow players to activate a teleport event. Almost identical to portal HA 1, but with no corpses. Functionally the same. R6D1, Main, last zone",
+              "images": [
+                "img-0169.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Exit 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_lab_exit_01.prefab"
+              ],
+              "description": "Standard exit for tech maps.",
+              "images": [
+                "img-0170.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Reactor HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_reactor_HA_01.prefab"
+              ],
+              "description": "Standard reactor for labs. In R8 a specific terminal spawn align is added, located right behind the reactor terminal. R4B1, Extreme, reactor zone R5A2, Extreme, not as a reactor zone, second zone R5C2, Extreme, reactor zone R6D1, Main, reactor zone R8B4, secondary.",
+              "images": [
+                "img-0171.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Lab Reactor HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_reactor_HA_02.prefab"
+              ],
+              "description": "Cool reactor for labs. R5D2, High, reactor zone",
+              "images": [
+                "img-0172.png"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "service": {
+    "complexId": 59,
+    "gardens": {
+      "elevators": [
+        {
+          "name": "Gardens Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_01.prefab"
+              ],
+              "description": "Just a simple wide open elevator with a happy little tree on the left side R7B1, start of the level if not obvious",
+              "images": [
+                "img-0207.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_02.prefab"
+              ],
+              "description": "Looks overgrown and half broken. There is also a ladder leading to the pit under the bridge. Elevator to R7D1",
+              "images": [
+                "img-0208.jpeg"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Gardens HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_HA_01.prefab"
+              ],
+              "description": "Like any garden tile, this is a three-story labyrinth that kills FPS, but the selling point of this is that its very versatile with markers R7B1, Main, first room after the hub zone",
+              "images": [
+                "img-0209.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_HA_02.prefab"
+              ],
+              "description": "Very large main section, but it also has very narrow side rooms. It has 3 floors, btw R7B1, Main, one of the key zones",
+              "images": [
+                "img-0210.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_HA_03.prefab"
+              ],
+              "description": "And this room is special for its especially large and deep lower part with trees and stones. Also, it has 2 floor in one of the side rooms instead of usual 3 R7D1, Main, First room (i think)",
+              "images": [
+                "img-0211.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens JG 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_JG_01.prefab"
+              ],
+              "description": "Flat platform with stairs leading to a balcony on the third floor. Is also not as big as most garden tiles. R7D1, Main, one of the zones with the terminal",
+              "images": [
+                "img-0212.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens JG 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_JG_02.prefab"
+              ],
+              "description": "The most compact geo of the garden. And in general one of the narrowest tiles in the game. R7B1, Main, zone before bridge alarm",
+              "images": [
+                "img-0213.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens SF 1 / R8D1 variant",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_SF_01.prefab"
+              ],
+              "description": "Biggest standard geo in the game, i think you can see it. It also has only one narrow side room.",
+              "images": [
+                "img-0214.jpeg"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_SF_01_R8D1.prefab"
+              ],
+              "description": "R8D1 variant, but a custom geo. There's an initially disabled Security Sensor. R7B1, Main, First zone",
+              "images": [
+                "img-0214.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens AW 1 / R8D1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_AW_01.prefab"
+              ],
+              "description": "Well, I am out of creative energy, so describe this tile for me.",
+              "images": [
+                "img-0215.jpeg"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_AW_01_R8D1.prefab"
+              ],
+              "description": "R8D1 variant, but used as custom geo. There're initially enabled built-in security sensors. Entrance to the zone (as long as this tile is built forward) has a world event object, which is a green visual wall that prevents players from passing through. R7B1, Main, zone with the stuff for Sh4ff32",
+              "images": [
+                "img-0215.jpeg"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Gardens I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_I_01.prefab"
+              ],
+              "description": "Event Tile. Bridge with the HSU depressurizer room on the left and a jungle under it. Also this zone has a T scan markers R7B1, Main, T scan room",
+              "images": [
+                "img-0216.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens bridge R8D1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_bridge_R8D1.prefab"
+              ],
+              "description": "2-sided bridge with initially enabled built-in security sensors. These sensors should be able to be reused, or turned off, using specific warden events, with `WorldEventObjectFilter` properly specified. There's an inaccessible HSU Activator on the left hand side of the tile.",
+              "images": [
+                "img-0217.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens hub HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_X_01.prefab"
+              ],
+              "description": "Large room. Well that's it really. Looks a bit like SF 1. R7B1, Main, Hub with shaffer's quest",
+              "images": [
+                "img-0218.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens Lab HSU Prep v1 / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_Lab_HSU_Prep_TestingFunc.prefab"
+              ],
+              "description": "Event Tile. Two floor room with a bunch of fun tech in the center making it look somewhat like a lab subcomplex. Also as of now I don't know if the terminal verify objective linked to this tile, so you will have to test it for yourself.",
+              "images": [
+                "img-0219.jpeg"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_Lab_HSU_Prep.prefab"
+              ],
+              "description": "Left side has more terminals on the left side of the room aside from that it's almost identical. R7D1 Main Hsu prep room.",
+              "images": [
+                "img-0219.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens Lab HSU Womb",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_Lab_HSU_Womb.prefab"
+              ],
+              "description": "Broken, but i guess its good for weapon|enemy tests Shit broke.",
+              "images": [
+                "img-0220.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens I 02 SF",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_I_02_SF.prefab"
+              ],
+              "description": "R8A1 opening.",
+              "images": [
+                "img-0221.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens VS 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_VS_01.prefab"
+              ],
+              "description": "NOTE: this is a T-tile. R8A1 second zone, denoting a vertically mirrored visual. In R8A2, you can find its rotated variants (yeah the only difference is it is ROTATED).",
+              "images": [
+                "img-0222.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_VS_01_R8A2.prefab"
+              ],
+              "description": "",
+              "images": [
+                "img-0222.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens Hub SF 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_hub_SF_01.prefab"
+              ],
+              "description": "R8A1 third zone. A small leading room connected to a garden with 2 doors. There're sth like culture rooms suspended in the garden. Contains a world event interaction object (i.e. shuttle box)",
+              "images": [
+                "img-0223.png",
+                "img-0224.png",
+                "img-0225.png",
+                "img-0226.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens deadend SF",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_dead_end_SF.prefab"
+              ],
+              "description": "A long hallway leading to a small room, in which in R8A1 you collect the MWP.",
+              "images": [
+                "img-0227.png",
+                "img-0228.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Gardens deadend SF R8D1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_dead_end_SF_R8D1.prefab"
+              ],
+              "description": "R8D1 variant of the deadend, with the door leading to the end a bit more closer to the zone's entrance.",
+              "images": [
+                "img-0229.png",
+                "img-0230.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways Exit 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_floodways_exit_01.prefab"
+              ],
+              "description": "Currently the only Service exit tile. Exit to R5A1, R6C1, R6D2",
+              "images": [
+                "img-0231.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Elevator Garden Exit 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_Gardens_exit_01.prefab"
+              ],
+              "description": "R8A1 opening tile with an elevator tile appended as exit tile. I am dumb - always have been",
+              "images": [
+                "img-0232.png",
+                "img-0233.png"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "floodways": {
+      "elevators": [
+        {
+          "name": "Floodways Elevator 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_01.prefab"
+              ],
+              "description": "A wide space that curves to the right. Elevator to R5A1, R6D2",
+              "images": [
+                "img-0173.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways Elevator 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_02.prefab"
+              ],
+              "description": "A staircase and ladder lead down into a pit with an overhead bridge leading away from the elevator. Elevator to R5C1",
+              "images": [
+                "img-0174.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways Elevator 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_03.prefab"
+              ],
+              "description": "A large rectangular space with a lower area to the left and 2 large tubes leading to the next area. Elevator to R6C1",
+              "images": [
+                "img-0175.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "standard": [
+        {
+          "name": "Floodways HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_01.prefab"
+              ],
+              "description": "The main room takes up most of the tile. An elevated area goes around most of the room while the lower area cuts straight across. The second room is a narrow L shaped hallway.",
+              "images": [
+                "img-0176.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_02.prefab"
+              ],
+              "description": "Very large hallway leading straight across the entire tile with a bridge overhead that connects the left and right rooms to the center room.",
+              "images": [
+                "img-0177.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_03.prefab"
+              ],
+              "description": "A complicated series of tunnels with an overlapping hallway with a catwalk floor that enemies can see you through. The left room is a long J shaped room with a staircase and ladder leading to a raised walkway. The far room is a rectangular shaped room with a deep pit with stairs and a ladder leading out of it.",
+              "images": [
+                "img-0178.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 4",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_04.prefab"
+              ],
+              "description": "Massive room with a narrow hallway that has 3 doors connecting to the main room.",
+              "images": [
+                "img-0179.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 5 / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_05.prefab"
+              ],
+              "description": "Another massive room. This tile is actually occasionally used as a custom tile. It has no side rooms at all. V2",
+              "images": [
+                "img-0180.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_05_V2.prefab"
+              ],
+              "description": "Used as a custom geo. There's an inaccessible platform on the right hand side of the tile, on which a nightmare scout is spawned in vanilla R8D2",
+              "images": [
+                "img-0180.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 6",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_06.prefab"
+              ],
+              "description": "Long room with a raised platform in the middle covered in plants that are difficult to see through. There's a short raised walkway on the left side. The right room is a short hallway with 3 doors connecting to the other rooms. The far room can have a structure on the left that is filled with plants, or two open spaces that count as one room.",
+              "images": [
+                "img-0181.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 7",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_07.prefab"
+              ],
+              "description": "1 short room with 2 much longer rooms. The middle room has a bridge that connects the first and last room with an elevated platform on the right side while the rest of the room has a deep pit. The last room has 2 ramps leading up to a bridge that passes across the room.",
+              "images": [
+                "img-0182.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 8",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_08.prefab"
+              ],
+              "description": "A large open room connected to the back rooms. The middle of the large room can have a drop pit with 2 ladders leading in.",
+              "images": [
+                "img-0183.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways HA 9",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_HA_09.prefab"
+              ],
+              "description": "A confusing tile. There is an overlapping hallway below the large ramp. The tile can be broken down into 3 winding hallways with the middle hallway overlapping with the far hallway.",
+              "images": [
+                "img-0184.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways SF 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_SF_01.prefab"
+              ],
+              "description": "The right room has a structure with stairs and a ladder leading up, and a small pit with many short staircases leading in. A ladder leads up to a pipe, leading out of the room to the left. The middle room is a simple large square room. The far room is a long L shaped hallway with a main hallway leading straight to the end, a middle narrow room with water and a small bridge, then another square space.",
+              "images": [
+                "img-0185.png"
+              ]
+            }
+          ]
+        }
+      ],
+      "custom": [
+        {
+          "name": "Floodways hub HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_HA_01.prefab"
+              ],
+              "description": "Very large room similar in structure to the standard HA 5 tile but with many raised platforms all over the room. R5C1, High, first respawn hub zone R6D2, Secondary, first zone",
+              "images": [
+                "img-0186.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways hub HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_HA_02.prefab"
+              ],
+              "description": "Event Tile. Very large room with a middle island that has a small room inside. The small room used to be separated by doors but the doors have been removed in the current version. If connected to the correct door, a T-Scan can be used for this tile that leads around the middle island and into the raised platform on the right side. R5C1, High, first respawn hub zone R6D2, Main, first zone",
+              "images": [
+                "img-0187.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways hub HA 3",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_HA_03.prefab"
+              ],
+              "description": "R5B4, High, second zone R6C1, Main, zone with 5 scouts R6D2, Main, zone with 5 charger scouts: In R8, a variant with built-in security sensors was introduced.",
+              "images": [
+                "img-0188.png",
+                "img-0189.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_HA_03_R8A2.prefab"
+              ],
+              "description": "Floodways version of the huge pillar room.",
+              "images": [
+                "img-0188.png",
+                "img-0189.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways hub SF 01 / R8D1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_SF_01.prefab"
+              ],
+              "description": "Event Tile. Probably the largest tile in the game. The top floor is a huge open space with an enormous spiral staircase leading all the way down. Most of the resources appear near the bottom. If a terminal is placed properly, a T-Scan can be used on this tile that leads from the bottom to the top of the room.",
+              "images": [
+                "img-0190.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_SF_01_R8D1.prefab"
+              ],
+              "description": "R8D1 variant: In R8D1 there're built-in security sensors which are initially enabled. By proper configuration it can be reused in your level. R6C1, Main, third last zone",
+              "images": [
+                "img-0190.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways hub SF 02",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_SF_02.prefab"
+              ],
+              "description": "In R8, 10cc introduced its variant with built-in security sensors.",
+              "images": [
+                "img-0191.jpeg",
+                "img-0192.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_SF_02_R8A2.prefab"
+              ],
+              "description": "A large room with stairs leading up to an upper floor. There's a small hidden room on the top floor, known to be John Schaeffer's hideout.",
+              "images": [
+                "img-0191.jpeg",
+                "img-0192.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways I HA 1",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_I_HA_01.prefab"
+              ],
+              "description": "Floodways version of the bridge tile. R5C1, High, zone between the respawn hubs",
+              "images": [
+                "img-0193.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways I HA 2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_I_HA_02.prefab"
+              ],
+              "description": "Long hallway with 2 raised platforms on either side. R5C1, High, first zone R6C1, Main, second last zone with Data Cube",
+              "images": [
+                "img-0194.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways  hub  I AW 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_AW_01.prefab"
+              ],
+              "description": "Hsu storage, but in floodways. It has a small room all the way at the bottom. It is also worth saying that despite the name it's not a hub, but in fact just an I tile. R7B3, High, last zone with hsu",
+              "images": [
+                "img-0195.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways  hub  I AW 01_V2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_AW_01_V2.prefab"
+              ],
+              "description": "Hub_AW_01 charger edition. At first it looks like the same tile, but with iconic charger ceiling dirtiness, but actually there are a couple of interesting details. Firstly, the entry point is a slide leading up, and secondly, there are very few light markers on it, which means that this room will always be quite dark. It also has two dead strikers if that's what you like R7B3, Overload, zone with cargo and black dudes",
+              "images": [
+                "img-0196.jpeg"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways Dead End HA 1 / R8A2 variant / v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_dead_end_HA_01.prefab"
+              ],
+              "description": "Simple dead end space. The first room has a very high ceiling. The second room has a ramp leading up to the ceiling.",
+              "images": [
+                "img-0197.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_dead_end_HA_01_R8A2.prefab"
+              ],
+              "description": "Simple dead end space but added with a world event chained puzzle. V2",
+              "images": [
+                "img-0197.png"
+              ]
+            },
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_dead_end_HA_01_v2.prefab"
+              ],
+              "description": "I don't know if there's any difference compared to v1. R6C1, Main, first and second Data Cube zone R6D2, Secondary, last zone with tank",
+              "images": [
+                "img-0197.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways Dead End HA 02",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_dead_end_HA_02.prefab"
+              ],
+              "description": "Dead end variant with a small platform.",
+              "images": [
+                "img-0198.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways VS 02 Control Room",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_VS_02_ControlRoom.prefab"
+              ],
+              "description": "A long hallway with small platforms on 2 sides.",
+              "images": [
+                "img-0199.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways VS 03 Control Room",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_VS_03_ControlRoom.prefab"
+              ],
+              "description": "Just a flipped version of VS 02 Control Room.",
+              "images": [
+                "img-0200.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways VS 01",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_VS_01.prefab"
+              ],
+              "description": "The huge hub in R8A2, where you find the secret terminal and navigate to R8A2 secondary.",
+              "images": [
+                "img-0201.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways I HA 03 v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_I_HA_03_v2.prefab"
+              ],
+              "description": "R8D2 passage to mega-huge pmother fight. I tile passage. Featured with altitude raise. By dropping into the pipe at the end, players are meant to not be able to go back to the previous zones. However, enemies are ABLE to travel through the sewer beside the ladder. Contains built-in mother's tumors.",
+              "images": [
+                "img-0202.png",
+                "img-0203.png",
+                "img-0204.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways hub HA 03 v2",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_hub_HA_03_V2.prefab"
+              ],
+              "description": "X-tile. R8D2 mega-huge pmother fight. Contains built-in tumors. There should be an align for spawning the mega-huge pmother.",
+              "images": [
+                "img-0205.png"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Floodways I HA 04",
+          "variants": [
+            {
+              "prefabs": [
+                "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_I_HA_04.prefab"
+              ],
+              "description": "R8D2 reservoir (cooling tanks). Contains 2 scan aligns, one for the normal scan at the center and the other for the T-scan around the periphery. You should be able to reuse them by the same means as in vanilla.",
+              "images": [
+                "img-0206.png"
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

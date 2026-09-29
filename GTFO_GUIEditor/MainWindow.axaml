@@ -30,12 +30,411 @@
                 </ScrollViewer>
             </TabItem>
             <TabItem Header="Alarms">
-                <ScrollViewer Margin="10">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="Alarms Configuration" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="Configure security door alarms and scan settings." TextWrapping="Wrap"/>
-                    </StackPanel>
-                </ScrollViewer>
+                <Panel DataContext="{Binding Alarms}" x:DataType="vm:AlarmsViewModel">
+                    <Grid RowDefinitions="Auto,*" Margin="10">
+                        <!-- Top Bar: Alarm Selection and Creation -->
+                        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Alarm:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding Alarms}"
+                                          SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                
+                                <Button Grid.Column="2"
+                                        Content="+ Create New Alarm"
+                                        Command="{Binding OpenCreateAlarmDialog}"
+                                        Margin="10,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+
+                                <Button Grid.Column="3"
+                                        Content="- Delete Alarm"
+                                        Command="{Binding RequestDeleteSelectedAlarm}"
+                                        IsEnabled="{Binding HasSelectedAlarm}"
+                                        Margin="8,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+                                        
+                                <TextBlock Grid.Column="4"
+                                           Text="{Binding StatusText}"
+                                           VerticalAlignment="Center"
+                                           Margin="12,0,0,0"
+                                           Foreground="#AAAAAA"
+                                           FontSize="12"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Main Editor Area (when an alarm is selected) -->
+                        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedAlarm}">
+                            <ScrollViewer Margin="0">
+                                <StackPanel Spacing="14">
+                                    <!-- Duplicate ID Warning Banner -->
+                                    <Border Background="#3A1C1C"
+                                            BorderBrush="#FF6B6B"
+                                            BorderThickness="1"
+                                            CornerRadius="4"
+                                            Padding="10,8"
+                                            IsVisible="{Binding HasDuplicatePersistentId}">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                                       Foreground="#FF6B6B"
+                                                       FontWeight="SemiBold"
+                                                       FontSize="12"
+                                                       TextWrapping="Wrap"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 1: General & Identification -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                                <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Column="1" Text="{Binding SelectedAlarm.Name, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                <TextBlock Grid.Column="2" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Column="3" Text="{Binding SelectedAlarm.PersistentId, Mode=TwoWay}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 2: Wave Roles (Enemy Selection) -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="Wave Roles (Enemy Selection)" FontWeight="Bold" FontSize="14"/>
+                                            <TextBlock Text="Select which enemies will spawn for each wave role." Foreground="Gray" FontSize="12"/>
+
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                                <!-- Row 0: Weakling & Standard -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                                          ItemsSource="{Binding Enemies}"
+                                                          SelectedValue="{Binding SelectedAlarm.WaveRoleWeakling, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,16,8">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <ComboBox Grid.Row="0" Grid.Column="3"
+                                                          ItemsSource="{Binding Enemies}"
+                                                          SelectedValue="{Binding SelectedAlarm.WaveRoleStandard, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,0,8">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <!-- Row 1: Special & MiniBoss -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="1"
+                                                          ItemsSource="{Binding Enemies}"
+                                                          SelectedValue="{Binding SelectedAlarm.WaveRoleSpecial, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,16,8">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="MiniBoss:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="3"
+                                                          ItemsSource="{Binding Enemies}"
+                                                          SelectedValue="{Binding SelectedAlarm.WaveRoleMiniBoss, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,0,8">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+
+                                                <!-- Row 2: Boss -->
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <ComboBox Grid.Row="2" Grid.Column="1"
+                                                          ItemsSource="{Binding Enemies}"
+                                                          SelectedValue="{Binding SelectedAlarm.WaveRoleBoss, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,16,0">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 3: Survival Wave Settings - Timing & Group Pauses -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="Wave Timing &amp; Pauses" FontWeight="Bold" FontSize="14"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                                <!-- Row 0: Pause Before Start & Pause Between Groups -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Pause Before Start (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PauseBeforeStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Pause Between Groups (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PauseBetweenGroups, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 1: Wave Pause Min & Max -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Wave Pause Min (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Pause Max (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 2: Wave Pause Min at Cost & Wave Pause Max at Cost -->
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Wave Pause Min at Cost:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin_AtCost, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Wave Pause Max at Cost:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax_AtCost, Mode=TwoWay}"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 4: Population Filter -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="Population Filter" FontWeight="Bold" FontSize="14"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                                <TextBlock Grid.Column="0" Text="Filter Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <ComboBox Grid.Column="1"
+                                                          ItemsSource="{x:Static vm:AlarmsViewModel.AvailableFilterTypes}"
+                                                          SelectedItem="{Binding SelectedAlarm.FilterType, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,16,0"/>
+                                            </Grid>
+
+                                            <!-- Filter Modes text directly above its buttons -->
+                                            <StackPanel Spacing="6" Margin="0,4,0,0">
+                                                <TextBlock Text="Filter Modes:" VerticalAlignment="Center"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="16">
+                                                    <CheckBox Content="Weakling" IsChecked="{Binding SelectedAlarm.FilterWeakling, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Standard" IsChecked="{Binding SelectedAlarm.FilterStandard, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Special" IsChecked="{Binding SelectedAlarm.FilterSpecial, Mode=TwoWay}"/>
+                                                    <CheckBox Content="MiniBoss" IsChecked="{Binding SelectedAlarm.FilterMiniBoss, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Boss" IsChecked="{Binding SelectedAlarm.FilterBoss, Mode=TwoWay}"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 5: Spawn Direction & Spawn Type -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="Spawn Direction &amp; Type" FontWeight="Bold" FontSize="14"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                                                <!-- Row 0: Direction Randomization -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Randomize Direction / Wave:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerWave, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Randomize Direction / Group:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerGroup, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 1: Override Spawn Type & Survival Wave Spawn Type -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Override Spawn Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedAlarm.OverrideWaveSpawnType, Mode=TwoWay}" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Spawn Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <ComboBox Grid.Row="1" Grid.Column="3"
+                                                          ItemsSource="{x:Static vm:AlarmsViewModel.AvailableWaveSpawnTypes}"
+                                                          SelectedItem="{Binding SelectedAlarm.SurvivalWaveSpawnType, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Group 6: Population Points & Ramp -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                        <StackPanel Spacing="10">
+                                            <TextBlock Text="Population Points &amp; Ramp" FontWeight="Bold" FontSize="14"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,5,0,0">
+                                                <!-- Row 0: Total Points & Ramp Time -->
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Population Points Total:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsTotal, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Population Ramp Over Time (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationRampOverTime, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 1: Wave Points Start & End -->
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Points Per Wave (Start):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerWaveStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Points Per Wave (End):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerWaveEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 2: Group Points Start & End -->
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Points Per Group (Start):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerGroupStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Points Per Group (End):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerGroupEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <!-- Row 3: Min Points Per Group -->
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Min Points Per Group:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsMinPerGroup, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+
+                        <!-- Create Alarm Modal Dialog Overlay -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsCreatingAlarm}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#1E1E1E"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="20"
+                                    Width="480"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 16 0 #000000">
+                                <StackPanel Spacing="14">
+                                    <TextBlock Text="Create New Alarm"
+                                               FontWeight="Bold"
+                                               FontSize="16"/>
+
+                                    <TextBlock Text="Choose how you want to create the new alarm:"
+                                               Foreground="LightGray"
+                                               FontSize="12"/>
+
+                                    <!-- Option: Blank or Template -->
+                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                                        <StackPanel Spacing="10">
+                                            <RadioButton Content="Create a new fresh (blank) alarm"
+                                                         IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                                            <RadioButton Content="Use an existing alarm as a template"
+                                                         IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+
+                                            <!-- Template Selector -->
+                                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
+                                                <TextBlock Text="Select Alarm Template:" FontSize="12" Foreground="LightGray"/>
+                                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Name and PersistentID -->
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewAlarmName, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewAlarmPersistentId, Mode=TwoWay}"/>
+                                    </Grid>
+
+                                    <!-- Error Message Banner -->
+                                    <TextBlock Text="{Binding CreationErrorMessage}"
+                                               Foreground="#FF6B6B"
+                                               IsVisible="{Binding HasCreationErrorMessage}"
+                                               FontSize="12"/>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                        <Button Content="Cancel"
+                                                Command="{Binding CancelCreateAlarm}"
+                                                Padding="14,6"/>
+                                        <Button Content="Create Alarm"
+                                                Command="{Binding ConfirmCreateAlarm}"
+                                                Classes="accent"
+                                                Padding="14,6"
+                                                FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+
+                        <!-- Delete Alarm Modal Confirmation Overlay -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsConfirmingDelete}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#1E1E1E"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    Padding="20"
+                                    Width="440"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 16 0 #000000">
+                                <StackPanel Spacing="14">
+                                    <TextBlock Text="Confirm Delete Alarm"
+                                               FontWeight="Bold"
+                                               FontSize="16"
+                                               Foreground="#FF6B6B"/>
+
+                                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                                               TextWrapping="Wrap"
+                                               FontSize="13"/>
+
+                                    <TextBlock Text="This action will remove the alarm from the configuration. This cannot be undone."
+                                               Foreground="Gray"
+                                               TextWrapping="Wrap"
+                                               FontSize="12"/>
+
+                                    <!-- Action Buttons -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                                        <Button Content="Cancel"
+                                                Command="{Binding CancelDeleteAlarm}"
+                                                Padding="14,6"/>
+                                        <Button Content="Delete"
+                                                Command="{Binding ConfirmDeleteAlarm}"
+                                                Background="#D32F2F"
+                                                Foreground="White"
+                                                Padding="14,6"
+                                                FontWeight="SemiBold"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </Panel>
             </TabItem>
             <TabItem Header="Complex Resource Sets">
                 <Panel DataContext="{Binding ComplexResourceSets}" x:DataType="vm:ComplexResourceSetsViewModel">
@@ -376,12 +775,129 @@
                 </Panel>
             </TabItem>
             <TabItem Header="Geomorphs">
-                <ScrollViewer Margin="10">
-                    <StackPanel Spacing="10">
-                        <TextBlock Text="Geomorphs" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Text="View vanilla Geomorphs and add custom prefabs." TextWrapping="Wrap"/>
-                    </StackPanel>
-                </ScrollViewer>
+                <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="10" DataContext="{Binding Geomorphs}" x:DataType="vm:GeomorphsViewModel">
+                    <TextBlock Grid.Row="0" Text="Geomorphs" FontWeight="Bold" FontSize="16" Margin="0,0,0,6"/>
+                    <TextBlock Grid.Row="1" Text="Browse vanilla Geomorphs. Click a prefab path to copy it to clipboard. Hover over image previews to view a screenshot of the geomorph." TextWrapping="Wrap" Margin="0,0,0,10"/>
+                    <TextBlock Grid.Row="2" Text="The content on this page is taken from the 'All Geomorphs' document, with permission from its creator and maintainers ProjectZaero and GhostlyMire." TextWrapping="Wrap" Margin="0,0,0,10"/>
+                    <Grid Grid.Row="3" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+                        <TextBlock Grid.Column="0" Text="Search:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+                        <TextBox Grid.Column="1" 
+                                 Text="{Binding SearchText, Mode=TwoWay}" 
+                                 Watermark="Search by name, prefab, description, complex, sub-complex..."
+                                 VerticalAlignment="Center"/>
+                        <TextBlock Grid.Column="2" 
+                                   Text="{Binding StatusText}" 
+                                   VerticalAlignment="Center" 
+                                   Margin="10,0,0,0" 
+                                   Foreground="Gray" 
+                                   FontSize="12"/>
+                    </Grid>
+
+                    <TabControl Grid.Row="4" ItemsSource="{Binding Complexes}">
+                        <TabControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:GeomorphComplexViewModel">
+                                <TextBlock Text="{Binding Name}" FontWeight="SemiBold"/>
+                            </DataTemplate>
+                        </TabControl.ItemTemplate>
+                        <TabControl.ContentTemplate>
+                            <DataTemplate x:DataType="vm:GeomorphComplexViewModel">
+                                <TabControl ItemsSource="{Binding SubComplexes}" Margin="0,4,0,0">
+                                    <TabControl.ItemTemplate>
+                                        <DataTemplate x:DataType="vm:GeomorphSubComplexViewModel">
+                                            <TextBlock Text="{Binding Name}"/>
+                                        </DataTemplate>
+                                    </TabControl.ItemTemplate>
+                                    <TabControl.ContentTemplate>
+                                        <DataTemplate x:DataType="vm:GeomorphSubComplexViewModel">
+                                            <TabControl ItemsSource="{Binding Categories}" Margin="0,4,0,0">
+                                                <TabControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="vm:GeomorphCategoryViewModel">
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                    </DataTemplate>
+                                                </TabControl.ItemTemplate>
+                                                <TabControl.ContentTemplate>
+                                                    <DataTemplate x:DataType="vm:GeomorphCategoryViewModel">
+                                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Margin="0,4,0,0">
+                                                            <DataGrid ItemsSource="{Binding FilteredGeomorphs}"
+                                                                      SelectedItem="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).Geomorphs.SelectedGeomorph, Mode=TwoWay}"
+                                                                      AutoGenerateColumns="False"
+                                                                      IsReadOnly="True"
+                                                                      GridLinesVisibility="All"
+                                                                      CanUserResizeColumns="True"
+                                                                      CanUserReorderColumns="True"
+                                                                      CanUserSortColumns="True"
+                                                                      CellPointerPressed="GeomorphsDataGrid_CellPointerPressed">
+                                                                <DataGrid.Columns>
+                                                                    <DataGridTextColumn Header="Name" Binding="{Binding DisplayName}" Width="1.5*"/>
+                                                                    <DataGridTextColumn Header="Prefab Path" Binding="{Binding PrefabPath}" Width="3.5*"/>
+                                                                    <DataGridTemplateColumn Header="Description" Width="5*">
+                                                                        <DataGridTemplateColumn.CellTemplate>
+                                                                            <DataTemplate x:DataType="models:GeomorphEntry">
+                                                                                <TextBlock Classes="desc-text"
+                                                                                           Text="{Binding Description}"
+                                                                                           TextWrapping="NoWrap"
+                                                                                           TextTrimming="CharacterEllipsis"
+                                                                                           VerticalAlignment="Center"
+                                                                                           Margin="8,4">
+                                                                                    <ToolTip.Tip>
+                                                                                        <Border Background="#1E1E1E" BorderBrush="#555555" BorderThickness="1" CornerRadius="4" Padding="8" MaxWidth="500">
+                                                                                            <TextBlock Text="{Binding Description}" TextWrapping="Wrap" Foreground="#CCCCCC" FontSize="12"/>
+                                                                                        </Border>
+                                                                                    </ToolTip.Tip>
+                                                                                </TextBlock>
+                                                                            </DataTemplate>
+                                                                        </DataGridTemplateColumn.CellTemplate>
+                                                                    </DataGridTemplateColumn>
+                                                                    <DataGridTemplateColumn Header="Image" Width="90">
+                                                                        <DataGridTemplateColumn.CellTemplate>
+                                                                            <DataTemplate x:DataType="models:GeomorphEntry">
+                                                                                <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                                                    <Border IsVisible="{Binding HasImage}"
+                                                                                            Background="#2D2D30"
+                                                                                            BorderBrush="#444444"
+                                                                                            BorderThickness="1"
+                                                                                            CornerRadius="3"
+                                                                                            Padding="6,2"
+                                                                                            Cursor="Hand">
+                                                                                        <ToolTip.Tip>
+                                                                                            <Border Background="#1E1E1E" BorderBrush="#555555" BorderThickness="1" CornerRadius="4" Padding="6">
+                                                                                                <Panel>
+                                                                                                    <Image Source="{Binding ImageBitmap}"
+                                                                                                           MaxWidth="1100"
+                                                                                                           MaxHeight="620"
+                                                                                                           Stretch="Uniform"
+                                                                                                           IsVisible="{Binding HasImageBitmap}"/>
+                                                                                                    <TextBlock Text="Image preview not found on disk"
+                                                                                                               Foreground="#888888"
+                                                                                                               FontStyle="Italic"
+                                                                                                               FontSize="12"
+                                                                                                               Margin="10"
+                                                                                                               IsVisible="{Binding !HasImageBitmap}"/>
+                                                                                                </Panel>
+                                                                                            </Border>
+                                                                                        </ToolTip.Tip>
+                                                                                        <StackPanel Orientation="Horizontal" Spacing="4">
+                                                                                             <TextBlock Text="Hover" FontSize="11" Foreground="#9CDCFE" VerticalAlignment="Center"/>
+                                                                                        </StackPanel>
+                                                                                    </Border>
+                                                                                    <TextBlock Text="—" Foreground="#666666" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasImage}"/>
+                                                                                </Panel>
+                                                                            </DataTemplate>
+                                                                        </DataGridTemplateColumn.CellTemplate>
+                                                                    </DataGridTemplateColumn>
+                                                                </DataGrid.Columns>
+                                                            </DataGrid>
+                                                        </Border>
+                                                    </DataTemplate>
+                                                </TabControl.ContentTemplate>
+                                            </TabControl>
+                                        </DataTemplate>
+                                    </TabControl.ContentTemplate>
+                                </TabControl>
+                            </DataTemplate>
+                        </TabControl.ContentTemplate>
+                    </TabControl>
+                </Grid>
             </TabItem>
             <TabItem Header="Sounds">
                 <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="10" DataContext="{Binding Sounds}" x:DataType="vm:SoundsViewModel">

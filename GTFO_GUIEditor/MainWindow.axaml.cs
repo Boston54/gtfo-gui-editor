@@ -22,4 +22,20 @@ public partial class MainWindow : Window
             }
         }
     }
+
+    private async void GeomorphsDataGrid_CellPointerPressed(object? sender, DataGridCellPointerPressedEventArgs e)
+    {
+        if (e.Column?.Header?.ToString() == "Image")
+        {
+            return;
+        }
+
+        if (e.Row?.DataContext is GeomorphEntry geomorph)
+        {
+            if (DataContext is MainWindowViewModel mainVm)
+            {
+                await mainVm.Geomorphs.CopyPrefabPathAsync(geomorph);
+            }
+        }
+    }
 }

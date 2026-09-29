@@ -77,3 +77,32 @@ public enum ShardType
     S19,
     S20
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum SurvivalWaveSpawnType
+{
+    InRelationToClosestAlivePlayer,
+    InSuppliedCourseNodeZone,
+    InSuppliedCourseNode,
+    InSuppliedCourseNode_OnPosition,
+    ClosestToSuppliedNodeButNoBetweenPlayers,
+    OnSpawnPoints,
+    FromElevatorDirection
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum WaveFilterType
+{
+    Include,
+    Exclude
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum WaveEnemyType
+{
+    Weakling,
+    Standard,
+    Special,
+    MiniBoss,
+    Boss
+}
