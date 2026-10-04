@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 0.00016050944,
+          "expanderPosition": {
+            "x": -0.0069880793,
+            "y": -0.07,
+            "z": 4.35
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99983,
+          "expanderPosition": {
+            "x": 9.1552734E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 0.00016050944,
+          "expanderPosition": {
+            "x": -0.0069880793,
+            "y": -0.07,
+            "z": 4.35
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_dead_end_SF.prefab",
+  "modDependency": null
+}

@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 179.99997,
+          "expanderPosition": {
+            "x": 0,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 0.00036200005,
+          "expanderPosition": {
+            "x": 0,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.999916,
+          "expanderPosition": {
+            "x": 32.000004,
+            "y": 0,
+            "z": 4.386902E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.00034,
+          "expanderPosition": {
+            "x": -32.000004,
+            "y": 0,
+            "z": -4.386902E-05
+          },
+          "direction": "Left"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_Lab_HSU_Womb.prefab",
+  "modDependency": null
+}

@@ -1,0 +1,46 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 0.0003329717,
+          "expanderPosition": {
+            "x": -6.6757193E-06,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180,
+          "expanderPosition": {
+            "x": 6.6757193E-06,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -6.6757193E-06
+          },
+          "direction": "Left"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_SF_01_R8D1.prefab",
+  "modDependency": null
+}

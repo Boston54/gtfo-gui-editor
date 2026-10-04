@@ -106,3 +106,23 @@ public enum WaveEnemyType
     MiniBoss,
     Boss
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ExpeditionAccessibility
+{
+    Normal,
+    AlwayBlock,
+    AlwaysAllow,
+    BlockedAndScrambled,
+    UseCustomProgressionLock,
+    UnlockedByExpedition
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DoorType
+{
+    RoomDoor,
+    SecurityDoor,
+    SecondaryDoor,
+    OverloadDoor
+}

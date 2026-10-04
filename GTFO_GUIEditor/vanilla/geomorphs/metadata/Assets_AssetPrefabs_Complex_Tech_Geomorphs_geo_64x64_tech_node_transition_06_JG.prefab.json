@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 89.99954,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 0.0002026496
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 269.9996,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -0.0002026496
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -0.00040468868,
+          "expanderPosition": {
+            "x": -0.00018882749,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99966,
+          "expanderPosition": {
+            "x": 0.00018882749,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_node_transition_06_JG.prefab",
+  "modDependency": null
+}

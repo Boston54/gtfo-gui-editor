@@ -1,0 +1,106 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 179.99983,
+          "expanderPosition": {
+            "x": 9.346008E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 90.00033,
+          "expanderPosition": {
+            "x": -5.040036,
+            "y": -0.059,
+            "z": -13.169987
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 270.00067,
+          "expanderPosition": {
+            "x": 3.4699638,
+            "y": -0.173,
+            "z": -13.200009
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 90.00033,
+          "expanderPosition": {
+            "x": -5.040036,
+            "y": -0.059,
+            "z": -13.169987
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 270.00067,
+          "expanderPosition": {
+            "x": 3.4699638,
+            "y": -0.173,
+            "z": -13.200009
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.00018,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -9.346008E-05
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.99983,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 9.346008E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -0.00016050944,
+          "expanderPosition": {
+            "x": 0.009906769,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_hub_SF_01.prefab",
+  "modDependency": null
+}

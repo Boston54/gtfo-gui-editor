@@ -1,0 +1,130 @@
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
+
+namespace GTFO_GUIEditor.Models;
+
+public class DimensionLayoutBlock : INotifyPropertyChanged
+{
+    private string _dimensionIndex = "Dimension_1";
+    private string _name = "Dimension 1";
+    private bool _internalEnabled = true;
+    private uint _complexResourceSet;
+    private string _dimensionGeomorph = string.Empty;
+    private uint _levelLayoutData;
+    private string _tileCategory = "Dimension Geomorph";
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    [JsonPropertyName("DimensionIndex")]
+    public string DimensionIndex
+    {
+        get => _dimensionIndex;
+        set
+        {
+            if (SetField(ref _dimensionIndex, value))
+            {
+                OnPropertyChanged(nameof(DisplayText));
+            }
+        }
+    }
+
+    [JsonPropertyName("name")]
+    public string Name
+    {
+        get => _name;
+        set
+        {
+            if (SetField(ref _name, value))
+            {
+                OnPropertyChanged(nameof(DisplayText));
+            }
+        }
+    }
+
+    [JsonPropertyName("internalEnabled")]
+    public bool InternalEnabled
+    {
+        get => _internalEnabled;
+        set => SetField(ref _internalEnabled, value);
+    }
+
+    [JsonPropertyName("ComplexResourceSet")]
+    public uint ComplexResourceSet
+    {
+        get => _complexResourceSet;
+        set
+        {
+            if (SetField(ref _complexResourceSet, value))
+            {
+                OnPropertyChanged(nameof(DimensionResourceSetID));
+            }
+        }
+    }
+
+    [JsonPropertyName("DimensionResourceSetID")]
+    public uint DimensionResourceSetID
+    {
+        get => _complexResourceSet;
+        set
+        {
+            if (SetField(ref _complexResourceSet, value))
+            {
+                OnPropertyChanged(nameof(ComplexResourceSet));
+            }
+        }
+    }
+
+    [JsonPropertyName("DimensionGeomorph")]
+    public string DimensionGeomorph
+    {
+        get => _dimensionGeomorph;
+        set => SetField(ref _dimensionGeomorph, value);
+    }
+
+    [JsonPropertyName("LevelLayoutData")]
+    public uint LevelLayoutData
+    {
+        get => _levelLayoutData;
+        set => SetField(ref _levelLayoutData, value);
+    }
+
+    [JsonPropertyName("TileCategory")]
+    public string TileCategory
+    {
+        get => _tileCategory;
+        set => SetField(ref _tileCategory, value);
+    }
+
+    [JsonIgnore]
+    public string DisplayText => string.IsNullOrWhiteSpace(Name)
+        ? DimensionIndex
+        : Name;
+
+    public DimensionLayoutBlock Clone()
+    {
+        return new DimensionLayoutBlock
+        {
+            DimensionIndex = DimensionIndex,
+            Name = Name,
+            InternalEnabled = InternalEnabled,
+            ComplexResourceSet = ComplexResourceSet,
+            DimensionGeomorph = DimensionGeomorph,
+            LevelLayoutData = LevelLayoutData,
+            TileCategory = TileCategory
+        };
+    }
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (System.Collections.Generic.EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
+}

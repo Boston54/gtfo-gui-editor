@@ -1,0 +1,15 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": []
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Dimensions/PouncerArena/Dimension_Pouncer_Arena_01.prefab",
+  "modDependency": null
+}

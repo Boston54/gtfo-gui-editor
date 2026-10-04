@@ -1,0 +1,26 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 180.00012,
+          "expanderPosition": {
+            "x": -7.247925E-05,
+            "y": 0,
+            "z": -31.96405
+          },
+          "direction": "Backwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_portal_HA_03.prefab",
+  "modDependency": null
+}

@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 0.00013318869,
+          "expanderPosition": {
+            "x": -0.012969974,
+            "y": 0,
+            "z": 32.03601
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.00013,
+          "expanderPosition": {
+            "x": 31.986958,
+            "y": 0,
+            "z": 0.035938263
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.00012,
+          "expanderPosition": {
+            "x": -0.013114933,
+            "y": 0,
+            "z": -31.96399
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.0001,
+          "expanderPosition": {
+            "x": -32.013042,
+            "y": 0,
+            "z": 0.036045074
+          },
+          "direction": "Left"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_lab_reactor_HA_02.prefab",
+  "modDependency": null
+}

@@ -21,6 +21,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <AvaloniaResource Include="Assets\**" />
       <Folder Include="vanilla\sounds\" />
       <None Update="vanilla\**\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -29,4 +30,5 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+
 </Project>

@@ -1,0 +1,266 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 3,
+          "y_angle": 0.040028375,
+          "expanderPosition": {
+            "x": 5.4719777,
+            "y": 8.040386,
+            "z": 11.244162
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 240.04036,
+          "expanderPosition": {
+            "x": 14.52862,
+            "y": 0.13712199,
+            "z": 16.380306
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 180.04036,
+          "expanderPosition": {
+            "x": 3.8910296,
+            "y": -5.0445986,
+            "z": -8.940183
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 270.0402,
+          "expanderPosition": {
+            "x": 10.029567,
+            "y": -5.103488,
+            "z": -20.954369
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 270.0399,
+          "expanderPosition": {
+            "x": 1.6247141,
+            "y": 9.485973,
+            "z": -0.064732045
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.04051,
+          "expanderPosition": {
+            "x": 32.001633,
+            "y": -0.036330808,
+            "z": -0.030792525
+          },
+          "direction": "Right"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 2,
+          "y_angle": 180.04045,
+          "expanderPosition": {
+            "x": -4.8911004,
+            "y": -5.19232,
+            "z": -18.88444
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 180.04045,
+          "expanderPosition": {
+            "x": -28.158155,
+            "y": -0.0013793856,
+            "z": -8.95825
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 0.040171813,
+          "expanderPosition": {
+            "x": -20.952219,
+            "y": 5.0092015,
+            "z": 8.552082
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 0.03992536,
+          "expanderPosition": {
+            "x": -5.7040834,
+            "y": -4.9469514,
+            "z": 10.389334
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.0404,
+          "expanderPosition": {
+            "x": -31.999971,
+            "y": 0.036291156,
+            "z": 0.02238004
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 180.04036,
+          "expanderPosition": {
+            "x": 3.8910296,
+            "y": -5.0445986,
+            "z": -8.940183
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 270.0402,
+          "expanderPosition": {
+            "x": 10.029567,
+            "y": -5.103488,
+            "z": -20.954369
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 270.0399,
+          "expanderPosition": {
+            "x": 1.6247141,
+            "y": 9.485973,
+            "z": -0.064732045
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 180.04065,
+          "expanderPosition": {
+            "x": -0.029252231,
+            "y": -0.14369984,
+            "z": -32.00968
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 180.04045,
+          "expanderPosition": {
+            "x": -4.8911004,
+            "y": -5.19232,
+            "z": -18.88444
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 180.04045,
+          "expanderPosition": {
+            "x": -28.158155,
+            "y": -0.0013793856,
+            "z": -8.95825
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 0.040757507,
+          "expanderPosition": {
+            "x": 0.022553574,
+            "y": 0.14366245,
+            "z": 31.99967
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 0.040028375,
+          "expanderPosition": {
+            "x": 5.4719777,
+            "y": 8.040386,
+            "z": 11.244162
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 240.04036,
+          "expanderPosition": {
+            "x": 14.52862,
+            "y": 0.13712199,
+            "z": 16.380306
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.040171813,
+          "expanderPosition": {
+            "x": -20.952219,
+            "y": 5.0092015,
+            "z": 8.552082
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.03992536,
+          "expanderPosition": {
+            "x": -5.7040834,
+            "y": -4.9469514,
+            "z": 10.389334
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_JG_02.prefab",
+  "modDependency": null
+}

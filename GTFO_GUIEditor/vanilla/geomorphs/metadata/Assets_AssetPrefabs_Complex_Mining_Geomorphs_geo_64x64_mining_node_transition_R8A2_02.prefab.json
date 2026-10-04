@@ -1,0 +1,36 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 270,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": 1.9073486E-06
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.99994,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": -1.9073486E-06
+          },
+          "direction": "Right"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_64x64_mining_node_transition_R8A2_02.prefab",
+  "modDependency": null
+}

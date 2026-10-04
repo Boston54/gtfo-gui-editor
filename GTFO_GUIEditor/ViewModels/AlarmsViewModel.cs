@@ -21,6 +21,7 @@ public class AlarmsViewModel : ViewModelBase
     private bool _isCreatingFromTemplate;
     private AlarmBlock? _selectedTemplate;
     private string _newAlarmName = string.Empty;
+    private string _newAlarmPublicAlarmName = string.Empty;
     private uint _newAlarmPersistentId;
     private string _creationErrorMessage = string.Empty;
 
@@ -169,13 +170,28 @@ public class AlarmsViewModel : ViewModelBase
     public AlarmBlock? SelectedTemplate
     {
         get => _selectedTemplate;
-        set => SetField(ref _selectedTemplate, value);
+        set
+        {
+            if (SetField(ref _selectedTemplate, value) && value != null)
+            {
+                if (IsCreatingFromTemplate)
+                {
+                    NewAlarmPublicAlarmName = value.PublicAlarmName;
+                }
+            }
+        }
     }
 
     public string NewAlarmName
     {
         get => _newAlarmName;
         set => SetField(ref _newAlarmName, value);
+    }
+
+    public string NewAlarmPublicAlarmName
+    {
+        get => _newAlarmPublicAlarmName;
+        set => SetField(ref _newAlarmPublicAlarmName, value);
     }
 
     public uint NewAlarmPersistentId
@@ -203,6 +219,7 @@ public class AlarmsViewModel : ViewModelBase
         uint randomId = GenerateUniquePersistentId();
         NewAlarmPersistentId = randomId;
         NewAlarmName = $"Alarm_Custom_{randomId}";
+        NewAlarmPublicAlarmName = string.Empty;
         IsCreatingFresh = true;
         IsCreatingFromTemplate = false;
         SelectedTemplate = AvailableTemplates.FirstOrDefault();
@@ -258,6 +275,8 @@ public class AlarmsViewModel : ViewModelBase
         {
             newAlarm = AlarmService.CreateFreshAlarm(NewAlarmPersistentId, NewAlarmName.Trim());
         }
+
+        newAlarm.PublicAlarmName = NewAlarmPublicAlarmName?.Trim() ?? string.Empty;
 
         _alarms.Add(newAlarm);
         SelectedAlarm = newAlarm;

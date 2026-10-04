@@ -1,0 +1,36 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 0.00028686793,
+          "expanderPosition": {
+            "x": -0.0032043462,
+            "y": 0,
+            "z": 32.000004
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.0002,
+          "expanderPosition": {
+            "x": -0.0031356816,
+            "y": 0,
+            "z": -32.000004
+          },
+          "direction": "Backwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_VS_03_ControlRoom.prefab",
+  "modDependency": null
+}

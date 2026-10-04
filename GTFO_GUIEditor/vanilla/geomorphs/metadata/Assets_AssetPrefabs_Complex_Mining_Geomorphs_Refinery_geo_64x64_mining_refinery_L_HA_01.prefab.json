@@ -1,0 +1,36 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 179.99995,
+          "expanderPosition": {
+            "x": 1.5258789E-05,
+            "y": 0,
+            "z": -32.000004
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.00043,
+          "expanderPosition": {
+            "x": -32.000004,
+            "y": 0,
+            "z": -1.5258789E-05
+          },
+          "direction": "Left"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_L_HA_01.prefab",
+  "modDependency": null
+}

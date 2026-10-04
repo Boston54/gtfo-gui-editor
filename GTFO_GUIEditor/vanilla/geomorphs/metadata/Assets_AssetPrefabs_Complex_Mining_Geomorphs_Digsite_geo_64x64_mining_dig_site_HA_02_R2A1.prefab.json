@@ -1,0 +1,66 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": -0.00037224527,
+          "expanderPosition": {
+            "x": 26.63999,
+            "y": 0,
+            "z": 16.500015
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -0.00037224527,
+          "expanderPosition": {
+            "x": -23.590014,
+            "y": 4.01,
+            "z": 21.409986
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 269.99997,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -1.9073486E-05
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.999626,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 1.9073486E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99947,
+          "expanderPosition": {
+            "x": 1.9073486E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_02_R2A1.prefab",
+  "modDependency": null
+}

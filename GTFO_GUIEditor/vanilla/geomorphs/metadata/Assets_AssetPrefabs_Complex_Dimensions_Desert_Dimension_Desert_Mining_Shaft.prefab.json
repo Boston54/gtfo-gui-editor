@@ -1,0 +1,126 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 207.77606,
+          "expanderPosition": {
+            "x": -14.670998,
+            "y": 13.348,
+            "z": -27.670008
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 267.77594,
+          "expanderPosition": {
+            "x": -31.129963,
+            "y": 19.779999,
+            "z": -9.480011
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 72.776115,
+          "expanderPosition": {
+            "x": 26.639994,
+            "y": 28.456997,
+            "z": 9.090069
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 342.77612,
+          "expanderPosition": {
+            "x": -9.756035,
+            "y": 28.272999,
+            "z": 29.061031
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 207.77606,
+          "expanderPosition": {
+            "x": -14.670998,
+            "y": 13.348,
+            "z": -27.670008
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 267.77594,
+          "expanderPosition": {
+            "x": -31.129963,
+            "y": 19.779999,
+            "z": -9.480011
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 72.776115,
+          "expanderPosition": {
+            "x": 26.639994,
+            "y": 28.456997,
+            "z": 9.090069
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 342.77612,
+          "expanderPosition": {
+            "x": -9.756035,
+            "y": 28.272999,
+            "z": 29.061031
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Dimensions/Desert/Dimension_Desert_Mining_Shaft.prefab",
+  "modDependency": null
+}

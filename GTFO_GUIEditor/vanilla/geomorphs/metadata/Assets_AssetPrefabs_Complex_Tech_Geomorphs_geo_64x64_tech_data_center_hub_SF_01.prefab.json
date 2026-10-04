@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 180.00005,
+          "expanderPosition": {
+            "x": 0.1299695,
+            "y": 0,
+            "z": -31.99
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 269.99988,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -0.019969482
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 0.00039273582,
+          "expanderPosition": {
+            "x": 3.0527106E-05,
+            "y": 0,
+            "z": 32.009995
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.00023,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 0.009963989
+          },
+          "direction": "Right"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_hub_SF_01.prefab",
+  "modDependency": null
+}

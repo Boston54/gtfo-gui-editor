@@ -1,0 +1,36 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 269.99976,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -5.1498413E-05
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.00007,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 5.1498413E-05
+          },
+          "direction": "Right"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_LF_01_R8C2.prefab",
+  "modDependency": null
+}

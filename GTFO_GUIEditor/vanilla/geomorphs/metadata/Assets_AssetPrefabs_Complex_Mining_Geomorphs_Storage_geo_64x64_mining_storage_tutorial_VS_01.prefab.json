@@ -1,0 +1,66 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 179.99985,
+          "expanderPosition": {
+            "x": -14.619981,
+            "y": 3.754,
+            "z": 2.2139854
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -6.147171E-05,
+          "expanderPosition": {
+            "x": -9.775162E-06,
+            "y": 0,
+            "z": 32.03
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.99994,
+          "expanderPosition": {
+            "x": 31.900023,
+            "y": 0,
+            "z": 0.030035019
+          },
+          "direction": "Right"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 179.99985,
+          "expanderPosition": {
+            "x": -14.619981,
+            "y": 3.754,
+            "z": 2.2139854
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_tutorial_VS_01.prefab",
+  "modDependency": null
+}

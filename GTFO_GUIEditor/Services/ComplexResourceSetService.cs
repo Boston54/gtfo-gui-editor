@@ -62,10 +62,16 @@ public static class ComplexResourceSetService
     public static string? FindDataBlockFile()
     {
         string dir = GetDatablocksDirectory();
-        string directPath = Path.Combine(dir, "GameData_ComplexResourceSetDataBlock_bin.json");
+        string directPath = Path.Combine(dir, "ComplexResourceSetDataBlock.json");
         if (File.Exists(directPath))
         {
             return directPath;
+        }
+
+        string altPath = Path.Combine(dir, "GameData_ComplexResourceSetDataBlock_bin.json");
+        if (File.Exists(altPath))
+        {
+            return altPath;
         }
 
         return null;

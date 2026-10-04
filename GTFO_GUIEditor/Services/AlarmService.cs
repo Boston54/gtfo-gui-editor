@@ -161,6 +161,9 @@ public static class AlarmService
 
     private class ChainedPuzzleBlock
     {
+        [JsonPropertyName("PublicAlarmName")]
+        public string? PublicAlarmName { get; set; }
+
         [JsonPropertyName("SurvivalWaveSettings")]
         public uint SurvivalWaveSettings { get; set; }
 
@@ -229,7 +232,7 @@ public static class AlarmService
             return idMatch;
         }
 
-        // 5. Chained Puzzle explicit mapping
+        // Chained Puzzle explicit mapping
         if (chainedPuzzleMap.TryGetValue(alarm.PersistentId, out uint popId) && populations.TryGetValue(popId, out var popFromPuzzle))
         {
             return popFromPuzzle;
@@ -266,6 +269,7 @@ public static class AlarmService
         }
 
         var chainedPuzzleMap = new Dictionary<uint, uint>();
+        var chainedPuzzlePublicAlarmMap = new Dictionary<uint, string>();
         if (!string.IsNullOrEmpty(chainedPuzzlePath) && File.Exists(chainedPuzzlePath))
         {
             try
@@ -279,6 +283,11 @@ public static class AlarmService
                         if (block.SurvivalWaveSettings > 0 && block.SurvivalWavePopulation > 0)
                         {
                             chainedPuzzleMap[block.SurvivalWaveSettings] = block.SurvivalWavePopulation;
+                        }
+
+                        if (block.SurvivalWaveSettings > 0 && !string.IsNullOrWhiteSpace(block.PublicAlarmName) && !chainedPuzzlePublicAlarmMap.ContainsKey(block.SurvivalWaveSettings))
+                        {
+                            chainedPuzzlePublicAlarmMap[block.SurvivalWaveSettings] = block.PublicAlarmName;
                         }
                     }
                 }
@@ -311,6 +320,11 @@ public static class AlarmService
                         alarm.WaveRoleSpecial = pop.WaveRoleSpecial;
                         alarm.WaveRoleMiniBoss = pop.WaveRoleMiniBoss;
                         alarm.WaveRoleBoss = pop.WaveRoleBoss;
+
+                        if (chainedPuzzlePublicAlarmMap.TryGetValue(alarm.PersistentId, out var pubName))
+                        {
+                            alarm.PublicAlarmName = pubName;
+                        }
 
                         alarms.Add(alarm);
                     }

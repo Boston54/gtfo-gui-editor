@@ -1,0 +1,106 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 259.3191,
+          "expanderPosition": {
+            "x": 61.700012,
+            "y": -1.037,
+            "z": 23.504969
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 351.2823,
+          "expanderPosition": {
+            "x": -17.310026,
+            "y": 1.954,
+            "z": -52.03099
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 172.26309,
+          "expanderPosition": {
+            "x": -12.43997,
+            "y": 0.201,
+            "z": 58.752007
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 259.3191,
+          "expanderPosition": {
+            "x": 61.700012,
+            "y": -1.037,
+            "z": 23.504969
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 351.2823,
+          "expanderPosition": {
+            "x": -17.310026,
+            "y": 1.954,
+            "z": -52.03099
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 172.26309,
+          "expanderPosition": {
+            "x": -12.43997,
+            "y": 0.201,
+            "z": 58.752007
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Dimensions/Desert/Dimension_Desert_R7B3.prefab",
+  "modDependency": null
+}

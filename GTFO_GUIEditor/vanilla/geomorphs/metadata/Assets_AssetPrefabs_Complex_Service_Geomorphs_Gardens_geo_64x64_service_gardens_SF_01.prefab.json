@@ -1,0 +1,176 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 270.00024,
+          "expanderPosition": {
+            "x": -10.210062,
+            "y": -0.02,
+            "z": 21.889973
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": -13.333059,
+            "y": -4.77,
+            "z": 20.069962
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": -29.520058,
+            "y": 2.9909997,
+            "z": 19.519915
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 270.00024,
+          "expanderPosition": {
+            "x": -10.210062,
+            "y": -0.02,
+            "z": 21.889973
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -0.00016050944,
+          "expanderPosition": {
+            "x": 0.009906769,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": 29.388943,
+            "y": -0.513,
+            "z": 19.350084
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": 3.0399427,
+            "y": 1.3,
+            "z": 19.350008
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": 29.388943,
+            "y": -0.513,
+            "z": 19.350084
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": 3.0399427,
+            "y": 1.3,
+            "z": 19.350008
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": -13.333059,
+            "y": -4.77,
+            "z": 20.069962
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": -0.00019466039,
+          "expanderPosition": {
+            "x": -29.520058,
+            "y": 2.9909997,
+            "z": 19.519915
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.00018,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": -9.346008E-05
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.99983,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 9.346008E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99983,
+          "expanderPosition": {
+            "x": 9.346008E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_SF_01.prefab",
+  "modDependency": null
+}

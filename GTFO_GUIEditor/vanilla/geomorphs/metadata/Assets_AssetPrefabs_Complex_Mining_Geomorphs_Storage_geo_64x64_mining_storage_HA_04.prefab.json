@@ -1,0 +1,256 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 2,
+          "y_angle": 0.00061130186,
+          "expanderPosition": {
+            "x": 16.046041,
+            "y": -3,
+            "z": 13.189933
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 4,
+          "y_angle": 90.00063,
+          "expanderPosition": {
+            "x": -18.500074,
+            "y": 2,
+            "z": -24.49995
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.00062837737,
+          "expanderPosition": {
+            "x": -14.999971,
+            "y": 0,
+            "z": 10.500044
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.00062837737,
+          "expanderPosition": {
+            "x": 7.0450315,
+            "y": 1.598,
+            "z": 10.499981
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270.00018,
+          "expanderPosition": {
+            "x": -32.000004,
+            "y": 0,
+            "z": 9.346008E-05
+          },
+          "direction": "Left"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 2,
+          "y_angle": 90.00063,
+          "expanderPosition": {
+            "x": 9.500083,
+            "y": 0,
+            "z": 27.999973
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 0.0001673396,
+          "expanderPosition": {
+            "x": 9.441376E-05,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 0.00062837737,
+          "expanderPosition": {
+            "x": -14.999971,
+            "y": 0,
+            "z": 10.500044
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 0.00062837737,
+          "expanderPosition": {
+            "x": 7.0450315,
+            "y": 1.598,
+            "z": 10.499981
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 3,
+          "y_angle": 180.00066,
+          "expanderPosition": {
+            "x": 26.96006,
+            "y": -3,
+            "z": 18.759924
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 0.00061130186,
+          "expanderPosition": {
+            "x": 16.046041,
+            "y": -3,
+            "z": 13.189933
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 90.00063,
+          "expanderPosition": {
+            "x": 9.500083,
+            "y": 0,
+            "z": 27.999973
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 90.00017,
+          "expanderPosition": {
+            "x": 32.000004,
+            "y": 0,
+            "z": -9.250641E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 180.00066,
+          "expanderPosition": {
+            "x": 26.96006,
+            "y": -3,
+            "z": 18.759924
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 4,
+          "y_angle": 90.000244,
+          "expanderPosition": {
+            "x": 15.499923,
+            "y": 2,
+            "z": -27.000046
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 4,
+          "y_angle": 90.000244,
+          "expanderPosition": {
+            "x": 15.499982,
+            "y": 2,
+            "z": -7.000045
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 3,
+          "y_angle": 90.000244,
+          "expanderPosition": {
+            "x": 15.499923,
+            "y": 2,
+            "z": -27.000046
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 90.000244,
+          "expanderPosition": {
+            "x": 15.499982,
+            "y": 2,
+            "z": -7.000045
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.00015,
+          "expanderPosition": {
+            "x": -9.441376E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 90.00063,
+          "expanderPosition": {
+            "x": -18.500074,
+            "y": 2,
+            "z": -24.49995
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_04.prefab",
+  "modDependency": null
+}

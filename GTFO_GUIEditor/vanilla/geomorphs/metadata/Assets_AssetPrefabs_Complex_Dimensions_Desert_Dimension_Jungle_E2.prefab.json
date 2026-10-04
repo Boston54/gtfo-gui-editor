@@ -1,0 +1,15 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": []
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Dimensions/Desert/Dimension_Jungle_E2.prefab",
+  "modDependency": null
+}

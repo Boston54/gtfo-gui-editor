@@ -14,6 +14,8 @@ public class ComplexResourceSetsViewModel : ViewModelBase
     private ObservableCollection<ComplexResourceSetBlock> _blocks;
     private ComplexResourceSetBlock? _selectedBlock;
     private string _statusText = string.Empty;
+    private IEnumerable<LevelLayoutBlock>? _levels;
+    private string _gridSizeWarningMessage = string.Empty;
 
     // Category / Prefabs management
     private string _selectedCategory = nameof(ComplexResourceSetBlock.GeomorphTiles_1x1);
@@ -87,9 +89,15 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         get => _selectedBlock;
         set
         {
+            if (_selectedBlock == value) return;
+
             if (_selectedBlock != null)
             {
                 _selectedBlock.PropertyChanged -= SelectedBlock_PropertyChanged;
+                if (_selectedBlock.LevelGenConfig != null)
+                {
+                    _selectedBlock.LevelGenConfig.PropertyChanged -= LevelGenConfig_PropertyChanged;
+                }
             }
 
             if (SetField(ref _selectedBlock, value))
@@ -97,10 +105,15 @@ public class ComplexResourceSetsViewModel : ViewModelBase
                 if (_selectedBlock != null)
                 {
                     _selectedBlock.PropertyChanged += SelectedBlock_PropertyChanged;
+                    if (_selectedBlock.LevelGenConfig != null)
+                    {
+                        _selectedBlock.LevelGenConfig.PropertyChanged += LevelGenConfig_PropertyChanged;
+                    }
                 }
 
                 RefreshCategoryItems();
                 UpdateStatusText();
+                CheckGridSizeWarning();
                 OnPropertyChanged(nameof(HasSelectedBlock));
                 OnPropertyChanged(nameof(HasDuplicatePersistentId));
                 OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
@@ -114,7 +127,62 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
+            CheckGridSizeWarning();
         }
+        else if (e.PropertyName == nameof(ComplexResourceSetBlock.LevelGenConfig))
+        {
+            CheckGridSizeWarning();
+        }
+    }
+
+    private void LevelGenConfig_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(LevelGenConfig.GridSize))
+        {
+            CheckGridSizeWarning();
+        }
+    }
+
+    public IEnumerable<LevelLayoutBlock>? Levels
+    {
+        get => _levels;
+        set
+        {
+            _levels = value;
+            CheckGridSizeWarning();
+        }
+    }
+
+    public bool HasGridSizeWarning => !string.IsNullOrEmpty(_gridSizeWarningMessage);
+
+    public string GridSizeWarningMessage
+    {
+        get => _gridSizeWarningMessage;
+        private set
+        {
+            if (SetField(ref _gridSizeWarningMessage, value))
+            {
+                OnPropertyChanged(nameof(HasGridSizeWarning));
+            }
+        }
+    }
+
+    public void CheckGridSizeWarning()
+    {
+        if (_selectedBlock?.LevelGenConfig == null)
+        {
+            GridSizeWarningMessage = string.Empty;
+            return;
+        }
+
+        int targetGridSize = _selectedBlock.LevelGenConfig.GridSize;
+        if (targetGridSize <= 0)
+        {
+            GridSizeWarningMessage = "Warning: Grid size must be at least 1.";
+            return;
+        }
+
+        GridSizeWarningMessage = string.Empty;
     }
 
     public bool HasSelectedBlock => _selectedBlock != null;

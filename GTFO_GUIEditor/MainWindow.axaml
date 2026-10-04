@@ -8,19 +8,745 @@
         x:Class="GTFO_GUIEditor.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="GTFO Level Editor">
-    <Grid ColumnDefinitions="*,*">
+    <Grid ColumnDefinitions="*,Auto,*">
         <!-- Left Half -->
-        <Border Grid.Column="0" BorderBrush="#333333" BorderThickness="0,0,1,0" Padding="10">
-            <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Level Layout" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                <Panel Background="#1E1E1E">
-                    <TextBlock Text="Level Layout View" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="Gray"/>
-                </Panel>
-            </DockPanel>
+        <Border Grid.Column="0" Padding="10">
+            <Panel DataContext="{Binding LevelLayout}" x:DataType="vm:LevelLayoutViewModel">
+                <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="0">
+                    <TextBlock Grid.Row="0" Text="Level Layout" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                    
+                    <!-- Top Bar 1: Level Selection, Level Name, Level Add/Delete -->
+                    <Border Grid.Row="1" Background="#252526" Padding="10" Margin="0,0,0,6" CornerRadius="4">
+                        <Grid ColumnDefinitions="Auto,*,Auto,160,Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Level:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding Levels}"
+                                      SelectedItem="{Binding SelectedLevel, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:LevelLayoutBlock">
+                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Column="2" Text="Level Name:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="12,0,8,0" Foreground="#E0E0E0"/>
+                            <TextBox Grid.Column="3"
+                                     Text="{Binding SelectedLevel.Name, Mode=TwoWay}"
+                                     IsEnabled="{Binding HasSelectedLevel}"
+                                     VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="4"
+                                    Content="+ Add Level"
+                                    Command="{Binding OpenCreateLevelDialog}"
+                                    Margin="8,0,0,0"
+                                    Padding="10,6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="5"
+                                    Content="- Delete Level"
+                                    Command="{Binding RequestDeleteSelectedLevel}"
+                                    IsEnabled="{Binding HasSelectedLevel}"
+                                    Margin="6,0,0,0"
+                                    Padding="10,6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Top Bar 2: Dimension Selection, Dimension Name, Dimension Add/Edit/Delete -->
+                    <Border Grid.Row="2" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+                        <Grid ColumnDefinitions="Auto,*,Auto,160,Auto,Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Dimension:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding AvailableDimensions}"
+                                      SelectedItem="{Binding SelectedDimension, Mode=TwoWay}"
+                                      IsEnabled="{Binding HasSelectedLevel}"
+                                      HorizontalAlignment="Stretch"
+                                      VerticalAlignment="Center">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:DimensionOption">
+                                        <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Column="2" Text="Dimension Name:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="12,0,8,0" Foreground="#E0E0E0"/>
+                            <TextBox Grid.Column="3"
+                                     Text="{Binding ActiveDimensionName, Mode=TwoWay}"
+                                     IsEnabled="{Binding CanEditActiveDimensionName}"
+                                     VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="4"
+                                    Content="+ Add Dimension"
+                                    Command="{Binding OpenAddDimensionDialog}"
+                                    IsEnabled="{Binding CanAddDimension}"
+                                    Margin="8,0,0,0"
+                                    Padding="10,6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="5"
+                                    Content="Edit Dimension"
+                                    Command="{Binding RequestEditActiveDimension}"
+                                    IsEnabled="{Binding CanEditActiveDimension}"
+                                    Margin="6,0,0,0"
+                                    Padding="10,6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"/>
+
+                            <Button Grid.Column="6"
+                                    Content="- Delete Dimension"
+                                    Command="{Binding RequestDeleteActiveDimension}"
+                                    IsEnabled="{Binding CanDeleteActiveDimension}"
+                                    Margin="6,0,0,0"
+                                    Padding="10,6"
+                                    FontWeight="SemiBold"
+                                    VerticalAlignment="Center"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Main Level Layout View Content Area -->
+                    <Grid Grid.Row="3">
+                        <!-- When a level is selected -->
+                        <Grid IsVisible="{Binding HasSelectedLevel}" RowDefinitions="Auto,*">
+                            <!-- Warnings StackPanel -->
+                            <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+                                <!-- Duplicate ID Warning Banner (if any) -->
+                                <Border Background="#3A1C1C"
+                                        BorderBrush="#FF6B6B"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10,8"
+                                        IsVisible="{Binding HasDuplicatePersistentId}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                                   Foreground="#FF6B6B"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Grid Size Warning Banner (if layout exceeds grid size) -->
+                                <Border Background="#3A281C"
+                                        BorderBrush="#FFA726"
+                                        BorderThickness="1"
+                                        CornerRadius="4"
+                                        Padding="10,8"
+                                        IsVisible="{Binding HasGridSizeWarning}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="⚠" Foreground="#FFA726" FontWeight="Bold" VerticalAlignment="Center"/>
+                                        <TextBlock Text="{Binding GridSizeWarningMessage}"
+                                                   Foreground="#FFA726"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="12"
+                                                   TextWrapping="Wrap"
+                                                   VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Level Layout Canvas / Visual View Panel -->
+                            <Border Grid.Row="1" Background="#141414" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+                                <Grid RowDefinitions="Auto,*">
+                                    <!-- Canvas Toolbar -->
+                                    <Border Grid.Row="0" Background="#1F1F1F" BorderBrush="#2D2D2D" BorderThickness="0,0,0,1" Padding="10,6">
+                                        <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto">
+                                            <Button Grid.Column="0" Content="+" Command="{Binding ZoomIn}" ToolTip.Tip="Zoom In" Width="30" Height="28" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                            <Button Grid.Column="1" Content="−" Command="{Binding ZoomOut}" ToolTip.Tip="Zoom Out" Width="30" Height="28" Margin="0,0,8,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                            <TextBlock Grid.Column="2" Text="{Binding GridState.ZoomPercentage}" VerticalAlignment="Center" Foreground="#B0BEC5" Margin="0,0,12,0" FontWeight="SemiBold" FontSize="12"/>
+                                            <Button Grid.Column="3" Content="Reset View" Click="OnResetViewClicked" ToolTip.Tip="Center view on Starting Elevator" Padding="8,4" FontSize="11" VerticalAlignment="Center"/>
+
+                                            <!-- Legend / Status info -->
+                                            <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#FFFF00" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Unexpanded" FontSize="11" Foreground="#FFFF00" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#9D00FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Connected" FontSize="11" Foreground="#9D00FF" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#FF0000" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Security Door" FontSize="11" Foreground="#FF0000" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#FFA200" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Secondary Door" FontSize="11" Foreground="#FFA200" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#00F2FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Overload Door" FontSize="11" Foreground="#00F2FF" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <Border Width="10" Height="5" Background="#757575" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5"/>
+                                                    <TextBlock Text="Blocked" FontSize="11" Foreground="#9E9E9E" VerticalAlignment="Center"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Interactive Pannable &amp; Zoomable Canvas Area -->
+                                    <Border x:Name="LevelLayoutCanvasBorder"
+                                            Grid.Row="1"
+                                            Background="#121212"
+                                            ClipToBounds="True"
+                                            PointerPressed="OnLevelLayoutPointerPressed"
+                                            PointerMoved="OnLevelLayoutPointerMoved"
+                                            PointerReleased="OnLevelLayoutPointerReleased"
+                                            PointerCaptureLost="OnLevelLayoutPointerCaptureLost"
+                                            PointerWheelChanged="OnLevelLayoutPointerWheelChanged">
+                                        <Canvas Background="#121212"
+                                                HorizontalAlignment="Left" VerticalAlignment="Top"
+                                                RenderTransformOrigin="0,0"
+                                                ClipToBounds="False">
+                                            <Canvas.RenderTransform>
+                                                <TransformGroup>
+                                                    <ScaleTransform ScaleX="{Binding GridState.Zoom}" ScaleY="{Binding GridState.Zoom}"/>
+                                                    <TranslateTransform X="{Binding GridState.PanX}" Y="{Binding GridState.PanY}"/>
+                                                </TransformGroup>
+                                            </Canvas.RenderTransform>
+
+                                            <!-- Dynamic Grid Background -->
+                                            <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                                       Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}">
+                                                <Rectangle.Fill>
+                                                    <VisualBrush DestinationRect="0,0,64,64" TileMode="Tile" SourceRect="0,0,64,64">
+                                                        <VisualBrush.Visual>
+                                                            <Border Width="64" Height="64" BorderBrush="#252525" BorderThickness="0,0,1,1" Background="#141414"/>
+                                                        </VisualBrush.Visual>
+                                                    </VisualBrush>
+                                                </Rectangle.Fill>
+                                            </Rectangle>
+
+                                            <!-- Grid Outer Boundary -->
+                                            <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                                       Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}"
+                                                       Stroke="#37474F" StrokeThickness="2" Fill="Transparent"/>
+
+                                            <!-- Placed Doors / Connectors -->
+                                            <ItemsControl ItemsSource="{Binding GridState.PlacedDoors}"
+                                                          Canvas.Left="0" Canvas.Top="0"
+                                                          ClipToBounds="False">
+                                                <ItemsControl.Template>
+                                                    <ControlTemplate>
+                                                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                        ClipToBounds="False"/>
+                                                    </ControlTemplate>
+                                                </ItemsControl.Template>
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas ClipToBounds="False"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemContainerTheme>
+                                                    <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                                        <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                        <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                        <Setter Property="Canvas.ZIndex" Value="10"/>
+                                                        <Setter Property="ClipToBounds" Value="False"/>
+                                                    </ControlTheme>
+                                                </ItemsControl.ItemContainerTheme>
+                                                <ItemsControl.Styles>
+                                                    <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                                        <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                        <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                        <Setter Property="Canvas.ZIndex" Value="10"/>
+                                                        <Setter Property="ClipToBounds" Value="False"/>
+                                                    </Style>
+                                                </ItemsControl.Styles>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:PlacedDoorNode">
+                                                        <Button Width="{Binding DoorWidth}"
+                                                                Height="{Binding DoorHeight}"
+                                                                Background="{Binding DoorBrush}"
+                                                                BorderBrush="#FFFFFF"
+                                                                BorderThickness="0.5"
+                                                                CornerRadius="0.5"
+                                                                Padding="0"
+                                                                Margin="0"
+                                                                Cursor="Hand"
+                                                                RenderTransformOrigin="50%,50%"
+                                                                ToolTip.Tip="{Binding TooltipText}"
+                                                                Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LevelLayout.OnDoorClicked}"
+                                                                CommandParameter="{Binding}"
+                                                                PointerPressed="OnDoorPointerPressed">
+                                                            <Button.RenderTransform>
+                                                                <RotateTransform Angle="{Binding RotationAngle}"/>
+                                                            </Button.RenderTransform>
+                                                        </Button>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </Canvas>
+                                    </Border>
+                                </Grid>
+                            </Border>
+                        </Grid>
+
+                        <!-- When no level is selected -->
+                        <Panel IsVisible="{Binding !HasSelectedLevel}" Background="#1E1E1E">
+                            <TextBlock Text="No level selected. Create a new level to begin."
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="Gray"/>
+                        </Panel>
+                    </Grid>
+
+                    <!-- Create Level Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsCreatingLevel}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="500"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="14">
+                                <TextBlock Text="Create New Level"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Level Name:" FontSize="13" Foreground="LightGray"/>
+                                    <TextBox Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..."/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Persistent ID:" FontSize="13" Foreground="LightGray"/>
+                                    <TextBox Text="{Binding NewLevelPersistentId, Mode=TwoWay}" Watermark="Enter persistent ID..."/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Complex Resource Set:" FontSize="13" Foreground="LightGray"/>
+                                    <ComboBox ItemsSource="{Binding AvailableComplexResourceSets}"
+                                              SelectedItem="{Binding SelectedComplexResourceSet, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ComplexResourceSetBlock">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Starting Elevator Tile:" FontSize="13" Foreground="LightGray"/>
+                                    <ComboBox ItemsSource="{Binding AvailableElevatorTiles}"
+                                              SelectedItem="{Binding SelectedElevatorTile, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ElevatorTileOption">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Error message if any -->
+                                <TextBlock Text="{Binding CreationErrorMessage}"
+                                           Foreground="#FF6B6B"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding HasCreationErrorMessage}"/>
+
+                                <!-- Action buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelCreateLevel}"
+                                            Padding="16,8"/>
+                                    <Button Content="Create"
+                                            Command="{Binding ConfirmCreateLevel}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Delete Level Confirmation Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsConfirmingDelete}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="440"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Confirm Deletion"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FF6B6B"/>
+
+                                <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                                           TextWrapping="Wrap"
+                                           FontSize="13"
+                                           Foreground="#E0E0E0"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelDeleteLevel}"
+                                            Padding="16,8"/>
+                                    <Button Content="Delete"
+                                            Command="{Binding ConfirmDeleteLevel}"
+                                            Background="#D9534F"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Delete Dimension Confirmation Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsConfirmingDeleteDimension}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="440"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="16">
+                                <TextBlock Text="Confirm Deletion"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FF6B6B"/>
+
+                                <TextBlock Text="{Binding DimensionDeleteConfirmationMessage}"
+                                           TextWrapping="Wrap"
+                                           FontSize="13"
+                                           Foreground="#E0E0E0"/>
+
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelDeleteDimension}"
+                                            Padding="16,8"/>
+                                    <Button Content="Delete"
+                                            Command="{Binding ConfirmDeleteDimension}"
+                                            Background="#D9534F"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Configure / Prompt Dimension Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsConfiguringDimension}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="520"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="14">
+                                <TextBlock Text="{Binding PromptDimensionTitle}"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <TextBlock Text="Select the Complex Resource Set and starting geomorph for this dimension."
+                                           Foreground="#AAAAAA"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+
+                                <StackPanel Spacing="6" IsVisible="{Binding !IsPromptingReality}">
+                                    <TextBlock Text="Dimension Name:" FontSize="13" Foreground="LightGray"/>
+                                    <TextBox Text="{Binding DimensionCustomName, Mode=TwoWay}" Watermark="Enter dimension name..."/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Complex Resource Set:" FontSize="13" Foreground="LightGray"/>
+                                    <ComboBox ItemsSource="{Binding AvailableComplexResourceSets}"
+                                              SelectedItem="{Binding DimensionSelectedComplexResourceSet, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ComplexResourceSetBlock">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6" IsVisible="{Binding !IsPromptingReality}">
+                                    <TextBlock Text="Starting Tile Source:" FontSize="13" Foreground="LightGray"/>
+                                    <ComboBox ItemsSource="{Binding AvailableTileSources}"
+                                              SelectedItem="{Binding SelectedTileSource, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch"/>
+                                </StackPanel>
+
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="{Binding PromptStartingTileLabel}" FontSize="13" Foreground="LightGray"/>
+                                    <ComboBox ItemsSource="{Binding AvailableDimensionTiles}"
+                                              SelectedItem="{Binding SelectedDimensionTile, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ElevatorTileOption">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Error message if any -->
+                                <TextBlock Text="{Binding DimensionPromptErrorMessage}"
+                                           Foreground="#FF6B6B"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding HasDimensionPromptErrorMessage}"/>
+
+                                <!-- Action buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelPromptDimension}"
+                                            Padding="16,8"/>
+                                    <Button Content="Confirm"
+                                            Command="{Binding ConfirmPromptDimension}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Pick Geomorph for Door Expansion Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsPickingGeomorphForDoor}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="540"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="14">
+                                <TextBlock Text="Expand Level - Pick Geomorph"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <!-- Expansion Target Info Card -->
+                                <Border Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Direction:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExpansionDirectionText}" FontWeight="Bold" Foreground="#9D00FF" Margin="0,0,16,4"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Target Cell:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,4"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding ExpansionTargetCellText}" FontWeight="Bold" Foreground="#E0E0E0" Margin="0,0,0,4"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="From Geo:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ExpansionSourceGeoText}" Foreground="#D0D0D0" TextTrimming="CharacterEllipsis"/>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Geomorph Selector with Filter -->
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Select Geomorph to Generate:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                                    <TextBox Text="{Binding GeomorphFilterText, Mode=TwoWay}" Watermark="Filter geomorphs by name..." Margin="0,0,0,4"/>
+                                    <ComboBox ItemsSource="{Binding FilteredExpansionGeomorphs}"
+                                              SelectedItem="{Binding SelectedExpansionGeomorph, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:GeomorphOption">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Door Type Option -->
+                                <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Door Type:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                                        <StackPanel Spacing="6" Margin="4,0,0,0">
+                                            <RadioButton Content="Room Door"
+                                                         GroupName="ExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsExpansionRoomDoor, Mode=TwoWay}"
+                                                         Foreground="#9D00FF"/>
+                                            <RadioButton Content="Security Door"
+                                                         GroupName="ExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsExpansionSecurityDoor, Mode=TwoWay}"
+                                                         Foreground="#FF0000"/>
+                                            <RadioButton Content="Secondary Door"
+                                                         GroupName="ExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsExpansionSecondaryDoor, Mode=TwoWay}"
+                                                         IsEnabled="{Binding CanAddSecondaryDoor}"
+                                                         Foreground="#FFA200"/>
+                                            <RadioButton Content="Overload Door"
+                                                         GroupName="ExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsExpansionOverloadDoor, Mode=TwoWay}"
+                                                         IsEnabled="{Binding CanAddOverloadDoor}"
+                                                         Foreground="#00F2FF"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Error message if any -->
+                                <TextBlock Text="{Binding ExpansionErrorMessage}"
+                                           Foreground="#FF6B6B"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding HasExpansionErrorMessage}"/>
+
+                                <!-- Action buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelDoorExpansion}"
+                                            Padding="16,8"/>
+                                    <Button Content="Generate"
+                                            Command="{Binding ConfirmDoorExpansion}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+
+                    <!-- Expand Room in Geomorph Modal Overlay -->
+                    <Border Grid.Row="0" Grid.RowSpan="4"
+                            Background="#80000000"
+                            IsVisible="{Binding IsExpandingRoom}"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="24"
+                                Width="480"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="14">
+                                <TextBlock Text="Expand Room in Geomorph"
+                                           FontSize="18"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <!-- Room Expansion Target Info Card -->
+                                <Border Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="12">
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="{Binding RoomExpansionGeomorphName}" FontWeight="Bold" Foreground="#9D00FF" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                                        <Grid ColumnDefinitions="Auto,*,Auto,*" Margin="0,4,0,0">
+                                            <TextBlock Grid.Column="0" Text="From Room:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Column="1" Text="{Binding RoomExpansionFromArea, StringFormat='Area {0}'}" FontWeight="Bold" Foreground="#E0E0E0" Margin="0,0,16,0"/>
+
+                                            <TextBlock Grid.Column="2" Text="Generating:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Column="3" Text="{Binding RoomExpansionTargetArea, StringFormat='Area {0}'}" FontWeight="Bold" Foreground="#FFA200"/>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+
+                                <TextBlock Text="Choose the connection type for this doorway. Once generated, this door type is permanent."
+                                           Foreground="#AAAAAA"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"/>
+
+                                <!-- Door Type Option -->
+                                <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="Door Type:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                                        <StackPanel Spacing="6" Margin="4,0,0,0">
+                                            <RadioButton Content="Room Door"
+                                                         GroupName="RoomExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsRoomExpansionRoomDoor, Mode=TwoWay}"
+                                                         Foreground="#9D00FF"/>
+                                            <RadioButton Content="Security Door"
+                                                         GroupName="RoomExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsRoomExpansionSecurityDoor, Mode=TwoWay}"
+                                                         Foreground="#FF0000"/>
+                                            <RadioButton Content="Secondary Door"
+                                                         GroupName="RoomExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsRoomExpansionSecondaryDoor, Mode=TwoWay}"
+                                                         IsEnabled="{Binding CanAddSecondaryDoor}"
+                                                         Foreground="#FFA200"/>
+                                            <RadioButton Content="Overload Door"
+                                                         GroupName="RoomExpansionDoorTypeGroup"
+                                                         IsChecked="{Binding IsRoomExpansionOverloadDoor, Mode=TwoWay}"
+                                                         IsEnabled="{Binding CanAddOverloadDoor}"
+                                                         Foreground="#00F2FF"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Error message if any -->
+                                <TextBlock Text="{Binding RoomExpansionErrorMessage}"
+                                           Foreground="#FF6B6B"
+                                           FontSize="12"
+                                           TextWrapping="Wrap"
+                                           IsVisible="{Binding HasRoomExpansionErrorMessage}"/>
+
+                                <!-- Action buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                    <Button Content="Cancel"
+                                            Command="{Binding CancelRoomExpansion}"
+                                            Padding="16,8"/>
+                                    <Button Content="Generate Room"
+                                            Command="{Binding ConfirmRoomExpansion}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="16,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+                    </Border>
+                </Grid>
+            </Panel>
         </Border>
 
+        <!-- Middle Margin Separator -->
+        <GridSplitter Grid.Column="1" Width="4" Background="#333333" ResizeDirection="Columns"/>
+
         <!-- Right Half -->
-        <TabControl Grid.Column="1" SelectedIndex="0" Margin="5">
+        <TabControl Grid.Column="2" SelectedIndex="0" Margin="5">
             <TabItem Header="Home">
                 <ScrollViewer Margin="10">
                     <StackPanel Spacing="10">
@@ -35,7 +761,7 @@
                         <!-- Top Bar: Alarm Selection and Creation -->
                         <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
                             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
-                                <TextBlock Grid.Column="0" Text="Alarm:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <TextBlock Grid.Column="0" Text="Alarm:" ToolTip.Tip="Select the alarm to modify" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
                                 <ComboBox Grid.Column="1"
                                           ItemsSource="{Binding Alarms}"
                                           SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}"
@@ -100,12 +826,15 @@
                                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
                                         <StackPanel Spacing="10">
                                             <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14"/>
-                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
-                                                <TextBlock Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <TextBox Grid.Column="1" Text="{Binding SelectedAlarm.Name, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the alarm. This is not visible to the player, but is used for identifying the alarm within the editor." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Column="2" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                                <TextBox Grid.Column="3" Text="{Binding SelectedAlarm.PersistentId, Mode=TwoWay}"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this alarm. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Public Alarm Name:" ToolTip.Tip="Public name for this alarm. This is what the player will see when they look at a door with this alarm attached." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.PublicAlarmName, Mode=TwoWay}" Margin="0,0,16,0"/>
                                             </Grid>
                                         </StackPanel>
                                     </Border>
@@ -118,7 +847,7 @@
 
                                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
                                                 <!-- Row 0: Weakling & Standard -->
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" ToolTip.Tip="The 'weakling' type enemy for this alarm. This enemy will cost 0.75 points to spawn, with a total points soft cap of 25. Many vanilla alarms opt to filter this out by excluding it in the population filter, instead using the standard and special slots for their small enemies as they cost 1 point instead of 0.75." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <ComboBox Grid.Row="0" Grid.Column="1"
                                                           ItemsSource="{Binding Enemies}"
                                                           SelectedValue="{Binding SelectedAlarm.WaveRoleWeakling, Mode=TwoWay}"
@@ -132,7 +861,7 @@
                                                     </ComboBox.ItemTemplate>
                                                 </ComboBox>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" ToolTip.Tip="The 'standard' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <ComboBox Grid.Row="0" Grid.Column="3"
                                                           ItemsSource="{Binding Enemies}"
                                                           SelectedValue="{Binding SelectedAlarm.WaveRoleStandard, Mode=TwoWay}"
@@ -147,7 +876,7 @@
                                                 </ComboBox>
 
                                                 <!-- Row 1: Special & MiniBoss -->
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" ToolTip.Tip="The 'special' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <ComboBox Grid.Row="1" Grid.Column="1"
                                                           ItemsSource="{Binding Enemies}"
                                                           SelectedValue="{Binding SelectedAlarm.WaveRoleSpecial, Mode=TwoWay}"
@@ -161,7 +890,7 @@
                                                     </ComboBox.ItemTemplate>
                                                 </ComboBox>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="MiniBoss:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="MiniBoss:" ToolTip.Tip="The 'miniboss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <ComboBox Grid.Row="1" Grid.Column="3"
                                                           ItemsSource="{Binding Enemies}"
                                                           SelectedValue="{Binding SelectedAlarm.WaveRoleMiniBoss, Mode=TwoWay}"
@@ -176,7 +905,7 @@
                                                 </ComboBox>
 
                                                 <!-- Row 2: Boss -->
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" ToolTip.Tip="The 'boss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army. NOTE: THIS ENEMY TYPE IS BROKEN IN VANILLA." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <ComboBox Grid.Row="2" Grid.Column="1"
                                                           ItemsSource="{Binding Enemies}"
                                                           SelectedValue="{Binding SelectedAlarm.WaveRoleBoss, Mode=TwoWay}"
@@ -199,24 +928,24 @@
                                             <TextBlock Text="Wave Timing &amp; Pauses" FontWeight="Bold" FontSize="14"/>
                                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
                                                 <!-- Row 0: Pause Before Start & Pause Between Groups -->
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Pause Before Start (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Pause Before Start (s):" ToolTip.Tip="How many seconds to wait between the alarm starting and the first wave spawning." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PauseBeforeStart, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Pause Between Groups (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Pause Between Groups (s):" ToolTip.Tip="Delay between spawning enemy groups." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PauseBetweenGroups, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 1: Wave Pause Min & Max -->
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Wave Pause Min (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Wave Pause Min (s):" ToolTip.Tip="Delay between waves at or below the minimum score boundary." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Pause Max (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Pause Max (s):" ToolTip.Tip="Delay between waves at the maximum score boundary." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 2: Wave Pause Min at Cost & Wave Pause Max at Cost -->
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Wave Pause Min at Cost:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Wave Pause Min at Cost:" ToolTip.Tip="Minimum score boundary for pauses between waves. Below this threshold, the timer for a new wave will decrease at its maximum speed." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin_AtCost, Mode=TwoWay}" Margin="0,0,16,0"/>
 
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Wave Pause Max at Cost:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Wave Pause Max at Cost:" ToolTip.Tip="Maximum score boundary for pauses between waves. Above this threshold, the timer for a new wave does not move. Anywhere in-between min and max, the timer is lerped." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax_AtCost, Mode=TwoWay}"/>
                                             </Grid>
                                         </StackPanel>
@@ -227,7 +956,7 @@
                                         <StackPanel Spacing="10">
                                             <TextBlock Text="Population Filter" FontWeight="Bold" FontSize="14"/>
                                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
-                                                <TextBlock Grid.Column="0" Text="Filter Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Column="0" Text="Filter Type:" ToolTip.Tip="The selected types below will be either the only enemies spawned, or will be excluded entirely, based on this value." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <ComboBox Grid.Column="1"
                                                           ItemsSource="{x:Static vm:AlarmsViewModel.AvailableFilterTypes}"
                                                           SelectedItem="{Binding SelectedAlarm.FilterType, Mode=TwoWay}"
@@ -237,13 +966,13 @@
 
                                             <!-- Filter Modes text directly above its buttons -->
                                             <StackPanel Spacing="6" Margin="0,4,0,0">
-                                                <TextBlock Text="Filter Modes:" VerticalAlignment="Center"/>
+                                                <TextBlock Text="Filter Modes:" ToolTip.Tip="Select the types to include/exclude from spawning." VerticalAlignment="Center"/>
                                                 <StackPanel Orientation="Horizontal" Spacing="16">
-                                                    <CheckBox Content="Weakling" IsChecked="{Binding SelectedAlarm.FilterWeakling, Mode=TwoWay}"/>
-                                                    <CheckBox Content="Standard" IsChecked="{Binding SelectedAlarm.FilterStandard, Mode=TwoWay}"/>
-                                                    <CheckBox Content="Special" IsChecked="{Binding SelectedAlarm.FilterSpecial, Mode=TwoWay}"/>
-                                                    <CheckBox Content="MiniBoss" IsChecked="{Binding SelectedAlarm.FilterMiniBoss, Mode=TwoWay}"/>
-                                                    <CheckBox Content="Boss" IsChecked="{Binding SelectedAlarm.FilterBoss, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Weakling" ToolTip.Tip="True if the weakling type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterWeakling, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Standard" ToolTip.Tip="True if the standard type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterStandard, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Special" ToolTip.Tip="True if the special type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterSpecial, Mode=TwoWay}"/>
+                                                    <CheckBox Content="MiniBoss" ToolTip.Tip="True if the miniboss type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterMiniBoss, Mode=TwoWay}"/>
+                                                    <CheckBox Content="Boss" ToolTip.Tip="True if the boss type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterBoss, Mode=TwoWay}"/>
                                                 </StackPanel>
                                             </StackPanel>
                                         </StackPanel>
@@ -255,17 +984,17 @@
                                             <TextBlock Text="Spawn Direction &amp; Type" FontWeight="Bold" FontSize="14"/>
                                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
                                                 <!-- Row 0: Direction Randomization -->
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Randomize Direction / Wave:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Randomize Direction / Wave:" ToolTip.Tip="0-1 chance for the spawn direction to change between waves." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerWave, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Randomize Direction / Group:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Randomize Direction / Group:" ToolTip.Tip="0-1 chance for the spawn direction to change between groups." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerGroup, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 1: Override Spawn Type & Survival Wave Spawn Type -->
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Override Spawn Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Override Spawn Type:" ToolTip.Tip="True if the spawn type should be overriden. This must be true for the Wave Spawn Type value to be functional." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedAlarm.OverrideWaveSpawnType, Mode=TwoWay}" Margin="0,0,16,0" VerticalAlignment="Center"/>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Spawn Type:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Spawn Type:" ToolTip.Tip="Affects how the enemies spawn. Note that FromElevatorDirection only refers to the host in vanilla; use the hostType6SpawnEnemyFix mod to fix it." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <ComboBox Grid.Row="1" Grid.Column="3"
                                                           ItemsSource="{x:Static vm:AlarmsViewModel.AvailableWaveSpawnTypes}"
                                                           SelectedItem="{Binding SelectedAlarm.SurvivalWaveSpawnType, Mode=TwoWay}"
@@ -280,28 +1009,28 @@
                                             <TextBlock Text="Population Points &amp; Ramp" FontWeight="Bold" FontSize="14"/>
                                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,5,0,0">
                                                 <!-- Row 0: Total Points & Ramp Time -->
-                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Population Points Total:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Population Points Total:" ToolTip.Tip="The total population points for waves. The alarm automatically stops if this runs out. -1 is infinite." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsTotal, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Population Ramp Over Time (s):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Population Ramp Over Time (s):" ToolTip.Tip="Lerp over time for start-end population point settings." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationRampOverTime, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 1: Wave Points Start & End -->
-                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Points Per Wave (Start):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Points Per Wave (Start):" ToolTip.Tip="Population points for a wave at start ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerWaveStart, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Points Per Wave (End):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Points Per Wave (End):" ToolTip.Tip="Population points for a wave at end ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerWaveEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 2: Group Points Start & End -->
-                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Points Per Group (Start):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Points Per Group (Start):" ToolTip.Tip="Population points for a group at start ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerGroupStart, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Points Per Group (End):" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                <TextBlock Grid.Row="2" Grid.Column="2" Text="Points Per Group (End):" ToolTip.Tip="Population points for a group at end ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                 <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerGroupEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                 <!-- Row 3: Min Points Per Group -->
-                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Min Points Per Group:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Min Points Per Group:" ToolTip.Tip="Minimum required cost for a group to spawn. This setting is related to the soft cap of enemies." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                 <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsMinPerGroup, Mode=TwoWay}" Margin="0,0,16,0"/>
                                             </Grid>
                                         </StackPanel>
@@ -337,14 +1066,12 @@
                                     <!-- Option: Blank or Template -->
                                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
                                         <StackPanel Spacing="10">
-                                            <RadioButton Content="Create a new fresh (blank) alarm"
-                                                         IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
-                                            <RadioButton Content="Use an existing alarm as a template"
-                                                         IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+                                            <RadioButton Content="Create a new fresh (blank) alarm" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                                            <RadioButton Content="Use an existing alarm as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
 
                                             <!-- Template Selector -->
                                             <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
-                                                <TextBlock Text="Select Alarm Template:" FontSize="12" Foreground="LightGray"/>
+                                                <TextBlock Text="Select Alarm Template:" ToolTip.Tip="Select an alarm to copy the properties from." FontSize="12" Foreground="LightGray"/>
                                                 <ComboBox ItemsSource="{Binding AvailableTemplates}"
                                                           SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
                                                           HorizontalAlignment="Stretch">
@@ -358,13 +1085,16 @@
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Name and PersistentID -->
-                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                                    <!-- Name, PersistentID, and Public Alarm Name -->
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the alarm. This is not visible to the player, but is used for identifying the alarm within the editor." VerticalAlignment="Center" Margin="0,0,10,8"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewAlarmName, Mode=TwoWay}" Margin="0,0,0,8"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewAlarmPersistentId, Mode=TwoWay}"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this alarm. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewAlarmPersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Public Alarm Name:" ToolTip.Tip="Public name for this alarm. This is what the player will see when they look at a door with this alarm attached." VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding NewAlarmPublicAlarmName, Mode=TwoWay}"/>
                                     </Grid>
 
                                     <!-- Error Message Banner -->
@@ -442,7 +1172,7 @@
                         <!-- Top Bar: Block Selection and Creation -->
                         <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
                             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
-                                <TextBlock Grid.Column="0" Text="Block:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <TextBlock Grid.Column="0" Text="Block:" ToolTip.Tip="The Complex Resource Set to edit." VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
                                 <ComboBox Grid.Column="1"
                                           ItemsSource="{Binding Blocks}"
                                           SelectedItem="{Binding SelectedBlock, Mode=TwoWay}"
@@ -493,14 +1223,14 @@
                                                     <TextBlock Text="Block Properties" FontWeight="Bold" FontSize="14"/>
                                                     <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" Margin="0,5,0,0">
                                                         <!-- Row 0: Name & Persistent ID -->
-                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the resource set. This is not visible to the player, but is used for identifying the resource set within the editor." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedBlock.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
                                                         
-                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this resource set. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedBlock.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
 
                                                         <!-- Row 1: Complex Type & Bundle Name -->
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Complex Type:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Complex Type:" ToolTip.Tip="The tileset this resource set will use." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <ComboBox Grid.Row="1" Grid.Column="1"
                                                                   ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableComplexTypes}"
                                                                   SelectedItem="{Binding SelectedBlock.ComplexType, Mode=TwoWay}"
@@ -515,18 +1245,18 @@
                                                                   Margin="0,0,0,8"/>
 
                                                         <!-- Row 2: Primary Sub-Complex & Randomize Geomorph Order -->
-                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Primary Sub-Complex:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Primary Sub-Complex:" ToolTip.Tip="The primary sub-complex type of this resource set. You are not required to use this subcomplex exclusively when choosing geomorphs." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <ComboBox Grid.Row="2" Grid.Column="1"
                                                                   ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableSubComplexTypes}"
                                                                   SelectedItem="{Binding SelectedBlock.PrimareSubComplexUsed, Mode=TwoWay}"
                                                                   HorizontalAlignment="Stretch"
                                                                   Margin="0,0,16,8"/>
 
-                                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Randomize Geomorphs:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Randomize Geomorphs:" ToolTip.Tip="Honestly, I have no clue what this does. It seems to be true in almost all vanilla resource sets." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <CheckBox Grid.Row="2" Grid.Column="3" IsChecked="{Binding SelectedBlock.RandomizeGeomorphOrder, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,0,8"/>
 
                                                         <!-- Row 3: Internal Enabled -->
-                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Internal Enabled:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Internal Enabled:" ToolTip.Tip="True if this resource set should actually be loaded by the game. You'll likely want to leave this as true." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                         <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding SelectedBlock.InternalEnabled, Mode=TwoWay}" VerticalAlignment="Center"/>
 
                                                         <!-- Row 4: Duplicate Persistent ID Warning Banner -->
@@ -547,16 +1277,16 @@
                                             <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
                                                 <StackPanel Spacing="10">
                                                     <TextBlock Text="Level Generation Configuration" FontWeight="Bold" FontSize="14"/>
-                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,5,0,0">
                                                         <!-- Row 0: Grid Size & Cell Dimension -->
-                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Grid Size:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Grid Size:" ToolTip.Tip="The size of the grid that the level generation is using. You will only have to change this if the level you are making is VERY large." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedBlock.LevelGenConfig.GridSize, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Cell Dimension:" VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedBlock.LevelGenConfig.CellDimension, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Cell Dimension:" ToolTip.Tip="The size of each cell in the grid." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedBlock.LevelGenConfig.CellDimension, Mode=TwoWay}" IsReadOnly="True" IsEnabled="False" Margin="0,0,0,8"/>
 
                                                         <!-- Row 1: Altitude Offset & Transition Direction -->
-                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Altitude Offset:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Altitude Offset:" ToolTip.Tip="Height difference between tiles. Would recommend leaving this unchanged." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                                         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedBlock.LevelGenConfig.AltitudeOffset, Mode=TwoWay}" Margin="0,0,16,8"/>
 
                                                         <TextBlock Grid.Row="1" Grid.Column="2" Text="Transition Direction:" VerticalAlignment="Center" Margin="0,0,8,8"/>
@@ -567,11 +1297,22 @@
                                                                   Margin="0,0,0,8"/>
 
                                                         <!-- Row 2: Level Progression -->
-                                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Level Progression:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <TextBlock Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0"/>
                                                         <ComboBox Grid.Row="2" Grid.Column="1"
                                                                   ItemsSource="{x:Static vm:ComplexResourceSetsViewModel.AvailableLevelProgressions}"
                                                                   SelectedItem="{Binding SelectedBlock.LevelGenConfig.LevelProgression, Mode=TwoWay}"
                                                                   HorizontalAlignment="Stretch"/>
+
+                                                        <!-- Row 3: Grid Size Warning Banner -->
+                                                        <Border Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="4"
+                                                                Background="#3A281C" BorderBrush="#FFA726" BorderThickness="1"
+                                                                CornerRadius="4" Padding="10,6" Margin="0,8,0,0"
+                                                                IsVisible="{Binding HasGridSizeWarning}">
+                                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                                <TextBlock Text="⚠" Foreground="#FFA726" FontWeight="Bold" VerticalAlignment="Center"/>
+                                                                <TextBlock Text="{Binding GridSizeWarningMessage}" Foreground="#FFA726" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                                                            </StackPanel>
+                                                        </Border>
                                                     </Grid>
                                                 </StackPanel>
                                             </Border>
@@ -583,7 +1324,7 @@
                                     <Grid RowDefinitions="Auto,*,Auto" Margin="5">
                                         <!-- Category Selector and Controls -->
                                         <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,10">
-                                            <TextBlock Grid.Column="0" Text="Category:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                            <TextBlock Grid.Column="0" Text="Category:" ToolTip.Tip="Select the category to edit prefabs and geomorphs for. The selected category affects how the prefab can be used by the level gen." VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0"/>
                                             <ComboBox Grid.Column="1"
                                                       ItemsSource="{Binding Categories}"
                                                       SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
@@ -670,17 +1411,16 @@
                                     <!-- Options: Fresh vs Template -->
                                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
                                         <StackPanel Spacing="10">
-                                            <RadioButton Content="Create a new fresh (blank) block"
-                                                         IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                                            <RadioButton Content="Create a new fresh (blank) block" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
                                                          
-                                            <RadioButton Content="Use a vanilla block as a template"
-                                                         IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+                                            <RadioButton Content="Use a vanilla block as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
 
                                             <!-- Template Selector (visible when template is selected) -->
                                             <StackPanel Margin="24,4,0,0"
                                                         Spacing="6"
                                                         IsVisible="{Binding IsCreatingFromTemplate}">
                                                 <TextBlock Text="Select Template Block:"
+                                                           ToolTip.Tip="Select a resource set to copy the properties from."
                                                            FontSize="12"
                                                            Foreground="Gray"/>
                                                 <ComboBox ItemsSource="{Binding AvailableTemplates}"
@@ -698,10 +1438,10 @@
 
                                     <!-- Block Name & ID Inputs -->
                                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
-                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the source set. This is not visible to the player, but is used for identifying the resource set within the editor." VerticalAlignment="Center" Margin="0,0,10,10" FontWeight="SemiBold"/>
                                         <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Watermark="Block name..." Margin="0,0,0,10"/>
 
-                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this resource set. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,10,0" FontWeight="SemiBold"/>
                                         <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}"/>
                                     </Grid>
 
@@ -936,6 +1676,903 @@
                         </DataGrid>
                     </Border>
                 </Grid>
+            </TabItem>
+
+            <!-- Rundown Tab -->
+            <TabItem Header="Rundown">
+                <Panel DataContext="{Binding Rundown}" x:DataType="vm:RundownViewModel">
+                    <Grid RowDefinitions="Auto,*" Margin="10">
+                        <!-- Top Bar: Rundown Display and Settings -->
+                        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Rundown:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <TextBlock Grid.Column="1"
+                                           Text="{Binding SelectedRundown.DisplayText}"
+                                           FontWeight="Bold"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"
+                                           Foreground="#FFFFFF"/>
+
+                                <Button Grid.Column="2"
+                                        Content="Rundown Settings"
+                                        Command="{Binding OpenRundownSettings}"
+                                        IsEnabled="{Binding HasSelectedRundown}"
+                                        Margin="8,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+
+                        <!-- Main Visual Rundown Viewport (when a rundown is selected) -->
+                        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedRundown}">
+                            <!-- Visual Rundown Screen Canvas mimicking GTFO selection screen -->
+                            <Border Background="{Binding BackgroundColorHex}"
+                                    BorderBrush="#252A30"
+                                    BorderThickness="1"
+                                    CornerRadius="6"
+                                    ClipToBounds="True">
+                                    <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                                        <Grid Margin="20,20,20,80">
+                                            <!-- Central Vertical Spine Line passing through all tiers -->
+                                            <Border Width="2"
+                                                    Background="#223344"
+                                                    HorizontalAlignment="Center"
+                                                    VerticalAlignment="Stretch"
+                                                    Margin="0,60,0,40"
+                                                    Opacity="0.7"/>
+
+                                            <StackPanel Spacing="0">
+                                                <!-- Screen Title Header (GTFO Terminal Style) -->
+                                                <StackPanel HorizontalAlignment="Center" Margin="0,0,0,24">
+                                                    <!-- Non-editable Rundown Title text from StorytellingData (e.g. "RUNDOWN #7.0\nTITLE: RISE") -->
+                                                    <TextBlock Text="{Binding SelectedRundown.StorytellingData.Title}"
+                                                               FontSize="14"
+                                                               FontWeight="Bold"
+                                                               Foreground="#E5A93C"
+                                                               TextAlignment="Center"
+                                                               HorizontalAlignment="Center"
+                                                               Margin="0,0,0,10"/>
+                                                    
+                                                    <!-- Edit Title & Intel Button -->
+                                                    <Button Content="[ EDIT TITLE &amp; INTEL ]"
+                                                            Command="{Binding OpenIntelDialog}"
+                                                            HorizontalAlignment="Center"
+                                                            Background="#0E1318"
+                                                            Foreground="#E5A93C"
+                                                            BorderBrush="#E5A93C"
+                                                            BorderThickness="1"
+                                                            CornerRadius="2"
+                                                            Padding="16,4"
+                                                            FontSize="11"
+                                                            FontWeight="Bold"/>
+                                                </StackPanel>
+
+                                                <!-- Tiers Tree Going Downward -->
+                                                <ItemsControl ItemsSource="{Binding Tiers}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="vm:RundownTierViewModel">
+                                                            <StackPanel Margin="{Binding TierMargin}" HorizontalAlignment="Center">
+                                                                <!-- Tier Header Marker on the Central Spine -->
+                                                                <Border Background="#0C1015"
+                                                                        BorderBrush="{Binding ColorHex}"
+                                                                        BorderThickness="1.5"
+                                                                        CornerRadius="3"
+                                                                        Padding="10,4"
+                                                                        HorizontalAlignment="Center"
+                                                                        Margin="0,0,0,12">
+                                                                    <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                                                        <!-- Tier Badge -->
+                                                                        <Border Background="{Binding ColorHex}"
+                                                                                CornerRadius="2"
+                                                                                Padding="6,2"
+                                                                                VerticalAlignment="Center">
+                                                                            <TextBlock Text="{Binding TierName}"
+                                                                                       FontWeight="Bold"
+                                                                                       FontSize="12"
+                                                                                       Foreground="#000000"/>
+                                                                        </Border>
+
+                                                                        <!-- Tier Info & Requirements -->
+                                                                        <TextBlock Text="{Binding RequirementsSummary}"
+                                                                                   FontSize="11"
+                                                                                   Foreground="#888888"
+                                                                                   VerticalAlignment="Center"/>
+
+                                                                        <TextBlock FontSize="10" Foreground="#666666" VerticalAlignment="Center">
+                                                                            <Run Text="Scale: "/>
+                                                                            <Run Text="{Binding Scale, StringFormat='{}{0:F2}'}" Foreground="{Binding ColorHex}" FontWeight="SemiBold"/>
+                                                                        </TextBlock>
+
+                                                                        <!-- Tier Settings Button -->
+                                                                        <Button Content="Visuals &amp; Reqs"
+                                                                                Command="{Binding OpenSettings}"
+                                                                                Padding="8,3"
+                                                                                FontSize="11"
+                                                                                VerticalAlignment="Center"/>
+
+                                                                        <!-- Add Expedition Button -->
+                                                                        <Button Content="+ Add Expedition"
+                                                                                Command="{Binding AddExpedition}"
+                                                                                Padding="8,3"
+                                                                                FontSize="11"
+                                                                                VerticalAlignment="Center"/>
+                                                                    </StackPanel>
+                                                                </Border>
+
+                                                                <!-- Expeditions Row centered along the tier -->
+                                                                <Grid HorizontalAlignment="Center">
+                                                                    <!-- When expeditions exist in tier -->
+                                                                    <ItemsControl ItemsSource="{Binding Expeditions}"
+                                                                                 IsVisible="{Binding HasVisibleExpeditions}"
+                                                                                 HorizontalAlignment="Center">
+                                                                        <ItemsControl.ItemContainerTheme>
+                                                                            <ControlTheme TargetType="ContentPresenter" x:DataType="models:ExpeditionBlock">
+                                                                                <Setter Property="IsVisible" Value="{Binding Enabled}"/>
+                                                                            </ControlTheme>
+                                                                        </ItemsControl.ItemContainerTheme>
+                                                                        <ItemsControl.ItemsPanel>
+                                                                            <ItemsPanelTemplate>
+                                                                                <StackPanel Orientation="Horizontal"
+                                                                                            HorizontalAlignment="Center"
+                                                                                            Spacing="{Binding $parent[ItemsControl].((vm:RundownTierViewModel)DataContext).ExpeditionSpacing}"/>
+                                                                            </ItemsPanelTemplate>
+                                                                        </ItemsControl.ItemsPanel>
+                                                                        <ItemsControl.ItemTemplate>
+                                                                            <DataTemplate x:DataType="models:ExpeditionBlock">
+                                                                                <Border Width="180"
+                                                                                        MinHeight="100"
+                                                                                        IsVisible="{Binding Enabled}"
+                                                                                        Background="#0E1318"
+                                                                                        BorderBrush="{Binding BorderBrushHex}"
+                                                                                        BorderThickness="1.5"
+                                                                                        CornerRadius="3"
+                                                                                        Padding="10">
+                                                                                    <Grid RowDefinitions="Auto,*,Auto">
+                                                                                        <!-- Top: Prefix in Box & Public Name -->
+                                                                                        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,6">
+                                                                                            <!-- Prefix in Box -->
+                                                                                            <Border Grid.Column="0"
+                                                                                                    BorderBrush="{Binding BorderBrushHex}"
+                                                                                                    BorderThickness="1"
+                                                                                                    Background="#182028"
+                                                                                                    CornerRadius="2"
+                                                                                                    Padding="4,1"
+                                                                                                    Margin="0,0,6,0">
+                                                                                                <TextBlock Text="{Binding DisplayPrefix}"
+                                                                                                           FontWeight="Bold"
+                                                                                                           FontSize="12"
+                                                                                                           Foreground="#FFFFFF"/>
+                                                                                            </Border>
+
+                                                                                            <!-- Public Name -->
+                                                                                            <TextBlock Grid.Column="1"
+                                                                                                       Text="{Binding Descriptive.PublicName, StringFormat='&quot;{0}&quot;'}"
+                                                                                                       FontWeight="Bold"
+                                                                                                       FontSize="12"
+                                                                                                       Foreground="#E0E0E0"
+                                                                                                       VerticalAlignment="Center"
+                                                                                                       TextTrimming="CharacterEllipsis"/>
+                                                                                        </Grid>
+
+                                                                                        <!-- Middle: Depth & Layer Sector Icons -->
+                                                                                        <StackPanel Grid.Row="1" Spacing="4" Margin="0,0,0,8">
+                                                                                            <TextBlock Text="{Binding Descriptive.ExpeditionDepth, StringFormat='{}DEPTH: {0}m'}"
+                                                                                                       FontSize="10"
+                                                                                                       Foreground="#AAAAAA"/>
+
+                                                                                            <!-- Sector Icons (Main, Secondary, Overload) -->
+                                                                                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,0,0">
+                                                                                                <Image Source="avares://GTFO_GUIEditor/Assets/Sector_Main.png"
+                                                                                                       Width="20" Height="20"
+                                                                                                       ToolTip.Tip="Main Sector"/>
+                                                                                                <Image Source="avares://GTFO_GUIEditor/Assets/Sector_Secondary.png"
+                                                                                                       Width="20" Height="20"
+                                                                                                       ToolTip.Tip="Secondary Sector"
+                                                                                                       IsVisible="{Binding SecondaryLayerEnabled}"/>
+                                                                                                <Image Source="avares://GTFO_GUIEditor/Assets/Sector_Overload.png"
+                                                                                                       Width="20" Height="20"
+                                                                                                       ToolTip.Tip="Overload Sector"
+                                                                                                       IsVisible="{Binding ThirdLayerEnabled}"/>
+                                                                                            </StackPanel>
+                                                                                        </StackPanel>
+
+                                                                                        <!-- Bottom: Action Buttons -->
+                                                                                        <Grid Grid.Row="2" ColumnDefinitions="*,Auto">
+                                                                                            <Button Grid.Column="0"
+                                                                                                    Content="Edit"
+                                                                                                    Command="{Binding $parent[ItemsControl].((vm:RundownTierViewModel)DataContext).OpenExpedition}"
+                                                                                                    CommandParameter="{Binding}"
+                                                                                                    Padding="6,3"
+                                                                                                    FontSize="11"
+                                                                                                    HorizontalAlignment="Stretch"
+                                                                                                    HorizontalContentAlignment="Center"
+                                                                                                    Margin="0,0,4,0"/>
+                                                                                            <Button Grid.Column="1"
+                                                                                                    Content="🗑"
+                                                                                                    ToolTip.Tip="Delete Expedition"
+                                                                                                    Command="{Binding $parent[ItemsControl].((vm:RundownTierViewModel)DataContext).RequestDeleteExpedition}"
+                                                                                                    CommandParameter="{Binding}"
+                                                                                                    Padding="6,3"
+                                                                                                    FontSize="11"/>
+                                                                                        </Grid>
+                                                                                    </Grid>
+                                                                                </Border>
+                                                                            </DataTemplate>
+                                                                        </ItemsControl.ItemTemplate>
+                                                                    </ItemsControl>
+
+                                                                    <!-- When no expeditions in tier -->
+                                                                    <Border IsVisible="{Binding !HasVisibleExpeditions}"
+                                                                            Background="#0E1318"
+                                                                            BorderBrush="#252A30"
+                                                                            BorderThickness="1"
+                                                                            CornerRadius="3"
+                                                                            Padding="14,8"
+                                                                            HorizontalAlignment="Center">
+                                                                        <TextBlock Text="No active expeditions in this tier."
+                                                                                   Foreground="#555555"
+                                                                                   FontStyle="Italic"
+                                                                                   FontSize="11"
+                                                                                   HorizontalAlignment="Center"/>
+                                                                    </Border>
+                                                                </Grid>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Grid>
+                                    </ScrollViewer>
+                                </Border>
+                        </Grid>
+
+                        <!-- When no rundown is selected -->
+                        <Panel Grid.Row="1" IsVisible="{Binding !HasSelectedRundown}" Background="#1E1E1E">
+                            <TextBlock Text="No rundown selected. Create a new rundown to begin."
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Foreground="Gray"/>
+                        </Panel>
+
+                        <!-- TIER SETTINGS POPUP MODAL OVERLAY -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsEditingTierSettings}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#252526"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    Width="540"
+                                    MaxHeight="620"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 20 #80000000">
+                                <ScrollViewer>
+                                    <StackPanel Spacing="16">
+                                        <!-- Header -->
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding ActiveEditingTier.TierName, StringFormat='{}{0} Visuals &amp; Settings'}"
+                                                       FontSize="18"
+                                                       FontWeight="Bold"
+                                                       Foreground="{Binding ActiveEditingTier.ColorHex}"/>
+                                            <Button Grid.Column="1"
+                                                    Content="✕"
+                                                    Command="{Binding CloseTierSettings}"
+                                                    Padding="8,4"
+                                                    Background="Transparent"/>
+                                        </Grid>
+
+                                        <!-- Section 1: Color (ARGB) -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Tier Color (ARGB)" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                
+                                                <!-- Swatch and Hex -->
+                                                <Grid ColumnDefinitions="Auto,*,Auto">
+                                                    <Border Grid.Column="0"
+                                                            Background="{Binding ActiveEditingTier.ColorHex}"
+                                                            Width="60"
+                                                            Height="30"
+                                                            CornerRadius="4"
+                                                            BorderBrush="#555555"
+                                                            BorderThickness="1"
+                                                            Margin="0,0,12,0"/>
+                                                    <TextBox Grid.Column="1"
+                                                             Text="{Binding ActiveEditingTier.TierColor.HexCode, Mode=TwoWay}"
+                                                             Watermark="#AARRGGBB"
+                                                             VerticalAlignment="Center"
+                                                             Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Column="2"
+                                                               Text="{Binding ActiveEditingTier.ColorHex}"
+                                                               VerticalAlignment="Center"
+                                                               Foreground="#AAAAAA"
+                                                               FontSize="12"/>
+                                                </Grid>
+
+                                                <!-- ARGB Sliders -->
+                                                <Grid ColumnDefinitions="30,*,50" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                                    <!-- Alpha -->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="A:" ToolTip.Tip="Alpha for this category. Affects the background colour of this tier of expeditions." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                    <Slider Grid.Row="0" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding ActiveEditingTier.TierColor.A, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ActiveEditingTier.TierColor.A, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                    <!-- Red -->
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="R:" ToolTip.Tip="Red for this category. Affects the background colour of this tier of expeditions." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding ActiveEditingTier.TierColor.R, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ActiveEditingTier.TierColor.R, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                    <!-- Green -->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="G:" ToolTip.Tip="Green for this category. Affects the background colour of this tier of expeditions." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                    <Slider Grid.Row="2" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding ActiveEditingTier.TierColor.G, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding ActiveEditingTier.TierColor.G, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                    <!-- Blue -->
+                                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="B:" ToolTip.Tip="Blue for this category. Affects the background colour of this tier of expeditions." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                    <Slider Grid.Row="3" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding ActiveEditingTier.TierColor.B, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding ActiveEditingTier.TierColor.B, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Section 2: Visual Scale & ScaleYModifier -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Visual Scale &amp; Modifiers" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                
+                                                <Grid ColumnDefinitions="110,*,50" RowDefinitions="Auto,Auto">
+                                                    <!-- Scale -->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Scale:" ToolTip.Tip="Affects how far apart the expeditions on this tier sit from one another. Note the in-editor view is not 1:1 accurate, rather just a visual representation." VerticalAlignment="Center"/>
+                                                    <Slider Grid.Row="0" Grid.Column="1" Minimum="0.2" Maximum="2.0" Value="{Binding ActiveEditingTier.Scale, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding ActiveEditingTier.Scale, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                    <!-- ScaleYModifier -->
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="ScaleYModifier:" ToolTip.Tip="Affects how close the expeditions on this tier sit towards the screen." VerticalAlignment="Center"/>
+                                                    <Slider Grid.Row="1" Grid.Column="1" Minimum="0.0" Maximum="2.0" Value="{Binding ActiveEditingTier.ScaleYModifier, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding ActiveEditingTier.ScaleYModifier, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Section 3: Sector Unlock Requirements -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Sector Unlock Requirements" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Main Sectors:" ToolTip.Tip="How many main sectors need to be completed in this rundown to unlock this tier." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveEditingTier.Requirements.MainSectors, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Secondary:" ToolTip.Tip="How many secondary sectors need to be completed in this rundown to unlock this tier." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveEditingTier.Requirements.SecondarySectors, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Third / Overload:" ToolTip.Tip="How many overload sectors need to be completed in this rundown to unlock this tier." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveEditingTier.Requirements.ThirdSectors, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="All Cleared:" ToolTip.Tip="How many 'all clears' need to be completed in this rundown to unlock this tier." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveEditingTier.Requirements.AllClearedSectors, Mode=TwoWay}"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Section 4: Expeditions in Tier (Active & Inactive) -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0">
+                                                        <TextBlock Text="Expeditions in Tier" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                        <TextBlock Text="Uncheck to hide an expedition from the visual rundown screen entirely." FontSize="11" Foreground="#888888"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1"
+                                                            Content="+ Add Expedition"
+                                                            Command="{Binding ActiveEditingTier.AddExpedition}"
+                                                            Padding="8,4"
+                                                            FontSize="11"
+                                                            VerticalAlignment="Center"/>
+                                                </Grid>
+
+                                                <ItemsControl ItemsSource="{Binding ActiveEditingTier.Expeditions}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:ExpeditionBlock">
+                                                            <Border Background="#141C24" BorderBrush="#253545" BorderThickness="1" CornerRadius="3" Padding="8,6" Margin="0,0,0,6">
+                                                                <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+                                                                    <!-- Enabled Toggle CheckBox -->
+                                                                    <CheckBox Grid.Column="0"
+                                                                              IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                                                              Margin="0,0,8,0"
+                                                                              ToolTip.Tip="Visible on Rundown Screen"/>
+                                                                    <!-- Prefix -->
+                                                                    <Border Grid.Column="1"
+                                                                            Background="#223344"
+                                                                            CornerRadius="2"
+                                                                            Padding="4,1"
+                                                                            Margin="0,0,8,0"
+                                                                            VerticalAlignment="Center">
+                                                                        <TextBlock Text="{Binding DisplayPrefix}"
+                                                                                   FontWeight="Bold"
+                                                                                   FontSize="11"
+                                                                                   Foreground="#FFFFFF"/>
+                                                                    </Border>
+                                                                    <!-- Public Name -->
+                                                                    <TextBlock Grid.Column="2"
+                                                                               Text="{Binding Descriptive.PublicName}"
+                                                                               FontWeight="SemiBold"
+                                                                               FontSize="12"
+                                                                               Foreground="{Binding Enabled, Converter={x:Null}}"
+                                                                               Opacity="{Binding Enabled, Converter={x:Null}}"
+                                                                               VerticalAlignment="Center"
+                                                                               TextTrimming="CharacterEllipsis"/>
+                                                                    <!-- Edit Button -->
+                                                                    <Button Grid.Column="3"
+                                                                            Content="Edit"
+                                                                            Command="{Binding $parent[Border].((vm:RundownViewModel)DataContext).OpenExpeditionEditor}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Padding="6,3"
+                                                                            FontSize="11"
+                                                                            Margin="0,0,4,0"/>
+                                                                    <!-- Delete Button -->
+                                                                    <Button Grid.Column="4"
+                                                                            Content="🗑"
+                                                                            Command="{Binding $parent[Border].((vm:RundownViewModel)DataContext).ActiveEditingTier.RequestDeleteExpedition}"
+                                                                            CommandParameter="{Binding}"
+                                                                            Padding="6,3"
+                                                                            FontSize="11"/>
+                                                                </Grid>
+                                                            </Border>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Done Button -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                            <Button Content="Done"
+                                                    Command="{Binding CloseTierSettings}"
+                                                    Background="#007ACC"
+                                                    Foreground="White"
+                                                    FontWeight="SemiBold"
+                                                    Padding="20,8"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Border>
+
+                        <!-- EXPEDITION EDITOR MODAL OVERLAY -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsEditingExpedition}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#252526"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    Width="580"
+                                    MaxHeight="700"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 20 #80000000">
+                                <ScrollViewer>
+                                    <StackPanel Spacing="16">
+                                        <!-- Header -->
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding ActiveEditingExpedition.Descriptive.FullDisplayName, StringFormat='{}Edit Expedition: {0}'}"
+                                                       FontSize="18"
+                                                       FontWeight="Bold"
+                                                       Foreground="#FFFFFF"/>
+                                            <Button Grid.Column="1"
+                                                    Content="✕"
+                                                    Command="{Binding CloseExpeditionEditor}"
+                                                    Padding="8,4"
+                                                    Background="Transparent"/>
+                                        </Grid>
+
+                                        <!-- General Expedition Info -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="General &amp; Descriptive" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+
+                                                <!-- Level Selection -->
+                                                <Grid ColumnDefinitions="Auto,*" Margin="0,4,0,4">
+                                                    <TextBlock Grid.Column="0" Text="Level:" ToolTip.Tip="The level that this expedition is attached to." VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding AvailableLevelLayouts}"
+                                                              SelectedItem="{Binding SelectedEditingExpeditionLevel, Mode=TwoWay}"
+                                                              HorizontalAlignment="Stretch">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:LevelLayoutBlock">
+                                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                </Grid>
+                                                
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                                    <!-- Enabled & Accessibility -->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Enabled:" ToolTip.Tip="Uncheck to hide this expedition from the visual rundown screen entirely." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding ActiveEditingExpedition.Enabled, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Accessibility:" ToolTip.Tip="Accessibility of this expedition." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <ComboBox Grid.Row="0" Grid.Column="3"
+                                                              ItemsSource="{x:Static vm:RundownViewModel.AvailableAccessibilities}"
+                                                              SelectedItem="{Binding ActiveEditingExpedition.Accessibility, Mode=TwoWay}"
+                                                              HorizontalAlignment="Stretch"
+                                                              Margin="0,0,0,8"/>
+
+                                                    <!-- Prefix & Public Name -->
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Prefix:" ToolTip.Tip="The shorthand prefix of the level. For example, R1A1 has the prefix 'R1A' and then the 1 is applied automatically." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveEditingExpedition.Descriptive.Prefix, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Public Name:" ToolTip.Tip="The public name of the level. For example, R1A1 has the public name 'The Admin'." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveEditingExpedition.Descriptive.PublicName, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                    <!-- Depth & Duration -->
+                                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Depth (m):" ToolTip.Tip="Purely cosmetic. The value shown to the user for the depth of the expedition." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ActiveEditingExpedition.Descriptive.ExpeditionDepth, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Duration (s):" ToolTip.Tip="Purely cosmetic. The value shown to the user for the expected duration of the level." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding ActiveEditingExpedition.Descriptive.EstimatedDuration, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                    <!-- Visual Style & Skip Number -->
+                                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Visual Style:" ToolTip.Tip="Story levels have a yellow outline on the rundown screen, normal levels do not." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <ComboBox Grid.Row="3" Grid.Column="1"
+                                                              ItemsSource="{x:Static vm:RundownViewModel.AvailableProgressionStyles}"
+                                                              SelectedItem="{Binding ActiveEditingExpedition.Descriptive.ProgressionVisualStyle, Mode=TwoWay}"
+                                                              HorizontalAlignment="Stretch"
+                                                              Margin="0,0,16,0"/>
+
+                                                    <TextBlock Grid.Row="3" Grid.Column="2" Text="Skip Number:" ToolTip.Tip="Whether to skip the number after the prefix. For example, R1A1 would be called R1A if this is false." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox Grid.Row="3" Grid.Column="3"
+                                                              IsChecked="{Binding ActiveEditingExpedition.Descriptive.SkipExpNumberInName, Mode=TwoWay}"
+                                                              VerticalAlignment="Center"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                        
+                                        <!-- Unlocked By Expedition Requirement -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12"
+                                                IsVisible="{Binding ActiveEditingExpedition.IsUnlockedByExpedition}">
+                                            <StackPanel Spacing="8">
+                                                <TextBlock Text="Unlock Prerequisite Level" FontWeight="Bold" FontSize="14" Foreground="#4EC9B0"/>
+                                                <TextBlock Text="Select which level in the rundown unlocks this expedition:" FontSize="11" Foreground="#888888"/>
+
+                                                <Grid ColumnDefinitions="Auto,*" Margin="0,4,0,0">
+                                                    <TextBlock Grid.Column="0" Text="Prerequisite Level:" ToolTip.Tip="If Accessibility is 'UnlockedByExpedition', this decides which expedition unlocks it." VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding AvailableOtherExpeditions}"
+                                                              SelectedItem="{Binding SelectedOtherExpedition, Mode=TwoWay}"
+                                                              HorizontalAlignment="Stretch">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:ExpeditionLookupItem">
+                                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Expedition Options -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Expedition Options" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+
+                                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,4,0,0">
+                                                    <CheckBox Grid.Row="0" Grid.Column="0" Content="Is Single Player" ToolTip.Tip="True if this level should be locked to singleplayer."
+                                                              IsChecked="{Binding ActiveEditingExpedition.IsSinglePlayer, Mode=TwoWay}" Margin="0,0,8,6"/>
+                                                    <CheckBox Grid.Row="0" Grid.Column="1" Content="Skip Lobby" ToolTip.Tip="If true, the player will skip the lobby entirely and will load straight into the elevator when this expedition is selected."
+                                                              IsChecked="{Binding ActiveEditingExpedition.SkipLobby, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                                    <CheckBox Grid.Row="1" Grid.Column="0" Content="Put Icon Above Tier" ToolTip.Tip="#TODO"
+                                                              IsChecked="{Binding ActiveEditingExpedition.PutIconAboveTier, Mode=TwoWay}" Margin="0,0,8,6"/>
+                                                    <CheckBox Grid.Row="1" Grid.Column="1" Content="Disable Player Voicelines" ToolTip.Tip="If true, player voicelines will be disabled in the level."
+                                                              IsChecked="{Binding ActiveEditingExpedition.DisablePlayerVoicelines, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                                    <CheckBox Grid.Row="2" Grid.Column="0" Content="Exclude From Progression" ToolTip.Tip="If true, completions of this expedition will not count towards progression requirements of other expeditions."
+                                                              IsChecked="{Binding ActiveEditingExpedition.ExcludeFromProgression, Mode=TwoWay}" Margin="0,0,8,6"/>
+                                                    <CheckBox Grid.Row="2" Grid.Column="1" Content="Hide On Locked" ToolTip.Tip="If true, this level is hidden until it is unlocked. R8 uses this to hide the second half."
+                                                              IsChecked="{Binding ActiveEditingExpedition.HideOnLocked, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                                    <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Hide Roleplay Data On Locked" ToolTip.Tip="If true, the roleplay data (the 'interrupted comms' text) is hidden until the level is unlocked."
+                                                              IsChecked="{Binding ActiveEditingExpedition.HideRolePlayDataOnLocked, Mode=TwoWay}" Margin="0,0,0,0"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Description & Warden Intel -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Description &amp; Warden Intel" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+
+                                                <TextBlock Text="Expedition Description:" ToolTip.Tip="Description of the expedition. This is what is shown to the user in the rundown menu." Margin="0,4,0,2" Foreground="#CCCCCC"/>
+                                                <TextBox Text="{Binding ActiveEditingExpedition.Descriptive.ExpeditionDescription, Mode=TwoWay}"
+                                                         AcceptsReturn="True"
+                                                         TextWrapping="Wrap"
+                                                         Height="65"
+                                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                         FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                         FontSize="12"/>
+
+                                                <TextBlock Text="Roleplayed Warden Intel:" ToolTip.Tip="Roleplayed warden intel of the description. Also known as the 'interrupted comms'.&#x0a;If you want colored text, use `&lt;color=red>text&lt;color>`, and for size, `&lt;size=200%>text&lt;/size>`" Margin="0,4,0,2" Foreground="#CCCCCC"/>
+                                                <TextBox Text="{Binding ActiveEditingExpedition.Descriptive.RoleplayedWardenIntel, Mode=TwoWay}"
+                                                         AcceptsReturn="True"
+                                                         TextWrapping="Wrap"
+                                                         Height="65"
+                                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                         FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                         FontSize="12"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Sectors -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Sectors" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                <TextBlock Text="Main sector is always enabled. Secondary and Overload sectors are automatically enabled when a secondary or overload door is present in the level layout." FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
+
+                                                <StackPanel Orientation="Horizontal" Spacing="24" Margin="0,4,0,0">
+                                                    <CheckBox Content="Secondary Sector" ToolTip.Tip="Enabled when a Secondary Door is present in the level layout."
+                                                              IsChecked="{Binding ActiveEditingExpedition.SecondaryLayerEnabled, Mode=OneWay}"
+                                                              IsEnabled="False"
+                                                              FontWeight="SemiBold"
+                                                              Foreground="#FFA200"/>
+                                                    <CheckBox Content="Overload Sector" ToolTip.Tip="Enabled when an Overload Door is present in the level layout."
+                                                              IsChecked="{Binding ActiveEditingExpedition.ThirdLayerEnabled, Mode=OneWay}"
+                                                              IsEnabled="False"
+                                                              FontWeight="SemiBold"
+                                                              Foreground="#00F2FF"/>
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Done Button -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                            <Button Content="Done"
+                                                    Command="{Binding CloseExpeditionEditor}"
+                                                    Background="#007ACC"
+                                                    Foreground="White"
+                                                    FontWeight="SemiBold"
+                                                    Padding="20,8"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Border>
+
+                        <!-- GLOBAL RUNDOWN SETTINGS MODAL OVERLAY -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsEditingRundownSettings}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#252526"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    Width="540"
+                                    MaxHeight="620"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 20 #80000000">
+                                <ScrollViewer>
+                                    <StackPanel Spacing="16">
+                                        <!-- Header -->
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Overall Rundown Settings"
+                                                       FontSize="18"
+                                                       FontWeight="Bold"
+                                                       Foreground="#FFFFFF"/>
+                                            <Button Grid.Column="1"
+                                                    Content="✕"
+                                                    Command="{Binding CloseRundownSettings}"
+                                                    Padding="8,4"
+                                                    Background="Transparent"/>
+                                        </Grid>
+
+                                        <!-- General Identification -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="General" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the rundown. This is not visible to the player, but is used for identifying the rundown within the editor." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedRundown.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this rundown. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedRundown.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Enabled:" ToolTip.Tip="Whether this rundown is loaded. You'll likely want to leave this checked." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedRundown.InternalEnabled, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Vanity Drop ID:" ToolTip.Tip="If you want your rundown to drop vanity items, put its ID here." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedRundown.VanityItemLayerDropDataBlock, Mode=TwoWay}"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Progression Options -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Progression Rules" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                <CheckBox Content="Use Tier Unlock Requirements" ToolTip.Tip="Whether the custom tier unlock requirements should be used." IsChecked="{Binding SelectedRundown.UseTierUnlockRequirements, Mode=TwoWay}"/>
+                                                <CheckBox Content="Never Show Rundown Tree" ToolTip.Tip="Whether to show the rundown tree. You'll likely want to leave this unchecked. The base game uses this for the &quot;rundown&quot; that contains the tutorial." IsChecked="{Binding SelectedRundown.NeverShowRundownTree, Mode=TwoWay}"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Story & Intel -->
+                                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                                            <StackPanel Spacing="10">
+                                                <TextBlock Text="Story &amp; Intel" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                                
+                                                <TextBlock Text="Title (Header Text):" ToolTip.Tip="The text that displays at the top of the rundown. Normally, this is set to the rundown number (&quot;Rundown 7.0&quot;), and then on a new line, &quot;TITLE: &lt;title>&quot;" Margin="0,4,0,2"/>
+                                                <TextBox Text="{Binding SelectedRundown.StorytellingData.Title, Mode=TwoWay}"
+                                                         AcceptsReturn="True"
+                                                         TextWrapping="Wrap"
+                                                         Height="55"
+                                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                         FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                         FontSize="12"/>
+
+                                                <TextBlock Text="Surface Description (Intel):" ToolTip.Tip="The text displayed to the player when they click the 'Intel' button at the top of a rundown." Margin="0,0,0,2"/>
+                                                <TextBox Text="{Binding SelectedRundown.StorytellingData.SurfaceDescription, Mode=TwoWay}"
+                                                         AcceptsReturn="True"
+                                                         TextWrapping="Wrap"
+                                                         Height="100"
+                                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                         FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                         FontSize="12"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Done Button -->
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                            <Button Content="Done"
+                                                    Command="{Binding CloseRundownSettings}"
+                                                    Background="#007ACC"
+                                                    Foreground="White"
+                                                    FontWeight="SemiBold"
+                                                    Padding="20,8"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Border>
+                        </Border>
+
+                        <!-- DELETE EXPEDITION CONFIRMATION MODAL OVERLAY -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsConfirmingDeleteExpedition}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#252526"
+                                    BorderBrush="#444444"
+                                    BorderThickness="1"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    Width="440"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 4 20 #80000000">
+                                <StackPanel Spacing="16">
+                                    <TextBlock Text="Confirm Deletion"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="#FF6B6B"/>
+
+                                    <TextBlock Text="{Binding DeleteExpeditionConfirmationMessage}"
+                                               TextWrapping="Wrap"
+                                               FontSize="13"
+                                               Foreground="#E0E0E0"/>
+
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                                        <Button Content="Cancel"
+                                                Command="{Binding CancelDeleteExpedition}"
+                                                Padding="16,8"/>
+                                        <Button Content="Delete"
+                                                Command="{Binding ConfirmDeleteExpedition}"
+                                                Background="#D9534F"
+                                                Foreground="White"
+                                                FontWeight="SemiBold"
+                                                Padding="16,8"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+
+                        <!-- INTEL MODAL OVERLAY -->
+                        <Border Grid.Row="0" Grid.RowSpan="2"
+                                Background="#80000000"
+                                IsVisible="{Binding IsShowingIntel}"
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch">
+                            <Border Background="#1A2026"
+                                    BorderBrush="#E5A93C"
+                                    BorderThickness="1.5"
+                                    CornerRadius="8"
+                                    Padding="24"
+                                    Width="650"
+                                    MaxHeight="600"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    BoxShadow="0 6 24 #80000000">
+                                <StackPanel Spacing="16">
+                                    <!-- Modal Header -->
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="2">
+                                            <TextBlock Text="[ INTEL TRANSMISSION ]"
+                                                       FontSize="16"
+                                                       FontWeight="Bold"
+                                                       Foreground="#E5A93C"/>
+                                            <TextBlock Text="Surface Description &amp; Mission Briefing Intel"
+                                                       FontSize="11"
+                                                       Foreground="#888888"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Content="✕"
+                                                Command="{Binding CloseIntelDialog}"
+                                                Padding="8,4"
+                                                Background="Transparent"/>
+                                    </Grid>
+
+                                    <!-- Rundown Title Quick Edit -->
+                                    <Border BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="10" Background="#12161C">
+                                        <StackPanel Spacing="6">
+                                            <TextBlock Text="Rundown Title (Header Text):" ToolTip.Tip="The text that displays at the top of the rundown. Normally, this is set to the rundown number (&quot;Rundown 7.0&quot;), and then on a new line, &quot;TITLE: &lt;title>&quot;" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+                                            <TextBox Text="{Binding SelectedRundown.StorytellingData.Title, Mode=TwoWay}"
+                                                     AcceptsReturn="True"
+                                                     TextWrapping="Wrap"
+                                                     Height="55"
+                                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                     Watermark="e.g. RUNDOWN #7.0&#x0a;TITLE: RISE"
+                                                     FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                     FontSize="12"
+                                                     Background="#0C1014"
+                                                     Foreground="#D0D0D0"
+                                                     Padding="8"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Surface Description (Intel) Text Editor -->
+                                    <Border BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="10" Background="#12161C">
+                                        <StackPanel Spacing="8">
+                                            <TextBlock Text="Surface Description (Intel Text):" ToolTip.Tip="The text displayed to the player when they click the 'Intel' button at the top of a rundown." FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+                                            <TextBox Text="{Binding SelectedRundown.StorytellingData.SurfaceDescription, Mode=TwoWay}"
+                                                     AcceptsReturn="True"
+                                                     TextWrapping="Wrap"
+                                                     Height="240"
+                                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                                     Watermark="Enter Intel / Surface Description..."
+                                                     FontFamily="Consolas, Menlo, Monaco, monospace"
+                                                     FontSize="12"
+                                                     Background="#0C1014"
+                                                     Foreground="#D0D0D0"
+                                                     Padding="8"/>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <!-- Done Button -->
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,4,0,0">
+                                        <Button Content="Done"
+                                                Command="{Binding CloseIntelDialog}"
+                                                Background="#E5A93C"
+                                                Foreground="#000000"
+                                                FontWeight="Bold"
+                                                Padding="20,8"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </Border>
+                    </Grid>
+                </Panel>
             </TabItem>
         </TabControl>
     </Grid>

@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 90.00034,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": -1.9073486E-06
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.00017,
+          "expanderPosition": {
+            "x": -1.9073486E-06,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270,
+          "expanderPosition": {
+            "x": -32,
+            "y": 0,
+            "z": 1.9073486E-06
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -0.0001673396,
+          "expanderPosition": {
+            "x": 1.9073486E-06,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_destroyed_HA_03.prefab",
+  "modDependency": null
+}

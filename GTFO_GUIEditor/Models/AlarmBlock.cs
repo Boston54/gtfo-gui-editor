@@ -11,6 +11,7 @@ public class AlarmBlock : INotifyPropertyChanged
 {
     private uint _persistentId;
     private string _name = "";
+    private string _publicAlarmName = "";
     private bool _internalEnabled = true;
 
     // Wave Roles (Enemy References)
@@ -77,6 +78,13 @@ public class AlarmBlock : INotifyPropertyChanged
                 OnPropertyChanged(nameof(DisplayText));
             }
         }
+    }
+
+    [JsonPropertyName("PublicAlarmName")]
+    public string PublicAlarmName
+    {
+        get => _publicAlarmName;
+        set => SetField(ref _publicAlarmName, value);
     }
 
     [JsonPropertyName("internalEnabled")]
@@ -354,6 +362,7 @@ public class AlarmBlock : INotifyPropertyChanged
         {
             PersistentId = PersistentId,
             Name = Name,
+            PublicAlarmName = PublicAlarmName,
             InternalEnabled = InternalEnabled,
 
             WaveRoleWeakling = WaveRoleWeakling,

@@ -203,6 +203,7 @@ public class AlarmTests
 
         // Success creation
         vm.NewAlarmPersistentId = 555;
+        vm.NewAlarmPublicAlarmName = "Class IV Alarm";
         created = vm.ConfirmCreateAlarm();
         Assert.True(created);
         Assert.False(vm.IsCreatingAlarm);
@@ -210,6 +211,7 @@ public class AlarmTests
         Assert.NotNull(vm.SelectedAlarm);
         Assert.Equal((uint)555, vm.SelectedAlarm.PersistentId);
         Assert.Equal("New Valid Alarm", vm.SelectedAlarm.Name);
+        Assert.Equal("Class IV Alarm", vm.SelectedAlarm.PublicAlarmName);
     }
 
     [Fact]

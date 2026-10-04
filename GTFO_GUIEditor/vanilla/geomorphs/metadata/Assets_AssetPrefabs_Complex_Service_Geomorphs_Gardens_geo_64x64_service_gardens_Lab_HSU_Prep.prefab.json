@@ -1,0 +1,56 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 0.00033980186,
+          "expanderPosition": {
+            "x": -1.6212463E-05,
+            "y": 0,
+            "z": 32.000008
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.00032,
+          "expanderPosition": {
+            "x": 3.1471252E-05,
+            "y": 0,
+            "z": -31.999992
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 269.99988,
+          "expanderPosition": {
+            "x": -31.999992,
+            "y": 0,
+            "z": -6.198883E-05
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 89.99981,
+          "expanderPosition": {
+            "x": 32.000008,
+            "y": 0,
+            "z": 2.9563904E-05
+          },
+          "direction": "Right"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Gardens/geo_64x64_service_gardens_Lab_HSU_Prep.prefab",
+  "modDependency": null
+}

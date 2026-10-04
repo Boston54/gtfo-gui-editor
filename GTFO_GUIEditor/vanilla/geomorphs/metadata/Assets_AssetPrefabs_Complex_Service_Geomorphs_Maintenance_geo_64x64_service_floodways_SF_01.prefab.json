@@ -1,0 +1,186 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 3,
+          "y_angle": -0.0003876132,
+          "expanderPosition": {
+            "x": 28.1,
+            "y": 0.073,
+            "z": 18.040003
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 359.7241,
+          "expanderPosition": {
+            "x": -26.039,
+            "y": -0.007003784,
+            "z": -11.102
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.000015,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": 0
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99997,
+          "expanderPosition": {
+            "x": -0.01,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 2,
+          "y_angle": 0.14411335,
+          "expanderPosition": {
+            "x": -4.799999,
+            "y": -1.2,
+            "z": 13.168
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 0.14411335,
+          "expanderPosition": {
+            "x": -29.427,
+            "y": 5.611,
+            "z": 12.151
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 270,
+          "expanderPosition": {
+            "x": -32.01,
+            "y": 0,
+            "z": 0
+          },
+          "direction": "Left"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 359.7241,
+          "expanderPosition": {
+            "x": -26.039,
+            "y": -0.007003784,
+            "z": -11.102
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 3,
+          "y_angle": 90.14396,
+          "expanderPosition": {
+            "x": 11.097,
+            "y": 0.04,
+            "z": 17.851
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -6.659434E-05,
+          "expanderPosition": {
+            "x": -0.009994507,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.14411335,
+          "expanderPosition": {
+            "x": -4.799999,
+            "y": -1.2,
+            "z": 13.168
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 0.14411335,
+          "expanderPosition": {
+            "x": -29.427,
+            "y": 5.611,
+            "z": 12.151
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": -0.0003876132,
+          "expanderPosition": {
+            "x": 28.1,
+            "y": 0.073,
+            "z": 18.040003
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 90.14396,
+          "expanderPosition": {
+            "x": 11.097,
+            "y": 0.04,
+            "z": 17.851
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Service/Geomorphs/Maintenance/geo_64x64_service_floodways_SF_01.prefab",
+  "modDependency": null
+}

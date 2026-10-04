@@ -1,0 +1,86 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": -0.00043030188,
+          "expanderPosition": {
+            "x": -9.67,
+            "y": -2.03,
+            "z": -9.46
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99988,
+          "expanderPosition": {
+            "x": 2.670288E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 179.99963,
+          "expanderPosition": {
+            "x": 9.777,
+            "y": -2.03,
+            "z": -9.46
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 179.99963,
+          "expanderPosition": {
+            "x": 9.777,
+            "y": -2.03,
+            "z": -9.46
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": -4.7811325E-05,
+          "expanderPosition": {
+            "x": -2.670288E-05,
+            "y": 0,
+            "z": 32
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": -0.00043030188,
+          "expanderPosition": {
+            "x": -9.67,
+            "y": -2.03,
+            "z": -9.46
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_I_HA_AW.prefab",
+  "modDependency": null
+}

@@ -1,0 +1,96 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 43.390495,
+          "expanderPosition": {
+            "x": 24.583122,
+            "y": 3.96,
+            "z": 25.028994
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 225.09224,
+          "expanderPosition": {
+            "x": -21.629894,
+            "y": 3.88,
+            "z": -22.489998
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 90.000145,
+          "expanderPosition": {
+            "x": 32,
+            "y": 0,
+            "z": -3.7193295E-05
+          },
+          "direction": "Right"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 180.00012,
+          "expanderPosition": {
+            "x": 0.019962842,
+            "y": -0.581,
+            "z": -31.97
+          },
+          "direction": "Backwards"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 43.390495,
+          "expanderPosition": {
+            "x": 24.583122,
+            "y": 3.96,
+            "z": 25.028994
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 225.09224,
+          "expanderPosition": {
+            "x": -21.629894,
+            "y": 3.88,
+            "z": -22.489998
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_VS_01.prefab",
+  "modDependency": null
+}

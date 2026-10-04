@@ -1,0 +1,106 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 104.900215,
+          "expanderPosition": {
+            "x": 149.85568,
+            "y": -8.54,
+            "z": 108.88779
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 2,
+          "y_angle": 122.520744,
+          "expanderPosition": {
+            "x": 39.628242,
+            "y": 7.204938,
+            "z": 203.88522
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 3,
+          "y_angle": 23.723803,
+          "expanderPosition": {
+            "x": 106.48198,
+            "y": -3.2300003,
+            "z": 285.1212
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 104.900215,
+          "expanderPosition": {
+            "x": 149.85568,
+            "y": -8.54,
+            "z": 108.88779
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 122.520744,
+          "expanderPosition": {
+            "x": 39.628242,
+            "y": 7.204938,
+            "z": 203.88522
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 0,
+          "y_angle": 23.723803,
+          "expanderPosition": {
+            "x": 106.48198,
+            "y": -3.2300003,
+            "z": 285.1212
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Dimensions/Desert/Dimension_Desert_Dune_camp_03.prefab",
+  "modDependency": null
+}

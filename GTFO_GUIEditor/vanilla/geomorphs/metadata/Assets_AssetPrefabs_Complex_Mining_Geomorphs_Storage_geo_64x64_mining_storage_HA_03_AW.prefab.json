@@ -1,0 +1,96 @@
+{
+  "areaDatas": [
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 1,
+          "y_angle": 90.00033,
+          "expanderPosition": {
+            "x": -15.49999,
+            "y": 0,
+            "z": 10.000015
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": -1,
+          "y_angle": 179.99998,
+          "expanderPosition": {
+            "x": -2.861023E-05,
+            "y": 0,
+            "z": -32
+          },
+          "direction": "Backwards"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": 2,
+          "y_angle": 270.00006,
+          "expanderPosition": {
+            "x": 8.500018,
+            "y": -0.034,
+            "z": 21
+          },
+          "direction": "InZoneArea"
+        },
+        {
+          "areaTo": 0,
+          "y_angle": 90.00033,
+          "expanderPosition": {
+            "x": -15.49999,
+            "y": 0,
+            "z": 10.000015
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    },
+    {
+      "mesh": {
+        "vertexCount": 0,
+        "vertices": [],
+        "edgeCount": 0,
+        "edges": []
+      },
+      "expanderDatas": [
+        {
+          "areaTo": -1,
+          "y_angle": 4.7811325E-05,
+          "expanderPosition": {
+            "x": 2.7656555E-05,
+            "y": 0,
+            "z": 32.000004
+          },
+          "direction": "Forwards"
+        },
+        {
+          "areaTo": 1,
+          "y_angle": 270.00006,
+          "expanderPosition": {
+            "x": 8.500018,
+            "y": -0.034,
+            "z": 21
+          },
+          "direction": "InZoneArea"
+        }
+      ]
+    }
+  ],
+  "geoAssetLink": "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Storage/geo_64x64_mining_storage_HA_03_AW.prefab",
+  "modDependency": null
+}
