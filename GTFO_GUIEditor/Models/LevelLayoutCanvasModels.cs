@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using Avalonia.Media;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
@@ -354,6 +357,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     private int _gridX = 0;
     private int _gridY = 0;
     private double _cellDimension = 64.0;
+    private double _rotationAngle;
     private double _worldX;
     private double _worldY;
     private double _worldLeft;
@@ -362,6 +366,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     private int _heightInCells = 1;
     private GeomorphMetadata _metadata = new();
     private ObservableCollection<PlacedDoorNode> _doors = new();
+    private ObservableCollection<PlacedRoomNode> _rooms = new();
     private readonly HashSet<int> _generatedRooms = new();
     private readonly Dictionary<int, int> _roomZones = new();
 
@@ -385,6 +390,11 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     public void SetRoomZone(int areaIndex, int zoneIndex)
     {
         _roomZones[areaIndex] = zoneIndex;
+        var room = _rooms.FirstOrDefault(r => r.AreaIndex == areaIndex);
+        if (room != null)
+        {
+            room.Zone = zoneIndex;
+        }
     }
 
     public string Id
@@ -439,6 +449,18 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(WidthInPixels));
                 OnPropertyChanged(nameof(HeightInPixels));
+                UpdateWorldPosition();
+            }
+        }
+    }
+
+    public double RotationAngle
+    {
+        get => _rotationAngle;
+        set
+        {
+            if (SetField(ref _rotationAngle, value))
+            {
                 UpdateWorldPosition();
             }
         }
@@ -510,6 +532,12 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
         set => SetField(ref _doors, value);
     }
 
+    public ObservableCollection<PlacedRoomNode> Rooms
+    {
+        get => _rooms;
+        set => SetField(ref _rooms, value);
+    }
+
     public void UpdateWorldPosition()
     {
         WorldLeft = GridX * CellDimension;
@@ -521,6 +549,12 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
         {
             door.WorldX = WorldX + door.LocalX;
             door.WorldY = WorldY + door.LocalY;
+        }
+
+        foreach (var room in Rooms)
+        {
+            room.WorldX = WorldX;
+            room.WorldY = WorldY;
         }
     }
 
@@ -553,4 +587,161 @@ public class GeomorphOption
     public string DisplayText => string.IsNullOrWhiteSpace(Category)
         ? DisplayName
         : $"{DisplayName} ({Category})";
+}
+
+public class RotationOption
+{
+    public double RotationAngle { get; set; }
+    public string DisplayText { get; set; } = string.Empty;
+
+    public override string ToString() => DisplayText;
+}
+
+public class PlacedRoomNode : INotifyPropertyChanged
+{
+    private string _id = Guid.NewGuid().ToString();
+    private PlacedGeomorphNode _geomorph = null!;
+    private int _areaIndex;
+    private int _zone;
+    private double _worldX;
+    private double _worldY;
+    private string _svgContent = string.Empty;
+    private string _svgPathData = string.Empty;
+    private Geometry? _geometry;
+    private IBrush _fillBrush = RoomSvgService.GetZoneFillBrush(0);
+    private IBrush _strokeBrush = RoomSvgService.GetZoneStrokeBrush(0);
+    private double _strokeThickness = 0.0;
+    private bool _isVisible = true;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    public string Id
+    {
+        get => _id;
+        set => SetField(ref _id, value);
+    }
+
+    public PlacedGeomorphNode Geomorph
+    {
+        get => _geomorph;
+        set => SetField(ref _geomorph, value);
+    }
+
+    public int AreaIndex
+    {
+        get => _areaIndex;
+        set
+        {
+            if (SetField(ref _areaIndex, value))
+            {
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
+    public int Zone
+    {
+        get => _zone;
+        set
+        {
+            if (SetField(ref _zone, value))
+            {
+                FillBrush = RoomSvgService.GetZoneFillBrush(value);
+                StrokeBrush = RoomSvgService.GetZoneStrokeBrush(value);
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
+    public double WorldX
+    {
+        get => _worldX;
+        set
+        {
+            if (SetField(ref _worldX, value))
+            {
+                OnPropertyChanged(nameof(CanvasLeft));
+            }
+        }
+    }
+
+    public double WorldY
+    {
+        get => _worldY;
+        set
+        {
+            if (SetField(ref _worldY, value))
+            {
+                OnPropertyChanged(nameof(CanvasTop));
+            }
+        }
+    }
+
+    public double CanvasLeft => WorldX;
+    public double CanvasTop => WorldY;
+
+    public string SvgContent
+    {
+        get => _svgContent;
+        set => SetField(ref _svgContent, value);
+    }
+
+    public string SvgPathData
+    {
+        get => _svgPathData;
+        set => SetField(ref _svgPathData, value);
+    }
+
+    public Geometry? Geometry
+    {
+        get => _geometry;
+        set
+        {
+            if (SetField(ref _geometry, value))
+            {
+                OnPropertyChanged(nameof(HasGeometry));
+            }
+        }
+    }
+
+    public bool HasGeometry => _geometry != null;
+
+    public IBrush FillBrush
+    {
+        get => _fillBrush;
+        set => SetField(ref _fillBrush, value);
+    }
+
+    public IBrush StrokeBrush
+    {
+        get => _strokeBrush;
+        set => SetField(ref _strokeBrush, value);
+    }
+
+    public double StrokeThickness
+    {
+        get => _strokeThickness;
+        set => SetField(ref _strokeThickness, value);
+    }
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set => SetField(ref _isVisible, value);
+    }
+
+    public string DisplayName => $"{Geomorph?.DisplayName ?? "Room"} - Area {AreaIndex} (Zone {Zone})";
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }

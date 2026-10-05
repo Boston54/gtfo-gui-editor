@@ -230,6 +230,50 @@
                                                        Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}"
                                                        Stroke="#37474F" StrokeThickness="2" Fill="Transparent"/>
 
+                                            <!-- Placed Rooms / Geomorph Meshes -->
+                                            <ItemsControl ItemsSource="{Binding GridState.PlacedRooms}"
+                                                          Canvas.Left="0" Canvas.Top="0"
+                                                          ClipToBounds="False">
+                                                <ItemsControl.Template>
+                                                    <ControlTemplate>
+                                                        <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                        ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                        ClipToBounds="False"/>
+                                                    </ControlTemplate>
+                                                </ItemsControl.Template>
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <Canvas ClipToBounds="False"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemContainerTheme>
+                                                    <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                                        <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                        <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                        <Setter Property="Canvas.ZIndex" Value="5"/>
+                                                        <Setter Property="ClipToBounds" Value="False"/>
+                                                    </ControlTheme>
+                                                </ItemsControl.ItemContainerTheme>
+                                                <ItemsControl.Styles>
+                                                    <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                                        <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                        <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                        <Setter Property="Canvas.ZIndex" Value="5"/>
+                                                        <Setter Property="ClipToBounds" Value="False"/>
+                                                    </Style>
+                                                </ItemsControl.Styles>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:PlacedRoomNode">
+                                                        <Path Data="{Binding Geometry}"
+                                                              Fill="{Binding FillBrush}"
+                                                              Stroke="{Binding StrokeBrush}"
+                                                              StrokeThickness="{Binding StrokeThickness}"
+                                                              IsVisible="{Binding HasGeometry}"
+                                                              ToolTip.Tip="{Binding DisplayName}"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+
                                             <!-- Placed Doors / Connectors -->
                                             <ItemsControl ItemsSource="{Binding GridState.PlacedDoors}"
                                                           Canvas.Left="0" Canvas.Top="0"
@@ -593,6 +637,20 @@
                                               HorizontalAlignment="Stretch">
                                         <ComboBox.ItemTemplate>
                                             <DataTemplate x:DataType="models:GeomorphOption">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </StackPanel>
+
+                                <!-- Tile Rotation Selector -->
+                                <StackPanel Spacing="6" IsVisible="{Binding HasAvailableRotations}">
+                                    <TextBlock Text="Tile Rotation:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                                    <ComboBox ItemsSource="{Binding AvailableExpansionRotations}"
+                                              SelectedItem="{Binding SelectedExpansionRotation, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:RotationOption">
                                                 <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>

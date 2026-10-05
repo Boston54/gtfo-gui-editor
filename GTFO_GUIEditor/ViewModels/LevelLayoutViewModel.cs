@@ -63,6 +63,8 @@ public class LevelLayoutViewModel : ViewModelBase
     private string _geomorphFilterText = string.Empty;
     private ObservableCollection<GeomorphOption> _availableExpansionGeomorphs = new();
     private GeomorphOption? _selectedExpansionGeomorph;
+    private ObservableCollection<RotationOption> _availableExpansionRotations = new();
+    private RotationOption? _selectedExpansionRotation;
     private DoorType _selectedExpansionDoorType = DoorType.RoomDoor;
     private string _expansionErrorMessage = string.Empty;
 
@@ -671,7 +673,67 @@ public class LevelLayoutViewModel : ViewModelBase
     public GeomorphOption? SelectedExpansionGeomorph
     {
         get => _selectedExpansionGeomorph;
-        set => SetField(ref _selectedExpansionGeomorph, value);
+        set
+        {
+            if (SetField(ref _selectedExpansionGeomorph, value))
+            {
+                UpdateAvailableExpansionRotations();
+            }
+        }
+    }
+
+    public ObservableCollection<RotationOption> AvailableExpansionRotations
+    {
+        get => _availableExpansionRotations;
+        set => SetField(ref _availableExpansionRotations, value);
+    }
+
+    public RotationOption? SelectedExpansionRotation
+    {
+        get => _selectedExpansionRotation;
+        set => SetField(ref _selectedExpansionRotation, value);
+    }
+
+    public bool HasAvailableRotations => _availableExpansionRotations.Count > 0;
+
+    private void UpdateAvailableExpansionRotations()
+    {
+        _availableExpansionRotations.Clear();
+        if (_selectedExpansionGeomorph != null && _selectedDoorForExpansion != null)
+        {
+            var validRotations = GridState.GetValidRotationsForGeomorph(_selectedDoorForExpansion, _selectedExpansionGeomorph.PrefabPath);
+            foreach (var rot in validRotations)
+            {
+                _availableExpansionRotations.Add(new RotationOption
+                {
+                    RotationAngle = rot,
+                    DisplayText = $"{rot:0}°"
+                });
+            }
+        }
+
+        OnPropertyChanged(nameof(AvailableExpansionRotations));
+        OnPropertyChanged(nameof(HasAvailableRotations));
+
+        // Preserve current rotation selection if valid, else pick first valid
+        if (_selectedExpansionRotation != null)
+        {
+            var matching = _availableExpansionRotations.FirstOrDefault(r => Math.Abs(r.RotationAngle - _selectedExpansionRotation.RotationAngle) < 0.1);
+            SelectedExpansionRotation = matching ?? _availableExpansionRotations.FirstOrDefault();
+        }
+        else
+        {
+            SelectedExpansionRotation = _availableExpansionRotations.FirstOrDefault();
+        }
+
+        if (_availableExpansionRotations.Count == 0 && _selectedExpansionGeomorph != null)
+        {
+            ExpansionErrorMessage = "Selected geomorph has no door facing the expansion direction.";
+        }
+        else if (ExpansionErrorMessage == "Selected geomorph has no door facing the expansion direction.")
+        {
+            ExpansionErrorMessage = string.Empty;
+        }
     }
 
     public DoorType SelectedExpansionDoorType
@@ -1006,6 +1068,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         OnPropertyChanged(nameof(FilteredExpansionGeomorphs));
         SelectedExpansionGeomorph = _availableExpansionGeomorphs.FirstOrDefault();
+        UpdateAvailableExpansionRotations();
         IsPickingGeomorphForDoor = true;
     }
 
@@ -1020,6 +1083,12 @@ public class LevelLayoutViewModel : ViewModelBase
         if (_selectedExpansionGeomorph == null)
         {
             ExpansionErrorMessage = "Please select a geomorph to generate.";
+            return false;
+        }
+
+        if (_selectedExpansionRotation == null)
+        {
+            ExpansionErrorMessage = "No valid rotation available for this geomorph in this direction.";
             return false;
         }
 
@@ -1050,7 +1119,8 @@ public class LevelLayoutViewModel : ViewModelBase
             return false;
         }
 
-        var placedGeo = GridState.ExpandFromDoor(_selectedDoorForExpansion, _selectedExpansionGeomorph.PrefabPath, SelectedExpansionDoorType);
+        double rotationAngle = _selectedExpansionRotation.RotationAngle;
+        var placedGeo = GridState.ExpandFromDoor(_selectedDoorForExpansion, _selectedExpansionGeomorph.PrefabPath, SelectedExpansionDoorType, rotationAngle);
         if (placedGeo == null)
         {
             ExpansionErrorMessage = "Failed to place geomorph at the target cell.";
@@ -1064,7 +1134,7 @@ public class LevelLayoutViewModel : ViewModelBase
             DoorType.SecurityDoor => " (Security Door)",
             _ => "."
         };
-        StatusText = $"Placed \"{_selectedExpansionGeomorph.DisplayName}\" at cell ({targetX}, {targetY}){doorTypeStr}";
+        StatusText = $"Placed \"{_selectedExpansionGeomorph.DisplayName}\" (Rotation {rotationAngle:0}°) at cell ({targetX}, {targetY}){doorTypeStr}";
 
         IsPickingGeomorphForDoor = false;
         _selectedDoorForExpansion = null;

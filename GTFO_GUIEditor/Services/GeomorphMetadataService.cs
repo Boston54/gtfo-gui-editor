@@ -92,6 +92,16 @@ public static class GeomorphMetadataService
         }
     }
 
+    public static void RegisterMetadata(string prefabPath, GeomorphMetadata metadata)
+    {
+        if (string.IsNullOrWhiteSpace(prefabPath) || metadata == null) return;
+        string normLink = NormalizePath(prefabPath);
+        Cache[normLink] = metadata;
+
+        string fileWithoutExt = Path.GetFileNameWithoutExtension(prefabPath);
+        Cache[fileWithoutExt] = metadata;
+    }
+
     public static GeomorphMetadata? GetMetadata(string? prefabPath)
     {
         if (string.IsNullOrWhiteSpace(prefabPath)) return null;

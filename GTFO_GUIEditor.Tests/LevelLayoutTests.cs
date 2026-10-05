@@ -1985,4 +1985,177 @@ public class LevelLayoutTests
             Assert.False(newGeo.IsRoomGenerated(2));
         }
     }
+
+    [Fact]
+    public void GetValidRotationsForGeomorph_FiltersRotationsBasedOnDoorAlignment()
+    {
+        var gridState = new LevelLayoutGridState();
+        string elevatorPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab";
+        gridState.InitializeStartingTile(elevatorPrefab, 0, 0);
+
+        var rightDoor = gridState.PlacedDoors.First(d => d.Direction == "Right");
+        var northDoor = gridState.PlacedDoors.First(d => d.Direction == "Forwards");
+        var southDoor = gridState.PlacedDoors.First(d => d.Direction == "Backwards");
+        var westDoor = gridState.PlacedDoors.First(d => d.Direction == "Left");
+
+        // Elevator shaft has 4 external doors in all 4 directions -> all 4 rotations are valid from any expanding door
+        var elevatorRotations = gridState.GetValidRotationsForGeomorph(rightDoor, elevatorPrefab);
+        Assert.Equal(4, elevatorRotations.Count);
+        Assert.Contains(0.0, elevatorRotations);
+        Assert.Contains(90.0, elevatorRotations);
+        Assert.Contains(180.0, elevatorRotations);
+        Assert.Contains(270.0, elevatorRotations);
+
+        // Digsite AS 01 has external doors on its unrotated sides:
+        // Area 0: Backwards (South, z = -32)
+        // Area 1: Forwards (North, z = +32)
+        // Area 2: Left (West, x = -32)
+        // Area 3: Right (East, x = +32)
+        string digSiteGeo = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
+        var digsiteRotations = gridState.GetValidRotationsForGeomorph(rightDoor, digSiteGeo);
+        Assert.Equal(4, digsiteRotations.Count); // Has doors in all 4 directions as well
+    }
+
+    [Fact]
+    public void GetValidRotationsForGeomorph_SingleDoorTile_ReturnsOnlyRotationFacingSourceDoor()
+    {
+        var gridState = new LevelLayoutGridState();
+        string elevatorPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab";
+        gridState.InitializeStartingTile(elevatorPrefab, 0, 0);
+
+        var rightDoor = gridState.PlacedDoors.First(d => d.Direction == "Right");
+        var northDoor = gridState.PlacedDoors.First(d => d.Direction == "Forwards");
+        var southDoor = gridState.PlacedDoors.First(d => d.Direction == "Backwards");
+        var westDoor = gridState.PlacedDoors.First(d => d.Direction == "Left");
+
+        // Single North-door metadata (Z = 32 -> LocalY = -32 at 0°):
+        string singleDoorPrefab = "test/single_north_door.prefab";
+        var singleNorthMetadata = new GeomorphMetadata
+        {
+            GeoAssetLink = singleDoorPrefab,
+            AreaDatas = new List<AreaData>
+            {
+                new AreaData
+                {
+                    ExpanderDatas = new List<ExpanderData>
+                    {
+                        new ExpanderData
+                        {
+                            AreaTo = -1,
+                            Direction = "Forwards",
+                            YAngle = 0,
+                            ExpanderPosition = new ExpanderPosition { X = 0, Y = 0, Z = 32 }
+                        }
+                    }
+                }
+            }
+        };
+        GeomorphMetadataService.RegisterMetadata(singleDoorPrefab, singleNorthMetadata);
+
+        // Expanding East (into 1, 0): connecting door must be at West (-X, localX = -32, localY = 0)
+        // Original North door (0, -32) rotated 270° clockwise becomes (-32, 0)
+        var eastRotations = gridState.GetValidRotationsForGeomorph(rightDoor, singleDoorPrefab);
+        Assert.Single(eastRotations);
+        Assert.Equal(270.0, eastRotations[0]);
+
+        // Expanding South (into 0, 1): connecting door must be at North (+Z, localX = 0, localY = -32)
+        // Original North door (0, -32) at 0° is (0, -32)
+        var southRotations = gridState.GetValidRotationsForGeomorph(southDoor, singleDoorPrefab);
+        Assert.Single(southRotations);
+        Assert.Equal(0.0, southRotations[0]);
+
+        // Expanding West (into -1, 0): connecting door must be at East (+X, localX = 32, localY = 0)
+        // Original North door (0, -32) rotated 90° clockwise becomes (32, 0)
+        var westRotations = gridState.GetValidRotationsForGeomorph(westDoor, singleDoorPrefab);
+        Assert.Single(westRotations);
+        Assert.Equal(90.0, westRotations[0]);
+
+        // Expanding North (into 0, -1): connecting door must be at South (-Z, localX = 0, localY = 32)
+        // Original North door (0, -32) rotated 180° clockwise becomes (0, 32)
+        var northRotations = gridState.GetValidRotationsForGeomorph(northDoor, singleDoorPrefab);
+        Assert.Single(northRotations);
+        Assert.Equal(180.0, northRotations[0]);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_RotationSelection_LimitsOptionsAndAppliesRotation()
+    {
+        var set = new ComplexResourceSetBlock
+        {
+            Name = "Mining Complex",
+            PersistentId = 1,
+            ElevatorShafts_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab" }
+            },
+            GeomorphTiles_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab" }
+            }
+        };
+
+        var level = new LevelLayoutBlock
+        {
+            Name = "Mining Level",
+            PersistentId = 10,
+            ComplexResourceSet = 1,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+        };
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock> { level });
+
+        var eastDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Right");
+        vm.OpenDoorExpansionDialog(eastDoor);
+
+        Assert.True(vm.IsPickingGeomorphForDoor);
+        Assert.True(vm.HasAvailableRotations);
+        Assert.NotEmpty(vm.AvailableExpansionRotations);
+        Assert.NotNull(vm.SelectedExpansionRotation);
+
+        // Pick 90° rotation
+        var rot90 = vm.AvailableExpansionRotations.FirstOrDefault(r => r.RotationAngle == 90.0);
+        Assert.NotNull(rot90);
+        vm.SelectedExpansionRotation = rot90;
+
+        bool success = vm.ConfirmDoorExpansion();
+        Assert.True(success);
+        Assert.False(vm.IsPickingGeomorphForDoor);
+
+        var placed = vm.GridState.GetGeomorphAt(1, 0);
+        Assert.NotNull(placed);
+        Assert.Equal(90.0, placed.RotationAngle);
+    }
+
+    [Fact]
+    public void LevelLayoutGridState_ExpandWithRotation_RotatesDoorsAndGeometryProperly()
+    {
+        var gridState = new LevelLayoutGridState();
+        string elevatorPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab";
+        gridState.InitializeStartingTile(elevatorPrefab, 0, 0);
+
+        var rightDoor = gridState.PlacedDoors.First(d => d.Direction == "Right");
+
+        // Expand East into (1, 0) with 90° rotation
+        var newGeo = gridState.ExpandFromDoor(rightDoor, elevatorPrefab, DoorType.RoomDoor, rotationAngle: 90.0);
+        Assert.NotNull(newGeo);
+        Assert.Equal(90.0, newGeo.RotationAngle);
+
+        // Elevator shaft doors at 0°:
+        // Forwards (0°): LocalX = 0, LocalY = -32
+        // Right (90°): LocalX = 32, LocalY = 0
+        // Backwards (180°): LocalX = 0, LocalY = 32
+        // Left (270°): LocalX = -32, LocalY = 0
+
+        // At 90° clockwise rotation:
+        // Forwards -> LocalX = 32, LocalY = 0 (Facing East / Right, Angle = 90°)
+        // Right -> LocalX = 0, LocalY = 32 (Facing South / Backwards, Angle = 180°)
+        // Backwards -> LocalX = -32, LocalY = 0 (Facing West / Left, Angle = 270°) -> connects to rightDoor at (64, 32)!
+        // Left -> LocalX = 0, LocalY = -32 (Facing North / Forwards, Angle = 0°)
+
+        var connectingDoor = newGeo.Doors.FirstOrDefault(d => Math.Abs(d.WorldX - 64.0) < 1.0 && Math.Abs(d.WorldY - 32.0) < 1.0);
+        Assert.NotNull(connectingDoor);
+        Assert.True(connectingDoor.IsConnected);
+        Assert.Equal(270.0, connectingDoor.RotationAngle, precision: 1);
+        Assert.Equal(rightDoor, connectingDoor.ConnectedDoor);
+    }
 }

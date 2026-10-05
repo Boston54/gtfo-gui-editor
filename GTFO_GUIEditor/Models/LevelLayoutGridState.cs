@@ -15,6 +15,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     private double _cellDimension = 64.0;
     private ObservableCollection<PlacedGeomorphNode> _placedGeomorphs = new();
     private ObservableCollection<PlacedDoorNode> _placedDoors = new();
+    private ObservableCollection<PlacedRoomNode> _placedRooms = new();
     private double _zoom = 4.0;
     private double _panX = 400.0;
     private double _panY = 300.0;
@@ -182,6 +183,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         set => SetField(ref _placedDoors, value);
     }
 
+    public ObservableCollection<PlacedRoomNode> PlacedRooms
+    {
+        get => _placedRooms;
+        set => SetField(ref _placedRooms, value);
+    }
+
     public double Zoom
     {
         get => _zoom;
@@ -283,6 +290,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     {
         PlacedGeomorphs.Clear();
         PlacedDoors.Clear();
+        PlacedRooms.Clear();
         OnPropertyChanged(nameof(HasGridSizeWarning));
         OnPropertyChanged(nameof(GridSizeWarningMessage));
     }
@@ -304,6 +312,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         geoNode.SetRoomZone(0, 0);
         PlacedGeomorphs.Add(geoNode);
 
+        foreach (var room in geoNode.Rooms)
+        {
+            if (!PlacedRooms.Contains(room))
+            {
+                PlacedRooms.Add(room);
+            }
+        }
+
         foreach (var door in geoNode.Doors)
         {
             PlacedDoors.Add(door);
@@ -318,6 +334,122 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     public PlacedGeomorphNode? GetGeomorphAt(int cellX, int cellY)
     {
         return PlacedGeomorphs.FirstOrDefault(g => g.OccupiesCell(cellX, cellY));
+    }
+
+    public static (double RotatedX, double RotatedY) RotateLocalOffset(double x, double y, double angleDegrees)
+    {
+        double normAngle = ((angleDegrees % 360) + 360) % 360;
+        if (Math.Abs(normAngle - 0) < 0.1) return (x == 0 ? 0 : x, y == 0 ? 0 : y);
+        if (Math.Abs(normAngle - 90) < 0.1) return (-y == 0 ? 0 : -y, x == 0 ? 0 : x);
+        if (Math.Abs(normAngle - 180) < 0.1) return (-x == 0 ? 0 : -x, -y == 0 ? 0 : -y);
+        if (Math.Abs(normAngle - 270) < 0.1) return (y == 0 ? 0 : y, -x == 0 ? 0 : -x);
+
+        double rad = normAngle * Math.PI / 180.0;
+        double cos = Math.Cos(rad);
+        double sin = Math.Sin(rad);
+        double rx = x * cos - y * sin;
+        double ry = x * sin + y * cos;
+        return (rx == 0 ? 0 : rx, ry == 0 ? 0 : ry);
+    }
+
+    public static string RotateDirection(string direction, double angleDegrees)
+    {
+        if (string.IsNullOrWhiteSpace(direction) || direction == "InZoneArea")
+        {
+            return direction;
+        }
+
+        double normAngle = ((angleDegrees % 360) + 360) % 360;
+        int steps = (int)Math.Round(normAngle / 90.0) % 4;
+        if (steps == 0) return direction;
+
+        string[] order = { "Forwards", "Right", "Backwards", "Left" };
+        int idx = Array.IndexOf(order, direction);
+        if (idx >= 0)
+        {
+            return order[(idx + steps) % 4];
+        }
+
+        return direction;
+    }
+
+    public List<double> GetValidRotationsForGeomorph(PlacedDoorNode? sourceDoor, string? geomorphPrefab)
+    {
+        var validRotations = new List<double>();
+        if (sourceDoor == null || string.IsNullOrWhiteSpace(geomorphPrefab))
+        {
+            return validRotations;
+        }
+
+        var metadata = GeomorphMetadataService.GetMetadata(geomorphPrefab);
+        if (metadata?.AreaDatas == null || metadata.AreaDatas.Count == 0)
+        {
+            validRotations.Add(0.0);
+            return validRotations;
+        }
+
+        var (targetX, targetY, _) = GetExpansionTargetCell(sourceDoor);
+
+        int baseWidth = 1;
+        int baseHeight = 1;
+        string lowerPath = geomorphPrefab.ToLowerInvariant();
+        if (lowerPath.Contains("128x128") || lowerPath.Contains("2x2"))
+        {
+            baseWidth = 2;
+            baseHeight = 2;
+        }
+        else if (lowerPath.Contains("128x64") || lowerPath.Contains("2x1"))
+        {
+            baseWidth = 2;
+            baseHeight = 1;
+        }
+        else if (lowerPath.Contains("64x128") || lowerPath.Contains("1x2"))
+        {
+            baseWidth = 1;
+            baseHeight = 2;
+        }
+
+        double[] candidateAngles = { 0.0, 90.0, 180.0, 270.0 };
+        foreach (double angle in candidateAngles)
+        {
+            double normAngle = ((angle % 360) + 360) % 360;
+            int widthInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseHeight : baseWidth;
+            int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseWidth : baseHeight;
+
+            double tempWorldLeft = targetX * CellDimension;
+            double tempWorldTop = targetY * CellDimension;
+            double tempWorldCenterX = tempWorldLeft + (widthInCells * CellDimension) / 2.0;
+            double tempWorldCenterY = tempWorldTop + (heightInCells * CellDimension) / 2.0;
+
+            bool hasMatchingDoor = false;
+            foreach (var ad in metadata.AreaDatas)
+            {
+                if (ad.ExpanderDatas == null) continue;
+                foreach (var exp in ad.ExpanderDatas)
+                {
+                    if (exp.AreaTo < 0) // External expander
+                    {
+                        var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, angle);
+                        double expWorldX = tempWorldCenterX + localX;
+                        double expWorldY = tempWorldCenterY + localY;
+                        double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) + Math.Pow(expWorldY - sourceDoor.WorldY, 2));
+                        if (dist < 10.0)
+                        {
+                            hasMatchingDoor = true;
+                            break;
+                        }
+                    }
+                }
+                if (hasMatchingDoor) break;
+            }
+
+            if (hasMatchingDoor)
+            {
+                validRotations.Add(angle);
+            }
+        }
+
+        return validRotations;
     }
 
     public (int targetX, int targetY, string directionName) GetExpansionTargetCell(PlacedDoorNode door)
@@ -368,7 +500,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return ExpandFromDoor(sourceDoor, geomorphPrefab, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab, DoorType doorType = DoorType.RoomDoor)
+    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab, DoorType doorType = DoorType.RoomDoor, double? rotationAngle = null)
     {
         if (sourceDoor.IsInternal) return null;
 
@@ -380,9 +512,48 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             return null;
         }
 
-        if (GetGeomorphAt(targetX, targetY) != null)
+        // Determine actual rotation angle to apply
+        double actualRotation = 0.0;
+        if (rotationAngle.HasValue)
         {
-            return null;
+            actualRotation = rotationAngle.Value;
+        }
+        else
+        {
+            var validRotations = GetValidRotationsForGeomorph(sourceDoor, geomorphPrefab);
+            actualRotation = validRotations.Count > 0 ? validRotations[0] : 0.0;
+        }
+
+        int baseWidth = 1;
+        int baseHeight = 1;
+        string lowerPath = geomorphPrefab.ToLowerInvariant();
+        if (lowerPath.Contains("128x128") || lowerPath.Contains("2x2"))
+        {
+            baseWidth = 2;
+            baseHeight = 2;
+        }
+        else if (lowerPath.Contains("128x64") || lowerPath.Contains("2x1"))
+        {
+            baseWidth = 2;
+            baseHeight = 1;
+        }
+        else if (lowerPath.Contains("64x128") || lowerPath.Contains("1x2"))
+        {
+            baseWidth = 1;
+            baseHeight = 2;
+        }
+
+        double normAngle = ((actualRotation % 360) + 360) % 360;
+        int widthInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseHeight : baseWidth;
+        int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseWidth : baseHeight;
+
+        for (int cx = targetX; cx < targetX + widthInCells; cx++)
+        {
+            for (int cy = targetY; cy < targetY + heightInCells; cy++)
+            {
+                if (cx < minCoord || cx > maxCoord || cy < minCoord || cy > maxCoord) return null;
+                if (GetGeomorphAt(cx, cy) != null) return null;
+            }
         }
 
         int sourceZone = sourceDoor.Geomorph?.GetRoomZone(sourceDoor.AreaFrom) ?? 0;
@@ -397,25 +568,6 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
         int connectingArea = 0;
         double bestDist = double.MaxValue;
-
-        int widthInCells = 1;
-        int heightInCells = 1;
-        string lowerPath = geomorphPrefab.ToLowerInvariant();
-        if (lowerPath.Contains("128x128") || lowerPath.Contains("2x2"))
-        {
-            widthInCells = 2;
-            heightInCells = 2;
-        }
-        else if (lowerPath.Contains("128x64") || lowerPath.Contains("2x1"))
-        {
-            widthInCells = 2;
-            heightInCells = 1;
-        }
-        else if (lowerPath.Contains("64x128") || lowerPath.Contains("1x2"))
-        {
-            widthInCells = 1;
-            heightInCells = 2;
-        }
 
         double tempWorldLeft = targetX * CellDimension;
         double tempWorldTop = targetY * CellDimension;
@@ -433,8 +585,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 {
                     if (exp.AreaTo < 0) // External expander
                     {
-                        double expWorldX = tempWorldCenterX + exp.ExpanderPosition.X;
-                        double expWorldY = tempWorldCenterY - exp.ExpanderPosition.Z;
+                        var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, actualRotation);
+                        double expWorldX = tempWorldCenterX + localX;
+                        double expWorldY = tempWorldCenterY + localY;
                         double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) + Math.Pow(expWorldY - sourceDoor.WorldY, 2));
                         if (dist < bestDist)
                         {
@@ -446,9 +599,17 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
-        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea);
+        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea, rotationAngle: actualRotation);
         newGeo.SetRoomZone(connectingArea, targetZone);
         PlacedGeomorphs.Add(newGeo);
+
+        foreach (var room in newGeo.Rooms)
+        {
+            if (!PlacedRooms.Contains(room))
+            {
+                PlacedRooms.Add(room);
+            }
+        }
 
         foreach (var door in newGeo.Doors)
         {
@@ -991,6 +1152,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     {
         var newDoors = new List<PlacedDoorNode>();
         geoNode.GenerateRoom(areaIdx);
+        CreateRoomNode(geoNode, areaIdx);
 
         if (geoNode.Metadata?.AreaDatas == null || areaIdx < 0 || areaIdx >= geoNode.Metadata.AreaDatas.Count)
         {
@@ -1003,8 +1165,10 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         for (int expIdx = 0; expIdx < areaData.ExpanderDatas.Count; expIdx++)
         {
             var exp = areaData.ExpanderDatas[expIdx];
-            double localX = exp.ExpanderPosition.X;
-            double localY = -exp.ExpanderPosition.Z; // Invert Z to map to 2D canvas Y (+Z is North/-Y)
+            var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, geoNode.RotationAngle);
+            double rotatedAngle = Math.Round(((exp.YAngle + geoNode.RotationAngle) % 360 + 360) % 360, 4);
+            if (Math.Abs(rotatedAngle - 360.0) < 0.0001) rotatedAngle = 0.0;
+            string rotatedDirection = RotateDirection(exp.Direction, geoNode.RotationAngle);
 
             if (exp.AreaTo >= 0)
             {
@@ -1069,8 +1233,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         LocalY = localY,
                         WorldX = geoNode.WorldX + localX,
                         WorldY = geoNode.WorldY + localY,
-                        Direction = exp.Direction,
-                        RotationAngle = exp.YAngle,
+                        Direction = rotatedDirection,
+                        RotationAngle = rotatedAngle,
                         IsConnected = isConnected,
                         IsBlocked = isBlocked
                     };
@@ -1099,8 +1263,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         LocalY = localY,
                         WorldX = geoNode.WorldX + localX,
                         WorldY = geoNode.WorldY + localY,
-                        Direction = exp.Direction,
-                        RotationAngle = exp.YAngle
+                        Direction = rotatedDirection,
+                        RotationAngle = rotatedAngle
                     };
                     geoNode.Doors.Add(doorNode);
                     newDoors.Add(doorNode);
@@ -1111,7 +1275,48 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return newDoors;
     }
 
-    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0)
+    public PlacedRoomNode? CreateRoomNode(PlacedGeomorphNode geoNode, int areaIdx)
+    {
+        var existingRoom = geoNode.Rooms.FirstOrDefault(r => r.AreaIndex == areaIdx);
+        if (existingRoom != null)
+        {
+            if (!PlacedRooms.Contains(existingRoom))
+            {
+                PlacedRooms.Add(existingRoom);
+            }
+            return existingRoom;
+        }
+
+        var areaData = geoNode.Metadata?.AreaDatas != null && areaIdx >= 0 && areaIdx < geoNode.Metadata.AreaDatas.Count
+            ? geoNode.Metadata.AreaDatas[areaIdx]
+            : null;
+
+        int zone = geoNode.GetRoomZone(areaIdx);
+        var mesh = areaData?.Mesh;
+        var (svgContent, svgPathData, geometry) = RoomSvgService.LoadRoomSvg(mesh, zone, geoNode.RotationAngle);
+
+        var roomNode = new PlacedRoomNode
+        {
+            Geomorph = geoNode,
+            AreaIndex = areaIdx,
+            Zone = zone,
+            WorldX = geoNode.WorldX,
+            WorldY = geoNode.WorldY,
+            SvgContent = svgContent,
+            SvgPathData = svgPathData,
+            Geometry = geometry
+        };
+
+        geoNode.Rooms.Add(roomNode);
+        if (!PlacedRooms.Contains(roomNode))
+        {
+            PlacedRooms.Add(roomNode);
+        }
+
+        return roomNode;
+    }
+
+    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0, double rotationAngle = 0.0)
     {
         var metadata = GeomorphMetadataService.GetMetadata(prefabPath) ?? new GeomorphMetadata
         {
@@ -1125,29 +1330,44 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             GridY = gridY,
             CellDimension = CellDimension,
             Metadata = metadata,
-            DisplayName = Path.GetFileNameWithoutExtension(prefabPath)
+            DisplayName = Path.GetFileNameWithoutExtension(prefabPath),
+            RotationAngle = rotationAngle
         };
 
+        int baseWidth = 1;
+        int baseHeight = 1;
         string lowerPath = prefabPath.ToLowerInvariant();
         if (lowerPath.Contains("128x128") || lowerPath.Contains("2x2"))
         {
-            geoNode.WidthInCells = 2;
-            geoNode.HeightInCells = 2;
+            baseWidth = 2;
+            baseHeight = 2;
         }
         else if (lowerPath.Contains("128x64") || lowerPath.Contains("2x1"))
         {
-            geoNode.WidthInCells = 2;
-            geoNode.HeightInCells = 1;
+            baseWidth = 2;
+            baseHeight = 1;
         }
         else if (lowerPath.Contains("64x128") || lowerPath.Contains("1x2"))
         {
-            geoNode.WidthInCells = 1;
-            geoNode.HeightInCells = 2;
+            baseWidth = 1;
+            baseHeight = 2;
         }
         else
         {
-            geoNode.WidthInCells = 1;
-            geoNode.HeightInCells = 1;
+            baseWidth = 1;
+            baseHeight = 1;
+        }
+
+        double normAngle = ((rotationAngle % 360) + 360) % 360;
+        if (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1)
+        {
+            geoNode.WidthInCells = baseHeight;
+            geoNode.HeightInCells = baseWidth;
+        }
+        else
+        {
+            geoNode.WidthInCells = baseWidth;
+            geoNode.HeightInCells = baseHeight;
         }
 
         geoNode.UpdateWorldPosition();
