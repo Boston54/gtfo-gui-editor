@@ -2158,4 +2158,525 @@ public class LevelLayoutTests
         Assert.Equal(270.0, connectingDoor.RotationAngle, precision: 1);
         Assert.Equal(rightDoor, connectingDoor.ConnectedDoor);
     }
+
+    [Fact]
+    public void PlacedDoorNode_MainDoor_PropertiesAndBrush()
+    {
+        var door = new PlacedDoorNode
+        {
+            IsConnected = true
+        };
+
+        door.IsMainDoor = true;
+        Assert.True(door.IsMainDoor);
+        Assert.Equal(DoorType.MainDoor, door.DoorType);
+        Assert.True(door.IsZoneBoundary);
+        Assert.Equal("#CCCCCC", door.DoorBrush);
+        Assert.Contains("[Main Door]", door.TooltipText);
+
+        // Setting another door type should clear IsMainDoor
+        door.IsSecondaryDoor = true;
+        Assert.False(door.IsMainDoor);
+        Assert.True(door.IsSecondaryDoor);
+        Assert.Equal(DoorType.SecondaryDoor, door.DoorType);
+
+        // Setting back via DoorType
+        door.DoorType = DoorType.MainDoor;
+        Assert.True(door.IsMainDoor);
+        Assert.False(door.IsSecondaryDoor);
+        Assert.Equal("#CCCCCC", door.DoorBrush);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_MainDoor_AllowsMultipleMainDoors()
+    {
+        var set = new ComplexResourceSetBlock
+        {
+            Name = "Mining Complex",
+            PersistentId = 1,
+            ElevatorShafts_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab" }
+            },
+            GeomorphTiles_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab" }
+            }
+        };
+
+        var level = new LevelLayoutBlock
+        {
+            Name = "Mining Level",
+            PersistentId = 10,
+            ComplexResourceSet = 1,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+        };
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock> { level });
+
+        // First Main Door expansion to the East
+        var eastDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Right");
+        vm.OpenDoorExpansionDialog(eastDoor);
+        Assert.True(vm.IsPickingGeomorphForDoor);
+
+        vm.IsExpansionMainDoor = true;
+        Assert.Equal(DoorType.MainDoor, vm.SelectedExpansionDoorType);
+
+        bool success1 = vm.ConfirmDoorExpansion();
+        Assert.True(success1);
+        Assert.True(eastDoor.IsMainDoor);
+        Assert.Equal("#CCCCCC", eastDoor.DoorBrush);
+
+        // Second Main Door expansion to the West (multiple Main doors allowed!)
+        var westDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Left");
+        vm.OpenDoorExpansionDialog(westDoor);
+        Assert.True(vm.IsPickingGeomorphForDoor);
+
+        vm.IsExpansionMainDoor = true;
+        bool success2 = vm.ConfirmDoorExpansion();
+        Assert.True(success2);
+        Assert.True(westDoor.IsMainDoor);
+        Assert.Equal("#CCCCCC", westDoor.DoorBrush);
+
+        // Count main doors in the grid
+        int mainDoorCount = vm.GridState.PlacedDoors.Count(d => d.IsMainDoor);
+        Assert.True(mainDoorCount >= 2);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_RoomExpansion_SupportsMainDoor()
+    {
+        var vm = new LevelLayoutViewModel();
+        string multiAreaPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
+        vm.GridState.InitializeStartingTile(multiAreaPrefab, 0, 0);
+
+        var internalDoor = vm.GridState.PlacedDoors.FirstOrDefault(d => d.IsInternal && !d.IsConnected);
+        Assert.NotNull(internalDoor);
+
+        vm.OpenRoomExpansionDialog(internalDoor);
+        Assert.True(vm.IsExpandingRoom);
+
+        vm.IsRoomExpansionMainDoor = true;
+        Assert.Equal(DoorType.MainDoor, vm.SelectedRoomExpansionDoorType);
+
+        bool result = vm.ConfirmRoomExpansion();
+        Assert.True(result);
+        Assert.True(internalDoor.IsMainDoor);
+        Assert.Equal("#CCCCCC", internalDoor.DoorBrush);
+        Assert.Contains("Main Door", vm.StatusText);
+    }
+
+    [Fact]
+    public void LevelLayoutBlock_SectorSettings_DefaultsAndClone()
+    {
+        var block = new LevelLayoutBlock
+        {
+            Name = "Sector Test Level",
+            PersistentId = 50
+        };
+
+        // Defaults
+        Assert.NotNull(block.MainSector);
+        Assert.NotNull(block.SecondarySector);
+        Assert.NotNull(block.OverloadSector);
+        Assert.Equal(1.0, block.MainSector.ArtifactAmountMultiplier);
+        Assert.Equal(1.0, block.SecondarySector.ArtifactAmountMultiplier);
+        Assert.Equal(1.0, block.OverloadSector.ArtifactAmountMultiplier);
+
+        // GetSectorSettings helper
+        Assert.Same(block.MainSector, block.GetSectorSettings(SectorType.Main));
+        Assert.Same(block.SecondarySector, block.GetSectorSettings(SectorType.Secondary));
+        Assert.Same(block.OverloadSector, block.GetSectorSettings(SectorType.Overload));
+
+        // Modify values
+        block.MainSector.ArtifactAmountMultiplier = 0.5;
+        block.SecondarySector.ArtifactAmountMultiplier = 1.8;
+        block.OverloadSector.ArtifactAmountMultiplier = 2.2;
+
+        // Clone
+        var clone = block.Clone();
+        Assert.NotSame(block.MainSector, clone.MainSector);
+        Assert.NotSame(block.SecondarySector, clone.SecondarySector);
+        Assert.NotSame(block.OverloadSector, clone.OverloadSector);
+
+        Assert.Equal(0.5, clone.MainSector.ArtifactAmountMultiplier);
+        Assert.Equal(1.8, clone.SecondarySector.ArtifactAmountMultiplier);
+        Assert.Equal(2.2, clone.OverloadSector.ArtifactAmountMultiplier);
+
+        // Modify clone should not affect original
+        clone.MainSector.ArtifactAmountMultiplier = 3.0;
+        Assert.Equal(0.5, block.MainSector.ArtifactAmountMultiplier);
+        Assert.Equal(3.0, clone.MainSector.ArtifactAmountMultiplier);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_SectorButtons_EnableDisableBasedOnDoors()
+    {
+        var set = new ComplexResourceSetBlock
+        {
+            Name = "Mining Set",
+            PersistentId = 1,
+            ElevatorShafts_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab" }
+            },
+            GeomorphTiles_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab" }
+            }
+        };
+
+        var level = new LevelLayoutBlock
+        {
+            Name = "Mining Level",
+            PersistentId = 10,
+            ComplexResourceSet = 1,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+        };
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock> { level });
+
+        // Initially with level selected and no sector doors:
+        Assert.True(vm.HasSelectedLevel);
+        Assert.True(vm.HasMainSector);
+        Assert.False(vm.HasSecondarySector);
+        Assert.False(vm.HasOverloadSector);
+
+        // Expand with Secondary Door to East
+        var eastDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Right");
+        vm.OpenDoorExpansionDialog(eastDoor);
+        vm.IsExpansionSecondaryDoor = true;
+        Assert.True(vm.ConfirmDoorExpansion());
+
+        Assert.True(vm.HasMainSector);
+        Assert.True(vm.HasSecondarySector);
+        Assert.False(vm.HasOverloadSector);
+
+        // Expand with Overload Door to West
+        var westDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Left");
+        vm.OpenDoorExpansionDialog(westDoor);
+        vm.IsExpansionOverloadDoor = true;
+        Assert.True(vm.ConfirmDoorExpansion());
+
+        Assert.True(vm.HasMainSector);
+        Assert.True(vm.HasSecondarySector);
+        Assert.True(vm.HasOverloadSector);
+
+        // When no level selected, all are false
+        vm.SelectedLevel = null;
+        Assert.False(vm.HasMainSector);
+        Assert.False(vm.HasSecondarySector);
+        Assert.False(vm.HasOverloadSector);
+
+        // Reselect level
+        vm.SelectedLevel = level;
+        Assert.True(vm.HasMainSector);
+        Assert.True(vm.HasSecondarySector);
+        Assert.True(vm.HasOverloadSector);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_SectorSettingsModal_OpensAndEditsSectorSettings()
+    {
+        var level = new LevelLayoutBlock
+        {
+            Name = "Sector Modal Level",
+            PersistentId = 25
+        };
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock>(), new List<LevelLayoutBlock> { level });
+        vm.SelectedLevel = level;
+
+        // 1. Main Sector
+        Assert.False(vm.IsEditingSector);
+        vm.OpenMainSectorSettings();
+        Assert.True(vm.IsEditingSector);
+        Assert.Equal(SectorType.Main, vm.EditingSectorType);
+        Assert.Equal("Sector Settings - Main", vm.EditingSectorTitle);
+        Assert.NotNull(vm.EditingSectorSettings);
+        Assert.Same(level.MainSector, vm.EditingSectorSettings);
+
+        vm.EditingSectorSettings.ArtifactAmountMultiplier = 0.75;
+        vm.CloseSectorSettings();
+        Assert.False(vm.IsEditingSector);
+        Assert.Equal(0.75, level.MainSector.ArtifactAmountMultiplier);
+
+        // 2. Secondary Sector
+        vm.OpenSecondarySectorSettings();
+        Assert.True(vm.IsEditingSector);
+        Assert.Equal(SectorType.Secondary, vm.EditingSectorType);
+        Assert.Equal("Sector Settings - Secondary", vm.EditingSectorTitle);
+        Assert.Same(level.SecondarySector, vm.EditingSectorSettings);
+
+        vm.EditingSectorSettings.ArtifactAmountMultiplier = 1.35;
+        vm.CloseSectorSettings();
+        Assert.False(vm.IsEditingSector);
+        Assert.Equal(1.35, level.SecondarySector.ArtifactAmountMultiplier);
+
+        // 3. Overload Sector
+        vm.OpenOverloadSectorSettings();
+        Assert.True(vm.IsEditingSector);
+        Assert.Equal(SectorType.Overload, vm.EditingSectorType);
+        Assert.Equal("Sector Settings - Overload", vm.EditingSectorTitle);
+        Assert.Same(level.OverloadSector, vm.EditingSectorSettings);
+
+        vm.EditingSectorSettings.ArtifactAmountMultiplier = 2.5;
+        vm.CloseSectorSettings();
+        Assert.False(vm.IsEditingSector);
+        Assert.Equal(2.5, level.OverloadSector.ArtifactAmountMultiplier);
+    }
+
+    [Fact]
+    public void SectorSettings_ZoneAliasStart_ComputesCorrectZoneDisplayName()
+    {
+        var settings = new SectorSettings
+        {
+            ZoneAliasStart = 40
+        };
+
+        Assert.Equal("Zone 40", settings.GetZoneDisplayName(0));
+        Assert.Equal("Zone 42", settings.GetZoneDisplayName(2));
+        Assert.Equal("Zone 55", settings.GetZoneDisplayName(15));
+
+        settings.ZoneAliasStart = 100;
+        Assert.Equal("Zone 100", settings.GetZoneDisplayName(0));
+        Assert.Equal("Zone 103", settings.GetZoneDisplayName(3));
+    }
+
+    [Fact]
+    public void LevelLayoutBlock_GetZoneDisplayName_UsesAppropriateSectorAlias()
+    {
+        var set = new ComplexResourceSetBlock
+        {
+            Name = "Mining Set",
+            PersistentId = 1,
+            ElevatorShafts_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab" }
+            },
+            GeomorphTiles_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab" }
+            }
+        };
+
+        var level = new LevelLayoutBlock
+        {
+            Name = "Mining Level",
+            PersistentId = 10,
+            ComplexResourceSet = 1,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+        };
+
+        level.MainSector.ZoneAliasStart = 20;
+        level.SecondarySector.ZoneAliasStart = 200;
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock> { level });
+        vm.SelectedLevel = level;
+
+        // Elevator room is in Zone 0 (Main Sector)
+        Assert.Equal("Zone 20", level.GetZoneDisplayName(0));
+
+        // Expand Secondary door -> New geomorph placed in Zone 1 (Secondary Sector)
+        var eastDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Right");
+        vm.OpenDoorExpansionDialog(eastDoor);
+        vm.IsExpansionSecondaryDoor = true;
+        Assert.True(vm.ConfirmDoorExpansion());
+
+        Assert.Equal("Zone 20", level.GetZoneDisplayName(0));
+        Assert.Equal("Zone 201", level.GetZoneDisplayName(1));
+    }
+
+    [Fact]
+    public void SectorSettings_WinConditionAndExitZone_ConfiguresCorrectly()
+    {
+        var settings = new SectorSettings
+        {
+            WinCondition = WinCondition.GoToExitGeo,
+            ExitZone = 3
+        };
+
+        Assert.Equal(WinCondition.GoToExitGeo, settings.WinCondition);
+        Assert.Equal(3, settings.ExitZone);
+
+        var clone = settings.Clone();
+        Assert.Equal(WinCondition.GoToExitGeo, clone.WinCondition);
+        Assert.Equal(3, clone.ExitZone);
+    }
+
+    [Fact]
+    public void SectorSettings_ObjectiveType_HsuPlacementAndWeights_ConfiguresCorrectly()
+    {
+        var settings = new SectorSettings
+        {
+            ObjectiveType = ObjectiveType.HSU_FindTakeSample,
+            HsuPlacementZone = 5,
+            HsuPlacementStartWeight = 0.2,
+            HsuPlacementMiddleWeight = 0.5,
+            HsuPlacementEndWeight = 0.3
+        };
+
+        Assert.Equal(ObjectiveType.HSU_FindTakeSample, settings.ObjectiveType);
+        Assert.Equal(5, settings.HsuPlacementZone);
+        Assert.Equal(0.2, settings.HsuPlacementStartWeight);
+        Assert.Equal(0.5, settings.HsuPlacementMiddleWeight);
+        Assert.Equal(0.3, settings.HsuPlacementEndWeight);
+
+        var clone = settings.Clone();
+        Assert.Equal(ObjectiveType.HSU_FindTakeSample, clone.ObjectiveType);
+        Assert.Equal(5, clone.HsuPlacementZone);
+        Assert.Equal(0.2, clone.HsuPlacementStartWeight);
+        Assert.Equal(0.5, clone.HsuPlacementMiddleWeight);
+        Assert.Equal(0.3, clone.HsuPlacementEndWeight);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_SectorSettingsModal_ObjectiveAndZoneOptions_WorksCorrectly()
+    {
+        var set = new ComplexResourceSetBlock
+        {
+            Name = "Mining Set",
+            PersistentId = 1,
+            ElevatorShafts_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab" }
+            },
+            GeomorphTiles_1x1 = new List<PrefabItem>
+            {
+                new PrefabItem { Prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab" }
+            }
+        };
+
+        var level = new LevelLayoutBlock
+        {
+            Name = "Mining Level",
+            PersistentId = 10,
+            ComplexResourceSet = 1,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab"
+        };
+
+        level.MainSector.ZoneAliasStart = 40;
+
+        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock> { level });
+        vm.SelectedLevel = level;
+
+        // Open Main Sector settings
+        vm.OpenMainSectorSettings();
+        Assert.True(vm.IsEditingSector);
+        Assert.NotEmpty(vm.AvailableWinConditions);
+        Assert.NotEmpty(vm.AvailableObjectiveTypes);
+        Assert.NotEmpty(vm.AvailableMainExitZones);
+        Assert.NotEmpty(vm.AvailableObjectiveZones);
+
+        // Win condition starts as GoToElevator
+        Assert.Equal(WinCondition.GoToElevator, vm.SelectedSectorWinCondition);
+        Assert.False(vm.IsExitGeoWinCondition);
+
+        // Switch to GoToExitGeo
+        vm.SelectedSectorWinCondition = WinCondition.GoToExitGeo;
+        Assert.True(vm.IsExitGeoWinCondition);
+        Assert.Equal(WinCondition.GoToExitGeo, level.MainSector.WinCondition);
+
+        // Check Exit Zone options format
+        Assert.Contains(vm.AvailableMainExitZones, opt => opt.ZoneIndex == 0 && opt.DisplayName == "Zone 40");
+
+        // Objective Type is HSU_FindTakeSample
+        Assert.Equal(ObjectiveType.HSU_FindTakeSample, vm.SelectedSectorObjectiveType);
+        Assert.True(vm.IsHsuObjective);
+
+        // Set HSU placement zone & weights
+        Assert.NotNull(vm.SelectedHsuPlacementZoneOption);
+        vm.EditingSectorSettings!.HsuPlacementStartWeight = 0.8;
+        vm.EditingSectorSettings.HsuPlacementMiddleWeight = 0.2;
+        vm.EditingSectorSettings.HsuPlacementEndWeight = 0.0;
+
+        Assert.Equal(0.8, level.MainSector.HsuPlacementStartWeight);
+        Assert.Equal(0.2, level.MainSector.HsuPlacementMiddleWeight);
+        Assert.Equal(0.0, level.MainSector.HsuPlacementEndWeight);
+
+        // Changing ZoneAliasStart updates zone option display names
+        vm.EditingSectorSettings.ZoneAliasStart = 50;
+        Assert.Contains(vm.AvailableMainExitZones, opt => opt.ZoneIndex == 0 && opt.DisplayName == "Zone 50");
+        Assert.Contains(vm.AvailableObjectiveZones, opt => opt.ZoneIndex == 0 && opt.DisplayName == "Zone 50");
+
+        vm.CloseSectorSettings();
+        Assert.False(vm.IsEditingSector);
+    }
+
+    [Fact]
+    public void LevelLayoutGridState_LegendPresenceProperties_ReflectActiveDoorTypes()
+    {
+        var gridState = new LevelLayoutGridState();
+
+        // Initially with no doors, all door legend properties should be false
+        Assert.False(gridState.HasUnexpandedDoors);
+        Assert.False(gridState.HasConnectedDoors);
+        Assert.False(gridState.HasSecurityDoors);
+        Assert.False(gridState.HasMainDoors);
+        Assert.False(gridState.HasSecondaryDoors);
+        Assert.False(gridState.HasOverloadDoors);
+        Assert.False(gridState.HasBlockedDoors);
+
+        var door1 = new PlacedDoorNode();
+        gridState.PlacedDoors.Add(door1);
+
+        // door1 is default (Unexpanded: yellow)
+        Assert.True(gridState.HasUnexpandedDoors);
+        Assert.False(gridState.HasConnectedDoors);
+        Assert.False(gridState.HasSecurityDoors);
+        Assert.False(gridState.HasMainDoors);
+        Assert.False(gridState.HasSecondaryDoors);
+        Assert.False(gridState.HasOverloadDoors);
+        Assert.False(gridState.HasBlockedDoors);
+
+        // Connect door1 -> Connected (purple)
+        door1.IsConnected = true;
+        Assert.False(gridState.HasUnexpandedDoors);
+        Assert.True(gridState.HasConnectedDoors);
+
+        // Add door2 as Security Door (red)
+        var door2 = new PlacedDoorNode { IsSecurityDoor = true };
+        gridState.PlacedDoors.Add(door2);
+        Assert.True(gridState.HasSecurityDoors);
+        Assert.True(gridState.HasConnectedDoors);
+
+        // Add door3 as Main Door (light grey)
+        var door3 = new PlacedDoorNode { IsMainDoor = true };
+        gridState.PlacedDoors.Add(door3);
+        Assert.True(gridState.HasMainDoors);
+
+        // Add door4 as Secondary Door (orange)
+        var door4 = new PlacedDoorNode { IsSecondaryDoor = true };
+        gridState.PlacedDoors.Add(door4);
+        Assert.True(gridState.HasSecondaryDoors);
+
+        // Add door5 as Overload Door (cyan)
+        var door5 = new PlacedDoorNode { IsOverloadDoor = true };
+        gridState.PlacedDoors.Add(door5);
+        Assert.True(gridState.HasOverloadDoors);
+
+        // Add door6 as Blocked (grey)
+        var door6 = new PlacedDoorNode { IsBlocked = true };
+        gridState.PlacedDoors.Add(door6);
+        Assert.True(gridState.HasBlockedDoors);
+
+        // Verify all are true now except Unexpanded
+        Assert.False(gridState.HasUnexpandedDoors);
+        Assert.True(gridState.HasConnectedDoors);
+        Assert.True(gridState.HasSecurityDoors);
+        Assert.True(gridState.HasMainDoors);
+        Assert.True(gridState.HasSecondaryDoors);
+        Assert.True(gridState.HasOverloadDoors);
+        Assert.True(gridState.HasBlockedDoors);
+
+        // Clear gridState -> all reset to false
+        gridState.Clear();
+        Assert.False(gridState.HasUnexpandedDoors);
+        Assert.False(gridState.HasConnectedDoors);
+        Assert.False(gridState.HasSecurityDoors);
+        Assert.False(gridState.HasMainDoors);
+        Assert.False(gridState.HasSecondaryDoors);
+        Assert.False(gridState.HasOverloadDoors);
+        Assert.False(gridState.HasBlockedDoors);
+    }
 }

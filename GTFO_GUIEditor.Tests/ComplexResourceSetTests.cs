@@ -421,4 +421,17 @@ public class ComplexResourceSetTests
         Assert.Equal(LevelProgression.EndLevel, config.LevelProgression);
         Assert.Equal(LevelProgression.MidLevel, cloned.LevelProgression);
     }
+
+    [Fact]
+    public void ComplexResourceSetsViewModel_HasSelectedBlock_ControlsUnifiedLayoutVisibility()
+    {
+        var vm = new ComplexResourceSetsViewModel();
+        Assert.True(vm.HasSelectedBlock);
+        Assert.NotNull(vm.SelectedBlock);
+
+        // Setting SelectedBlock to null triggers empty state
+        vm.SelectedBlock = null;
+        Assert.False(vm.HasSelectedBlock);
+        Assert.Null(vm.SelectedBlock);
+    }
 }

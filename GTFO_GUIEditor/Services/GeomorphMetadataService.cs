@@ -24,22 +24,22 @@ public static class GeomorphMetadataService
 
     public static string GetMetadataDirectory()
     {
-        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vanilla", "geomorphs", "metadata");
+        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Geomorphs", "metadata");
         if (Directory.Exists(outputDir)) return outputDir;
 
-        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "vanilla", "geomorphs", "metadata");
+        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Geomorphs", "metadata");
         if (Directory.Exists(cwdDir)) return cwdDir;
 
-        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "vanilla", "geomorphs", "metadata");
+        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Geomorphs", "metadata");
         if (Directory.Exists(cwdProjectDir)) return cwdProjectDir;
 
         var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         while (dir != null)
         {
-            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "vanilla", "geomorphs", "metadata");
+            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "Data", "Vanilla", "Geomorphs", "metadata");
             if (Directory.Exists(candidateProject)) return candidateProject;
 
-            string candidateVanilla = Path.Combine(dir.FullName, "vanilla", "geomorphs", "metadata");
+            string candidateVanilla = Path.Combine(dir.FullName, "Data", "Vanilla", "Geomorphs", "metadata");
             if (Directory.Exists(candidateVanilla)) return candidateVanilla;
 
             dir = dir.Parent;

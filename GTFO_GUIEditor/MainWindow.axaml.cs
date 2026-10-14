@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
@@ -10,6 +11,8 @@ namespace GTFO_GUIEditor;
 public partial class MainWindow : Window
 {
     private bool _isPanningLevelLayout;
+    private bool _isDraggingPan;
+    private Point _pointerPressedPosition;
     private Point _lastPointerPosition;
     private bool _hasInitializedViewCenter;
 
@@ -51,7 +54,9 @@ public partial class MainWindow : Window
         if (currentPoint.Properties.IsLeftButtonPressed)
         {
             _isPanningLevelLayout = true;
-            _lastPointerPosition = e.GetPosition(sender as Visual);
+            _isDraggingPan = false;
+            _pointerPressedPosition = e.GetPosition(sender as Visual);
+            _lastPointerPosition = _pointerPressedPosition;
             e.Pointer.Capture(sender as Control);
             e.Handled = true;
         }
@@ -59,9 +64,20 @@ public partial class MainWindow : Window
 
     private void OnLevelLayoutPointerMoved(object? sender, PointerEventArgs e)
     {
-        if (_isPanningLevelLayout && DataContext is MainWindowViewModel mainVm)
+        if (DataContext is not MainWindowViewModel mainVm) return;
+
+        var currentPosition = e.GetPosition(sender as Visual);
+
+        if (_isPanningLevelLayout)
         {
-            var currentPosition = e.GetPosition(sender as Visual);
+            double moveX = currentPosition.X - _pointerPressedPosition.X;
+            double moveY = currentPosition.Y - _pointerPressedPosition.Y;
+            double totalMove = Math.Sqrt(moveX * moveX + moveY * moveY);
+            if (totalMove > 4.0)
+            {
+                _isDraggingPan = true;
+            }
+
             double deltaX = currentPosition.X - _lastPointerPosition.X;
             double deltaY = currentPosition.Y - _lastPointerPosition.Y;
             _lastPointerPosition = currentPosition;
@@ -69,21 +85,51 @@ public partial class MainWindow : Window
             mainVm.LevelLayout.Pan(deltaX, deltaY);
             e.Handled = true;
         }
+        else
+        {
+            double worldX = (currentPosition.X - mainVm.LevelLayout.GridState.PanX) / mainVm.LevelLayout.GridState.Zoom;
+            double worldY = (currentPosition.Y - mainVm.LevelLayout.GridState.PanY) / mainVm.LevelLayout.GridState.Zoom;
+            var room = mainVm.LevelLayout.GridState.GetRoomAt(worldX, worldY);
+            mainVm.LevelLayout.GridState.HoveredRoom = room;
+        }
     }
 
     private void OnLevelLayoutPointerReleased(object? sender, PointerReleasedEventArgs e)
     {
         if (_isPanningLevelLayout)
         {
+            bool wasDragging = _isDraggingPan;
             _isPanningLevelLayout = false;
+            _isDraggingPan = false;
             e.Pointer.Capture(null);
             e.Handled = true;
+
+            if (!wasDragging && DataContext is MainWindowViewModel mainVm)
+            {
+                var pos = e.GetPosition(sender as Visual);
+                double worldX = (pos.X - mainVm.LevelLayout.GridState.PanX) / mainVm.LevelLayout.GridState.Zoom;
+                double worldY = (pos.Y - mainVm.LevelLayout.GridState.PanY) / mainVm.LevelLayout.GridState.Zoom;
+                var clickedRoom = mainVm.LevelLayout.GridState.GetRoomAt(worldX, worldY);
+                if (clickedRoom != null)
+                {
+                    mainVm.LevelLayout.OnRoomClicked(clickedRoom);
+                }
+            }
         }
     }
 
     private void OnLevelLayoutPointerCaptureLost(object? sender, PointerCaptureLostEventArgs e)
     {
         _isPanningLevelLayout = false;
+        _isDraggingPan = false;
+    }
+
+    private void OnLevelLayoutPointerExited(object? sender, PointerEventArgs e)
+    {
+        if (!_isPanningLevelLayout && DataContext is MainWindowViewModel mainVm)
+        {
+            mainVm.LevelLayout.GridState.HoveredRoom = null;
+        }
     }
 
     private void OnLevelLayoutPointerWheelChanged(object? sender, PointerWheelEventArgs e)

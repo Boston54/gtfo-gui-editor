@@ -151,19 +151,19 @@ public static class RundownService
 
     public static string GetDatablocksDirectory()
     {
-        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vanilla", "datablocks");
+        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Datablocks");
         if (Directory.Exists(outputDir))
         {
             return outputDir;
         }
 
-        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "vanilla", "datablocks");
+        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Datablocks");
         if (Directory.Exists(cwdDir))
         {
             return cwdDir;
         }
 
-        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "vanilla", "datablocks");
+        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Datablocks");
         if (Directory.Exists(cwdProjectDir))
         {
             return cwdProjectDir;
@@ -172,13 +172,13 @@ public static class RundownService
         var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         while (dir != null)
         {
-            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "vanilla", "datablocks");
+            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "Data", "Vanilla", "Datablocks");
             if (Directory.Exists(candidateProject))
             {
                 return candidateProject;
             }
 
-            string candidateVanilla = Path.Combine(dir.FullName, "vanilla", "datablocks");
+            string candidateVanilla = Path.Combine(dir.FullName, "Data", "Vanilla", "Datablocks");
             if (Directory.Exists(candidateVanilla))
             {
                 return candidateVanilla;

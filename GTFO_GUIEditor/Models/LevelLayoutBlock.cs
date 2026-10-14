@@ -12,10 +12,14 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private string _name = "New Level";
     private bool _internalEnabled = true;
     private uint _persistentId;
+    private ComplexType _complexType = ComplexType.Mining;
     private uint _complexResourceSet;
     private string _elevatorTile = string.Empty;
     private ObservableCollection<DimensionLayoutBlock> _dimensions = new();
     private LevelLayoutGridState? _gridState;
+    private SectorSettings _mainSector = new() { ArtifactAmountMultiplier = 1.0 };
+    private SectorSettings _secondarySector = new() { ArtifactAmountMultiplier = 1.0 };
+    private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0 };
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -52,6 +56,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
         }
     }
 
+    [JsonPropertyName("ComplexType")]
+    public ComplexType ComplexType
+    {
+        get => _complexType;
+        set => SetField(ref _complexType, value);
+    }
+
     [JsonPropertyName("ComplexResourceSet")]
     public uint ComplexResourceSet
     {
@@ -84,6 +95,45 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _dimensions;
         set => SetField(ref _dimensions, value ?? new ObservableCollection<DimensionLayoutBlock>());
+    }
+
+    [JsonPropertyName("MainSector")]
+    public SectorSettings MainSector
+    {
+        get => _mainSector;
+        set => SetField(ref _mainSector, value ?? new SectorSettings());
+    }
+
+    [JsonPropertyName("SecondarySector")]
+    public SectorSettings SecondarySector
+    {
+        get => _secondarySector;
+        set => SetField(ref _secondarySector, value ?? new SectorSettings());
+    }
+
+    [JsonPropertyName("OverloadSector")]
+    public SectorSettings OverloadSector
+    {
+        get => _overloadSector;
+        set => SetField(ref _overloadSector, value ?? new SectorSettings());
+    }
+
+    public SectorSettings GetSectorSettings(SectorType sectorType)
+    {
+        return sectorType switch
+        {
+            SectorType.Main => MainSector,
+            SectorType.Secondary => SecondarySector,
+            SectorType.Overload => OverloadSector,
+            _ => MainSector
+        };
+    }
+
+    public string GetZoneDisplayName(int zoneIndex)
+    {
+        SectorType sector = GridState.GetSectorForZone(zoneIndex);
+        SectorSettings settings = GetSectorSettings(sector);
+        return settings.GetZoneDisplayName(zoneIndex);
     }
 
     [JsonIgnore]
@@ -160,6 +210,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             {
                 DimensionIndex = "Reality",
                 Name = "Reality",
+                ComplexType = ComplexType,
                 ComplexResourceSet = ComplexResourceSet,
                 DimensionGeomorph = ElevatorTile,
                 LevelLayoutData = PersistentId,
@@ -176,6 +227,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
 
         if (string.Equals(dimension.DimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase))
         {
+            ComplexType = dimension.ComplexType;
             ComplexResourceSet = dimension.ComplexResourceSet;
             ElevatorTile = dimension.DimensionGeomorph;
             return;
@@ -215,9 +267,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             Name = Name,
             InternalEnabled = InternalEnabled,
             PersistentId = PersistentId,
+            ComplexType = ComplexType,
             ComplexResourceSet = ComplexResourceSet,
             ElevatorTile = ElevatorTile,
-            Dimensions = new ObservableCollection<DimensionLayoutBlock>(_dimensions.Select(d => d.Clone()))
+            Dimensions = new ObservableCollection<DimensionLayoutBlock>(_dimensions.Select(d => d.Clone())),
+            MainSector = MainSector.Clone(),
+            SecondarySector = SecondarySector.Clone(),
+            OverloadSector = OverloadSector.Clone()
         };
         return clone;
     }

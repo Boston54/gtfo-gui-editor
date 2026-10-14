@@ -9,6 +9,7 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
     private string _dimensionIndex = "Dimension_1";
     private string _name = "Dimension 1";
     private bool _internalEnabled = true;
+    private ComplexType _complexType = ComplexType.Mining;
     private uint _complexResourceSet;
     private string _dimensionGeomorph = string.Empty;
     private uint _levelLayoutData;
@@ -47,6 +48,13 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
     {
         get => _internalEnabled;
         set => SetField(ref _internalEnabled, value);
+    }
+
+    [JsonPropertyName("ComplexType")]
+    public ComplexType ComplexType
+    {
+        get => _complexType;
+        set => SetField(ref _complexType, value);
     }
 
     [JsonPropertyName("ComplexResourceSet")]
@@ -108,6 +116,7 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
             DimensionIndex = DimensionIndex,
             Name = Name,
             InternalEnabled = InternalEnabled,
+            ComplexType = ComplexType,
             ComplexResourceSet = ComplexResourceSet,
             DimensionGeomorph = DimensionGeomorph,
             LevelLayoutData = LevelLayoutData,

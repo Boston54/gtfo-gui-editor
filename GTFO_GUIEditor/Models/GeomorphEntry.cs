@@ -1,13 +1,18 @@
 using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using Avalonia.Media.Imaging;
 using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
-public class GeomorphEntry
+public class GeomorphEntry : INotifyPropertyChanged
 {
     private Bitmap? _imageBitmap;
     private bool _imageAttempted;
+    private string? _imagePath;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     public string Name { get; set; } = string.Empty;
     public string DisplayName { get; set; } = string.Empty;
@@ -22,7 +27,19 @@ public class GeomorphEntry
     public string Category { get; set; } = string.Empty;
     public int VariantIndex { get; set; } = 1;
     public int VariantCount { get; set; } = 1;
-    public string? ImagePath { get; set; }
+
+    public string? ImagePath
+    {
+        get
+        {
+            if (_imagePath == null && !string.IsNullOrWhiteSpace(ImageName))
+            {
+                _imagePath = GeomorphService.FindImageFile(ImageName);
+            }
+            return _imagePath;
+        }
+        set => _imagePath = value;
+    }
 
     public Bitmap? ImageBitmap
     {
@@ -32,9 +49,9 @@ public class GeomorphEntry
             {
                 _imageAttempted = true;
                 _imageBitmap = GeomorphService.LoadImageBitmap(ImageName);
-                if (_imageBitmap != null && ImagePath == null)
+                if (_imageBitmap != null && _imagePath == null)
                 {
-                    ImagePath = GeomorphService.FindImageFile(ImageName);
+                    _imagePath = GeomorphService.FindImageFile(ImageName);
                 }
             }
             return _imageBitmap;
@@ -43,12 +60,19 @@ public class GeomorphEntry
         {
             _imageBitmap = value;
             _imageAttempted = true;
+            OnPropertyChanged(nameof(ImageBitmap));
+            OnPropertyChanged(nameof(HasImageBitmap));
         }
     }
 
     public bool HasImage => !string.IsNullOrWhiteSpace(ImageName);
     public bool HasImageBitmap => ImageBitmap != null;
     public bool HasDescription => !string.IsNullOrWhiteSpace(Description);
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     public override string ToString() => $"{Name} ({PrefabName})";
 }

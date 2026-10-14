@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
@@ -22,7 +23,9 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private double _worldY;
     private string _direction = string.Empty;
     private double _rotationAngle;
+    private GeomorphAltitude _altitude = GeomorphAltitude.Mid;
     private bool _isSecurityDoor;
+    private bool _isMainDoor;
     private bool _isSecondaryDoor;
     private bool _isOverloadDoor;
     private bool _isConnected;
@@ -135,6 +138,12 @@ public class PlacedDoorNode : INotifyPropertyChanged
         }
     }
 
+    public GeomorphAltitude Altitude
+    {
+        get => _altitude;
+        set => SetField(ref _altitude, value);
+    }
+
     public bool IsSecurityDoor
     {
         get => _isSecurityDoor;
@@ -144,8 +153,34 @@ public class PlacedDoorNode : INotifyPropertyChanged
             {
                 if (value)
                 {
+                    _isMainDoor = false;
                     _isSecondaryDoor = false;
                     _isOverloadDoor = false;
+                    OnPropertyChanged(nameof(IsMainDoor));
+                    OnPropertyChanged(nameof(IsSecondaryDoor));
+                    OnPropertyChanged(nameof(IsOverloadDoor));
+                    OnPropertyChanged(nameof(DoorType));
+                }
+                OnPropertyChanged(nameof(IsZoneBoundary));
+                OnPropertyChanged(nameof(DoorBrush));
+                OnPropertyChanged(nameof(TooltipText));
+            }
+        }
+    }
+
+    public bool IsMainDoor
+    {
+        get => _isMainDoor;
+        set
+        {
+            if (SetField(ref _isMainDoor, value))
+            {
+                if (value)
+                {
+                    _isSecurityDoor = false;
+                    _isSecondaryDoor = false;
+                    _isOverloadDoor = false;
+                    OnPropertyChanged(nameof(IsSecurityDoor));
                     OnPropertyChanged(nameof(IsSecondaryDoor));
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
@@ -167,8 +202,10 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 if (value)
                 {
                     _isSecurityDoor = false;
+                    _isMainDoor = false;
                     _isOverloadDoor = false;
                     OnPropertyChanged(nameof(IsSecurityDoor));
+                    OnPropertyChanged(nameof(IsMainDoor));
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
@@ -189,8 +226,10 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 if (value)
                 {
                     _isSecurityDoor = false;
+                    _isMainDoor = false;
                     _isSecondaryDoor = false;
                     OnPropertyChanged(nameof(IsSecurityDoor));
+                    OnPropertyChanged(nameof(IsMainDoor));
                     OnPropertyChanged(nameof(IsSecondaryDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
@@ -207,6 +246,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
         {
             if (IsSecondaryDoor) return DoorType.SecondaryDoor;
             if (IsOverloadDoor) return DoorType.OverloadDoor;
+            if (IsMainDoor) return DoorType.MainDoor;
             if (IsSecurityDoor) return DoorType.SecurityDoor;
             return DoorType.RoomDoor;
         }
@@ -220,14 +260,19 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 case DoorType.OverloadDoor:
                     IsOverloadDoor = true;
                     break;
+                case DoorType.MainDoor:
+                    IsMainDoor = true;
+                    break;
                 case DoorType.SecurityDoor:
                     IsSecurityDoor = true;
                     break;
                 default:
                     _isSecurityDoor = false;
+                    _isMainDoor = false;
                     _isSecondaryDoor = false;
                     _isOverloadDoor = false;
                     OnPropertyChanged(nameof(IsSecurityDoor));
+                    OnPropertyChanged(nameof(IsMainDoor));
                     OnPropertyChanged(nameof(IsSecondaryDoor));
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
@@ -239,7 +284,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
         }
     }
 
-    public bool IsZoneBoundary => IsSecurityDoor || IsSecondaryDoor || IsOverloadDoor;
+    public bool IsZoneBoundary => IsSecurityDoor || IsMainDoor || IsSecondaryDoor || IsOverloadDoor;
 
     public bool IsConnected
     {
@@ -284,6 +329,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
             if (IsBlocked) return "#757575"; // Grey
             if (IsSecondaryDoor) return "#FFA200"; // Secondary Sector
             if (IsOverloadDoor) return "#00F2FF"; // Overload Sector
+            if (IsMainDoor) return "#CCCCCC"; // Main Door (Light Grey)
             if (IsSecurityDoor) return "#FF0000"; // Security Door
             if (IsConnected) return "#9D00FF"; // Expanded / Connected
             return "#FFFF00"; // Unexpanded
@@ -311,6 +357,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
             string secLabel = "";
             if (IsSecondaryDoor) secLabel = " [Secondary Door]";
             else if (IsOverloadDoor) secLabel = " [Overload Door]";
+            else if (IsMainDoor) secLabel = " [Main Door]";
             else if (IsSecurityDoor) secLabel = " [Security Door]";
 
             if (IsBlocked)
@@ -358,6 +405,9 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     private int _gridY = 0;
     private double _cellDimension = 64.0;
     private double _rotationAngle;
+    private GeomorphAltitude _altitude = GeomorphAltitude.Mid;
+    private double _altitudeOffset = 6.0;
+    private uint _lighting;
     private double _worldX;
     private double _worldY;
     private double _worldLeft;
@@ -372,6 +422,57 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public GeomorphAltitude Altitude
+    {
+        get => _altitude;
+        set
+        {
+            if (SetField(ref _altitude, value))
+            {
+                OnPropertyChanged(nameof(AltitudeOffsetValue));
+                UpdateRoomsFillBrush();
+                foreach (var door in Doors)
+                {
+                    door.Altitude = value;
+                }
+            }
+        }
+    }
+
+    public double AltitudeOffset
+    {
+        get => _altitudeOffset;
+        set
+        {
+            if (SetField(ref _altitudeOffset, value))
+            {
+                OnPropertyChanged(nameof(AltitudeOffsetValue));
+                UpdateRoomsFillBrush();
+            }
+        }
+    }
+
+    public double AltitudeOffsetValue => Altitude switch
+    {
+        GeomorphAltitude.High => AltitudeOffset,
+        GeomorphAltitude.Low => -AltitudeOffset,
+        _ => 0.0
+    };
+
+    public uint Lighting
+    {
+        get => _lighting;
+        set => SetField(ref _lighting, value);
+    }
+
+    public void UpdateRoomsFillBrush()
+    {
+        foreach (var room in Rooms)
+        {
+            room.NotifyAltitudeChanged();
+        }
+    }
+
     public IReadOnlyCollection<int> GeneratedRooms => _generatedRooms;
     public IReadOnlyDictionary<int, int> RoomZones => _roomZones;
 
@@ -380,6 +481,17 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     public bool GenerateRoom(int areaIndex)
     {
         return _generatedRooms.Add(areaIndex);
+    }
+
+    public bool UngenerateRoom(int areaIndex)
+    {
+        _roomZones.Remove(areaIndex);
+        var room = _rooms.FirstOrDefault(r => r.AreaIndex == areaIndex);
+        if (room != null)
+        {
+            _rooms.Remove(room);
+        }
+        return _generatedRooms.Remove(areaIndex);
     }
 
     public int GetRoomZone(int areaIndex)
@@ -578,20 +690,86 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     }
 }
 
-public class GeomorphOption
+public class GeomorphOption : INotifyPropertyChanged
 {
+    private Bitmap? _imageBitmap;
+    private bool _imageAttempted;
+    private string _imageName = string.Empty;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     public string DisplayName { get; set; } = string.Empty;
     public string PrefabPath { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
+    public string Complex { get; set; } = string.Empty;
+
+    public string ImageName
+    {
+        get => _imageName;
+        set
+        {
+            if (_imageName != value)
+            {
+                _imageName = value;
+                _imageAttempted = false;
+                _imageBitmap = null;
+                OnPropertyChanged(nameof(ImageName));
+                OnPropertyChanged(nameof(HasImageBitmap));
+            }
+        }
+    }
+
+    public Bitmap? ImageBitmap
+    {
+        get
+        {
+            if (_imageBitmap == null && !_imageAttempted && !string.IsNullOrWhiteSpace(ImageName))
+            {
+                _imageAttempted = true;
+                _imageBitmap = GeomorphService.LoadImageBitmap(ImageName);
+                if (_imageBitmap != null)
+                {
+                    OnPropertyChanged(nameof(HasImageBitmap));
+                }
+            }
+            return _imageBitmap;
+        }
+        set
+        {
+            _imageBitmap = value;
+            _imageAttempted = true;
+            OnPropertyChanged(nameof(ImageBitmap));
+            OnPropertyChanged(nameof(HasImageBitmap));
+        }
+    }
+
+    public bool HasImage => !string.IsNullOrWhiteSpace(ImageName);
+    public bool HasImageBitmap => ImageBitmap != null;
+    public string? ImagePath => GeomorphService.FindImageFile(ImageName);
+    public Geometry? SvgGeometry { get; set; }
+    public bool HasSvgGeometry => SvgGeometry != null;
 
     public string DisplayText => string.IsNullOrWhiteSpace(Category)
         ? DisplayName
         : $"{DisplayName} ({Category})";
+
+    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
 
 public class RotationOption
 {
     public double RotationAngle { get; set; }
+    public string DisplayText { get; set; } = string.Empty;
+
+    public override string ToString() => DisplayText;
+}
+
+public class AltitudeOption
+{
+    public GeomorphAltitude Altitude { get; set; }
     public string DisplayText { get; set; } = string.Empty;
 
     public override string ToString() => DisplayText;
@@ -612,8 +790,32 @@ public class PlacedRoomNode : INotifyPropertyChanged
     private IBrush _strokeBrush = RoomSvgService.GetZoneStrokeBrush(0);
     private double _strokeThickness = 0.0;
     private bool _isVisible = true;
+    private bool _isHovered;
+    private bool _isZoneHighlighted;
+    private double _area;
+    private double _boundsMinX;
+    private double _boundsMinY;
+    private double _boundsMaxX;
+    private double _boundsMaxY;
+    private List<Triangle2D> _triangles2D = new();
+    private double _meshHeight;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public double MeshHeight
+    {
+        get => _meshHeight;
+        set
+        {
+            if (SetField(ref _meshHeight, value))
+            {
+                OnPropertyChanged(nameof(TotalHeight));
+                UpdateFillBrush();
+            }
+        }
+    }
+
+    public double TotalHeight => (Geomorph?.AltitudeOffsetValue ?? 0.0) + MeshHeight;
 
     public string Id
     {
@@ -646,7 +848,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
         {
             if (SetField(ref _zone, value))
             {
-                FillBrush = RoomSvgService.GetZoneFillBrush(value);
+                UpdateFillBrush();
                 StrokeBrush = RoomSvgService.GetZoneStrokeBrush(value);
                 OnPropertyChanged(nameof(DisplayName));
             }
@@ -730,6 +932,144 @@ public class PlacedRoomNode : INotifyPropertyChanged
         set => SetField(ref _isVisible, value);
     }
 
+    public bool IsHovered
+    {
+        get => _isHovered;
+        set
+        {
+            if (SetField(ref _isHovered, value))
+            {
+                UpdateFillBrush();
+                OnPropertyChanged(nameof(ZIndex));
+            }
+        }
+    }
+
+    public bool IsZoneHighlighted
+    {
+        get => _isZoneHighlighted;
+        set
+        {
+            if (SetField(ref _isZoneHighlighted, value))
+            {
+                UpdateFillBrush();
+                OnPropertyChanged(nameof(ZIndex));
+            }
+        }
+    }
+
+    public void SetHighlightState(bool isHovered, bool isZoneHighlighted)
+    {
+        bool changed = false;
+        if (_isHovered != isHovered)
+        {
+            _isHovered = isHovered;
+            OnPropertyChanged(nameof(IsHovered));
+            changed = true;
+        }
+        if (_isZoneHighlighted != isZoneHighlighted)
+        {
+            _isZoneHighlighted = isZoneHighlighted;
+            OnPropertyChanged(nameof(IsZoneHighlighted));
+            changed = true;
+        }
+        if (changed)
+        {
+            UpdateFillBrush();
+            OnPropertyChanged(nameof(ZIndex));
+        }
+    }
+
+    public void NotifyAltitudeChanged()
+    {
+        OnPropertyChanged(nameof(TotalHeight));
+        UpdateFillBrush();
+    }
+
+    public void UpdateFillBrush()
+    {
+        double altOffset = Geomorph?.AltitudeOffset ?? 6.0;
+        double height = TotalHeight;
+
+        if (IsHovered)
+        {
+            FillBrush = RoomSvgService.GetHoveredHeightFillBrush(height, altOffset);
+        }
+        else if (IsZoneHighlighted)
+        {
+            FillBrush = RoomSvgService.GetZoneHighlightHeightFillBrush(height, altOffset);
+        }
+        else
+        {
+            FillBrush = RoomSvgService.GetHeightFillBrush(height, altOffset);
+        }
+    }
+
+    public int ZIndex => IsHovered ? 7 : (IsZoneHighlighted ? 6 : 5);
+
+    public double Area
+    {
+        get => _area;
+        set => SetField(ref _area, value);
+    }
+
+    public double BoundsMinX
+    {
+        get => _boundsMinX;
+        set => SetField(ref _boundsMinX, value);
+    }
+
+    public double BoundsMinY
+    {
+        get => _boundsMinY;
+        set => SetField(ref _boundsMinY, value);
+    }
+
+    public double BoundsMaxX
+    {
+        get => _boundsMaxX;
+        set => SetField(ref _boundsMaxX, value);
+    }
+
+    public double BoundsMaxY
+    {
+        get => _boundsMaxY;
+        set => SetField(ref _boundsMaxY, value);
+    }
+
+    public List<Triangle2D> Triangles2D
+    {
+        get => _triangles2D;
+        set => SetField(ref _triangles2D, value);
+    }
+
+    public bool ContainsWorldPoint(double worldX, double worldY)
+    {
+        if (_triangles2D == null || _triangles2D.Count == 0)
+        {
+            return false;
+        }
+
+        double localX = worldX - WorldX;
+        double localY = worldY - WorldY;
+
+        if (localX < BoundsMinX - 0.5 || localX > BoundsMaxX + 0.5 ||
+            localY < BoundsMinY - 0.5 || localY > BoundsMaxY + 0.5)
+        {
+            return false;
+        }
+
+        foreach (var tri in _triangles2D)
+        {
+            if (RoomSvgService.IsPointInTriangle(localX, localY, tri.X0, tri.Y0, tri.X1, tri.Y1, tri.X2, tri.Y2))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public string DisplayName => $"{Geomorph?.DisplayName ?? "Room"} - Area {AreaIndex} (Zone {Zone})";
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
@@ -744,4 +1084,12 @@ public class PlacedRoomNode : INotifyPropertyChanged
         OnPropertyChanged(propertyName);
         return true;
     }
+}
+
+public class ZoneOption
+{
+    public int ZoneIndex { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+
+    public override string ToString() => DisplayName;
 }

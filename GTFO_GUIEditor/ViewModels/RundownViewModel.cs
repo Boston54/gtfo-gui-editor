@@ -171,7 +171,30 @@ public class RundownViewModel : ViewModelBase
         private set => SetField(ref _tiers, value);
     }
 
-    public RundownBlock? SelectedRundown => _selectedRundown;
+    public RundownBlock? SelectedRundown
+    {
+        get => _selectedRundown;
+        set
+        {
+            if (_selectedRundown != null)
+            {
+                _selectedRundown.PropertyChanged -= SelectedRundown_PropertyChanged;
+            }
+
+            if (SetField(ref _selectedRundown, value))
+            {
+                if (_selectedRundown != null)
+                {
+                    _selectedRundown.PropertyChanged += SelectedRundown_PropertyChanged;
+                }
+
+                RebuildTiers();
+                SyncAllExpeditionsWithLevelLayouts();
+                OnPropertyChanged(nameof(HasSelectedRundown));
+                OnPropertyChanged(nameof(BackgroundColorHex));
+            }
+        }
+    }
 
     public bool HasSelectedRundown => _selectedRundown != null;
 
@@ -421,7 +444,7 @@ public class RundownViewModel : ViewModelBase
         }
     }
 
-    private void RebuildTiers()
+    public void RebuildTiers()
     {
         if (_selectedRundown == null)
         {

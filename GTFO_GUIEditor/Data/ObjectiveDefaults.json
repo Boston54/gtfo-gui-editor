@@ -1,0 +1,137 @@
+{
+  "HSU_FindTakeSample": {
+    "Header": "Essential DNA Core",
+    "MainObjective": "Find Hydrostasis Unit [ITEM_SERIAL] and retrieve a DNA core sample",
+    "FindLocationInfo": "Use the command <color=orange>QUERY [ALL_ITEMS]</color> at a terminal to locate the objective",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and find [ITEM_SERIAL]",
+    "InZoneFindItem": "Find [ITEM_SERIAL] somewhere inside [ITEM_ZONE]",
+    "SolveItem": "Proceed to collect the DNA sample from [ITEM_SERIAL]"
+  },
+  "Reactor_Startup": {
+    "Header": "Reactor Startup",
+    "MainObjective": "Find the main reactor for the floor and make sure it is back online.",
+    "FindLocationInfo": "Gather information about the location of the Reactor",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and start the Reactor",
+    "InZoneFindItem": "Find the reactor control panel and initiate the startup",
+    "SolveItem": "Make sure the Reactor is fully started before leaving"
+  },
+  "Reactor_Shutdown": {
+    "Header": "Reactor Shutdown",
+    "MainObjective": "Find the main reactor and shut it down",
+    "FindLocationInfo": "Gather information about the location of the Reactor",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and initiate the shutdown process",
+    "InZoneFindItem": "",
+    "SolveItem": "Make sure the Reactor is fully shut down before leaving"
+  },
+  "GatherSmallItems": {
+    "Header": "Gather Personnel IDs",
+    "MainObjective": "Gather [COUNT_REQUIRED] Personnel IDs and return the data to be processed.",
+    "FindLocationInfo": "Look for personnel IDs in the complex",
+    "FindLocationInfoHelp": "Current progress: [COUNT_CURRENT] / [COUNT_REQUIRED]",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "ClearAPath": {
+    "Header": "Clear a path",
+    "MainObjective": "Clear a path to the exit point in [EXTRACTION_ZONE]",
+    "FindLocationInfo": "",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "SpecialTerminalCommand": {
+    "Header": "Backdoor Command",
+    "MainObjective": "Find Computer terminal [ITEM_SERIAL] and input the backdoor command [SPECIAL_COMMAND]",
+    "FindLocationInfo": "Gather information about the location of [ITEM_SERIAL]",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "Navigate to [ITEM_ZONE] and find [ITEM_SERIAL]",
+    "InZoneFindItem": "Find [ITEM_SERIAL] somewhere inside [ITEM_ZONE]",
+    "SolveItem": "Proceed to input the backdoor command [SPECIAL_COMMAND] in [ITEM_SERIAL]"
+  },
+  "RetrieveBigItems": {
+    "Header": "Retrieve Essential Items",
+    "MainObjective": "Find [ALL_ITEMS] and bring them to the extraction scan in [EXTRACTION_ZONE]",
+    "FindLocationInfo": "Gather information about the locations of [ALL_ITEMS]",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "DistributePowerCells": {
+    "Header": "Distribute Power Cells",
+    "MainObjective": "Air filtration system offline. Find Power Cells in the zone and bring them to [ALL_ITEMS] to re-route power.",
+    "FindLocationInfo": "Locate the Generators and bring the Power Cells to them to re-route power to air filtration system.",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "TerminalUplink": {
+    "Header": "Terminal Uplink",
+    "MainObjective": "Find the <u>Uplink Terminal</u> [ALL_ITEMS] and establish an external uplink",
+    "FindLocationInfo": "Gather information about the location of [ALL_ITEMS]",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and find [ALL_ITEMS]",
+    "InZoneFindItem": "Find [ITEM_SERIAL] somewhere inside",
+    "SolveItem": "Use [ITEM_SERIAL] to create an uplink to [UPLINK_ADDRESS]"
+  },
+  "CentralGeneratorCluster": {
+    "Header": "Central Powergenerator Cluster",
+    "MainObjective": "Find [COUNT_REQUIRED] Power Cells and bring them to the Central Generator Cluster in [ITEM_ZONE]",
+    "FindLocationInfo": "Locate the Power Cells and use them to power up the Generator Cluster",
+    "FindLocationInfoHelp": "Generators Online: [COUNT_CURRENT] / [COUNT_REQUIRED]",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "ActivateSmallHSU": {
+    "Header": "Resuscitate Neonate HSU",
+    "MainObjective": "Bring the Neonate to the Neurogenic Cardiac Resuscitator and resuscitate it",
+    "FindLocationInfo": "Gather information about the location of [ITEM_SERIAL]",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and find [ITEM_SERIAL]",
+    "InZoneFindItem": "Find [ITEM_SERIAL] inside [ITEM_ZONE]",
+    "SolveItem": ""
+  },
+  "Survival": {
+    "Header": "Survive",
+    "MainObjective": "Find a way to stay alive, and make your way to [EXTRACTION_ZONE] for extraction",
+    "FindLocationInfo": "",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  },
+  "GatherTerminal": {
+    "Header": "Gather Terminal Passwords",
+    "MainObjective": "Download local files on all terminals in [ITEM_ZONE] and then proceed to the exit point",
+    "FindLocationInfo": "Find the terminals.",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "Find the terminals.",
+    "SolveItem": "Copy files from the terminals."
+  },
+  "CorruptedTerminalUplink": {
+    "Header": "Corrupted Uplink",
+    "MainObjective": "Gather information about the location of [ALL_ITEMS]",
+    "FindLocationInfo": "Gather information about the location of the terminals",
+    "FindLocationInfoHelp": "Access more data in the terminal maintenance system",
+    "GoToZone": "Navigate to [ITEM_ZONE] and find [ALL_ITEMS]",
+    "InZoneFindItem": "Use maintenance terminal command PING to find [ITEM_SERIAL]",
+    "SolveItem": "Use [ITEM_SERIAL] to create an uplink to [UPLINK_ADDRESS]"
+  },
+  "TimedTerminalSequence": {
+    "Header": "Timed Terminal Sequence",
+    "MainObjective": "",
+    "FindLocationInfo": "",
+    "FindLocationInfoHelp": "",
+    "GoToZone": "",
+    "InZoneFindItem": "",
+    "SolveItem": ""
+  }
+}

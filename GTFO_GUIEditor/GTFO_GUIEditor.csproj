@@ -22,11 +22,8 @@
 
     <ItemGroup>
       <AvaloniaResource Include="Assets\**" />
-      <Folder Include="vanilla\sounds\" />
-      <None Update="vanilla\**\*">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="vanilla\geomorphs\mappings.json">
+      <AvaloniaResource Include="Data\ObjectiveDefaults.json" />
+      <None Update="Data\**\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

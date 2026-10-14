@@ -10,19 +10,19 @@ public static class SoundService
 {
     public static string GetSoundsDirectory()
     {
-        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "vanilla", "sounds");
+        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Sounds");
         if (Directory.Exists(outputDir))
         {
             return outputDir;
         }
 
-        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "vanilla", "sounds");
+        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Sounds");
         if (Directory.Exists(cwdDir))
         {
             return cwdDir;
         }
 
-        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "vanilla", "sounds");
+        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Sounds");
         if (Directory.Exists(cwdProjectDir))
         {
             return cwdProjectDir;
@@ -31,13 +31,13 @@ public static class SoundService
         var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
         while (dir != null)
         {
-            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "vanilla", "sounds");
+            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "Data", "Vanilla", "Sounds");
             if (Directory.Exists(candidateProject))
             {
                 return candidateProject;
             }
 
-            string candidateVanilla = Path.Combine(dir.FullName, "vanilla", "sounds");
+            string candidateVanilla = Path.Combine(dir.FullName, "Data", "Vanilla", "Sounds");
             if (Directory.Exists(candidateVanilla))
             {
                 return candidateVanilla;

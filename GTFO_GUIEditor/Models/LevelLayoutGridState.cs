@@ -13,9 +13,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 {
     private int _gridSize = 40;
     private double _cellDimension = 64.0;
+    private double _altitudeOffset = 6.0;
     private ObservableCollection<PlacedGeomorphNode> _placedGeomorphs = new();
     private ObservableCollection<PlacedDoorNode> _placedDoors = new();
     private ObservableCollection<PlacedRoomNode> _placedRooms = new();
+    private PlacedRoomNode? _hoveredRoom;
     private double _zoom = 4.0;
     private double _panX = 400.0;
     private double _panY = 300.0;
@@ -23,47 +25,91 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     private double _viewportHeight = 600;
     private string _currentStartingPrefab = string.Empty;
     private int _nextZoneIndex = 1;
+    private readonly Dictionary<int, ZoneSettings> _zoneSettings = new();
 
     public LevelLayoutGridState()
     {
         _placedDoors.CollectionChanged += PlacedDoors_CollectionChanged;
     }
 
+    public ZoneSettings GetOrCreateZoneSettings(int zoneIndex)
+    {
+        if (!_zoneSettings.TryGetValue(zoneIndex, out var settings))
+        {
+            settings = new ZoneSettings { ZoneIndex = zoneIndex };
+            _zoneSettings[zoneIndex] = settings;
+        }
+        return settings;
+    }
+
+    public IReadOnlyDictionary<int, ZoneSettings> ZoneSettingsMap => _zoneSettings;
+
     private void PlacedDoors_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        if (e.NewItems != null)
+        if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
         {
-            foreach (PlacedDoorNode door in e.NewItems)
+            // Reset occurred
+        }
+        else
+        {
+            if (e.NewItems != null)
             {
-                door.PropertyChanged += OnDoorPropertyChanged;
+                foreach (PlacedDoorNode door in e.NewItems)
+                {
+                    door.PropertyChanged += OnDoorPropertyChanged;
+                }
+            }
+            if (e.OldItems != null)
+            {
+                foreach (PlacedDoorNode door in e.OldItems)
+                {
+                    door.PropertyChanged -= OnDoorPropertyChanged;
+                }
             }
         }
-        if (e.OldItems != null)
-        {
-            foreach (PlacedDoorNode door in e.OldItems)
-            {
-                door.PropertyChanged -= OnDoorPropertyChanged;
-            }
-        }
-        OnPropertyChanged(nameof(HasSecondaryDoor));
-        OnPropertyChanged(nameof(HasOverloadDoor));
+        NotifyLegendProperties();
     }
 
     private void OnDoorPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(PlacedDoorNode.IsSecondaryDoor) ||
+        if (e.PropertyName == nameof(PlacedDoorNode.IsSecurityDoor) ||
+            e.PropertyName == nameof(PlacedDoorNode.IsMainDoor) ||
+            e.PropertyName == nameof(PlacedDoorNode.IsSecondaryDoor) ||
             e.PropertyName == nameof(PlacedDoorNode.IsOverloadDoor) ||
+            e.PropertyName == nameof(PlacedDoorNode.IsConnected) ||
+            e.PropertyName == nameof(PlacedDoorNode.IsBlocked) ||
+            e.PropertyName == nameof(PlacedDoorNode.DoorBrush) ||
             e.PropertyName == nameof(PlacedDoorNode.DoorType))
         {
-            OnPropertyChanged(nameof(HasSecondaryDoor));
-            OnPropertyChanged(nameof(HasOverloadDoor));
+            NotifyLegendProperties();
         }
+    }
+
+    private void NotifyLegendProperties()
+    {
+        OnPropertyChanged(nameof(HasSecondaryDoor));
+        OnPropertyChanged(nameof(HasOverloadDoor));
+        OnPropertyChanged(nameof(HasUnexpandedDoors));
+        OnPropertyChanged(nameof(HasConnectedDoors));
+        OnPropertyChanged(nameof(HasSecurityDoors));
+        OnPropertyChanged(nameof(HasMainDoors));
+        OnPropertyChanged(nameof(HasSecondaryDoors));
+        OnPropertyChanged(nameof(HasOverloadDoors));
+        OnPropertyChanged(nameof(HasBlockedDoors));
     }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public bool HasSecondaryDoor => PlacedDoors.Any(d => d.IsSecondaryDoor);
     public bool HasOverloadDoor => PlacedDoors.Any(d => d.IsOverloadDoor);
+
+    public bool HasUnexpandedDoors => PlacedDoors.Any(d => d.DoorBrush == "#FFFF00");
+    public bool HasConnectedDoors => PlacedDoors.Any(d => d.DoorBrush == "#9D00FF");
+    public bool HasSecurityDoors => PlacedDoors.Any(d => d.DoorBrush == "#FF0000");
+    public bool HasMainDoors => PlacedDoors.Any(d => d.DoorBrush == "#CCCCCC");
+    public bool HasSecondaryDoors => PlacedDoors.Any(d => d.DoorBrush == "#FFA200");
+    public bool HasOverloadDoors => PlacedDoors.Any(d => d.DoorBrush == "#00F2FF");
+    public bool HasBlockedDoors => PlacedDoors.Any(d => d.DoorBrush == "#757575");
 
     public int GetNextZoneId() => _nextZoneIndex++;
     public void ResetZoneIdCounter() => _nextZoneIndex = 1;
@@ -103,6 +149,22 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 foreach (var geo in PlacedGeomorphs)
                 {
                     geo.CellDimension = val;
+                }
+            }
+        }
+    }
+
+    public double AltitudeOffset
+    {
+        get => _altitudeOffset;
+        set
+        {
+            double val = value > 0 ? value : 6.0;
+            if (SetField(ref _altitudeOffset, val))
+            {
+                foreach (var geo in PlacedGeomorphs)
+                {
+                    geo.AltitudeOffset = val;
                 }
             }
         }
@@ -187,6 +249,29 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     {
         get => _placedRooms;
         set => SetField(ref _placedRooms, value);
+    }
+
+    public PlacedRoomNode? HoveredRoom
+    {
+        get => _hoveredRoom;
+        set
+        {
+            if (_hoveredRoom == value) return;
+            _hoveredRoom = value;
+            UpdateRoomHighlightStates();
+            OnPropertyChanged(nameof(HoveredRoom));
+        }
+    }
+
+    public void UpdateRoomHighlightStates()
+    {
+        int? activeZone = _hoveredRoom?.Zone;
+        foreach (var room in _placedRooms)
+        {
+            bool isHovered = room == _hoveredRoom;
+            bool isZoneHighlighted = !isHovered && activeZone.HasValue && room.Zone == activeZone.Value;
+            room.SetHighlightState(isHovered, isZoneHighlighted);
+        }
     }
 
     public double Zoom
@@ -288,6 +373,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
     public void Clear()
     {
+        foreach (var door in PlacedDoors)
+        {
+            door.PropertyChanged -= OnDoorPropertyChanged;
+        }
+        HoveredRoom = null;
         PlacedGeomorphs.Clear();
         PlacedDoors.Clear();
         PlacedRooms.Clear();
@@ -334,6 +424,26 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     public PlacedGeomorphNode? GetGeomorphAt(int cellX, int cellY)
     {
         return PlacedGeomorphs.FirstOrDefault(g => g.OccupiesCell(cellX, cellY));
+    }
+
+    public PlacedRoomNode? GetRoomAt(double worldX, double worldY)
+    {
+        PlacedRoomNode? bestRoom = null;
+        double minArea = double.MaxValue;
+
+        foreach (var room in PlacedRooms)
+        {
+            if (room.IsVisible && room.ContainsWorldPoint(worldX, worldY))
+            {
+                if (room.Area < minArea)
+                {
+                    minArea = room.Area;
+                    bestRoom = room;
+                }
+            }
+        }
+
+        return bestRoom;
     }
 
     public static (double RotatedX, double RotatedY) RotateLocalOffset(double x, double y, double angleDegrees)
@@ -500,7 +610,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return ExpandFromDoor(sourceDoor, geomorphPrefab, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab, DoorType doorType = DoorType.RoomDoor, double? rotationAngle = null)
+    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab, DoorType doorType = DoorType.RoomDoor, double? rotationAngle = null, GeomorphAltitude? altitude = null, uint? lighting = null)
     {
         if (sourceDoor.IsInternal) return null;
 
@@ -599,8 +709,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
-        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea, rotationAngle: actualRotation);
+        GeomorphAltitude actualAltitude = altitude ?? sourceDoor.Altitude;
+        uint actualLighting = lighting ?? 0;
+        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea, rotationAngle: actualRotation, altitude: actualAltitude, lighting: actualLighting);
         newGeo.SetRoomZone(connectingArea, targetZone);
+        if (isZoneBoundary && actualLighting > 0)
+        {
+            GetOrCreateZoneSettings(targetZone).Lighting = actualLighting;
+        }
         PlacedGeomorphs.Add(newGeo);
 
         foreach (var room in newGeo.Rooms)
@@ -632,7 +748,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return GenerateRoomFromDoor(roomDoor, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public int GenerateRoomFromDoor(PlacedDoorNode roomDoor, DoorType doorType = DoorType.RoomDoor)
+    public int GenerateRoomFromDoor(PlacedDoorNode roomDoor, DoorType doorType = DoorType.RoomDoor, uint? lighting = null)
     {
         if (!roomDoor.IsInternal || roomDoor.Geomorph == null) return -1;
 
@@ -657,6 +773,10 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             bool isZoneBoundary = (doorType != DoorType.RoomDoor || roomDoor.IsZoneBoundary);
             int targetZone = isZoneBoundary ? GetNextZoneId() : sourceZone;
             geo.SetRoomZone(targetArea, targetZone);
+            if (isZoneBoundary && lighting.HasValue && lighting.Value > 0)
+            {
+                GetOrCreateZoneSettings(targetZone).Lighting = lighting.Value;
+            }
 
             var newDoors = GenerateDoorsForRoom(geo, targetArea);
             foreach (var door in newDoors)
@@ -1229,6 +1349,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         ExpanderIndex = expIdx,
                         AreaFrom = minArea,
                         AreaTo = maxArea,
+                        Altitude = geoNode.Altitude,
                         LocalX = localX,
                         LocalY = localY,
                         WorldX = geoNode.WorldX + localX,
@@ -1259,6 +1380,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         ExpanderIndex = expIdx,
                         AreaFrom = areaIdx,
                         AreaTo = -1,
+                        Altitude = geoNode.Altitude,
                         LocalX = localX,
                         LocalY = localY,
                         WorldX = geoNode.WorldX + localX,
@@ -1293,19 +1415,30 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
         int zone = geoNode.GetRoomZone(areaIdx);
         var mesh = areaData?.Mesh;
-        var (svgContent, svgPathData, geometry) = RoomSvgService.LoadRoomSvg(mesh, zone, geoNode.RotationAngle);
+        double meshHeight = RoomSvgService.CalculateMeshHeight(mesh);
+        double totalHeight = geoNode.AltitudeOffsetValue + meshHeight;
+        var (svgContent, svgPathData, geometry) = RoomSvgService.LoadRoomSvg(mesh, totalHeight, geoNode.AltitudeOffset, geoNode.RotationAngle);
+        var (triangles, bounds, area) = RoomSvgService.Extract2DTriangles(mesh, geoNode.RotationAngle);
 
         var roomNode = new PlacedRoomNode
         {
             Geomorph = geoNode,
             AreaIndex = areaIdx,
             Zone = zone,
+            MeshHeight = meshHeight,
             WorldX = geoNode.WorldX,
             WorldY = geoNode.WorldY,
             SvgContent = svgContent,
             SvgPathData = svgPathData,
-            Geometry = geometry
+            Geometry = geometry,
+            Triangles2D = triangles,
+            BoundsMinX = bounds.MinX,
+            BoundsMinY = bounds.MinY,
+            BoundsMaxX = bounds.MaxX,
+            BoundsMaxY = bounds.MaxY,
+            Area = area
         };
+        roomNode.UpdateFillBrush();
 
         geoNode.Rooms.Add(roomNode);
         if (!PlacedRooms.Contains(roomNode))
@@ -1316,7 +1449,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return roomNode;
     }
 
-    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0, double rotationAngle = 0.0)
+    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0, double rotationAngle = 0.0, GeomorphAltitude altitude = GeomorphAltitude.Mid, uint lighting = 0)
     {
         var metadata = GeomorphMetadataService.GetMetadata(prefabPath) ?? new GeomorphMetadata
         {
@@ -1329,6 +1462,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             GridX = gridX,
             GridY = gridY,
             CellDimension = CellDimension,
+            Altitude = altitude,
+            AltitudeOffset = AltitudeOffset,
+            Lighting = lighting,
             Metadata = metadata,
             DisplayName = Path.GetFileNameWithoutExtension(prefabPath),
             RotationAngle = rotationAngle
@@ -1378,6 +1514,679 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
 
         return geoNode;
+    }
+
+    public List<PlacedGeomorphNode> GetDisconnectedGeomorphsOnDelete(PlacedGeomorphNode targetGeo)
+    {
+        if (PlacedGeomorphs.Count == 0) return new List<PlacedGeomorphNode>();
+        var rootGeo = PlacedGeomorphs[0];
+        if (targetGeo == rootGeo)
+        {
+            return PlacedGeomorphs.Where(g => g != targetGeo).ToList();
+        }
+
+        var reachableRooms = new HashSet<(PlacedGeomorphNode geo, int area)>();
+        var queue = new Queue<(PlacedGeomorphNode geo, int area)>();
+
+        if (rootGeo.IsRoomGenerated(0))
+        {
+            reachableRooms.Add((rootGeo, 0));
+            queue.Enqueue((rootGeo, 0));
+        }
+
+        while (queue.Count > 0)
+        {
+            var (currGeo, currArea) = queue.Dequeue();
+
+            // 1. Internal doors within currGeo
+            foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == currGeo && d.IsConnected))
+            {
+                int neighborArea = -1;
+                if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
+                else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
+
+                if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
+                {
+                    var neighbor = (currGeo, neighborArea);
+                    if (reachableRooms.Add(neighbor))
+                    {
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+
+            // 2. External doors to other geomorphs
+            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
+            {
+                var otherDoor = d.ConnectedDoor!;
+                var otherGeo = otherDoor.Geomorph;
+                if (otherGeo != null && otherGeo != targetGeo && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
+                {
+                    var neighbor = (otherGeo, otherDoor.AreaFrom);
+                    if (reachableRooms.Add(neighbor))
+                    {
+                        queue.Enqueue(neighbor);
+                    }
+                }
+            }
+        }
+
+        var reachableGeomorphs = reachableRooms.Select(r => r.geo).ToHashSet();
+        return PlacedGeomorphs.Where(g => g != targetGeo && !reachableGeomorphs.Contains(g)).ToList();
+    }
+
+    public Dictionary<int, SectorType> GetZoneSectorMap()
+    {
+        var map = new Dictionary<int, SectorType>();
+        if (PlacedGeomorphs.Count == 0)
+        {
+            map[0] = SectorType.Main;
+            return map;
+        }
+
+        var rootGeo = PlacedGeomorphs[0];
+        int rootZone = rootGeo.GetRoomZone(0);
+        map[rootZone] = SectorType.Main;
+
+        var queue = new Queue<(PlacedGeomorphNode geo, int area, SectorType sector)>();
+        var visited = new HashSet<(PlacedGeomorphNode geo, int area)>();
+
+        if (rootGeo.IsRoomGenerated(0))
+        {
+            visited.Add((rootGeo, 0));
+            queue.Enqueue((rootGeo, 0, SectorType.Main));
+        }
+
+        while (queue.Count > 0)
+        {
+            var (currGeo, currArea, currSector) = queue.Dequeue();
+            int currZone = currGeo.GetRoomZone(currArea);
+            map[currZone] = currSector;
+
+            // 1. Internal doors
+            foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == currGeo && d.IsConnected))
+            {
+                int neighborArea = -1;
+                if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
+                else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
+
+                if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
+                {
+                    var neighbor = (currGeo, neighborArea);
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        SectorType nextSector = currSector;
+                        if (d.IsSecondaryDoor) nextSector = SectorType.Secondary;
+                        else if (d.IsOverloadDoor) nextSector = SectorType.Overload;
+                        queue.Enqueue((currGeo, neighborArea, nextSector));
+                    }
+                }
+            }
+
+            // 2. External doors
+            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
+            {
+                var otherDoor = d.ConnectedDoor!;
+                var otherGeo = otherDoor.Geomorph;
+                if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
+                {
+                    var neighbor = (otherGeo, otherDoor.AreaFrom);
+                    if (!visited.Contains(neighbor))
+                    {
+                        visited.Add(neighbor);
+                        SectorType nextSector = currSector;
+                        if (d.IsSecondaryDoor || otherDoor.IsSecondaryDoor) nextSector = SectorType.Secondary;
+                        else if (d.IsOverloadDoor || otherDoor.IsOverloadDoor) nextSector = SectorType.Overload;
+                        queue.Enqueue((otherGeo, otherDoor.AreaFrom, nextSector));
+                    }
+                }
+            }
+        }
+
+        foreach (var room in PlacedRooms)
+        {
+            if (!map.ContainsKey(room.Zone))
+            {
+                map[room.Zone] = SectorType.Main;
+            }
+        }
+
+        return map;
+    }
+
+    public SectorType GetSectorForZone(int zoneIndex)
+    {
+        var map = GetZoneSectorMap();
+        return map.TryGetValue(zoneIndex, out var sector) ? sector : SectorType.Main;
+    }
+
+    public List<int> GetZonesForSector(SectorType sector)
+    {
+        var map = GetZoneSectorMap();
+        var list = map.Where(kvp => kvp.Value == sector).Select(kvp => kvp.Key).Distinct().OrderBy(z => z).ToList();
+        if (list.Count == 0 && sector == SectorType.Main)
+        {
+            list.Add(0);
+        }
+        return list;
+    }
+
+    public List<PlacedGeomorphNode> DeleteGeomorph(PlacedGeomorphNode targetGeo)
+    {
+        if (!PlacedGeomorphs.Contains(targetGeo)) return new List<PlacedGeomorphNode>();
+
+        var disconnected = GetDisconnectedGeomorphsOnDelete(targetGeo);
+        var toDelete = new List<PlacedGeomorphNode> { targetGeo };
+        toDelete.AddRange(disconnected);
+        var toDeleteSet = toDelete.ToHashSet();
+
+        foreach (var geo in toDelete)
+        {
+            foreach (var door in geo.Doors.ToList())
+            {
+                if (door.ConnectedDoor != null)
+                {
+                    var other = door.ConnectedDoor;
+                    door.ConnectedDoor = null;
+                    door.IsConnected = false;
+                    if (other.Geomorph != null && !toDeleteSet.Contains(other.Geomorph))
+                    {
+                        other.ConnectedDoor = null;
+                        other.IsConnected = false;
+                        other.IsSecurityDoor = false;
+                        other.IsMainDoor = false;
+                        other.IsSecondaryDoor = false;
+                        other.IsOverloadDoor = false;
+                    }
+                }
+                PlacedDoors.Remove(door);
+            }
+
+            foreach (var room in geo.Rooms.ToList())
+            {
+                PlacedRooms.Remove(room);
+            }
+
+            PlacedGeomorphs.Remove(geo);
+        }
+
+        if (HoveredRoom != null && !PlacedRooms.Contains(HoveredRoom))
+        {
+            HoveredRoom = null;
+        }
+
+        if (PlacedGeomorphs.Count > 0)
+        {
+            RecalculateSecurityDoorConstraints();
+            UpdateRoomHighlightStates();
+        }
+
+        OnPropertyChanged(nameof(HasGridSizeWarning));
+        OnPropertyChanged(nameof(GridSizeWarningMessage));
+        OnPropertyChanged(nameof(HasSecondaryDoor));
+        OnPropertyChanged(nameof(HasOverloadDoor));
+
+        return toDelete;
+    }
+
+    public (List<PlacedRoomNode> DisconnectedRooms, List<PlacedGeomorphNode> DisconnectedGeomorphs) GetDisconnectedRoomsOnDelete(PlacedRoomNode targetRoom)
+    {
+        if (PlacedGeomorphs.Count == 0 || targetRoom.Geomorph == null)
+            return (new List<PlacedRoomNode>(), new List<PlacedGeomorphNode>());
+
+        var rootGeo = PlacedGeomorphs[0];
+        if (targetRoom.Geomorph == rootGeo && targetRoom.AreaIndex == 0)
+        {
+            var otherRooms = PlacedRooms.Where(r => r != targetRoom).ToList();
+            var allGeos = PlacedGeomorphs.ToList();
+            return (otherRooms, allGeos);
+        }
+
+        var reachableRooms = new HashSet<(PlacedGeomorphNode geo, int area)>();
+        var queue = new Queue<(PlacedGeomorphNode geo, int area)>();
+
+        if (rootGeo.IsRoomGenerated(0))
+        {
+            reachableRooms.Add((rootGeo, 0));
+            queue.Enqueue((rootGeo, 0));
+        }
+
+        while (queue.Count > 0)
+        {
+            var (currGeo, currArea) = queue.Dequeue();
+
+            // 1. Internal doors
+            foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == currGeo && d.IsConnected))
+            {
+                int neighborArea = -1;
+                if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
+                else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
+
+                if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
+                {
+                    var neighbor = (currGeo, neighborArea);
+                    if (neighbor != (targetRoom.Geomorph, targetRoom.AreaIndex))
+                    {
+                        if (reachableRooms.Add(neighbor))
+                        {
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                }
+            }
+
+            // 2. External doors
+            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
+            {
+                var otherDoor = d.ConnectedDoor!;
+                var otherGeo = otherDoor.Geomorph;
+                if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
+                {
+                    var neighbor = (otherGeo, otherDoor.AreaFrom);
+                    if (neighbor != (targetRoom.Geomorph, targetRoom.AreaIndex))
+                    {
+                        if (reachableRooms.Add(neighbor))
+                        {
+                            queue.Enqueue(neighbor);
+                        }
+                    }
+                }
+            }
+        }
+
+        var disconnectedRooms = PlacedRooms.Where(r => r != targetRoom && !reachableRooms.Contains((r.Geomorph!, r.AreaIndex))).ToList();
+        var reachableGeomorphs = reachableRooms.Select(r => r.geo).ToHashSet();
+        var disconnectedGeomorphs = PlacedGeomorphs.Where(g => !reachableGeomorphs.Contains(g)).ToList();
+
+        return (disconnectedRooms, disconnectedGeomorphs);
+    }
+
+    public (List<PlacedRoomNode> DeletedRooms, List<PlacedGeomorphNode> DeletedGeomorphs) DeleteRoom(PlacedRoomNode targetRoom)
+    {
+        if (!PlacedRooms.Contains(targetRoom) || targetRoom.Geomorph == null)
+            return (new List<PlacedRoomNode>(), new List<PlacedGeomorphNode>());
+
+        var (disconnectedRooms, disconnectedGeos) = GetDisconnectedRoomsOnDelete(targetRoom);
+        var allRoomsToDelete = new List<PlacedRoomNode> { targetRoom };
+        allRoomsToDelete.AddRange(disconnectedRooms);
+
+        foreach (var room in allRoomsToDelete)
+        {
+            var geo = room.Geomorph;
+            if (geo != null)
+            {
+                geo.UngenerateRoom(room.AreaIndex);
+
+                // Handle internal doors involving this room
+                foreach (var d in geo.Doors.Where(d => d.IsInternal && (d.AreaFrom == room.AreaIndex || d.AreaTo == room.AreaIndex)).ToList())
+                {
+                    int otherArea = (d.AreaFrom == room.AreaIndex) ? d.AreaTo : d.AreaFrom;
+                    if (geo.IsRoomGenerated(otherArea))
+                    {
+                        // The other area is still generated; keep the door as an unexpanded internal doorway
+                        d.IsConnected = false;
+                        d.IsSecurityDoor = false;
+                        d.IsMainDoor = false;
+                        d.IsSecondaryDoor = false;
+                        d.IsOverloadDoor = false;
+                        d.IsBlocked = false;
+                    }
+                    else
+                    {
+                        // Neither area is generated anymore; remove the orphaned internal door
+                        if (d.ConnectedDoor != null)
+                        {
+                            var other = d.ConnectedDoor;
+                            other.ConnectedDoor = null;
+                            other.IsConnected = false;
+                            other.IsSecurityDoor = false;
+                            other.IsMainDoor = false;
+                            other.IsSecondaryDoor = false;
+                            other.IsOverloadDoor = false;
+                            d.ConnectedDoor = null;
+                        }
+                        d.IsConnected = false;
+                        geo.Doors.Remove(d);
+                        PlacedDoors.Remove(d);
+                    }
+                }
+
+                // Handle external doors belonging to this room
+                foreach (var d in geo.Doors.Where(d => !d.IsInternal && d.AreaFrom == room.AreaIndex).ToList())
+                {
+                    if (d.ConnectedDoor != null)
+                    {
+                        var other = d.ConnectedDoor;
+                        other.ConnectedDoor = null;
+                        other.IsConnected = false;
+                        other.IsSecurityDoor = false;
+                        other.IsMainDoor = false;
+                        other.IsSecondaryDoor = false;
+                        other.IsOverloadDoor = false;
+                        d.ConnectedDoor = null;
+                    }
+                    d.IsConnected = false;
+                    geo.Doors.Remove(d);
+                    PlacedDoors.Remove(d);
+                }
+            }
+            PlacedRooms.Remove(room);
+        }
+
+        var deletedGeomorphs = new List<PlacedGeomorphNode>();
+        foreach (var geo in PlacedGeomorphs.ToList())
+        {
+            if (geo.GeneratedRooms.Count == 0)
+            {
+                deletedGeomorphs.Add(geo);
+                foreach (var door in geo.Doors.ToList())
+                {
+                    if (door.ConnectedDoor != null)
+                    {
+                        var other = door.ConnectedDoor;
+                        other.ConnectedDoor = null;
+                        other.IsConnected = false;
+                        other.IsSecurityDoor = false;
+                        other.IsMainDoor = false;
+                        other.IsSecondaryDoor = false;
+                        other.IsOverloadDoor = false;
+                        door.ConnectedDoor = null;
+                    }
+                    door.IsConnected = false;
+                    geo.Doors.Remove(door);
+                    PlacedDoors.Remove(door);
+                }
+                PlacedGeomorphs.Remove(geo);
+            }
+        }
+
+        if (HoveredRoom != null && !PlacedRooms.Contains(HoveredRoom))
+        {
+            HoveredRoom = null;
+        }
+
+        if (PlacedGeomorphs.Count > 0)
+        {
+            RecalculateSecurityDoorConstraints();
+            UpdateRoomHighlightStates();
+        }
+
+        OnPropertyChanged(nameof(HasGridSizeWarning));
+        OnPropertyChanged(nameof(GridSizeWarningMessage));
+        OnPropertyChanged(nameof(HasSecondaryDoor));
+        OnPropertyChanged(nameof(HasOverloadDoor));
+
+        return (allRoomsToDelete, deletedGeomorphs);
+    }
+
+    public LevelLayoutGridStateData ExportStateData()
+    {
+        var data = new LevelLayoutGridStateData
+        {
+            GridSize = GridSize,
+            CellDimension = CellDimension,
+            AltitudeOffset = AltitudeOffset,
+            Zoom = Zoom,
+            PanX = PanX,
+            PanY = PanY,
+            CurrentStartingPrefab = CurrentStartingPrefab,
+            NextZoneIndex = _nextZoneIndex
+        };
+
+        foreach (var geo in PlacedGeomorphs)
+        {
+            data.PlacedGeomorphs.Add(new PlacedGeomorphNodeData
+            {
+                Id = geo.Id,
+                PrefabPath = geo.PrefabPath,
+                DisplayName = geo.DisplayName,
+                GridX = geo.GridX,
+                GridY = geo.GridY,
+                RotationAngle = geo.RotationAngle,
+                Altitude = geo.Altitude,
+                AltitudeOffset = geo.AltitudeOffset,
+                Lighting = geo.Lighting,
+                GeneratedRooms = geo.GeneratedRooms.ToList(),
+                RoomZones = new Dictionary<int, int>(geo.RoomZones)
+            });
+        }
+
+        foreach (var door in PlacedDoors)
+        {
+            data.PlacedDoors.Add(new PlacedDoorNodeData
+            {
+                Id = door.Id,
+                GeomorphId = door.Geomorph?.Id ?? string.Empty,
+                ExpanderIndex = door.ExpanderIndex,
+                AreaFrom = door.AreaFrom,
+                AreaTo = door.AreaTo,
+                LocalX = door.LocalX,
+                LocalY = door.LocalY,
+                WorldX = door.WorldX,
+                WorldY = door.WorldY,
+                Direction = door.Direction,
+                RotationAngle = door.RotationAngle,
+                Altitude = door.Altitude,
+                IsSecurityDoor = door.IsSecurityDoor,
+                IsMainDoor = door.IsMainDoor,
+                IsSecondaryDoor = door.IsSecondaryDoor,
+                IsOverloadDoor = door.IsOverloadDoor,
+                IsConnected = door.IsConnected,
+                IsBlocked = door.IsBlocked,
+                ConnectedDoorId = door.ConnectedDoor?.Id
+            });
+        }
+
+        foreach (var kvp in _zoneSettings)
+        {
+            var zs = kvp.Value;
+            data.ZoneSettings.Add(new ZoneSettingsData
+            {
+                ZoneIndex = zs.ZoneIndex,
+                Lighting = zs.Lighting,
+                MedKitUses = zs.MedKitUses,
+                AmmoKitUses = zs.AmmoKitUses,
+                ToolKitUses = zs.ToolKitUses,
+                DisinfectKitUses = zs.DisinfectKitUses,
+                BulkheadKeys = zs.BulkheadKeys,
+                ContainsDC = zs.ContainsDC,
+                ContainsDisinfectStation = zs.ContainsDisinfectStation,
+                PowerCells = zs.PowerCells,
+                FogTurbines = zs.FogTurbines,
+                DcOpensSecondary = zs.DcOpensSecondary,
+                DcOpensOverload = zs.DcOpensOverload,
+                DcOpenedMainDoorIds = zs.DcOpenedMainDoorIds.ToList()
+            });
+        }
+
+        return data;
+    }
+
+    public void ImportStateData(LevelLayoutGridStateData? data)
+    {
+        Clear();
+        _zoneSettings.Clear();
+
+        if (data == null)
+        {
+            ResetZoneIdCounter();
+            return;
+        }
+
+        GridSize = data.GridSize > 0 ? data.GridSize : 40;
+        CellDimension = data.CellDimension > 0 ? data.CellDimension : 64.0;
+        AltitudeOffset = data.AltitudeOffset > 0 ? data.AltitudeOffset : 6.0;
+        Zoom = data.Zoom > 0 ? data.Zoom : 4.0;
+        PanX = data.PanX;
+        PanY = data.PanY;
+        CurrentStartingPrefab = data.CurrentStartingPrefab ?? string.Empty;
+        _nextZoneIndex = data.NextZoneIndex > 0 ? data.NextZoneIndex : 1;
+
+        if (data.ZoneSettings != null)
+        {
+            foreach (var zsData in data.ZoneSettings)
+            {
+                var zs = GetOrCreateZoneSettings(zsData.ZoneIndex);
+                zs.Lighting = zsData.Lighting;
+                zs.MedKitUses = zsData.MedKitUses;
+                zs.AmmoKitUses = zsData.AmmoKitUses;
+                zs.ToolKitUses = zsData.ToolKitUses;
+                zs.DisinfectKitUses = zsData.DisinfectKitUses;
+                zs.BulkheadKeys = zsData.BulkheadKeys;
+                zs.ContainsDC = zsData.ContainsDC;
+                zs.ContainsDisinfectStation = zsData.ContainsDisinfectStation;
+                zs.PowerCells = zsData.PowerCells;
+                zs.FogTurbines = zsData.FogTurbines;
+                zs.DcOpensSecondary = zsData.DcOpensSecondary;
+                zs.DcOpensOverload = zsData.DcOpensOverload;
+                zs.DcOpenedMainDoorIds.Clear();
+                if (zsData.DcOpenedMainDoorIds != null)
+                {
+                    foreach (var id in zsData.DcOpenedMainDoorIds)
+                    {
+                        zs.DcOpenedMainDoorIds.Add(id);
+                    }
+                }
+            }
+        }
+
+        var geoMap = new Dictionary<string, PlacedGeomorphNode>();
+        if (data.PlacedGeomorphs != null)
+        {
+            foreach (var gData in data.PlacedGeomorphs)
+            {
+                var metadata = GeomorphMetadataService.GetMetadata(gData.PrefabPath) ?? new GeomorphMetadata
+                {
+                    GeoAssetLink = gData.PrefabPath ?? string.Empty
+                };
+
+                var geoNode = new PlacedGeomorphNode
+                {
+                    Id = string.IsNullOrEmpty(gData.Id) ? Guid.NewGuid().ToString() : gData.Id,
+                    PrefabPath = gData.PrefabPath ?? string.Empty,
+                    GridX = gData.GridX,
+                    GridY = gData.GridY,
+                    CellDimension = CellDimension,
+                    Altitude = gData.Altitude,
+                    AltitudeOffset = gData.AltitudeOffset > 0 ? gData.AltitudeOffset : AltitudeOffset,
+                    Lighting = gData.Lighting,
+                    Metadata = metadata,
+                    DisplayName = string.IsNullOrEmpty(gData.DisplayName) ? Path.GetFileNameWithoutExtension(gData.PrefabPath ?? string.Empty) : gData.DisplayName,
+                    RotationAngle = gData.RotationAngle
+                };
+
+                int baseWidth = 1;
+                int baseHeight = 1;
+                string lowerPath = geoNode.PrefabPath.ToLowerInvariant();
+                if (lowerPath.Contains("128x128") || lowerPath.Contains("2x2"))
+                {
+                    baseWidth = 2;
+                    baseHeight = 2;
+                }
+                else if (lowerPath.Contains("128x64") || lowerPath.Contains("2x1"))
+                {
+                    baseWidth = 2;
+                    baseHeight = 1;
+                }
+                else if (lowerPath.Contains("64x128") || lowerPath.Contains("1x2"))
+                {
+                    baseWidth = 1;
+                    baseHeight = 2;
+                }
+
+                double normAngle = ((geoNode.RotationAngle % 360) + 360) % 360;
+                if (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1)
+                {
+                    geoNode.WidthInCells = baseHeight;
+                    geoNode.HeightInCells = baseWidth;
+                }
+                else
+                {
+                    geoNode.WidthInCells = baseWidth;
+                    geoNode.HeightInCells = baseHeight;
+                }
+
+                geoNode.UpdateWorldPosition();
+
+                if (gData.GeneratedRooms != null)
+                {
+                    foreach (int areaIndex in gData.GeneratedRooms)
+                    {
+                        geoNode.GenerateRoom(areaIndex);
+                        int zone = 0;
+                        if (gData.RoomZones != null && gData.RoomZones.TryGetValue(areaIndex, out int z))
+                        {
+                            zone = z;
+                        }
+                        geoNode.SetRoomZone(areaIndex, zone);
+                        CreateRoomNode(geoNode, areaIndex);
+                    }
+                }
+
+                PlacedGeomorphs.Add(geoNode);
+                geoMap[geoNode.Id] = geoNode;
+            }
+        }
+
+        var doorMap = new Dictionary<string, PlacedDoorNode>();
+        if (data.PlacedDoors != null)
+        {
+            foreach (var dData in data.PlacedDoors)
+            {
+                if (!geoMap.TryGetValue(dData.GeomorphId, out var geoNode))
+                {
+                    continue;
+                }
+
+                var doorNode = new PlacedDoorNode
+                {
+                    Id = string.IsNullOrEmpty(dData.Id) ? Guid.NewGuid().ToString() : dData.Id,
+                    Geomorph = geoNode,
+                    ExpanderIndex = dData.ExpanderIndex,
+                    AreaFrom = dData.AreaFrom,
+                    AreaTo = dData.AreaTo,
+                    LocalX = dData.LocalX,
+                    LocalY = dData.LocalY,
+                    WorldX = dData.WorldX,
+                    WorldY = dData.WorldY,
+                    Direction = dData.Direction ?? string.Empty,
+                    RotationAngle = dData.RotationAngle,
+                    Altitude = dData.Altitude,
+                    IsSecurityDoor = dData.IsSecurityDoor,
+                    IsMainDoor = dData.IsMainDoor,
+                    IsSecondaryDoor = dData.IsSecondaryDoor,
+                    IsOverloadDoor = dData.IsOverloadDoor,
+                    IsConnected = dData.IsConnected,
+                    IsBlocked = dData.IsBlocked
+                };
+
+                geoNode.Doors.Add(doorNode);
+                PlacedDoors.Add(doorNode);
+                doorMap[doorNode.Id] = doorNode;
+            }
+
+            foreach (var dData in data.PlacedDoors)
+            {
+                if (!string.IsNullOrEmpty(dData.ConnectedDoorId) &&
+                    doorMap.TryGetValue(dData.Id, out var door) &&
+                    doorMap.TryGetValue(dData.ConnectedDoorId, out var connectedDoor))
+                {
+                    door.ConnectedDoor = connectedDoor;
+                }
+            }
+        }
+
+        if (PlacedGeomorphs.Count > 0)
+        {
+            RecalculateSecurityDoorConstraints();
+            UpdateRoomHighlightStates();
+        }
+
+        OnPropertyChanged(nameof(HasGridSizeWarning));
+        OnPropertyChanged(nameof(GridSizeWarningMessage));
+        OnPropertyChanged(nameof(HasSecondaryDoor));
+        OnPropertyChanged(nameof(HasOverloadDoor));
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

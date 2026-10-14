@@ -211,4 +211,92 @@ public class GeomorphTests
         Assert.Equal("Digsite", entry.SubComplex);
         Assert.Equal("Custom Cat", entry.Category);
     }
+
+    [Fact]
+    public void LoadTilesets_LoadsVanillaTilesets()
+    {
+        var tilesets = GeomorphService.LoadTilesets();
+        Assert.NotEmpty(tilesets);
+        Assert.True(tilesets.ContainsKey("mining"));
+        Assert.True(tilesets.ContainsKey("service"));
+        Assert.True(tilesets.ContainsKey("tech"));
+
+        Assert.NotEmpty(tilesets["mining"]);
+        Assert.NotEmpty(tilesets["service"]);
+        Assert.NotEmpty(tilesets["tech"]);
+
+        Assert.Contains("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab", tilesets["mining"]);
+    }
+
+    [Fact]
+    public void LoadImageMappings_LoadsVanillaImageMappings()
+    {
+        var imageMappings = GeomorphService.LoadImageMappings();
+        Assert.NotEmpty(imageMappings);
+        Assert.True(imageMappings.Count > 100);
+
+        string testPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab";
+        Assert.True(imageMappings.ContainsKey(testPrefab));
+        Assert.Equal("img-0001.png", imageMappings[testPrefab]);
+    }
+
+    [Fact]
+    public void GetGeomorphsForTileset_ReturnsValidGeomorphsWithImages()
+    {
+        var miningGeos = GeomorphService.GetGeomorphsForTileset("mining");
+        Assert.NotEmpty(miningGeos);
+        Assert.All(miningGeos, g => Assert.Equal("Mining", g.Complex));
+
+        var digsite01 = miningGeos.FirstOrDefault(g => g.PrefabPath == "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab");
+        Assert.NotNull(digsite01);
+        Assert.Equal("img-0001.png", digsite01.ImageName);
+        Assert.True(digsite01.HasImage);
+
+        var techGeos = GeomorphService.GetGeomorphsForTileset("tech");
+        Assert.NotEmpty(techGeos);
+        Assert.All(techGeos, g => Assert.Equal("Tech", g.Complex));
+
+        var serviceGeos = GeomorphService.GetGeomorphsForTileset("service");
+        Assert.NotEmpty(serviceGeos);
+        Assert.All(serviceGeos, g => Assert.Equal("Service", g.Complex));
+    }
+
+    [Fact]
+    public void ExtractCategoryFromPath_ExtractsCorrectCategory()
+    {
+        Assert.Equal("Digsite", GeomorphService.ExtractCategoryFromPath("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab"));
+        Assert.Equal("Refinery", GeomorphService.ExtractCategoryFromPath("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_HA_01.prefab"));
+        Assert.Equal("Elevator Shaft", GeomorphService.ExtractCategoryFromPath("Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"));
+    }
+
+    [Fact]
+    public void GeomorphOption_LoadsImageOnDemand()
+    {
+        var option = new GeomorphOption
+        {
+            DisplayName = "Test Geo",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab",
+            ImageName = "img-0001.png"
+        };
+
+        // Before accessing ImageBitmap, HasImage reflects presence of image mapping
+        Assert.True(option.HasImage);
+        Assert.NotNull(option.ImagePath);
+        Assert.True(File.Exists(option.ImagePath));
+    }
+
+    [Fact]
+    public void LoadGeomorphs_DoesNotEagerlyBlockOnImageBitmaps()
+    {
+        var geomorphs = GeomorphService.LoadGeomorphs();
+        Assert.NotEmpty(geomorphs);
+
+        // Geomorphs have image names and paths populated without forcing full bitmap loads
+        var withImages = geomorphs.Where(g => g.HasImage).ToList();
+        Assert.NotEmpty(withImages);
+
+        var first = withImages.First();
+        Assert.NotNull(first.ImagePath);
+        Assert.True(File.Exists(first.ImagePath));
+    }
 }
