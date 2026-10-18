@@ -60,65 +60,37 @@ public class LevelLayoutTests
     }
 
     [Fact]
-    public void LevelLayoutViewModel_SelectingComplexResourceSet_UpdatesElevatorTiles()
+    public void LevelLayoutViewModel_SelectingComplexType_UpdatesElevatorTilesFromElevatorsJson()
     {
-        var set1 = new ComplexResourceSetBlock
-        {
-            Name = "Set 1",
-            PersistentId = 1,
-            ElevatorShafts_1x1 = new List<PrefabItem>
-            {
-                new PrefabItem { Prefab = "Assets/Mining/Elevator1.prefab" },
-                new PrefabItem { Prefab = "Assets/Mining/Elevator2.prefab" }
-            }
-        };
-
-        var set2 = new ComplexResourceSetBlock
-        {
-            Name = "Set 2",
-            PersistentId = 2,
-            ElevatorShafts_1x1 = new List<PrefabItem>
-            {
-                new PrefabItem { Prefab = "Assets/Tech/ElevatorA.prefab" }
-            }
-        };
-
-        var sets = new ObservableCollection<ComplexResourceSetBlock> { set1, set2 };
-        var vm = new LevelLayoutViewModel(sets, new List<LevelLayoutBlock>());
+        var vm = new LevelLayoutViewModel(null, new List<LevelLayoutBlock>());
 
         vm.OpenCreateLevelDialog();
-        vm.SelectedComplexResourceSet = set1;
+        vm.SelectedComplexType = ComplexType.Mining;
 
-        Assert.Equal(2, vm.AvailableElevatorTiles.Count);
-        Assert.Contains(vm.AvailableElevatorTiles, opt => opt.Prefab == "Assets/Mining/Elevator1.prefab");
-        Assert.Contains(vm.AvailableElevatorTiles, opt => opt.Prefab == "Assets/Mining/Elevator2.prefab");
-        Assert.Equal("Assets/Mining/Elevator1.prefab", vm.SelectedElevatorTile?.Prefab);
+        Assert.Equal(11, vm.AvailableElevatorTiles.Count);
+        Assert.Contains(vm.AvailableElevatorTiles, opt => opt.Prefab == "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab");
+        Assert.Equal("Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab", vm.SelectedElevatorTile?.Prefab);
 
-        // Switch to set 2
-        vm.SelectedComplexResourceSet = set2;
-        Assert.Single(vm.AvailableElevatorTiles);
-        Assert.Equal("Assets/Tech/ElevatorA.prefab", vm.SelectedElevatorTile?.Prefab);
+        // Switch to Tech complex type
+        vm.SelectedComplexType = ComplexType.Tech;
+        Assert.Equal(6, vm.AvailableElevatorTiles.Count);
+        Assert.Equal("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab", vm.SelectedElevatorTile?.Prefab);
+
+        // Switch to Service complex type
+        vm.SelectedComplexType = ComplexType.Service;
+        Assert.Equal(5, vm.AvailableElevatorTiles.Count);
+        Assert.Equal("Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_01.prefab", vm.SelectedElevatorTile?.Prefab);
     }
 
     [Fact]
     public void LevelLayoutViewModel_ConfirmCreateLevel_CreatesAndSelectsLevel()
     {
-        var set = new ComplexResourceSetBlock
-        {
-            Name = "Tech Set",
-            PersistentId = 10,
-            ElevatorShafts_1x1 = new List<PrefabItem>
-            {
-                new PrefabItem { Prefab = "Assets/Tech/Elevator01.prefab" }
-            }
-        };
-
-        var vm = new LevelLayoutViewModel(new ObservableCollection<ComplexResourceSetBlock> { set }, new List<LevelLayoutBlock>());
+        var vm = new LevelLayoutViewModel(null, new List<LevelLayoutBlock>());
 
         vm.OpenCreateLevelDialog();
         vm.NewLevelName = "Level Alpha";
         vm.NewLevelPersistentId = 500;
-        vm.SelectedComplexResourceSet = set;
+        vm.SelectedComplexType = ComplexType.Tech;
 
         bool success = vm.ConfirmCreateLevel();
 
@@ -128,8 +100,8 @@ public class LevelLayoutTests
         Assert.NotNull(vm.SelectedLevel);
         Assert.Equal("Level Alpha", vm.SelectedLevel.Name);
         Assert.Equal((uint)500, vm.SelectedLevel.PersistentId);
-        Assert.Equal((uint)10, vm.SelectedLevel.ComplexResourceSet);
-        Assert.Equal("Assets/Tech/Elevator01.prefab", vm.SelectedLevel.ElevatorTile);
+        Assert.Equal(ComplexType.Tech, vm.SelectedLevel.ComplexType);
+        Assert.Equal("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab", vm.SelectedLevel.ElevatorTile);
     }
 
     [Fact]
@@ -620,14 +592,14 @@ public class LevelLayoutTests
         Assert.Equal("Elevator Shafts", vm.SelectedTileSource);
 
         // Only elevator tiles are available to pick
-        Assert.Equal(2, vm.AvailableDimensionTiles.Count);
+        Assert.Equal(11, vm.AvailableDimensionTiles.Count);
         Assert.All(vm.AvailableDimensionTiles, t => Assert.Equal("Elevator Shaft", t.Category));
 
         // Select the second elevator shaft
         vm.SelectedDimensionTile = vm.AvailableDimensionTiles[1];
         bool confirmed = vm.ConfirmPromptDimension();
         Assert.True(confirmed);
-        Assert.Equal("Assets/Elevators/Shaft2.prefab", level.ElevatorTile);
+        Assert.Equal("Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_02.prefab", level.ElevatorTile);
     }
 
     [Fact]
@@ -2678,5 +2650,666 @@ public class LevelLayoutTests
         Assert.False(gridState.HasSecondaryDoors);
         Assert.False(gridState.HasOverloadDoors);
         Assert.False(gridState.HasBlockedDoors);
+    }
+
+    [Fact]
+    public void ZoneHasGenClusterTile_DetectsGenClusterGeomorphsInZone()
+    {
+        var gridState = new LevelLayoutGridState();
+
+        // Zone 0 has regular elevator shaft
+        var geo0 = new PlacedGeomorphNode
+        {
+            Id = "geo-0",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"
+        };
+        geo0.SetRoomZone(0, 0);
+        var room0 = new PlacedRoomNode
+        {
+            Id = "room-0",
+            AreaIndex = 0,
+            Zone = 0,
+            Geomorph = geo0
+        };
+        geo0.Rooms.Add(room0);
+        gridState.PlacedGeomorphs.Add(geo0);
+        gridState.PlacedRooms.Add(room0);
+
+        // Zone 1 has gen cluster geomorph
+        var geo1 = new PlacedGeomorphNode
+        {
+            Id = "geo-1",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab"
+        };
+        geo1.SetRoomZone(0, 1);
+        var room1 = new PlacedRoomNode
+        {
+            Id = "room-1",
+            AreaIndex = 0,
+            Zone = 1,
+            Geomorph = geo1
+        };
+        geo1.Rooms.Add(room1);
+        gridState.PlacedGeomorphs.Add(geo1);
+        gridState.PlacedRooms.Add(room1);
+
+        Assert.False(gridState.ZoneHasGenClusterTile(0, ComplexType.Mining));
+        Assert.True(gridState.ZoneHasGenClusterTile(1, ComplexType.Mining));
+        Assert.False(gridState.ZoneHasGenClusterTile(1, ComplexType.Tech)); // Tech complex should not match mining-specific gen cluster tile
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_ActiveZoneHasGenClusterTile_ReflectsZoneGenClusterState()
+    {
+        var level = new LevelLayoutBlock
+        {
+            Name = "Level 1",
+            PersistentId = 1,
+            ComplexType = ComplexType.Mining
+        };
+        var vm = new LevelLayoutViewModel(null, new List<LevelLayoutBlock> { level });
+        vm.SelectedLevel = level;
+
+        var geo = new PlacedGeomorphNode
+        {
+            Id = "geo-gen",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_07.prefab"
+        };
+        geo.SetRoomZone(0, 2);
+        var room = new PlacedRoomNode
+        {
+            Id = "room-gen",
+            AreaIndex = 0,
+            Zone = 2,
+            Geomorph = geo
+        };
+        geo.Rooms.Add(room);
+        vm.GridState.PlacedGeomorphs.Add(geo);
+        vm.GridState.PlacedRooms.Add(room);
+
+        vm.EditingRoom = room;
+
+        Assert.True(vm.ActiveZoneHasGenClusterTile);
+        Assert.NotNull(vm.ActiveZoneSettings);
+        Assert.False(vm.ActiveZoneSettings.ContainsGenCluster);
+
+        // Toggle ContainsGenCluster checkbox
+        vm.ActiveZoneSettings.ContainsGenCluster = true;
+        Assert.True(vm.ActiveZoneSettings.ContainsGenCluster);
+    }
+
+    [Fact]
+    public void LevelLayoutGridState_ExportAndImport_PersistsContainsGenCluster()
+    {
+        var gridState = new LevelLayoutGridState();
+        var zs = gridState.GetOrCreateZoneSettings(3);
+        zs.ContainsGenCluster = true;
+        zs.ContainsDisinfectStation = true;
+
+        var exported = gridState.ExportStateData();
+        var zsData = exported.ZoneSettings.FirstOrDefault(z => z.ZoneIndex == 3);
+        Assert.NotNull(zsData);
+        Assert.True(zsData.ContainsGenCluster);
+        Assert.True(zsData.ContainsDisinfectStation);
+
+        var newGridState = new LevelLayoutGridState();
+        newGridState.ImportStateData(exported);
+        var importedZs = newGridState.GetOrCreateZoneSettings(3);
+        Assert.True(importedZs.ContainsGenCluster);
+        Assert.True(importedZs.ContainsDisinfectStation);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_OnDoorClicked_ExpandedSecurityDoor_OpensEditDoorDialog()
+    {
+        var vm = new LevelLayoutViewModel();
+        string multiAreaGeo = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
+        vm.GridState.InitializeStartingTile(multiAreaGeo, 0, 0);
+
+        var internalDoor = vm.GridState.PlacedDoors.FirstOrDefault(d => d.IsInternal);
+        Assert.NotNull(internalDoor);
+
+        vm.OnDoorClicked(internalDoor);
+        Assert.True(vm.IsExpandingRoom);
+
+        vm.IsRoomExpansionSecurityDoor = true;
+        Assert.True(vm.ConfirmRoomExpansion());
+        Assert.True(internalDoor.IsConnected);
+        Assert.True(internalDoor.IsSecurityDoor);
+
+        // Clicking the expanded security door opens Edit Door dialog
+        Assert.False(vm.IsEditingDoor);
+        vm.OnDoorClicked(internalDoor);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal(internalDoor, vm.EditingDoor);
+        Assert.Equal("Edit Door - Security Door", vm.EditingDoorTitle);
+        Assert.Equal("Security Door", vm.EditingDoorTypeDisplayName);
+        Assert.Equal("#FF0000", vm.EditingDoorBrushColor);
+
+        // Close dialog
+        vm.CloseEditDoorDialog();
+        Assert.False(vm.IsEditingDoor);
+        Assert.Null(vm.EditingDoor);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_OnDoorClicked_ExpandedSecondaryAndOverloadDoors_OpensEditDoorDialog()
+    {
+        var vm = new LevelLayoutViewModel();
+        string multiAreaGeo = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
+        vm.GridState.InitializeStartingTile(multiAreaGeo, 0, 0);
+
+        var internalDoor = vm.GridState.PlacedDoors.FirstOrDefault(d => d.IsInternal);
+        Assert.NotNull(internalDoor);
+
+        // Expand as Secondary Door
+        vm.OnDoorClicked(internalDoor);
+        vm.SelectedRoomExpansionDoorType = DoorType.SecondaryDoor;
+        Assert.True(vm.ConfirmRoomExpansion());
+
+        vm.OnDoorClicked(internalDoor);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal("Secondary Door", vm.EditingDoorTypeDisplayName);
+        Assert.Equal("#FFA200", vm.EditingDoorBrushColor);
+        vm.CloseEditDoorDialog();
+
+        // Create an Overload Door
+        var overloadDoor = new PlacedDoorNode
+        {
+            IsOverloadDoor = true,
+            IsConnected = true
+        };
+        vm.OnDoorClicked(overloadDoor);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal("Overload Door", vm.EditingDoorTypeDisplayName);
+        Assert.Equal("#00F2FF", vm.EditingDoorBrushColor);
+        vm.CloseEditDoorDialog();
+
+        // Create a Main Door
+        var mainDoor = new PlacedDoorNode
+        {
+            IsMainDoor = true,
+            IsConnected = true
+        };
+        vm.OnDoorClicked(mainDoor);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal("Main Door", vm.EditingDoorTypeDisplayName);
+        Assert.Equal("#CCCCCC", vm.EditingDoorBrushColor);
+        vm.CloseEditDoorDialog();
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_DoorConfiguration_AlarmAndOverrides_SyncsWithConnectedDoor()
+    {
+        var vm = new LevelLayoutViewModel();
+        var door1 = new PlacedDoorNode { IsSecurityDoor = true, IsConnected = true };
+        var door2 = new PlacedDoorNode { IsSecurityDoor = true, IsConnected = true };
+        door1.ConnectedDoor = door2;
+        door2.ConnectedDoor = door1;
+
+        vm.OpenEditDoorDialog(door1);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal(door1, vm.EditingDoor);
+
+        // Configure Alarm
+        var testAlarm = vm.AvailableAlarms.FirstOrDefault(a => a.PersistentId > 0) ?? new AlarmBlock { PersistentId = 123, Name = "Class II Alarm" };
+        vm.SelectedDoorAlarmOption = testAlarm;
+        Assert.Equal(testAlarm.PersistentId, door1.ChainedPuzzleToSolve);
+        Assert.Equal(testAlarm.PersistentId, door2.ChainedPuzzleToSolve);
+
+        // Configure Alias Override
+        vm.EditingDoorAliasOverride = 42;
+        Assert.Equal(42, door1.AliasOverride);
+        Assert.Equal(42, door2.AliasOverride);
+
+        // Configure Alias Prefix Short Override
+        vm.EditingDoorAliasPrefixShortOverride = "SEC_ZONE";
+        Assert.Equal("SEC_ZONE", door1.AliasPrefixShortOverride);
+        Assert.Equal("SEC_ZONE", door2.AliasPrefixShortOverride);
+    }
+
+    [Fact]
+    public void LevelLayoutGridState_ExportAndImport_PreservesDoorConfiguration()
+    {
+        var gridState = new LevelLayoutGridState();
+        var geo = new PlacedGeomorphNode
+        {
+            Id = "geo-test",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab"
+        };
+        var door = new PlacedDoorNode
+        {
+            Id = "door-test",
+            Geomorph = geo,
+            IsSecurityDoor = true,
+            IsConnected = true,
+            ChainedPuzzleToSolve = 456,
+            AliasOverride = 99,
+            AliasPrefixShortOverride = "DOOR_PREFIX"
+        };
+        geo.Doors.Add(door);
+        gridState.PlacedGeomorphs.Add(geo);
+        gridState.PlacedDoors.Add(door);
+
+        var exported = gridState.ExportStateData();
+        var doorData = exported.PlacedDoors.FirstOrDefault(d => d.Id == "door-test");
+        Assert.NotNull(doorData);
+        Assert.Equal((uint)456, doorData.ChainedPuzzleToSolve);
+        Assert.Equal(99, doorData.AliasOverride);
+        Assert.Equal("DOOR_PREFIX", doorData.AliasPrefixShortOverride);
+
+        var newGridState = new LevelLayoutGridState();
+        newGridState.ImportStateData(exported);
+        var importedDoor = newGridState.PlacedDoors.FirstOrDefault(d => d.Id == "door-test");
+        Assert.NotNull(importedDoor);
+        Assert.Equal((uint)456, importedDoor.ChainedPuzzleToSolve);
+        Assert.Equal(99, importedDoor.AliasOverride);
+        Assert.Equal("DOOR_PREFIX", importedDoor.AliasPrefixShortOverride);
+    }
+
+    [Fact]
+    public void WardenEvent_FieldVisibilityRules_MatchConfiguredEventTypes()
+    {
+        var ev = new WardenEvent();
+
+        // Default None
+        Assert.Equal(EventType.None, ev.Type);
+        Assert.False(ev.IsChainPuzzleVisible);
+        Assert.False(ev.IsUseStaticBioscanPointsVisible);
+        Assert.False(ev.IsDurationVisible);
+        Assert.False(ev.IsClearDimensionVisible);
+        Assert.False(ev.IsCustomSubObjectiveVisible);
+        Assert.False(ev.IsFogSettingVisible);
+        Assert.False(ev.IsFogTransitionDurationVisible);
+        Assert.False(ev.IsEnemyWaveDataVisible);
+        Assert.False(ev.IsEnemyIdVisible);
+        Assert.False(ev.IsCountVisible);
+        Assert.False(ev.IsPositionVisible);
+
+        // ActivateChainedPuzzle
+        ev.Type = EventType.ActivateChainedPuzzle;
+        Assert.True(ev.IsChainPuzzleVisible);
+        Assert.True(ev.IsUseStaticBioscanPointsVisible);
+        Assert.False(ev.IsDurationVisible);
+
+        // AddToTimer, DimensionFlashTeam, LightsInZone
+        ev.Type = EventType.AddToTimer;
+        Assert.True(ev.IsDurationVisible);
+        Assert.False(ev.IsChainPuzzleVisible);
+
+        ev.Type = EventType.DimensionFlashTeam;
+        Assert.True(ev.IsDurationVisible);
+
+        ev.Type = EventType.LightsInZone;
+        Assert.True(ev.IsDurationVisible);
+        Assert.True(ev.IsPositionVisible);
+
+        // DimensionWarpTeam
+        ev.Type = EventType.DimensionWarpTeam;
+        Assert.True(ev.IsClearDimensionVisible);
+        Assert.False(ev.IsDurationVisible);
+
+        // UpdateCustomSubObjective
+        ev.Type = EventType.UpdateCustomSubObjective;
+        Assert.True(ev.IsCustomSubObjectiveVisible);
+        Assert.True(ev.IsCustomSubObjectiveHeaderVisible);
+
+        // SetFogSetting
+        ev.Type = EventType.SetFogSetting;
+        Assert.True(ev.IsFogSettingVisible);
+        Assert.True(ev.IsFogTransitionDurationVisible);
+
+        // SpawnEnemyWave
+        ev.Type = EventType.SpawnEnemyWave;
+        Assert.True(ev.IsEnemyWaveDataVisible);
+        Assert.False(ev.IsEnemyIdVisible);
+
+        // SpawnEnemyOnPoint
+        ev.Type = EventType.SpawnEnemyOnPoint;
+        Assert.True(ev.IsEnemyIdVisible);
+        Assert.True(ev.IsCountVisible);
+        Assert.False(ev.IsEnemyWaveDataVisible);
+    }
+
+    [Fact]
+    public void WardenEvent_Clone_CopiesAllProperties()
+    {
+        var original = new WardenEvent
+        {
+            Type = EventType.SpawnEnemyWave,
+            Trigger = EventTrigger.OnStart,
+            ChainPuzzle = 123,
+            UseStaticBioscanPoints = true,
+            Layer = SectorType.Secondary,
+            Dimension = "Dimension_1",
+            Zone = 3,
+            Delay = 5.5,
+            Duration = 10.0,
+            ClearDimension = true,
+            WardenIntel = "Intel 123",
+            CustomSubObjectiveHeader = "Header Text",
+            CustomSubObjective = "Objective Text",
+            SoundID = 456,
+            SoundSubtitle = "Subtitle Text",
+            FogSetting = 789,
+            FogTransitionDuration = 15,
+            EnemyID = 999,
+            Count = 4,
+            Enabled = true,
+            Position = new Vector3Data(1.0, 2.0, 3.0),
+            EnemyWaveData = new GenericWaveSettings
+            {
+                WaveRoleStandard = 1001,
+                PauseBeforeStart = 8.0
+            }
+        };
+
+        var clone = original.Clone();
+        Assert.Equal(original.Type, clone.Type);
+        Assert.Equal(original.Trigger, clone.Trigger);
+        Assert.Equal(original.ChainPuzzle, clone.ChainPuzzle);
+        Assert.Equal(original.UseStaticBioscanPoints, clone.UseStaticBioscanPoints);
+        Assert.Equal(original.Layer, clone.Layer);
+        Assert.Equal(original.Dimension, clone.Dimension);
+        Assert.Equal(original.Zone, clone.Zone);
+        Assert.Equal(original.Delay, clone.Delay);
+        Assert.Equal(original.Duration, clone.Duration);
+        Assert.Equal(original.ClearDimension, clone.ClearDimension);
+        Assert.Equal(original.WardenIntel, clone.WardenIntel);
+        Assert.Equal(original.CustomSubObjectiveHeader, clone.CustomSubObjectiveHeader);
+        Assert.Equal(original.CustomSubObjective, clone.CustomSubObjective);
+        Assert.Equal(original.SoundID, clone.SoundID);
+        Assert.Equal(original.SoundSubtitle, clone.SoundSubtitle);
+        Assert.Equal(original.FogSetting, clone.FogSetting);
+        Assert.Equal(original.FogTransitionDuration, clone.FogTransitionDuration);
+        Assert.Equal(original.EnemyID, clone.EnemyID);
+        Assert.Equal(original.Count, clone.Count);
+        Assert.Equal(original.Enabled, clone.Enabled);
+        Assert.Equal(1.0, clone.Position.X);
+        Assert.Equal(2.0, clone.Position.Y);
+        Assert.Equal(3.0, clone.Position.Z);
+        Assert.Equal((uint)1001, clone.EnemyWaveData.WaveRoleStandard);
+        Assert.Equal(8.0, clone.EnemyWaveData.PauseBeforeStart);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_DoorEvents_AddAndRemoveCommandsWork()
+    {
+        var vm = new LevelLayoutViewModel();
+        var door = new PlacedDoorNode { IsSecurityDoor = true, IsConnected = true };
+        vm.OpenEditDoorDialog(door);
+
+        Assert.Empty(door.EventsOnPortalWarp);
+        vm.AddEventOnPortalWarp();
+        Assert.Single(door.EventsOnPortalWarp);
+        vm.RemoveEventOnPortalWarp(door.EventsOnPortalWarp[0]);
+        Assert.Empty(door.EventsOnPortalWarp);
+
+        vm.AddEventOnApproachDoor();
+        Assert.Single(door.EventsOnApproachDoor);
+
+        vm.AddEventOnUnlockDoor();
+        Assert.Single(door.EventsOnUnlockDoor);
+
+        vm.AddEventOnOpenDoor();
+        Assert.Single(door.EventsOnOpenDoor);
+
+        vm.AddEventOnDoorScanStart();
+        Assert.Single(door.EventsOnDoorScanStart);
+
+        vm.AddEventOnDoorScanDone();
+        Assert.Single(door.EventsOnDoorScanDone);
+
+        vm.AddEventOnBossDeath();
+        Assert.Single(door.EventsOnBossDeath);
+
+        vm.AddEventOnTrigger();
+        Assert.Single(door.EventsOnTrigger);
+
+        // Test RemoveWardenEvent generic helper
+        var openEvent = door.EventsOnOpenDoor[0];
+        vm.RemoveWardenEvent(openEvent);
+        Assert.Empty(door.EventsOnOpenDoor);
+    }
+
+    [Fact]
+    public void LevelLayoutGridState_ExportAndImport_PreservesAllEightEventLists()
+    {
+        var gridState = new LevelLayoutGridState();
+        var geo = new PlacedGeomorphNode
+        {
+            Id = "geo-events",
+            PrefabPath = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab"
+        };
+        var door = new PlacedDoorNode
+        {
+            Id = "door-events",
+            Geomorph = geo,
+            IsSecurityDoor = true,
+            IsConnected = true
+        };
+
+        door.EventsOnPortalWarp.Add(new WardenEvent { Type = EventType.DimensionWarpTeam, ClearDimension = true });
+        door.EventsOnApproachDoor.Add(new WardenEvent { Type = EventType.PlaySound, SoundID = 101 });
+        door.EventsOnUnlockDoor.Add(new WardenEvent { Type = EventType.UnlockSecurityDoor, Delay = 2.0 });
+        door.EventsOnOpenDoor.Add(new WardenEvent { Type = EventType.ActivateChainedPuzzle, ChainPuzzle = 456, UseStaticBioscanPoints = true });
+        door.EventsOnDoorScanStart.Add(new WardenEvent { Type = EventType.SetFogSetting, FogSetting = 12, FogTransitionDuration = 5 });
+        door.EventsOnDoorScanDone.Add(new WardenEvent
+        {
+            Type = EventType.SpawnEnemyWave,
+            EnemyWaveData = new GenericWaveSettings
+            {
+                WaveRoleStandard = 33,
+                WaveRoleWeakling = 11,
+                WaveRoleSpecial = 22,
+                WaveRoleMiniBoss = 44,
+                WaveRoleBoss = 55,
+                PauseBeforeStart = 10,
+                PauseBetweenGroups = 5,
+                WavePauseMin_AtCost = 15,
+                WavePauseMax_AtCost = 25,
+                WavePauseMin = 8,
+                WavePauseMax = 18,
+                FilterType = WaveFilterType.Include,
+                FilterWeakling = true,
+                FilterStandard = true,
+                FilterSpecial = false,
+                FilterMiniBoss = false,
+                FilterBoss = false,
+                ChanceToRandomizeSpawnDirectionPerWave = 0.5,
+                ChanceToRandomizeSpawnDirectionPerGroup = 0.25,
+                OverrideWaveSpawnType = true,
+                SurvivalWaveSpawnType = SurvivalWaveSpawnType.InSuppliedCourseNodeZone,
+                PopulationPointsTotal = 100,
+                PopulationPointsPerWaveStart = 20,
+                PopulationPointsPerWaveEnd = 40,
+                PopulationPointsMinPerGroup = 5,
+                PopulationPointsPerGroupStart = 10,
+                PopulationPointsPerGroupEnd = 20,
+                PopulationRampOverTime = 60
+            }
+        });
+        door.EventsOnBossDeath.Add(new WardenEvent { Type = EventType.ForceInstantWin });
+        door.EventsOnTrigger.Add(new WardenEvent { Type = EventType.LightsInZone, Duration = 20.0, Position = new Vector3Data(10, 20, 30) });
+
+        geo.Doors.Add(door);
+        gridState.PlacedGeomorphs.Add(geo);
+        gridState.PlacedDoors.Add(door);
+
+        var exported = gridState.ExportStateData();
+        var newGridState = new LevelLayoutGridState();
+        newGridState.ImportStateData(exported);
+
+        var importedDoor = newGridState.PlacedDoors.FirstOrDefault(d => d.Id == "door-events");
+        Assert.NotNull(importedDoor);
+
+        Assert.Single(importedDoor.EventsOnPortalWarp);
+        Assert.Equal(EventType.DimensionWarpTeam, importedDoor.EventsOnPortalWarp[0].Type);
+        Assert.True(importedDoor.EventsOnPortalWarp[0].ClearDimension);
+
+        Assert.Single(importedDoor.EventsOnApproachDoor);
+        Assert.Equal(EventType.PlaySound, importedDoor.EventsOnApproachDoor[0].Type);
+        Assert.Equal((uint)101, importedDoor.EventsOnApproachDoor[0].SoundID);
+
+        Assert.Single(importedDoor.EventsOnUnlockDoor);
+        Assert.Equal(EventType.UnlockSecurityDoor, importedDoor.EventsOnUnlockDoor[0].Type);
+        Assert.Equal(2.0, importedDoor.EventsOnUnlockDoor[0].Delay);
+
+        Assert.Single(importedDoor.EventsOnOpenDoor);
+        Assert.Equal(EventType.ActivateChainedPuzzle, importedDoor.EventsOnOpenDoor[0].Type);
+        Assert.Equal((uint)456, importedDoor.EventsOnOpenDoor[0].ChainPuzzle);
+        Assert.True(importedDoor.EventsOnOpenDoor[0].UseStaticBioscanPoints);
+
+        Assert.Single(importedDoor.EventsOnDoorScanStart);
+        Assert.Equal(EventType.SetFogSetting, importedDoor.EventsOnDoorScanStart[0].Type);
+        Assert.Equal((uint)12, importedDoor.EventsOnDoorScanStart[0].FogSetting);
+        Assert.Equal(5, importedDoor.EventsOnDoorScanStart[0].FogTransitionDuration);
+
+        Assert.Single(importedDoor.EventsOnDoorScanDone);
+        Assert.Equal(EventType.SpawnEnemyWave, importedDoor.EventsOnDoorScanDone[0].Type);
+        Assert.Equal((uint)33, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.WaveRoleStandard);
+        Assert.Equal((uint)11, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.WaveRoleWeakling);
+        Assert.Equal(WaveFilterType.Include, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.FilterType);
+        Assert.True(importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.FilterWeakling);
+        Assert.True(importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.OverrideWaveSpawnType);
+        Assert.Equal(SurvivalWaveSpawnType.InSuppliedCourseNodeZone, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.SurvivalWaveSpawnType);
+        Assert.Equal(100.0, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.PopulationPointsTotal);
+        Assert.Equal(60.0, importedDoor.EventsOnDoorScanDone[0].EnemyWaveData.PopulationRampOverTime);
+
+        Assert.Single(importedDoor.EventsOnBossDeath);
+        Assert.Equal(EventType.ForceInstantWin, importedDoor.EventsOnBossDeath[0].Type);
+
+        Assert.Single(importedDoor.EventsOnTrigger);
+        Assert.Equal(EventType.LightsInZone, importedDoor.EventsOnTrigger[0].Type);
+        Assert.Equal(20.0, importedDoor.EventsOnTrigger[0].Duration);
+        Assert.Equal(10.0, importedDoor.EventsOnTrigger[0].Position.X);
+    }
+
+    [Fact]
+    public void WardenEvent_SoundId_CanBeSetDirectlyAsInteger()
+    {
+        var evt = new WardenEvent
+        {
+            Type = EventType.PlaySound,
+            SoundID = 123456,
+            SoundSubtitle = "Alarm Sound"
+        };
+
+        Assert.Equal((uint)123456, evt.SoundID);
+        Assert.Equal("Alarm Sound", evt.SoundSubtitle);
+
+        var clone = evt.Clone();
+        Assert.Equal((uint)123456, clone.SoundID);
+        Assert.Equal("Alarm Sound", clone.SoundSubtitle);
+    }
+
+    [Fact]
+    public void WardenEvent_AvailableZones_ReflectsDimensionAndLayerSelection()
+    {
+        var vm = new LevelLayoutViewModel();
+        var level = new LevelLayoutBlock { Name = "Test Level", PersistentId = 100 };
+        level.Dimensions.Add(new DimensionLayoutBlock { DimensionIndex = "Dimension_1", Name = "Dimension One" });
+        vm.Levels.Add(level);
+        vm.SelectedLevel = level;
+
+        var evt = new WardenEvent
+        {
+            Dimension = "Reality",
+            Layer = SectorType.Main,
+            Zone = 0
+        };
+
+        var realityMainZones = evt.AvailableZones.ToList();
+        Assert.Contains(realityMainZones, z => z.ZoneIndex == 0);
+
+        // When changing layer to Secondary
+        bool zonesNotified = false;
+        evt.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(WardenEvent.AvailableZones))
+            {
+                zonesNotified = true;
+            }
+        };
+
+        evt.Layer = SectorType.Secondary;
+        Assert.True(zonesNotified);
+
+        // When changing dimension to custom dimension
+        zonesNotified = false;
+        evt.Dimension = "Dimension_1";
+        Assert.True(zonesNotified);
+
+        var dimZones = evt.AvailableZones.ToList();
+        Assert.Contains(dimZones, z => z.ZoneIndex == 0);
+
+        // When changing Zone, AvailableZones should NOT be notified (prevents ComboBox resetting selection)
+        zonesNotified = false;
+        evt.Zone = 5;
+        Assert.False(zonesNotified);
+        Assert.Equal(5, evt.Zone);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_SectorObjectiveEvents_AddAndRemoveCommandsWork()
+    {
+        var vm = new LevelLayoutViewModel();
+        var sector = new SectorSettings();
+        vm.EditingSectorSettings = sector;
+
+        // EventsOnActivation
+        Assert.Empty(sector.EventsOnActivation);
+        vm.AddEventOnActivation();
+        Assert.Single(sector.EventsOnActivation);
+        vm.RemoveEventOnActivation(sector.EventsOnActivation[0]);
+        Assert.Empty(sector.EventsOnActivation);
+
+        // EventsOnSequenceStart
+        Assert.Empty(sector.EventsOnSequenceStart);
+        vm.AddEventOnSequenceStart();
+        Assert.Single(sector.EventsOnSequenceStart);
+        vm.RemoveEventOnSequenceStart(sector.EventsOnSequenceStart[0]);
+        Assert.Empty(sector.EventsOnSequenceStart);
+
+        // EventsOnSequenceDone
+        Assert.Empty(sector.EventsOnSequenceDone);
+        vm.AddEventOnSequenceDone();
+        Assert.Single(sector.EventsOnSequenceDone);
+        vm.RemoveEventOnSequenceDone(sector.EventsOnSequenceDone[0]);
+        Assert.Empty(sector.EventsOnSequenceDone);
+
+        // EventsOnSequenceFail
+        Assert.Empty(sector.EventsOnSequenceFail);
+        vm.AddEventOnSequenceFail();
+        Assert.Single(sector.EventsOnSequenceFail);
+        vm.RemoveEventOnSequenceFail(sector.EventsOnSequenceFail[0]);
+        Assert.Empty(sector.EventsOnSequenceFail);
+
+        // EventsOnElevatorLand
+        Assert.Empty(sector.EventsOnElevatorLand);
+        vm.AddEventOnElevatorLand();
+        Assert.Single(sector.EventsOnElevatorLand);
+        vm.RemoveEventOnElevatorLand(sector.EventsOnElevatorLand[0]);
+        Assert.Empty(sector.EventsOnElevatorLand);
+
+        // EventsOnGotoWin
+        Assert.Empty(sector.EventsOnGotoWin);
+        vm.AddEventOnGotoWin();
+        Assert.Single(sector.EventsOnGotoWin);
+        vm.RemoveEventOnGotoWin(sector.EventsOnGotoWin[0]);
+        Assert.Empty(sector.EventsOnGotoWin);
+
+        // EventsOnActivate
+        Assert.Empty(sector.EventsOnActivate);
+        vm.AddEventOnActivate();
+        Assert.Single(sector.EventsOnActivate);
+        vm.RemoveEventOnActivate(sector.EventsOnActivate[0]);
+        Assert.Empty(sector.EventsOnActivate);
+
+        // Generic RemoveWardenEvent helper
+        vm.AddEventOnGotoWin();
+        var gotoWinEv = sector.EventsOnGotoWin[0];
+        vm.RemoveWardenEvent(gotoWinEv);
+        Assert.Empty(sector.EventsOnGotoWin);
     }
 }

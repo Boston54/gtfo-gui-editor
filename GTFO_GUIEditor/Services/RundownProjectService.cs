@@ -301,7 +301,14 @@ public static class RundownProjectService
             StopAllWavesBeforeGotoWin = sector.StopAllWavesBeforeGotoWin,
             WavesOnElevatorLand = sector.WavesOnElevatorLand.Clone(),
             FogTransitionDataOnGotoWin = sector.FogTransitionDataOnGotoWin,
-            FogTransitionDataOnGotoWinDuration = sector.FogTransitionDataOnGotoWinDuration
+            FogTransitionDataOnGotoWinDuration = sector.FogTransitionDataOnGotoWinDuration,
+            EventsOnActivation = sector.EventsOnActivation.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceStart = sector.EventsOnSequenceStart.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceDone = sector.EventsOnSequenceDone.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceFail = sector.EventsOnSequenceFail.Select(e => e.Clone()).ToList(),
+            EventsOnElevatorLand = sector.EventsOnElevatorLand.Select(e => e.Clone()).ToList(),
+            EventsOnGotoWin = sector.EventsOnGotoWin.Select(e => e.Clone()).ToList(),
+            EventsOnActivate = sector.EventsOnActivate.Select(e => e.Clone()).ToList()
         };
     }
 
@@ -477,6 +484,62 @@ public static class RundownProjectService
                 clone.ItemNumber = idx++;
                 clone.ItemPrefix = "Terminal";
                 sector.TimedTerminalSequencePlacements.Add(clone);
+            }
+        }
+
+        if (data.EventsOnActivation != null)
+        {
+            foreach (var ev in data.EventsOnActivation)
+            {
+                sector.EventsOnActivation.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnSequenceStart != null)
+        {
+            foreach (var ev in data.EventsOnSequenceStart)
+            {
+                sector.EventsOnSequenceStart.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnSequenceDone != null)
+        {
+            foreach (var ev in data.EventsOnSequenceDone)
+            {
+                sector.EventsOnSequenceDone.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnSequenceFail != null)
+        {
+            foreach (var ev in data.EventsOnSequenceFail)
+            {
+                sector.EventsOnSequenceFail.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnElevatorLand != null)
+        {
+            foreach (var ev in data.EventsOnElevatorLand)
+            {
+                sector.EventsOnElevatorLand.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnGotoWin != null)
+        {
+            foreach (var ev in data.EventsOnGotoWin)
+            {
+                sector.EventsOnGotoWin.Add(ev.Clone());
+            }
+        }
+
+        if (data.EventsOnActivate != null)
+        {
+            foreach (var ev in data.EventsOnActivate)
+            {
+                sector.EventsOnActivate.Add(ev.Clone());
             }
         }
 

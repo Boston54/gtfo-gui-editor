@@ -245,6 +245,27 @@ public class SectorSettingsData
 
     [JsonPropertyName("timedTerminalSequencePlacements")]
     public List<GatherItemPlacement>? TimedTerminalSequencePlacements { get; set; }
+
+    [JsonPropertyName("eventsOnActivation")]
+    public List<WardenEvent>? EventsOnActivation { get; set; }
+
+    [JsonPropertyName("eventsOnSequenceStart")]
+    public List<WardenEvent>? EventsOnSequenceStart { get; set; }
+
+    [JsonPropertyName("eventsOnSequenceDone")]
+    public List<WardenEvent>? EventsOnSequenceDone { get; set; }
+
+    [JsonPropertyName("eventsOnSequenceFail")]
+    public List<WardenEvent>? EventsOnSequenceFail { get; set; }
+
+    [JsonPropertyName("eventsOnElevatorLand")]
+    public List<WardenEvent>? EventsOnElevatorLand { get; set; }
+
+    [JsonPropertyName("eventsOnGotoWin")]
+    public List<WardenEvent>? EventsOnGotoWin { get; set; }
+
+    [JsonPropertyName("eventsOnActivate")]
+    public List<WardenEvent>? EventsOnActivate { get; set; }
 }
 
 public class LevelLayoutGridStateData
@@ -337,6 +358,23 @@ public class PlacedDoorNodeData
     [JsonPropertyName("isBlocked")] public bool IsBlocked { get; set; }
 
     [JsonPropertyName("connectedDoorId")] public string? ConnectedDoorId { get; set; }
+
+    [JsonPropertyName("chainedPuzzleToSolve")] public uint ChainedPuzzleToSolve { get; set; }
+
+    [JsonPropertyName("aliasOverride")] public int AliasOverride { get; set; }
+
+    [JsonPropertyName("aliasPrefixShortOverride")] public string AliasPrefixShortOverride { get; set; } = string.Empty;
+    [JsonPropertyName("turnOffAlarmOnTerminal")] public bool TurnOffAlarmOnTerminal { get; set; }
+    [JsonPropertyName("terminalZone")] public int TerminalZone { get; set; }
+    [JsonPropertyName("terminalIndex")] public int TerminalIndex { get; set; }
+    [JsonPropertyName("eventsOnPortalWarp")] public List<WardenEvent> EventsOnPortalWarp { get; set; } = new();
+    [JsonPropertyName("eventsOnApproachDoor")] public List<WardenEvent> EventsOnApproachDoor { get; set; } = new();
+    [JsonPropertyName("eventsOnUnlockDoor")] public List<WardenEvent> EventsOnUnlockDoor { get; set; } = new();
+    [JsonPropertyName("eventsOnOpenDoor")] public List<WardenEvent> EventsOnOpenDoor { get; set; } = new();
+    [JsonPropertyName("eventsOnDoorScanStart")] public List<WardenEvent> EventsOnDoorScanStart { get; set; } = new();
+    [JsonPropertyName("eventsOnDoorScanDone")] public List<WardenEvent> EventsOnDoorScanDone { get; set; } = new();
+    [JsonPropertyName("eventsOnBossDeath")] public List<WardenEvent> EventsOnBossDeath { get; set; } = new();
+    [JsonPropertyName("eventsOnTrigger")] public List<WardenEvent> EventsOnTrigger { get; set; } = new();
 }
 
 public class ZoneSettingsData
@@ -344,6 +382,18 @@ public class ZoneSettingsData
     [JsonPropertyName("zoneIndex")] public int ZoneIndex { get; set; }
 
     [JsonPropertyName("lighting")] public uint Lighting { get; set; }
+
+    [JsonPropertyName("subSeed")] public int SubSeed { get; set; }
+    [JsonPropertyName("markerSubSeed")] public int MarkerSubSeed { get; set; }
+    [JsonPropertyName("lightingSubSeed")] public int LightingSubSeed { get; set; }
+    [JsonPropertyName("dcScanSeed")] public int DcScanSeed { get; set; }
+
+    [JsonPropertyName("enemyRespawning")] public bool EnemyRespawning { get; set; }
+    [JsonPropertyName("requireOtherZone")] public bool RequireOtherZone { get; set; } = true;
+    [JsonPropertyName("roomDistance")] public int RoomDistance { get; set; } = 2;
+    [JsonPropertyName("timeInterval")] public double TimeInterval { get; set; } = 10.0;
+    [JsonPropertyName("countMultiplier")] public double CountMultiplier { get; set; } = 1.0;
+    [JsonPropertyName("excludeList")] public List<EnemyExcludeItem> ExcludeList { get; set; } = new();
 
     [JsonPropertyName("medKitUses")] public int MedKitUses { get; set; }
 
@@ -360,6 +410,9 @@ public class ZoneSettingsData
     [JsonPropertyName("containsDisinfectStation")]
     public bool ContainsDisinfectStation { get; set; }
 
+    [JsonPropertyName("containsGenCluster")]
+    public bool ContainsGenCluster { get; set; }
+
     [JsonPropertyName("powerCells")] public int PowerCells { get; set; }
 
     [JsonPropertyName("fogTurbines")] public int FogTurbines { get; set; }
@@ -370,6 +423,17 @@ public class ZoneSettingsData
 
     [JsonPropertyName("dcOpenedMainDoorIds")]
     public List<string> DcOpenedMainDoorIds { get; set; } = new();
+
+    [JsonPropertyName("hsuClusters")] public int HSUClusters { get; set; }
+    [JsonPropertyName("corpseClusters")] public int CorpseClusters { get; set; }
+    [JsonPropertyName("resourceContainerClusters")] public int ResourceContainerClusters { get; set; }
+    [JsonPropertyName("corpsesInZone")] public int CorpsesInZone { get; set; }
+    [JsonPropertyName("groundSpawnersInZone")] public ZoneDistributionAmount GroundSpawnersInZone { get; set; } = ZoneDistributionAmount.None_0;
+    [JsonPropertyName("hsusInZone")] public ZoneDistributionAmount HSUsInZone { get; set; } = ZoneDistributionAmount.None_0;
+    [JsonPropertyName("deconUnitsInZone")] public ZoneDistributionAmount DeconUnitsInZone { get; set; } = ZoneDistributionAmount.None_0;
+    [JsonPropertyName("bigPickupDistributionInZone")] public List<BigPickupDistributionItem> BigPickupDistributionInZone { get; set; } = new();
+    [JsonPropertyName("disinfectionStationPlacements")] public List<DisinfectionStationPlacement> DisinfectionStationPlacements { get; set; } = new();
+    [JsonPropertyName("terminalPlacements")] public List<TerminalPlacement> TerminalPlacements { get; set; } = new();
 }
 
 public class RecentFileItem

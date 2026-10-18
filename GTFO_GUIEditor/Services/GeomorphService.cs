@@ -120,6 +120,44 @@ public static class GeomorphService
         return candidates.FirstOrDefault(File.Exists);
     }
 
+    public static string? FindElevatorsFile()
+    {
+        string geoDir = GetGeomorphsDirectory();
+        string direct = Path.Combine(geoDir, "elevators.json");
+        if (File.Exists(direct)) return direct;
+
+        string[] candidates =
+        {
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Geomorphs", "elevators.json"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Datablocks", "Geomorphs", "elevators.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Geomorphs", "elevators.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Datablocks", "Geomorphs", "elevators.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Geomorphs", "elevators.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Datablocks", "Geomorphs", "elevators.json")
+        };
+
+        return candidates.FirstOrDefault(File.Exists);
+    }
+
+    public static string? FindGenClusterTilesFile()
+    {
+        string geoDir = GetGeomorphsDirectory();
+        string direct = Path.Combine(geoDir, "genclustertiles.json");
+        if (File.Exists(direct)) return direct;
+
+        string[] candidates =
+        {
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Geomorphs", "genclustertiles.json"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "Datablocks", "Geomorphs", "genclustertiles.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Geomorphs", "genclustertiles.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "Datablocks", "Geomorphs", "genclustertiles.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Geomorphs", "genclustertiles.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "Datablocks", "Geomorphs", "genclustertiles.json")
+        };
+
+        return candidates.FirstOrDefault(File.Exists);
+    }
+
     public static string? FindImageMappingsFile()
     {
         string geoDir = GetGeomorphsDirectory();
@@ -181,6 +219,227 @@ public static class GeomorphService
         {
             return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
         }
+    }
+
+    public static Dictionary<string, List<string>> LoadElevators(string? filePath = null)
+    {
+        filePath ??= FindElevatorsFile();
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+        {
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        try
+        {
+            string json = File.ReadAllText(filePath);
+            var map = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+            return map != null
+                ? new Dictionary<string, List<string>>(map, StringComparer.OrdinalIgnoreCase)
+                : new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    public static List<ElevatorTileOption> GetElevatorOptionsForComplex(ComplexType complexType, string? elevatorsPath = null)
+    {
+        return GetElevatorOptionsForComplex(complexType.ToString(), elevatorsPath);
+    }
+
+    public static List<ElevatorTileOption> GetElevatorOptionsForComplex(string complexName, string? elevatorsPath = null)
+    {
+        var elevators = LoadElevators(elevatorsPath);
+        string key = complexName.ToLowerInvariant();
+
+        if (!elevators.TryGetValue(key, out var prefabList) || prefabList == null)
+        {
+            var matched = elevators.FirstOrDefault(kvp => kvp.Key.Equals(complexName, StringComparison.OrdinalIgnoreCase));
+            prefabList = matched.Value ?? new List<string>();
+        }
+
+        var options = new List<ElevatorTileOption>();
+        var added = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var prefab in prefabList)
+        {
+            if (!string.IsNullOrWhiteSpace(prefab) && added.Add(prefab))
+            {
+                options.Add(new ElevatorTileOption
+                {
+                    Prefab = prefab,
+                    DisplayName = LevelLayoutService.GetFriendlyElevatorName(prefab),
+                    Category = "Elevator Shaft"
+                });
+            }
+        }
+
+        return options;
+    }
+
+    public static List<GeomorphEntry> GetElevatorGeomorphsForComplex(ComplexType complexType, string? elevatorsPath = null, string? imageMappingsPath = null)
+    {
+        return GetElevatorGeomorphsForComplex(complexType.ToString(), elevatorsPath, imageMappingsPath);
+    }
+
+    public static List<GeomorphEntry> GetElevatorGeomorphsForComplex(string complexName, string? elevatorsPath = null, string? imageMappingsPath = null)
+    {
+        var elevators = LoadElevators(elevatorsPath);
+        var imageMappings = LoadImageMappings(imageMappingsPath);
+
+        string key = complexName.ToLowerInvariant();
+        if (!elevators.TryGetValue(key, out var prefabList) || prefabList == null)
+        {
+            var matched = elevators.FirstOrDefault(kvp => kvp.Key.Equals(complexName, StringComparison.OrdinalIgnoreCase));
+            prefabList = matched.Value ?? new List<string>();
+        }
+
+        var list = new List<GeomorphEntry>();
+        var added = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        var layoutEntries = LoadGeomorphs();
+        var layoutMap = layoutEntries
+            .Where(e => !string.IsNullOrEmpty(e.PrefabPath))
+            .GroupBy(e => e.PrefabPath, StringComparer.OrdinalIgnoreCase)
+            .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase);
+
+        foreach (var prefabPath in prefabList)
+        {
+            if (string.IsNullOrWhiteSpace(prefabPath) || !added.Add(prefabPath))
+            {
+                continue;
+            }
+
+            string imageName = string.Empty;
+            if (imageMappings.TryGetValue(prefabPath, out var mappedImg))
+            {
+                imageName = mappedImg ?? string.Empty;
+            }
+            else if (imageMappings.TryGetValue(Path.GetFileName(prefabPath), out var fallbackImg))
+            {
+                imageName = fallbackImg ?? string.Empty;
+            }
+
+            if (layoutMap.TryGetValue(prefabPath, out var existing))
+            {
+                if (string.IsNullOrEmpty(existing.ImageName) && !string.IsNullOrEmpty(imageName))
+                {
+                    existing.ImageName = imageName;
+                }
+                list.Add(existing);
+            }
+            else
+            {
+                string fileName = Path.GetFileName(prefabPath);
+                string baseName = Path.GetFileNameWithoutExtension(prefabPath);
+                string friendlyName = LevelLayoutService.GetFriendlyElevatorName(prefabPath);
+                string category = ExtractCategoryFromPath(prefabPath);
+
+                list.Add(new GeomorphEntry
+                {
+                    Name = baseName,
+                    DisplayName = friendlyName,
+                    PrefabName = fileName,
+                    PrefabPath = prefabPath,
+                    Description = string.Empty,
+                    ImageName = imageName ?? string.Empty,
+                    Complex = FormatDisplayName(complexName),
+                    SubComplex = category,
+                    Category = category,
+                    VariantIndex = 1,
+                    VariantCount = 1
+                });
+            }
+        }
+
+        return list;
+    }
+
+    public static Dictionary<string, List<string>> LoadGenClusterTiles(string? filePath = null)
+    {
+        filePath ??= FindGenClusterTilesFile();
+        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+        {
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+
+        try
+        {
+            string json = File.ReadAllText(filePath);
+            var map = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json);
+            return map != null
+                ? new Dictionary<string, List<string>>(map, StringComparer.OrdinalIgnoreCase)
+                : new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+        catch
+        {
+            return new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+        }
+    }
+
+    public static List<string> GetGenClusterTilesForComplex(ComplexType complexType, string? filePath = null)
+    {
+        return GetGenClusterTilesForComplex(complexType.ToString(), filePath);
+    }
+
+    public static List<string> GetGenClusterTilesForComplex(string complexName, string? filePath = null)
+    {
+        var clusters = LoadGenClusterTiles(filePath);
+        string key = complexName.ToLowerInvariant();
+
+        if (!clusters.TryGetValue(key, out var prefabList) || prefabList == null)
+        {
+            var matched = clusters.FirstOrDefault(kvp => kvp.Key.Equals(complexName, StringComparison.OrdinalIgnoreCase));
+            prefabList = matched.Value ?? new List<string>();
+        }
+
+        return prefabList;
+    }
+
+    public static List<string> GetAllGenClusterTiles(string? filePath = null)
+    {
+        var clusters = LoadGenClusterTiles(filePath);
+        var all = new List<string>();
+        var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var list in clusters.Values)
+        {
+            if (list == null) continue;
+            foreach (var item in list)
+            {
+                if (!string.IsNullOrWhiteSpace(item) && seen.Add(item))
+                {
+                    all.Add(item);
+                }
+            }
+        }
+
+        return all;
+    }
+
+    public static bool IsGenClusterTile(string? prefabPath, ComplexType? complexType = null, string? filePath = null)
+    {
+        if (string.IsNullOrWhiteSpace(prefabPath)) return false;
+
+        List<string> tiles = complexType.HasValue
+            ? GetGenClusterTilesForComplex(complexType.Value, filePath)
+            : GetAllGenClusterTiles(filePath);
+
+        if (tiles.Count == 0 && complexType.HasValue)
+        {
+            tiles = GetAllGenClusterTiles(filePath);
+        }
+
+        string cleanPrefab = prefabPath.Trim().Replace('\\', '/');
+        string fileName = Path.GetFileName(cleanPrefab);
+
+        return tiles.Any(t =>
+        {
+            string cleanT = t.Trim().Replace('\\', '/');
+            return string.Equals(cleanT, cleanPrefab, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(Path.GetFileName(cleanT), fileName, StringComparison.OrdinalIgnoreCase);
+        });
     }
 
     public static Dictionary<string, string> LoadImageMappings(string? filePath = null)

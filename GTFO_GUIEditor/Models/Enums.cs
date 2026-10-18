@@ -234,3 +234,93 @@ public enum WaveOnGotoWinTrigger
     OnObjectiveCompleted,
     WhenExitScanMakesProgress
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum EventTrigger
+{
+    None = 0,
+    OnStart = 1,
+    OnMid = 2,
+    OnEnd = 3
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum EventType
+{
+    None = 0,
+    OpenSecurityDoor = 1,
+    UnlockSecurityDoor = 2,
+    AllLightsOff = 3,
+    AllLightsOn = 4,
+    PlaySound = 5,
+    SetFogSetting = 6,
+    DimensionFlashTeam = 7,
+    DimensionWarpTeam = 8,
+    SpawnEnemyWave = 9,
+    StopEnemyWaves = 10,
+    UpdateCustomSubObjective = 11,
+    ForceCompleteObjective = 12,
+    LightsInZone = 13,
+    LightsInZoneToggle = 14,
+    AnimationTrigger = 15,
+    SpawnEnemyOnPoint = 16,
+    SetNavMarker = 17,
+    StepProgressionObjective = 18,
+    SetWorldEventCondition = 19,
+    LockSecurityDoor = 20,
+    SetTerminalCommand = 21,
+    ActivateChainedPuzzle = 22,
+    LightOnWorldEventObject = 23,
+    AddToTimer = 24,
+    ResetTimer = 25,
+    WinOnDeath = 26,
+    ForceInstantWin = 27,
+    DialogueOnClosest = 28,
+    GetAchievement = 29,
+    ClearDimension = 30,
+    StartRepeatingFog = 31,
+    StopSustainedEvent = 32
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ZoneDistributionAmount
+{
+    None_0,
+    Pair_2,
+    Few_5,
+    Some_10,
+    SomeMore_15,
+    Many_20,
+    Alot_30,
+    Tons_50
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TerminalLineType
+{
+    Normal,
+    Fail,
+    SpinningWaitDone,
+    SpinningWaitNoDone,
+    ProgressWait,
+    Warning
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TerminalStartingState
+{
+    Sleeping,
+    Awake,
+    PlayerInteracting,
+    DataMining,
+    Hacked,
+    CodePuzzle,
+    InputTest,
+    ReactorError,
+    AskToPlayLogFile,
+    DoPlayAudioFile,
+    AudioLoopError,
+    Ping,
+    PasswordProtected,
+    EnterPassword
+}

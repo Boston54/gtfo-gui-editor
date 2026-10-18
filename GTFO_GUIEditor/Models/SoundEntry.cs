@@ -9,4 +9,6 @@ public class SoundEntry
     public string WwisePath { get; set; } = string.Empty;
     public string Notes { get; set; } = string.Empty;
     public string RawLine { get; set; } = string.Empty;
+
+    public string DisplayText => Id == 0 ? "(None)" : (string.IsNullOrWhiteSpace(Name) ? (string.IsNullOrWhiteSpace(Event) ? $"[{Id}]" : $"[{Id}] {Event}") : $"[{Id}] {Name}");
 }

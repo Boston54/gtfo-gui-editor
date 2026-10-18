@@ -1,0 +1,30 @@
+{
+    "mining": [
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_02.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_03.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_05.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_01.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_02.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_refinery_03.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_01.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_02.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_03.prefab",
+        "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_storage_01.prefab"
+    ],
+    "tech": [
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab",
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_02.prefab",
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_03.prefab",
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_01.prefab",
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_02.prefab",
+        "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_lab_03.prefab"
+    ],
+    "service": [
+        "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_01.prefab",
+        "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_02.prefab",
+        "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_01.prefab",
+        "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_02.prefab",
+        "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_floodways_03.prefab"
+    ]
+}

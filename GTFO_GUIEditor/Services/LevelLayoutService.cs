@@ -35,8 +35,10 @@ public static class LevelLayoutService
 
         uint defaultSetId = firstSet?.PersistentId ?? 1;
         ComplexType defaultComplexType = firstSet?.ComplexType ?? ComplexType.Mining;
-        string defaultElevator = firstSet?.ElevatorShafts_1x1.FirstOrDefault()?.Prefab
-            ?? "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_mining_02.prefab";
+        var elevatorOptions = GeomorphService.GetElevatorOptionsForComplex(defaultComplexType);
+        string defaultElevator = elevatorOptions.FirstOrDefault()?.Prefab
+            ?? firstSet?.ElevatorShafts_1x1.FirstOrDefault()?.Prefab
+            ?? "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab";
 
         return new List<LevelLayoutBlock>
         {

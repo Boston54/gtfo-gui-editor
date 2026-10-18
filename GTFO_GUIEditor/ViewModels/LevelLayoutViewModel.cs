@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using Avalonia.Media;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
@@ -91,10 +92,43 @@ public class LevelLayoutViewModel : ViewModelBase
     private bool _isEditingRoom;
     private PlacedRoomNode? _editingRoom;
 
+    public static ZoneDistributionAmount[] AvailableZoneDistributionAmounts { get; } = (ZoneDistributionAmount[])Enum.GetValues(typeof(ZoneDistributionAmount));
+    public static TerminalLineType[] AvailableTerminalLineTypes { get; } = (TerminalLineType[])Enum.GetValues(typeof(TerminalLineType));
+    public static TerminalStartingState[] AvailableTerminalStartingStates { get; } = (TerminalStartingState[])Enum.GetValues(typeof(TerminalStartingState));
+
+    public ICommand RemoveWardenEventCommand { get; }
+    public ICommand RemoveEnemyExcludeItemCommand { get; }
+    public ICommand RemoveBigPickupDistributionItemCommand { get; }
+    public ICommand RemoveDisinfectionStationPlacementCommand { get; }
+    public ICommand RemoveTerminalPlacementCommand { get; }
+    public ICommand RemoveTerminalZoneSelectionDataCommand { get; }
+    public ICommand RemoveTerminalUniqueCommandCommand { get; }
+    public ICommand RemoveTerminalPostCommandOutputCommand { get; }
+
+    // Edit Door modal state
+    private bool _isEditingDoor;
+    private PlacedDoorNode? _editingDoor;
+    private ObservableCollection<ZoneOption> _availableDoorTerminalZones = new();
+    private ObservableCollection<TerminalOption> _availableDoorTerminals = new();
+
+    public ObservableCollection<ZoneOption> AvailableDoorTerminalZones => _availableDoorTerminalZones;
+    public ObservableCollection<TerminalOption> AvailableDoorTerminals => _availableDoorTerminals;
+
     private ObservableCollection<LightSettingsBlock> _availableLightingConfigs = new();
     private ObservableCollection<AlarmBlock> _availableAlarms = new();
     private ObservableCollection<FogSettingsBlock> _availableFogSettings = new();
     private ObservableCollection<FogTransitionOption> _availableFogTransitionOptions = new();
+    private ObservableCollection<SoundEntry> _availableSounds = new();
+
+    public static LevelLayoutViewModel? Instance { get; private set; }
+
+    public static EventType[] AvailableEventTypes => Enum.GetValues<EventType>();
+    public static EventTrigger[] AvailableEventTriggers => Enum.GetValues<EventTrigger>();
+    public static SectorType[] AvailableSectors => Enum.GetValues<SectorType>();
+
+    public ObservableCollection<EventType> InstanceAvailableEventTypes { get; } = new(Enum.GetValues<EventType>());
+    public ObservableCollection<EventTrigger> InstanceAvailableEventTriggers { get; } = new(Enum.GetValues<EventTrigger>());
+    public ObservableCollection<SectorType> InstanceAvailableSectors { get; } = new(Enum.GetValues<SectorType>());
 
     public LevelLayoutGridState GridState => _selectedLevel?.GridState ?? _gridState;
 
@@ -188,6 +222,12 @@ public class LevelLayoutViewModel : ViewModelBase
         private set => SetField(ref _availableDimensions, value);
     }
 
+    public ObservableCollection<SoundEntry> AvailableSounds
+    {
+        get => _availableSounds;
+        private set => SetField(ref _availableSounds, value);
+    }
+
     public DimensionOption? SelectedDimension
     {
         get => _selectedDimension;
@@ -214,6 +254,7 @@ public class LevelLayoutViewModel : ViewModelBase
         ObservableCollection<AlarmBlock>? alarms = null,
         ObservableCollection<FogSettingsBlock>? fogSettings = null)
     {
+        Instance = this;
         if (complexResourceSets != null)
         {
             _availableComplexResourceSets = complexResourceSets;
@@ -261,6 +302,16 @@ public class LevelLayoutViewModel : ViewModelBase
         }
 
         RefreshFogTransitionOptions();
+
+        try
+        {
+            var loadedSounds = SoundService.LoadSounds();
+            _availableSounds = new ObservableCollection<SoundEntry>(loadedSounds);
+        }
+        catch
+        {
+            _availableSounds = new ObservableCollection<SoundEntry>();
+        }
 
         var loadedLevels = initialLevels?.ToList() ??
                            LevelLayoutService.GetInitialLevels(_availableComplexResourceSets);
@@ -321,6 +372,15 @@ public class LevelLayoutViewModel : ViewModelBase
 
         UpdateStatusText();
         UpdateActiveDimensionView();
+
+        RemoveWardenEventCommand = new RelayCommand<WardenEvent>(RemoveWardenEvent);
+        RemoveEnemyExcludeItemCommand = new RelayCommand<EnemyExcludeItem>(RemoveEnemyExcludeItem);
+        RemoveBigPickupDistributionItemCommand = new RelayCommand<BigPickupDistributionItem>(RemoveBigPickupDistributionItem);
+        RemoveDisinfectionStationPlacementCommand = new RelayCommand<DisinfectionStationPlacement>(RemoveDisinfectionStationPlacement);
+        RemoveTerminalPlacementCommand = new RelayCommand<TerminalPlacement>(RemoveTerminalPlacement);
+        RemoveTerminalZoneSelectionDataCommand = new RelayCommand<TerminalZoneSelectionData>(RemoveTerminalZoneSelectionData);
+        RemoveTerminalUniqueCommandCommand = new RelayCommand<TerminalUniqueCommand>(RemoveTerminalUniqueCommand);
+        RemoveTerminalPostCommandOutputCommand = new RelayCommand<TerminalPostCommandOutput>(RemoveTerminalPostCommandOutput);
     }
 
     public void RefreshAvailableDimensions()
@@ -1259,16 +1319,14 @@ public class LevelLayoutViewModel : ViewModelBase
             }
             else
             {
-                if (door.IsSecondaryDoor)
-                    StatusText = $"Room Door [Area {door.AreaFrom} <-> Area {door.AreaTo}] is a Secondary Door.";
-                else if (door.IsOverloadDoor)
-                    StatusText = $"Room Door [Area {door.AreaFrom} <-> Area {door.AreaTo}] is an Overload Door.";
-                else if (door.IsMainDoor)
-                    StatusText = $"Room Door [Area {door.AreaFrom} <-> Area {door.AreaTo}] is a Main Door.";
-                else if (door.IsSecurityDoor)
-                    StatusText = $"Room Door [Area {door.AreaFrom} <-> Area {door.AreaTo}] is a Security Door.";
+                if (door.IsZoneBoundary)
+                {
+                    OpenEditDoorDialog(door);
+                }
                 else
+                {
                     StatusText = $"Room Door [Area {door.AreaFrom} <-> Area {door.AreaTo}] is connected.";
+                }
             }
         }
         else
@@ -1280,16 +1338,14 @@ public class LevelLayoutViewModel : ViewModelBase
             }
             else
             {
-                if (door.IsSecondaryDoor)
-                    StatusText = "Geomorph door is a Secondary Door.";
-                else if (door.IsOverloadDoor)
-                    StatusText = "Geomorph door is an Overload Door.";
-                else if (door.IsMainDoor)
-                    StatusText = "Geomorph door is a Main Door.";
-                else if (door.IsSecurityDoor)
-                    StatusText = "Geomorph door is a Security Door.";
+                if (door.IsZoneBoundary)
+                {
+                    OpenEditDoorDialog(door);
+                }
                 else
+                {
                     StatusText = "Geomorph door is connected.";
+                }
             }
         }
     }
@@ -1369,6 +1425,321 @@ public class LevelLayoutViewModel : ViewModelBase
         RoomExpansionErrorMessage = string.Empty;
     }
 
+    // --- Edit Door Modal State & Properties ---
+
+    public bool IsEditingDoor
+    {
+        get => _isEditingDoor;
+        set => SetField(ref _isEditingDoor, value);
+    }
+
+    public PlacedDoorNode? EditingDoor
+    {
+        get => _editingDoor;
+        set
+        {
+            if (SetField(ref _editingDoor, value))
+            {
+                OnPropertyChanged(nameof(EditingDoorTitle));
+                OnPropertyChanged(nameof(EditingDoorTypeDisplayName));
+                OnPropertyChanged(nameof(EditingDoorBrushColor));
+                OnPropertyChanged(nameof(SelectedDoorAlarmOption));
+                OnPropertyChanged(nameof(EditingDoorAliasOverride));
+                OnPropertyChanged(nameof(EditingDoorAliasPrefixShortOverride));
+                UpdateAvailableDoorTerminalZones();
+            }
+        }
+    }
+
+    public string EditingDoorTitle => EditingDoor != null
+        ? $"Edit Door - {EditingDoorTypeDisplayName}"
+        : "Edit Door";
+
+    public string EditingDoorTypeDisplayName
+    {
+        get
+        {
+            if (EditingDoor == null) return "Security Door";
+            if (EditingDoor.IsSecondaryDoor) return "Secondary Door";
+            if (EditingDoor.IsOverloadDoor) return "Overload Door";
+            if (EditingDoor.IsMainDoor) return "Main Door";
+            if (EditingDoor.IsSecurityDoor) return "Security Door";
+            return "Security Door";
+        }
+    }
+
+    public string EditingDoorBrushColor => EditingDoor?.DoorBrush ?? "#FF0000";
+
+    public AlarmBlock? SelectedDoorAlarmOption
+    {
+        get => AvailableAlarms.FirstOrDefault(a => a.PersistentId == (EditingDoor?.ChainedPuzzleToSolve ?? 0)) ?? AvailableAlarms.FirstOrDefault();
+        set
+        {
+            if (value != null && EditingDoor != null && EditingDoor.ChainedPuzzleToSolve != value.PersistentId)
+            {
+                EditingDoor.ChainedPuzzleToSolve = value.PersistentId;
+                OnPropertyChanged(nameof(SelectedDoorAlarmOption));
+            }
+        }
+    }
+
+    public ZoneOption? SelectedDoorTerminalZoneOption
+    {
+        get => AvailableDoorTerminalZones.FirstOrDefault(z => z.ZoneIndex == (EditingDoor?.TerminalZone ?? 0)) ?? AvailableDoorTerminalZones.FirstOrDefault();
+        set
+        {
+            if (value != null && EditingDoor != null && EditingDoor.TerminalZone != value.ZoneIndex)
+            {
+                EditingDoor.TerminalZone = value.ZoneIndex;
+                OnPropertyChanged(nameof(SelectedDoorTerminalZoneOption));
+                UpdateAvailableDoorTerminals();
+            }
+        }
+    }
+
+    public TerminalOption? SelectedDoorTerminalOption
+    {
+        get => AvailableDoorTerminals.FirstOrDefault(t => t.TerminalIndex == (EditingDoor?.TerminalIndex ?? 0)) ?? AvailableDoorTerminals.FirstOrDefault();
+        set
+        {
+            if (value != null && EditingDoor != null && EditingDoor.TerminalIndex != value.TerminalIndex)
+            {
+                EditingDoor.TerminalIndex = value.TerminalIndex;
+                OnPropertyChanged(nameof(SelectedDoorTerminalOption));
+            }
+        }
+    }
+
+    public void UpdateAvailableDoorTerminalZones()
+    {
+        _availableDoorTerminalZones.Clear();
+        var zoneIndices = GridState.PlacedRooms
+            .Select(r => r.Zone)
+            .Distinct()
+            .Where(z => GridState.GetOrCreateZoneSettings(z).TerminalPlacements.Count > 0)
+            .OrderBy(z => z)
+            .ToList();
+
+        foreach (int z in zoneIndices)
+        {
+            string name = SelectedLevel != null ? SelectedLevel.GetZoneDisplayName(z) : $"Zone {z}";
+            _availableDoorTerminalZones.Add(new ZoneOption { ZoneIndex = z, DisplayName = name });
+        }
+
+        if (EditingDoor != null)
+        {
+            if (_availableDoorTerminalZones.Count > 0)
+            {
+                if (!_availableDoorTerminalZones.Any(z => z.ZoneIndex == EditingDoor.TerminalZone))
+                {
+                    EditingDoor.TerminalZone = _availableDoorTerminalZones[0].ZoneIndex;
+                }
+            }
+        }
+
+        OnPropertyChanged(nameof(SelectedDoorTerminalZoneOption));
+        UpdateAvailableDoorTerminals();
+    }
+
+    public void UpdateAvailableDoorTerminals()
+    {
+        _availableDoorTerminals.Clear();
+        if (EditingDoor != null && _availableDoorTerminalZones.Count > 0)
+        {
+            int zone = EditingDoor.TerminalZone;
+            var zoneSettings = GridState.GetOrCreateZoneSettings(zone);
+            int terminalCount = zoneSettings.TerminalPlacements.Count;
+            if (terminalCount > 0)
+            {
+                for (int i = 0; i < terminalCount; i++)
+                {
+                    _availableDoorTerminals.Add(new TerminalOption(i, $"Terminal {i + 1}"));
+                }
+                if (EditingDoor.TerminalIndex < 0 || EditingDoor.TerminalIndex >= terminalCount)
+                {
+                    EditingDoor.TerminalIndex = 0;
+                }
+            }
+        }
+
+        OnPropertyChanged(nameof(SelectedDoorTerminalOption));
+    }
+
+    public int EditingDoorAliasOverride
+    {
+        get => EditingDoor?.AliasOverride ?? 0;
+        set
+        {
+            if (EditingDoor != null && EditingDoor.AliasOverride != value)
+            {
+                EditingDoor.AliasOverride = value;
+                OnPropertyChanged(nameof(EditingDoorAliasOverride));
+            }
+        }
+    }
+
+    public string EditingDoorAliasPrefixShortOverride
+    {
+        get => EditingDoor?.AliasPrefixShortOverride ?? string.Empty;
+        set
+        {
+            if (EditingDoor != null && EditingDoor.AliasPrefixShortOverride != (value ?? string.Empty))
+            {
+                EditingDoor.AliasPrefixShortOverride = value ?? string.Empty;
+                OnPropertyChanged(nameof(EditingDoorAliasPrefixShortOverride));
+            }
+        }
+    }
+
+    public void OpenEditDoorDialog(PlacedDoorNode? door)
+    {
+        if (door == null) return;
+        EditingDoor = door;
+        IsEditingDoor = true;
+        UpdateAvailableDoorTerminalZones();
+    }
+
+    public void CloseEditDoorDialog()
+    {
+        IsEditingDoor = false;
+        EditingDoor = null;
+    }
+
+    public void AddEventOnPortalWarp() => EditingDoor?.EventsOnPortalWarp.Add(new WardenEvent());
+    public void RemoveEventOnPortalWarp(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnPortalWarp.Remove(ev); }
+
+    public void AddEventOnApproachDoor() => EditingDoor?.EventsOnApproachDoor.Add(new WardenEvent());
+    public void RemoveEventOnApproachDoor(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnApproachDoor.Remove(ev); }
+
+    public void AddEventOnUnlockDoor() => EditingDoor?.EventsOnUnlockDoor.Add(new WardenEvent());
+    public void RemoveEventOnUnlockDoor(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnUnlockDoor.Remove(ev); }
+
+    public void AddEventOnOpenDoor() => EditingDoor?.EventsOnOpenDoor.Add(new WardenEvent());
+    public void RemoveEventOnOpenDoor(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnOpenDoor.Remove(ev); }
+
+    public void AddEventOnDoorScanStart() => EditingDoor?.EventsOnDoorScanStart.Add(new WardenEvent());
+    public void RemoveEventOnDoorScanStart(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnDoorScanStart.Remove(ev); }
+
+    public void AddEventOnDoorScanDone() => EditingDoor?.EventsOnDoorScanDone.Add(new WardenEvent());
+    public void RemoveEventOnDoorScanDone(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnDoorScanDone.Remove(ev); }
+
+    public void AddEventOnBossDeath() => EditingDoor?.EventsOnBossDeath.Add(new WardenEvent());
+    public void RemoveEventOnBossDeath(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnBossDeath.Remove(ev); }
+
+    public void AddEventOnTrigger() => EditingDoor?.EventsOnTrigger.Add(new WardenEvent());
+    public void RemoveEventOnTrigger(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnTrigger.Remove(ev); }
+
+    public void AddEventOnActivation() => EditingSectorSettings?.EventsOnActivation.Add(new WardenEvent());
+    public void RemoveEventOnActivation(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnActivation.Remove(ev); }
+
+    public void AddEventOnSequenceStart() => EditingSectorSettings?.EventsOnSequenceStart.Add(new WardenEvent());
+    public void RemoveEventOnSequenceStart(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnSequenceStart.Remove(ev); }
+
+    public void AddEventOnSequenceDone() => EditingSectorSettings?.EventsOnSequenceDone.Add(new WardenEvent());
+    public void RemoveEventOnSequenceDone(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnSequenceDone.Remove(ev); }
+
+    public void AddEventOnSequenceFail() => EditingSectorSettings?.EventsOnSequenceFail.Add(new WardenEvent());
+    public void RemoveEventOnSequenceFail(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnSequenceFail.Remove(ev); }
+
+    public void AddEventOnElevatorLand() => EditingSectorSettings?.EventsOnElevatorLand.Add(new WardenEvent());
+    public void RemoveEventOnElevatorLand(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnElevatorLand.Remove(ev); }
+
+    public void AddEventOnGotoWin() => EditingSectorSettings?.EventsOnGotoWin.Add(new WardenEvent());
+    public void RemoveEventOnGotoWin(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnGotoWin.Remove(ev); }
+
+    public void AddEventOnActivate() => EditingSectorSettings?.EventsOnActivate.Add(new WardenEvent());
+    public void RemoveEventOnActivate(WardenEvent? ev) { if (ev != null) EditingSectorSettings?.EventsOnActivate.Remove(ev); }
+
+    public void RemoveWardenEvent(WardenEvent? ev)
+    {
+        if (ev == null) return;
+        if (EditingDoor != null)
+        {
+            EditingDoor.EventsOnPortalWarp.Remove(ev);
+            EditingDoor.EventsOnApproachDoor.Remove(ev);
+            EditingDoor.EventsOnUnlockDoor.Remove(ev);
+            EditingDoor.EventsOnOpenDoor.Remove(ev);
+            EditingDoor.EventsOnDoorScanStart.Remove(ev);
+            EditingDoor.EventsOnDoorScanDone.Remove(ev);
+            EditingDoor.EventsOnBossDeath.Remove(ev);
+            EditingDoor.EventsOnTrigger.Remove(ev);
+        }
+        if (EditingSectorSettings != null)
+        {
+            EditingSectorSettings.EventsOnActivation.Remove(ev);
+            EditingSectorSettings.EventsOnSequenceStart.Remove(ev);
+            EditingSectorSettings.EventsOnSequenceDone.Remove(ev);
+            EditingSectorSettings.EventsOnSequenceFail.Remove(ev);
+            EditingSectorSettings.EventsOnElevatorLand.Remove(ev);
+            EditingSectorSettings.EventsOnGotoWin.Remove(ev);
+            EditingSectorSettings.EventsOnActivate.Remove(ev);
+        }
+        if (ActiveZoneSettings != null)
+        {
+            foreach (var term in ActiveZoneSettings.TerminalPlacements)
+            {
+                foreach (var cmd in term.UniqueCommands)
+                {
+                    cmd.CommandEvents.Remove(ev);
+                }
+            }
+        }
+    }
+
+    public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem());
+    public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }
+
+    public void AddBigPickupDistributionItem() => ActiveZoneSettings?.BigPickupDistributionInZone.Add(new BigPickupDistributionItem());
+    public void RemoveBigPickupDistributionItem(BigPickupDistributionItem? item) { if (item != null) ActiveZoneSettings?.BigPickupDistributionInZone.Remove(item); }
+
+    public void AddDisinfectionStationPlacement() => ActiveZoneSettings?.DisinfectionStationPlacements.Add(new DisinfectionStationPlacement());
+    public void RemoveDisinfectionStationPlacement(DisinfectionStationPlacement? placement) { if (placement != null) ActiveZoneSettings?.DisinfectionStationPlacements.Remove(placement); }
+
+    public void AddTerminalPlacement()
+    {
+        ActiveZoneSettings?.TerminalPlacements.Add(new TerminalPlacement());
+        UpdateAvailableDoorTerminalZones();
+    }
+
+    public void RemoveTerminalPlacement(TerminalPlacement? placement)
+    {
+        if (placement != null)
+        {
+            ActiveZoneSettings?.TerminalPlacements.Remove(placement);
+            UpdateAvailableDoorTerminalZones();
+        }
+    }
+
+    public void RemoveTerminalUniqueCommand(TerminalUniqueCommand? cmd)
+    {
+        if (cmd == null || ActiveZoneSettings == null) return;
+        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        {
+            term.UniqueCommands.Remove(cmd);
+        }
+    }
+
+    public void RemoveTerminalZoneSelectionData(TerminalZoneSelectionData? data)
+    {
+        if (data == null || ActiveZoneSettings == null) return;
+        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        {
+            term.TerminalZoneSelectionDatas.Remove(data);
+        }
+    }
+
+    public void RemoveTerminalPostCommandOutput(TerminalPostCommandOutput? output)
+    {
+        if (output == null || ActiveZoneSettings == null) return;
+        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        {
+            foreach (var cmd in term.UniqueCommands)
+            {
+                cmd.PostCommandOutputs.Remove(output);
+            }
+        }
+    }
+
     // --- Edit Room Modal State & Properties ---
 
     public bool IsEditingRoom
@@ -1393,6 +1764,8 @@ public class LevelLayoutViewModel : ViewModelBase
                 OnPropertyChanged(nameof(EditingRoomTitle));
                 OnPropertyChanged(nameof(EditingRoomGeomorphName));
                 OnPropertyChanged(nameof(EditingRoomAreaIndex));
+                OnPropertyChanged(nameof(EditingRoomRoomName));
+                OnPropertyChanged(nameof(EditingRoomUserFacingDisplayName));
                 OnPropertyChanged(nameof(EditingRoomZone));
                 OnPropertyChanged(nameof(EditingRoomZoneDisplayName));
                 OnPropertyChanged(nameof(EditingRoomAreaSize));
@@ -1403,6 +1776,7 @@ public class LevelLayoutViewModel : ViewModelBase
                 OnPropertyChanged(nameof(ActiveZoneSettings));
                 OnPropertyChanged(nameof(SelectedZoneLightingOption));
                 OnPropertyChanged(nameof(EditingZoneLighting));
+                OnPropertyChanged(nameof(ActiveZoneHasGenClusterTile));
                 OnPropertyChanged(nameof(HasSecondaryDoor));
                 OnPropertyChanged(nameof(HasOverloadDoor));
                 OnPropertyChanged(nameof(HasSectorDoors));
@@ -1412,12 +1786,24 @@ public class LevelLayoutViewModel : ViewModelBase
     }
 
     public string EditingRoomTitle => EditingRoom != null
-        ? $"Edit Room - {EditingRoom.DisplayName} (Area {EditingRoom.AreaIndex})"
+        ? $"Edit Room - {EditingRoom.UserFacingDisplayName} ({EditingRoom.Geomorph?.DisplayName ?? "Room"}, Area {EditingRoom.AreaIndex})"
         : "Edit Room";
 
     public string EditingRoomGeomorphName => EditingRoom?.Geomorph?.DisplayName ?? "Unknown";
     public int EditingRoomAreaIndex => EditingRoom?.AreaIndex ?? 0;
+    public string EditingRoomRoomName => EditingRoom?.RoomName ?? "Room A";
+    public string EditingRoomUserFacingDisplayName => EditingRoom != null ? EditingRoom.UserFacingDisplayName : string.Empty;
     public int EditingRoomZone => EditingRoom?.Zone ?? 0;
+
+    public bool ActiveZoneHasGenClusterTile
+    {
+        get
+        {
+            if (EditingRoom == null) return false;
+            ComplexType? complexType = SelectedLevel?.ComplexType;
+            return GridState.ZoneHasGenClusterTile(EditingRoom.Zone, complexType);
+        }
+    }
 
     public string EditingRoomZoneDisplayName
     {
@@ -1743,7 +2129,7 @@ public class LevelLayoutViewModel : ViewModelBase
             var warningItems = new List<string>();
             foreach (var r in disconnectedRooms)
             {
-                warningItems.Add($"• Area {r.AreaIndex} in {r.Geomorph?.DisplayName ?? "Unknown"}");
+                warningItems.Add($"• {r.UserFacingDisplayName} (Area {r.AreaIndex} in {r.Geomorph?.DisplayName ?? "Unknown"})");
             }
 
             LayoutDeletionWarning =
@@ -1773,10 +2159,10 @@ public class LevelLayoutViewModel : ViewModelBase
         }
         else if (_pendingLayoutDeletionType == LayoutDeletionType.Room && _pendingDeleteRoom != null)
         {
-            var name = _pendingDeleteRoom.DisplayName;
+            var name = _pendingDeleteRoom.UserFacingDisplayName;
             var area = _pendingDeleteRoom.AreaIndex;
             GridState.DeleteRoom(_pendingDeleteRoom);
-            StatusText = $"Deleted room '{name}' (Area {area}).";
+            StatusText = $"Deleted {name} (Area {area}).";
         }
 
         IsConfirmingLayoutDeletion = false;
@@ -2172,7 +2558,12 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public static List<ElevatorTileOption> GetElevatorTilesForComplex(ComplexType complexType)
     {
-        var options = new List<ElevatorTileOption>();
+        var options = GeomorphService.GetElevatorOptionsForComplex(complexType);
+        if (options.Count > 0)
+        {
+            return options;
+        }
+
         var allGeos = GeomorphService.LoadGeomorphs();
         var complexName = complexType.ToString();
 
@@ -2195,27 +2586,6 @@ public class LevelLayoutViewModel : ViewModelBase
                     DisplayName = geo.DisplayName,
                     Category = "Elevator Shaft"
                 });
-            }
-        }
-
-        if (options.Count == 0)
-        {
-            var vanillaSets = ComplexResourceSetService.LoadVanillaBlocks();
-            var set = vanillaSets.FirstOrDefault(s => s.ComplexType == complexType) ?? vanillaSets.FirstOrDefault();
-            if (set != null)
-            {
-                foreach (var shaft in set.ElevatorShafts_1x1)
-                {
-                    if (!string.IsNullOrWhiteSpace(shaft.Prefab) && added.Add(shaft.Prefab))
-                    {
-                        options.Add(new ElevatorTileOption
-                        {
-                            Prefab = shaft.Prefab,
-                            DisplayName = LevelLayoutService.GetFriendlyElevatorName(shaft.Prefab),
-                            Category = "Elevator Shaft"
-                        });
-                    }
-                }
             }
         }
 
@@ -2376,28 +2746,10 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (_selectedTileSource == "Elevator Shafts" || IsPromptingReality)
         {
-            if (_dimensionSelectedComplexResourceSet != null && _dimensionSelectedComplexResourceSet.ElevatorShafts_1x1.Count > 0)
+            var options = GetElevatorTilesForComplex(_dimensionSelectedComplexType);
+            foreach (var opt in options)
             {
-                foreach (var shaft in _dimensionSelectedComplexResourceSet.ElevatorShafts_1x1)
-                {
-                    if (!string.IsNullOrWhiteSpace(shaft.Prefab))
-                    {
-                        _availableDimensionTiles.Add(new ElevatorTileOption
-                        {
-                            Prefab = shaft.Prefab,
-                            DisplayName = LevelLayoutService.GetFriendlyElevatorName(shaft.Prefab),
-                            Category = "Elevator Shaft"
-                        });
-                    }
-                }
-            }
-            else
-            {
-                var options = GetElevatorTilesForComplex(_dimensionSelectedComplexType);
-                foreach (var opt in options)
-                {
-                    _availableDimensionTiles.Add(opt);
-                }
+                _availableDimensionTiles.Add(opt);
             }
         }
         else
@@ -2603,28 +2955,10 @@ public class LevelLayoutViewModel : ViewModelBase
     {
         _availableElevatorTiles.Clear();
 
-        if (_selectedComplexResourceSet != null && _selectedComplexResourceSet.ElevatorShafts_1x1.Count > 0)
+        var options = GetElevatorTilesForComplex(_selectedComplexType);
+        foreach (var opt in options)
         {
-            foreach (var shaft in _selectedComplexResourceSet.ElevatorShafts_1x1)
-            {
-                if (!string.IsNullOrWhiteSpace(shaft.Prefab))
-                {
-                    _availableElevatorTiles.Add(new ElevatorTileOption
-                    {
-                        Prefab = shaft.Prefab,
-                        DisplayName = LevelLayoutService.GetFriendlyElevatorName(shaft.Prefab),
-                        Category = "Elevator Shaft"
-                    });
-                }
-            }
-        }
-        else
-        {
-            var options = GetElevatorTilesForComplex(_selectedComplexType);
-            foreach (var opt in options)
-            {
-                _availableElevatorTiles.Add(opt);
-            }
+            _availableElevatorTiles.Add(opt);
         }
 
         SelectedElevatorTile = _availableElevatorTiles.FirstOrDefault();

@@ -151,6 +151,14 @@ public class SectorSettings : INotifyPropertyChanged
         }
     };
 
+    private ObservableCollection<WardenEvent> _eventsOnActivation = new();
+    private ObservableCollection<WardenEvent> _eventsOnSequenceStart = new();
+    private ObservableCollection<WardenEvent> _eventsOnSequenceDone = new();
+    private ObservableCollection<WardenEvent> _eventsOnSequenceFail = new();
+    private ObservableCollection<WardenEvent> _eventsOnElevatorLand = new();
+    private ObservableCollection<WardenEvent> _eventsOnGotoWin = new();
+    private ObservableCollection<WardenEvent> _eventsOnActivate = new();
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public SectorSettings()
@@ -856,6 +864,55 @@ public class SectorSettings : INotifyPropertyChanged
         }
     }
 
+    [JsonPropertyName("EventsOnActivation")]
+    public ObservableCollection<WardenEvent> EventsOnActivation
+    {
+        get => _eventsOnActivation;
+        set => SetField(ref _eventsOnActivation, value);
+    }
+
+    [JsonPropertyName("EventsOnSequenceStart")]
+    public ObservableCollection<WardenEvent> EventsOnSequenceStart
+    {
+        get => _eventsOnSequenceStart;
+        set => SetField(ref _eventsOnSequenceStart, value);
+    }
+
+    [JsonPropertyName("EventsOnSequenceDone")]
+    public ObservableCollection<WardenEvent> EventsOnSequenceDone
+    {
+        get => _eventsOnSequenceDone;
+        set => SetField(ref _eventsOnSequenceDone, value);
+    }
+
+    [JsonPropertyName("EventsOnSequenceFail")]
+    public ObservableCollection<WardenEvent> EventsOnSequenceFail
+    {
+        get => _eventsOnSequenceFail;
+        set => SetField(ref _eventsOnSequenceFail, value);
+    }
+
+    [JsonPropertyName("EventsOnElevatorLand")]
+    public ObservableCollection<WardenEvent> EventsOnElevatorLand
+    {
+        get => _eventsOnElevatorLand;
+        set => SetField(ref _eventsOnElevatorLand, value);
+    }
+
+    [JsonPropertyName("EventsOnGotoWin")]
+    public ObservableCollection<WardenEvent> EventsOnGotoWin
+    {
+        get => _eventsOnGotoWin;
+        set => SetField(ref _eventsOnGotoWin, value);
+    }
+
+    [JsonPropertyName("EventsOnActivate")]
+    public ObservableCollection<WardenEvent> EventsOnActivate
+    {
+        get => _eventsOnActivate;
+        set => SetField(ref _eventsOnActivate, value);
+    }
+
     public string GetZoneDisplayName(int zoneIndex) => $"Zone {ZoneAliasStart + zoneIndex}";
 
     public SectorSettings Clone()
@@ -975,6 +1032,48 @@ public class SectorSettings : INotifyPropertyChanged
         foreach (var placement in TimedTerminalSequencePlacements)
         {
             clone.TimedTerminalSequencePlacements.Add(placement.Clone());
+        }
+
+        clone.EventsOnActivation.Clear();
+        foreach (var ev in EventsOnActivation)
+        {
+            clone.EventsOnActivation.Add(ev.Clone());
+        }
+
+        clone.EventsOnSequenceStart.Clear();
+        foreach (var ev in EventsOnSequenceStart)
+        {
+            clone.EventsOnSequenceStart.Add(ev.Clone());
+        }
+
+        clone.EventsOnSequenceDone.Clear();
+        foreach (var ev in EventsOnSequenceDone)
+        {
+            clone.EventsOnSequenceDone.Add(ev.Clone());
+        }
+
+        clone.EventsOnSequenceFail.Clear();
+        foreach (var ev in EventsOnSequenceFail)
+        {
+            clone.EventsOnSequenceFail.Add(ev.Clone());
+        }
+
+        clone.EventsOnElevatorLand.Clear();
+        foreach (var ev in EventsOnElevatorLand)
+        {
+            clone.EventsOnElevatorLand.Add(ev.Clone());
+        }
+
+        clone.EventsOnGotoWin.Clear();
+        foreach (var ev in EventsOnGotoWin)
+        {
+            clone.EventsOnGotoWin.Add(ev.Clone());
+        }
+
+        clone.EventsOnActivate.Clear();
+        foreach (var ev in EventsOnActivate)
+        {
+            clone.EventsOnActivate.Add(ev.Clone());
         }
 
         return clone;

@@ -299,4 +299,102 @@ public class GeomorphTests
         Assert.NotNull(first.ImagePath);
         Assert.True(File.Exists(first.ImagePath));
     }
+
+    [Fact]
+    public void LoadElevators_LoadsVanillaElevatorsJson()
+    {
+        var elevators = GeomorphService.LoadElevators();
+        Assert.NotEmpty(elevators);
+        Assert.True(elevators.ContainsKey("mining"));
+        Assert.True(elevators.ContainsKey("tech"));
+        Assert.True(elevators.ContainsKey("service"));
+
+        Assert.Equal(11, elevators["mining"].Count);
+        Assert.Equal(6, elevators["tech"].Count);
+        Assert.Equal(5, elevators["service"].Count);
+
+        Assert.Contains("Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab", elevators["mining"]);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab", elevators["tech"]);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_01.prefab", elevators["service"]);
+    }
+
+    [Fact]
+    public void GetElevatorOptionsForComplex_ReturnsOptionsForComplexType()
+    {
+        var miningOptions = GeomorphService.GetElevatorOptionsForComplex(ComplexType.Mining);
+        Assert.Equal(11, miningOptions.Count);
+        Assert.All(miningOptions, o => Assert.Equal("Elevator Shaft", o.Category));
+        Assert.Contains(miningOptions, o => o.Prefab == "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab");
+
+        var techOptions = GeomorphService.GetElevatorOptionsForComplex(ComplexType.Tech);
+        Assert.Equal(6, techOptions.Count);
+        Assert.All(techOptions, o => Assert.Equal("Elevator Shaft", o.Category));
+        Assert.Contains(techOptions, o => o.Prefab == "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab");
+
+        var serviceOptions = GeomorphService.GetElevatorOptionsForComplex(ComplexType.Service);
+        Assert.Equal(5, serviceOptions.Count);
+        Assert.All(serviceOptions, o => Assert.Equal("Elevator Shaft", o.Category));
+        Assert.Contains(serviceOptions, o => o.Prefab == "Assets/AssetPrefabs/Complex/Service/Geomorphs/geo_32x32_elevator_shaft_Gardens_01.prefab");
+    }
+
+    [Fact]
+    public void GetElevatorGeomorphsForComplex_ReturnsGeomorphEntriesWithImages()
+    {
+        var miningGeos = GeomorphService.GetElevatorGeomorphsForComplex(ComplexType.Mining);
+        Assert.Equal(11, miningGeos.Count);
+        Assert.All(miningGeos, g => Assert.Equal("Mining", g.Complex));
+
+        var techGeos = GeomorphService.GetElevatorGeomorphsForComplex(ComplexType.Tech);
+        Assert.Equal(6, techGeos.Count);
+        Assert.All(techGeos, g => Assert.Equal("Tech", g.Complex));
+
+        var serviceGeos = GeomorphService.GetElevatorGeomorphsForComplex(ComplexType.Service);
+        Assert.Equal(5, serviceGeos.Count);
+        Assert.All(serviceGeos, g => Assert.Equal("Service", g.Complex));
+    }
+
+    [Fact]
+    public void LoadGenClusterTiles_LoadsVanillaGenClusterTilesJson()
+    {
+        var clusters = GeomorphService.LoadGenClusterTiles();
+        Assert.NotEmpty(clusters);
+        Assert.True(clusters.ContainsKey("mining"));
+        Assert.True(clusters.ContainsKey("tech"));
+        Assert.True(clusters.ContainsKey("service"));
+
+        Assert.Equal(3, clusters["mining"].Count);
+        Assert.Equal(4, clusters["tech"].Count);
+        Assert.Empty(clusters["service"]);
+
+        Assert.Contains("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab", clusters["mining"]);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Refinery/geo_64x64_mining_refinery_X_HA_07.prefab", clusters["mining"]);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_02.prefab", clusters["tech"]);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_LF_03_R8C2.prefab", clusters["tech"]);
+    }
+
+    [Fact]
+    public void GetGenClusterTilesForComplex_ReturnsExpectedTiles()
+    {
+        var miningTiles = GeomorphService.GetGenClusterTilesForComplex(ComplexType.Mining);
+        Assert.Equal(3, miningTiles.Count);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab", miningTiles);
+
+        var techTiles = GeomorphService.GetGenClusterTilesForComplex(ComplexType.Tech);
+        Assert.Equal(4, techTiles.Count);
+        Assert.Contains("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_hub_HA_02.prefab", techTiles);
+
+        var serviceTiles = GeomorphService.GetGenClusterTilesForComplex(ComplexType.Service);
+        Assert.Empty(serviceTiles);
+    }
+
+    [Fact]
+    public void IsGenClusterTile_CorrectlyMatchesPrefabs()
+    {
+        Assert.True(GeomorphService.IsGenClusterTile("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab", ComplexType.Mining));
+        Assert.True(GeomorphService.IsGenClusterTile("geo_64x64_mining_dig_site_hub_HA_01.prefab", ComplexType.Mining));
+        Assert.True(GeomorphService.IsGenClusterTile("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_lab_HA_02.prefab"));
+
+        Assert.False(GeomorphService.IsGenClusterTile("Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"));
+        Assert.False(GeomorphService.IsGenClusterTile("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_hub_HA_01.prefab", ComplexType.Tech));
+    }
 }

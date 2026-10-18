@@ -31,6 +31,20 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private bool _isConnected;
     private bool _isBlocked;
     private PlacedDoorNode? _connectedDoor;
+    private uint _chainedPuzzleToSolve;
+    private int _aliasOverride;
+    private string _aliasPrefixShortOverride = string.Empty;
+    private bool _turnOffAlarmOnTerminal;
+    private int _terminalZone;
+    private int _terminalIndex;
+    private ObservableCollection<WardenEvent> _eventsOnPortalWarp = new();
+    private ObservableCollection<WardenEvent> _eventsOnApproachDoor = new();
+    private ObservableCollection<WardenEvent> _eventsOnUnlockDoor = new();
+    private ObservableCollection<WardenEvent> _eventsOnOpenDoor = new();
+    private ObservableCollection<WardenEvent> _eventsOnDoorScanStart = new();
+    private ObservableCollection<WardenEvent> _eventsOnDoorScanDone = new();
+    private ObservableCollection<WardenEvent> _eventsOnBossDeath = new();
+    private ObservableCollection<WardenEvent> _eventsOnTrigger = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -317,7 +331,307 @@ public class PlacedDoorNode : INotifyPropertyChanged
     public PlacedDoorNode? ConnectedDoor
     {
         get => _connectedDoor;
-        set => SetField(ref _connectedDoor, value);
+        set
+        {
+            if (SetField(ref _connectedDoor, value) && value != null)
+            {
+                if (value.ChainedPuzzleToSolve == 0 && ChainedPuzzleToSolve != 0)
+                    value.ChainedPuzzleToSolve = ChainedPuzzleToSolve;
+                else if (ChainedPuzzleToSolve == 0 && value.ChainedPuzzleToSolve != 0)
+                    ChainedPuzzleToSolve = value.ChainedPuzzleToSolve;
+
+                if (value.AliasOverride == 0 && AliasOverride != 0)
+                    value.AliasOverride = AliasOverride;
+                else if (AliasOverride == 0 && value.AliasOverride != 0)
+                    AliasOverride = value.AliasOverride;
+
+                if (string.IsNullOrEmpty(value.AliasPrefixShortOverride) && !string.IsNullOrEmpty(AliasPrefixShortOverride))
+                    value.AliasPrefixShortOverride = AliasPrefixShortOverride;
+                else if (string.IsNullOrEmpty(AliasPrefixShortOverride) && !string.IsNullOrEmpty(value.AliasPrefixShortOverride))
+                    AliasPrefixShortOverride = value.AliasPrefixShortOverride;
+
+                if (value.TurnOffAlarmOnTerminal != TurnOffAlarmOnTerminal)
+                    value.TurnOffAlarmOnTerminal = TurnOffAlarmOnTerminal;
+
+                if (value.TerminalZone != TerminalZone)
+                    value.TerminalZone = TerminalZone;
+
+                if (value.TerminalIndex != TerminalIndex)
+                    value.TerminalIndex = TerminalIndex;
+
+                SyncEventCollections(this, value);
+            }
+        }
+    }
+
+    private static void SyncEventCollections(PlacedDoorNode a, PlacedDoorNode b)
+    {
+        if (a.EventsOnPortalWarp.Count > 0 && b.EventsOnPortalWarp.Count == 0)
+            b.EventsOnPortalWarp = a.EventsOnPortalWarp;
+        else if (b.EventsOnPortalWarp.Count > 0 && a.EventsOnPortalWarp.Count == 0)
+            a.EventsOnPortalWarp = b.EventsOnPortalWarp;
+        else if (a.EventsOnPortalWarp != b.EventsOnPortalWarp && a.EventsOnPortalWarp.Count > 0)
+            b.EventsOnPortalWarp = a.EventsOnPortalWarp;
+
+        if (a.EventsOnApproachDoor.Count > 0 && b.EventsOnApproachDoor.Count == 0)
+            b.EventsOnApproachDoor = a.EventsOnApproachDoor;
+        else if (b.EventsOnApproachDoor.Count > 0 && a.EventsOnApproachDoor.Count == 0)
+            a.EventsOnApproachDoor = b.EventsOnApproachDoor;
+        else if (a.EventsOnApproachDoor != b.EventsOnApproachDoor && a.EventsOnApproachDoor.Count > 0)
+            b.EventsOnApproachDoor = a.EventsOnApproachDoor;
+
+        if (a.EventsOnUnlockDoor.Count > 0 && b.EventsOnUnlockDoor.Count == 0)
+            b.EventsOnUnlockDoor = a.EventsOnUnlockDoor;
+        else if (b.EventsOnUnlockDoor.Count > 0 && a.EventsOnUnlockDoor.Count == 0)
+            a.EventsOnUnlockDoor = b.EventsOnUnlockDoor;
+        else if (a.EventsOnUnlockDoor != b.EventsOnUnlockDoor && a.EventsOnUnlockDoor.Count > 0)
+            b.EventsOnUnlockDoor = a.EventsOnUnlockDoor;
+
+        if (a.EventsOnOpenDoor.Count > 0 && b.EventsOnOpenDoor.Count == 0)
+            b.EventsOnOpenDoor = a.EventsOnOpenDoor;
+        else if (b.EventsOnOpenDoor.Count > 0 && a.EventsOnOpenDoor.Count == 0)
+            a.EventsOnOpenDoor = b.EventsOnOpenDoor;
+        else if (a.EventsOnOpenDoor != b.EventsOnOpenDoor && a.EventsOnOpenDoor.Count > 0)
+            b.EventsOnOpenDoor = a.EventsOnOpenDoor;
+
+        if (a.EventsOnDoorScanStart.Count > 0 && b.EventsOnDoorScanStart.Count == 0)
+            b.EventsOnDoorScanStart = a.EventsOnDoorScanStart;
+        else if (b.EventsOnDoorScanStart.Count > 0 && a.EventsOnDoorScanStart.Count == 0)
+            a.EventsOnDoorScanStart = b.EventsOnDoorScanStart;
+        else if (a.EventsOnDoorScanStart != b.EventsOnDoorScanStart && a.EventsOnDoorScanStart.Count > 0)
+            b.EventsOnDoorScanStart = a.EventsOnDoorScanStart;
+
+        if (a.EventsOnDoorScanDone.Count > 0 && b.EventsOnDoorScanDone.Count == 0)
+            b.EventsOnDoorScanDone = a.EventsOnDoorScanDone;
+        else if (b.EventsOnDoorScanDone.Count > 0 && a.EventsOnDoorScanDone.Count == 0)
+            a.EventsOnDoorScanDone = b.EventsOnDoorScanDone;
+        else if (a.EventsOnDoorScanDone != b.EventsOnDoorScanDone && a.EventsOnDoorScanDone.Count > 0)
+            b.EventsOnDoorScanDone = a.EventsOnDoorScanDone;
+
+        if (a.EventsOnBossDeath.Count > 0 && b.EventsOnBossDeath.Count == 0)
+            b.EventsOnBossDeath = a.EventsOnBossDeath;
+        else if (b.EventsOnBossDeath.Count > 0 && a.EventsOnBossDeath.Count == 0)
+            a.EventsOnBossDeath = b.EventsOnBossDeath;
+        else if (a.EventsOnBossDeath != b.EventsOnBossDeath && a.EventsOnBossDeath.Count > 0)
+            b.EventsOnBossDeath = a.EventsOnBossDeath;
+
+        if (a.EventsOnTrigger.Count > 0 && b.EventsOnTrigger.Count == 0)
+            b.EventsOnTrigger = a.EventsOnTrigger;
+        else if (b.EventsOnTrigger.Count > 0 && a.EventsOnTrigger.Count == 0)
+            a.EventsOnTrigger = b.EventsOnTrigger;
+        else if (a.EventsOnTrigger != b.EventsOnTrigger && a.EventsOnTrigger.Count > 0)
+            b.EventsOnTrigger = a.EventsOnTrigger;
+    }
+
+    public uint ChainedPuzzleToSolve
+    {
+        get => _chainedPuzzleToSolve;
+        set
+        {
+            if (SetField(ref _chainedPuzzleToSolve, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.ChainedPuzzleToSolve != value)
+                {
+                    ConnectedDoor.ChainedPuzzleToSolve = value;
+                }
+            }
+        }
+    }
+
+    public int AliasOverride
+    {
+        get => _aliasOverride;
+        set
+        {
+            if (SetField(ref _aliasOverride, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.AliasOverride != value)
+                {
+                    ConnectedDoor.AliasOverride = value;
+                }
+            }
+        }
+    }
+
+    public string AliasPrefixShortOverride
+    {
+        get => _aliasPrefixShortOverride;
+        set
+        {
+            string val = value ?? string.Empty;
+            if (SetField(ref _aliasPrefixShortOverride, val))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.AliasPrefixShortOverride != val)
+                {
+                    ConnectedDoor.AliasPrefixShortOverride = val;
+                }
+            }
+        }
+    }
+
+    public bool TurnOffAlarmOnTerminal
+    {
+        get => _turnOffAlarmOnTerminal;
+        set
+        {
+            if (SetField(ref _turnOffAlarmOnTerminal, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.TurnOffAlarmOnTerminal != value)
+                {
+                    ConnectedDoor.TurnOffAlarmOnTerminal = value;
+                }
+            }
+        }
+    }
+
+    public int TerminalZone
+    {
+        get => _terminalZone;
+        set
+        {
+            if (SetField(ref _terminalZone, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.TerminalZone != value)
+                {
+                    ConnectedDoor.TerminalZone = value;
+                }
+            }
+        }
+    }
+
+    public int TerminalIndex
+    {
+        get => _terminalIndex;
+        set
+        {
+            if (SetField(ref _terminalIndex, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.TerminalIndex != value)
+                {
+                    ConnectedDoor.TerminalIndex = value;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnPortalWarp
+    {
+        get => _eventsOnPortalWarp;
+        set
+        {
+            if (SetField(ref _eventsOnPortalWarp, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnPortalWarp != _eventsOnPortalWarp)
+                {
+                    ConnectedDoor.EventsOnPortalWarp = _eventsOnPortalWarp;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnApproachDoor
+    {
+        get => _eventsOnApproachDoor;
+        set
+        {
+            if (SetField(ref _eventsOnApproachDoor, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnApproachDoor != _eventsOnApproachDoor)
+                {
+                    ConnectedDoor.EventsOnApproachDoor = _eventsOnApproachDoor;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnUnlockDoor
+    {
+        get => _eventsOnUnlockDoor;
+        set
+        {
+            if (SetField(ref _eventsOnUnlockDoor, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnUnlockDoor != _eventsOnUnlockDoor)
+                {
+                    ConnectedDoor.EventsOnUnlockDoor = _eventsOnUnlockDoor;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnOpenDoor
+    {
+        get => _eventsOnOpenDoor;
+        set
+        {
+            if (SetField(ref _eventsOnOpenDoor, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnOpenDoor != _eventsOnOpenDoor)
+                {
+                    ConnectedDoor.EventsOnOpenDoor = _eventsOnOpenDoor;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnDoorScanStart
+    {
+        get => _eventsOnDoorScanStart;
+        set
+        {
+            if (SetField(ref _eventsOnDoorScanStart, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnDoorScanStart != _eventsOnDoorScanStart)
+                {
+                    ConnectedDoor.EventsOnDoorScanStart = _eventsOnDoorScanStart;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnDoorScanDone
+    {
+        get => _eventsOnDoorScanDone;
+        set
+        {
+            if (SetField(ref _eventsOnDoorScanDone, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnDoorScanDone != _eventsOnDoorScanDone)
+                {
+                    ConnectedDoor.EventsOnDoorScanDone = _eventsOnDoorScanDone;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnBossDeath
+    {
+        get => _eventsOnBossDeath;
+        set
+        {
+            if (SetField(ref _eventsOnBossDeath, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnBossDeath != _eventsOnBossDeath)
+                {
+                    ConnectedDoor.EventsOnBossDeath = _eventsOnBossDeath;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnTrigger
+    {
+        get => _eventsOnTrigger;
+        set
+        {
+            if (SetField(ref _eventsOnTrigger, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnTrigger != _eventsOnTrigger)
+                {
+                    ConnectedDoor.EventsOnTrigger = _eventsOnTrigger;
+                }
+            }
+        }
     }
 
     public bool IsInternal => AreaTo >= 0;
@@ -369,12 +683,19 @@ public class PlacedDoorNode : INotifyPropertyChanged
 
             if (IsInternal)
             {
+                var roomFrom = Geomorph?.Rooms.FirstOrDefault(r => r.AreaIndex == AreaFrom);
+                var roomTo = Geomorph?.Rooms.FirstOrDefault(r => r.AreaIndex == AreaTo);
+                string descFrom = roomFrom != null ? roomFrom.UserFacingDisplayName : $"Area {AreaFrom}";
+                string descTo = roomTo != null ? roomTo.UserFacingDisplayName : $"Area {AreaTo}";
+
                 if (IsConnected)
                 {
-                    return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [Area {AreaFrom} <-> Area {AreaTo}] (Connected)";
+                    return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [{descFrom} <-> {descTo}] (Connected)";
                 }
                 int ungeneratedArea = (Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom)) ? AreaTo : AreaFrom;
-                return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [Area {AreaFrom} -> Area {AreaTo}] (Click to expand Area {ungeneratedArea})";
+                var sourceRoom = (Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom)) ? roomFrom : roomTo;
+                string sourceDesc = sourceRoom != null ? sourceRoom.UserFacingDisplayName : $"Area {(Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom) ? AreaFrom : AreaTo)}";
+                return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [From {sourceDesc}] (Click to expand Area {ungeneratedArea})";
             }
 
             string status = IsConnected ? "(Connected)" : "(Click to expand geomorph)";
@@ -781,6 +1102,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
     private PlacedGeomorphNode _geomorph = null!;
     private int _areaIndex;
     private int _zone;
+    private int _roomNumber;
     private double _worldX;
     private double _worldY;
     private string _svgContent = string.Empty;
@@ -850,9 +1172,39 @@ public class PlacedRoomNode : INotifyPropertyChanged
             {
                 UpdateFillBrush();
                 StrokeBrush = RoomSvgService.GetZoneStrokeBrush(value);
+                OnPropertyChanged(nameof(UserFacingDisplayName));
                 OnPropertyChanged(nameof(DisplayName));
             }
         }
+    }
+
+    public int RoomNumber
+    {
+        get => _roomNumber;
+        set
+        {
+            if (SetField(ref _roomNumber, value))
+            {
+                OnPropertyChanged(nameof(RoomLetter));
+                OnPropertyChanged(nameof(RoomName));
+                OnPropertyChanged(nameof(UserFacingDisplayName));
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
+    public string RoomLetter => GetRoomLetter(RoomNumber);
+
+    public string RoomName => $"Room {RoomLetter}";
+
+    public string UserFacingDisplayName => $"Zone {Zone}, {RoomName}";
+
+    public static string GetRoomLetter(int roomNumber)
+    {
+        if (roomNumber < 0) return string.Empty;
+        int cycle = (roomNumber / 26) + 1;
+        char letter = (char)('A' + (roomNumber % 26));
+        return cycle == 1 ? letter.ToString() : $"{letter}{cycle}";
     }
 
     public double WorldX
@@ -1070,7 +1422,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
         return false;
     }
 
-    public string DisplayName => $"{Geomorph?.DisplayName ?? "Room"} - Area {AreaIndex} (Zone {Zone})";
+    public string DisplayName => $"{Geomorph?.DisplayName ?? "Room"} - {UserFacingDisplayName} (Area {AreaIndex})";
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {

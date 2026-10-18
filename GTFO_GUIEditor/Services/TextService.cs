@@ -26,7 +26,7 @@ public static class TextService
     {
         lock (_lock)
         {
-            if (_textCache != null) return;
+            if (_textCache != null && _textCache.Count > 0) return;
             _textCache = new Dictionary<uint, string>();
 
             filePath ??= FindTextDataBlockFile();

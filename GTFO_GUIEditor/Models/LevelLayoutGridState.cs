@@ -248,7 +248,28 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     public ObservableCollection<PlacedRoomNode> PlacedRooms
     {
         get => _placedRooms;
-        set => SetField(ref _placedRooms, value);
+        set
+        {
+            if (SetField(ref _placedRooms, value))
+            {
+                UpdateRoomNumbers();
+            }
+        }
+    }
+
+    public void UpdateRoomNumbers()
+    {
+        var zoneCounters = new Dictionary<int, int>();
+        foreach (var room in _placedRooms)
+        {
+            int z = room.Zone;
+            if (!zoneCounters.TryGetValue(z, out int nextNum))
+            {
+                nextNum = 0;
+            }
+            room.RoomNumber = nextNum;
+            zoneCounters[z] = nextNum + 1;
+        }
     }
 
     public PlacedRoomNode? HoveredRoom
@@ -381,6 +402,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         PlacedGeomorphs.Clear();
         PlacedDoors.Clear();
         PlacedRooms.Clear();
+        UpdateRoomNumbers();
         OnPropertyChanged(nameof(HasGridSizeWarning));
         OnPropertyChanged(nameof(GridSizeWarningMessage));
     }
@@ -1445,6 +1467,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             PlacedRooms.Add(roomNode);
         }
+        UpdateRoomNumbers();
 
         return roomNode;
     }
@@ -1672,6 +1695,35 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return list;
     }
 
+    public bool ZoneHasGenClusterTile(int zoneIndex, ComplexType? complexType = null)
+    {
+        var geosInZone = PlacedGeomorphs
+            .Where(g => (g.RoomZones != null && g.RoomZones.Values.Contains(zoneIndex)) || g.Rooms.Any(r => r.Zone == zoneIndex))
+            .Concat(PlacedRooms.Where(r => r.Zone == zoneIndex && r.Geomorph != null).Select(r => r.Geomorph!))
+            .Distinct();
+
+        foreach (var geo in geosInZone)
+        {
+            if (GeomorphService.IsGenClusterTile(geo.PrefabPath, complexType))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public bool ZoneHasGenClusterTile(int zoneIndex, string? complexName)
+    {
+        ComplexType? complexType = null;
+        if (!string.IsNullOrEmpty(complexName) && Enum.TryParse<ComplexType>(complexName, true, out var ct))
+        {
+            complexType = ct;
+        }
+
+        return ZoneHasGenClusterTile(zoneIndex, complexType);
+    }
+
     public List<PlacedGeomorphNode> DeleteGeomorph(PlacedGeomorphNode targetGeo)
     {
         if (!PlacedGeomorphs.Contains(targetGeo)) return new List<PlacedGeomorphNode>();
@@ -1710,6 +1762,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
             PlacedGeomorphs.Remove(geo);
         }
+
+        UpdateRoomNumbers();
 
         if (HoveredRoom != null && !PlacedRooms.Contains(HoveredRoom))
         {
@@ -1874,6 +1928,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             PlacedRooms.Remove(room);
         }
 
+        UpdateRoomNumbers();
+
         var deletedGeomorphs = new List<PlacedGeomorphNode>();
         foreach (var geo in PlacedGeomorphs.ToList())
         {
@@ -1974,7 +2030,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 IsOverloadDoor = door.IsOverloadDoor,
                 IsConnected = door.IsConnected,
                 IsBlocked = door.IsBlocked,
-                ConnectedDoorId = door.ConnectedDoor?.Id
+                ConnectedDoorId = door.ConnectedDoor?.Id,
+                ChainedPuzzleToSolve = door.ChainedPuzzleToSolve,
+                AliasOverride = door.AliasOverride,
+                AliasPrefixShortOverride = door.AliasPrefixShortOverride,
+                TurnOffAlarmOnTerminal = door.TurnOffAlarmOnTerminal,
+                TerminalZone = door.TerminalZone,
+                TerminalIndex = door.TerminalIndex,
+                EventsOnPortalWarp = door.EventsOnPortalWarp.Select(e => e.Clone()).ToList(),
+                EventsOnApproachDoor = door.EventsOnApproachDoor.Select(e => e.Clone()).ToList(),
+                EventsOnUnlockDoor = door.EventsOnUnlockDoor.Select(e => e.Clone()).ToList(),
+                EventsOnOpenDoor = door.EventsOnOpenDoor.Select(e => e.Clone()).ToList(),
+                EventsOnDoorScanStart = door.EventsOnDoorScanStart.Select(e => e.Clone()).ToList(),
+                EventsOnDoorScanDone = door.EventsOnDoorScanDone.Select(e => e.Clone()).ToList(),
+                EventsOnBossDeath = door.EventsOnBossDeath.Select(e => e.Clone()).ToList(),
+                EventsOnTrigger = door.EventsOnTrigger.Select(e => e.Clone()).ToList()
             });
         }
 
@@ -1985,6 +2055,16 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             {
                 ZoneIndex = zs.ZoneIndex,
                 Lighting = zs.Lighting,
+                SubSeed = zs.SubSeed,
+                MarkerSubSeed = zs.MarkerSubSeed,
+                LightingSubSeed = zs.LightingSubSeed,
+                DcScanSeed = zs.DcScanSeed,
+                EnemyRespawning = zs.EnemyRespawning,
+                RequireOtherZone = zs.RequireOtherZone,
+                RoomDistance = zs.RoomDistance,
+                TimeInterval = zs.TimeInterval,
+                CountMultiplier = zs.CountMultiplier,
+                ExcludeList = zs.ExcludeList.Select(e => e.Clone()).ToList(),
                 MedKitUses = zs.MedKitUses,
                 AmmoKitUses = zs.AmmoKitUses,
                 ToolKitUses = zs.ToolKitUses,
@@ -1992,11 +2072,22 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 BulkheadKeys = zs.BulkheadKeys,
                 ContainsDC = zs.ContainsDC,
                 ContainsDisinfectStation = zs.ContainsDisinfectStation,
+                ContainsGenCluster = zs.ContainsGenCluster,
                 PowerCells = zs.PowerCells,
                 FogTurbines = zs.FogTurbines,
                 DcOpensSecondary = zs.DcOpensSecondary,
                 DcOpensOverload = zs.DcOpensOverload,
-                DcOpenedMainDoorIds = zs.DcOpenedMainDoorIds.ToList()
+                DcOpenedMainDoorIds = zs.DcOpenedMainDoorIds.ToList(),
+                HSUClusters = zs.HSUClusters,
+                CorpseClusters = zs.CorpseClusters,
+                ResourceContainerClusters = zs.ResourceContainerClusters,
+                CorpsesInZone = zs.CorpsesInZone,
+                GroundSpawnersInZone = zs.GroundSpawnersInZone,
+                HSUsInZone = zs.HSUsInZone,
+                DeconUnitsInZone = zs.DeconUnitsInZone,
+                BigPickupDistributionInZone = zs.BigPickupDistributionInZone.Select(b => b.Clone()).ToList(),
+                DisinfectionStationPlacements = zs.DisinfectionStationPlacements.Select(d => d.Clone()).ToList(),
+                TerminalPlacements = zs.TerminalPlacements.Select(t => t.Clone()).ToList()
             });
         }
 
@@ -2029,6 +2120,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             {
                 var zs = GetOrCreateZoneSettings(zsData.ZoneIndex);
                 zs.Lighting = zsData.Lighting;
+                zs.SubSeed = zsData.SubSeed;
+                zs.MarkerSubSeed = zsData.MarkerSubSeed;
+                zs.LightingSubSeed = zsData.LightingSubSeed;
+                zs.DcScanSeed = zsData.DcScanSeed;
+                zs.EnemyRespawning = zsData.EnemyRespawning;
+                zs.RequireOtherZone = zsData.RequireOtherZone;
+                zs.RoomDistance = zsData.RoomDistance;
+                zs.TimeInterval = zsData.TimeInterval;
+                zs.CountMultiplier = zsData.CountMultiplier;
+                zs.ExcludeList.Clear();
+                if (zsData.ExcludeList != null)
+                {
+                    foreach (var item in zsData.ExcludeList)
+                        zs.ExcludeList.Add(item.Clone());
+                }
                 zs.MedKitUses = zsData.MedKitUses;
                 zs.AmmoKitUses = zsData.AmmoKitUses;
                 zs.ToolKitUses = zsData.ToolKitUses;
@@ -2036,6 +2142,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 zs.BulkheadKeys = zsData.BulkheadKeys;
                 zs.ContainsDC = zsData.ContainsDC;
                 zs.ContainsDisinfectStation = zsData.ContainsDisinfectStation;
+                zs.ContainsGenCluster = zsData.ContainsGenCluster;
                 zs.PowerCells = zsData.PowerCells;
                 zs.FogTurbines = zsData.FogTurbines;
                 zs.DcOpensSecondary = zsData.DcOpensSecondary;
@@ -2047,6 +2154,31 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     {
                         zs.DcOpenedMainDoorIds.Add(id);
                     }
+                }
+                zs.HSUClusters = zsData.HSUClusters;
+                zs.CorpseClusters = zsData.CorpseClusters;
+                zs.ResourceContainerClusters = zsData.ResourceContainerClusters;
+                zs.CorpsesInZone = zsData.CorpsesInZone;
+                zs.GroundSpawnersInZone = zsData.GroundSpawnersInZone;
+                zs.HSUsInZone = zsData.HSUsInZone;
+                zs.DeconUnitsInZone = zsData.DeconUnitsInZone;
+                zs.BigPickupDistributionInZone.Clear();
+                if (zsData.BigPickupDistributionInZone != null)
+                {
+                    foreach (var item in zsData.BigPickupDistributionInZone)
+                        zs.BigPickupDistributionInZone.Add(item.Clone());
+                }
+                zs.DisinfectionStationPlacements.Clear();
+                if (zsData.DisinfectionStationPlacements != null)
+                {
+                    foreach (var item in zsData.DisinfectionStationPlacements)
+                        zs.DisinfectionStationPlacements.Add(item.Clone());
+                }
+                zs.TerminalPlacements.Clear();
+                if (zsData.TerminalPlacements != null)
+                {
+                    foreach (var item in zsData.TerminalPlacements)
+                        zs.TerminalPlacements.Add(item.Clone());
                 }
             }
         }
@@ -2158,7 +2290,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     IsSecondaryDoor = dData.IsSecondaryDoor,
                     IsOverloadDoor = dData.IsOverloadDoor,
                     IsConnected = dData.IsConnected,
-                    IsBlocked = dData.IsBlocked
+                    IsBlocked = dData.IsBlocked,
+                    ChainedPuzzleToSolve = dData.ChainedPuzzleToSolve,
+                    AliasOverride = dData.AliasOverride,
+                    AliasPrefixShortOverride = dData.AliasPrefixShortOverride ?? string.Empty,
+                    TurnOffAlarmOnTerminal = dData.TurnOffAlarmOnTerminal,
+                    TerminalZone = dData.TerminalZone,
+                    TerminalIndex = dData.TerminalIndex,
+                    EventsOnPortalWarp = new ObservableCollection<WardenEvent>(dData.EventsOnPortalWarp?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnApproachDoor = new ObservableCollection<WardenEvent>(dData.EventsOnApproachDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnUnlockDoor = new ObservableCollection<WardenEvent>(dData.EventsOnUnlockDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnOpenDoor = new ObservableCollection<WardenEvent>(dData.EventsOnOpenDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnDoorScanStart = new ObservableCollection<WardenEvent>(dData.EventsOnDoorScanStart?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnDoorScanDone = new ObservableCollection<WardenEvent>(dData.EventsOnDoorScanDone?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnBossDeath = new ObservableCollection<WardenEvent>(dData.EventsOnBossDeath?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnTrigger = new ObservableCollection<WardenEvent>(dData.EventsOnTrigger?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>())
                 };
 
                 geoNode.Doors.Add(doorNode);
@@ -2176,6 +2322,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 }
             }
         }
+
+        UpdateRoomNumbers();
 
         if (PlacedGeomorphs.Count > 0)
         {
