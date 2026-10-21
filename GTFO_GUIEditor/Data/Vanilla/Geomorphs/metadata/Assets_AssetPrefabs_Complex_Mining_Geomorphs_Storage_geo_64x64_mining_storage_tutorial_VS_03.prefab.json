@@ -2,59 +2,55 @@
   "areaDatas": [
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": [
         {
           "areaTo": 1,
-          "y_angle": 270.00006,
+          "y_angle": 7.5132084E-05,
           "expanderPosition": {
-            "x": 8.963026,
+            "x": 23.950012,
             "y": 0,
-            "z": 23.950012
+            "z": -8.963024
           },
           "direction": "InZoneArea"
         },
         {
           "areaTo": -1,
-          "y_angle": 90.00012,
+          "y_angle": 180.00012,
           "expanderPosition": {
-            "x": 31.99,
+            "x": -0.040011443,
             "y": 0,
-            "z": -0.04001236
+            "z": -31.99
           },
-          "direction": "Right"
+          "direction": "Backwards"
         }
       ]
     },
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": [
         {
           "areaTo": 3,
-          "y_angle": 270.00018,
+          "y_angle": 0.00018441511,
           "expanderPosition": {
-            "x": -8.260019,
+            "x": -16.321991,
             "y": 0.014,
-            "z": -16.321991
+            "z": 8.260017
           },
           "direction": "InZoneArea"
         },
         {
           "areaTo": 0,
-          "y_angle": 270.00006,
+          "y_angle": 7.5132084E-05,
           "expanderPosition": {
-            "x": 8.963026,
+            "x": 23.950012,
             "y": 0,
-            "z": 23.950012
+            "z": -8.963024
           },
           "direction": "InZoneArea"
         }
@@ -62,29 +58,27 @@
     },
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": [
         {
           "areaTo": -1,
-          "y_angle": 270.00018,
+          "y_angle": 0.000181,
           "expanderPosition": {
-            "x": -31.989998,
+            "x": 0.010009535,
             "y": 0,
-            "z": 0.010011673
+            "z": 31.989998
           },
-          "direction": "Left"
+          "direction": "Forwards"
         },
         {
           "areaTo": 3,
-          "y_angle": 0.00014343398,
+          "y_angle": 90.00014,
           "expanderPosition": {
-            "x": -27.832016,
+            "x": -12.53897,
             "y": 0.982,
-            "z": -12.538968
+            "z": 27.832016
           },
           "direction": "InZoneArea"
         }
@@ -92,39 +86,37 @@
     },
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": [
         {
           "areaTo": 2,
-          "y_angle": 0.00014343398,
+          "y_angle": 90.00014,
           "expanderPosition": {
-            "x": -27.832016,
+            "x": -12.53897,
             "y": 0.982,
-            "z": -12.538968
+            "z": 27.832016
           },
           "direction": "InZoneArea"
         },
         {
           "areaTo": 4,
-          "y_angle": 180.00023,
+          "y_angle": 270.0002,
           "expanderPosition": {
-            "x": -20.020021,
+            "x": -20.08998,
             "y": 0,
-            "z": -20.089977
+            "z": 20.02002
           },
           "direction": "InZoneArea"
         },
         {
           "areaTo": 1,
-          "y_angle": 270.00018,
+          "y_angle": 0.00018441511,
           "expanderPosition": {
-            "x": -8.260019,
+            "x": -16.321991,
             "y": 0.014,
-            "z": -16.321991
+            "z": 8.260017
           },
           "direction": "InZoneArea"
         }
@@ -132,29 +124,27 @@
     },
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": [
         {
           "areaTo": -1,
-          "y_angle": 180.00012,
+          "y_angle": 270.00012,
           "expanderPosition": {
-            "x": -0.010038376,
+            "x": -32.000027,
             "y": -0.01,
-            "z": -32.000027
+            "z": 0.010034561
           },
-          "direction": "Backwards"
+          "direction": "Left"
         },
         {
           "areaTo": 3,
-          "y_angle": 180.00023,
+          "y_angle": 270.0002,
           "expanderPosition": {
-            "x": -20.020021,
+            "x": -20.08998,
             "y": 0,
-            "z": -20.089977
+            "z": 20.02002
           },
           "direction": "InZoneArea"
         }
