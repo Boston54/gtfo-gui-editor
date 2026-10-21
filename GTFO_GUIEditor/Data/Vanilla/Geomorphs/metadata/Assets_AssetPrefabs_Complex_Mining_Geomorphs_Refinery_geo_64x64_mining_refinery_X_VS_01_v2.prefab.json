@@ -2,10 +2,8 @@
   "areaDatas": [
     {
       "mesh": {
-        "vertexCount": 0,
         "vertices": [],
-        "edgeCount": 0,
-        "edges": []
+        "indices": []
       },
       "expanderDatas": []
     }
