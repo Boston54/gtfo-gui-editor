@@ -26,6 +26,57 @@
       <None Update="Data\**\*">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\ChainedPuzzleDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\ChainedPuzzleTypeDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\ComplexResourceSetDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\DimensionDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\EnemyDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\EnemyGroupDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\ExpeditionBalanceDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\FogSettingsDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\GameSetupDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\LevelLayoutDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\LightSettingsDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\RundownDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\SurvivalWavePopulationDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\SurvivalWaveSettingsDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\TextDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\WardenObjectiveDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Data\Vanilla\OriginalDatablocks\ConsumableDistributionDataBlock.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

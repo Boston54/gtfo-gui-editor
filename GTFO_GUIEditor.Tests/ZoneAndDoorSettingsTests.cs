@@ -451,4 +451,400 @@ public class ZoneAndDoorSettingsTests
         Assert.Equal(2, importedTerm.TerminalZoneSelectionDatas[0].Zone);
         Assert.Equal(1, importedTerm.TerminalZoneSelectionDatas[0].Terminal);
     }
+
+    [Fact]
+    public void PlacedDoorNode_BloodDoorProperties_SyncWithConnectedDoor()
+    {
+        var door1 = new PlacedDoorNode { Id = "door-1" };
+        var door2 = new PlacedDoorNode { Id = "door-2" };
+
+        door1.ConnectedDoor = door2;
+        door2.ConnectedDoor = door1;
+
+        door1.HasBloodDoor = true;
+        Assert.True(door2.HasBloodDoor);
+
+        var itemInArea = new EnemyGroupItem { EnemyId = 30, Count = 3 };
+        door1.EnemyGroupInArea.Add(itemInArea);
+
+        var itemInFront = new EnemyGroupItem { EnemyId = 76, Count = 5 };
+        door1.EnemyGroupInFrontOfDoor.Add(itemInFront);
+
+        Assert.Equal(door1.EnemyGroupInArea, door2.EnemyGroupInArea);
+        Assert.Equal(door1.EnemyGroupInFrontOfDoor, door2.EnemyGroupInFrontOfDoor);
+        Assert.Single(door2.EnemyGroupInArea);
+        Assert.Equal(30u, door2.EnemyGroupInArea[0].EnemyId);
+        Assert.Equal(3, door2.EnemyGroupInArea[0].Count);
+        Assert.Single(door2.EnemyGroupInFrontOfDoor);
+        Assert.Equal(76u, door2.EnemyGroupInFrontOfDoor[0].EnemyId);
+        Assert.Equal(5, door2.EnemyGroupInFrontOfDoor[0].Count);
+    }
+
+    [Fact]
+    public void GridState_ExportAndImport_PreservesBloodDoorSettings()
+    {
+        var grid = new LevelLayoutGridState();
+        var geoNode = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_03.prefab", 0, 0);
+        grid.PlacedGeomorphs.Add(geoNode);
+
+        var door = new PlacedDoorNode
+        {
+            Id = "door-blood-1",
+            Geomorph = geoNode,
+            HasBloodDoor = true
+        };
+        door.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 30, Count = 2 });
+        door.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem { EnemyId = 76, Count = 4 });
+        grid.PlacedDoors.Add(door);
+        geoNode.Doors.Add(door);
+
+        var exported = grid.ExportStateData();
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(exported);
+
+        Assert.Single(newGrid.PlacedDoors);
+        var importedDoor = newGrid.PlacedDoors[0];
+        Assert.True(importedDoor.HasBloodDoor);
+        Assert.Single(importedDoor.EnemyGroupInArea);
+        Assert.Equal(30u, importedDoor.EnemyGroupInArea[0].EnemyId);
+        Assert.Equal(2, importedDoor.EnemyGroupInArea[0].Count);
+        Assert.Single(importedDoor.EnemyGroupInFrontOfDoor);
+        Assert.Equal(76u, importedDoor.EnemyGroupInFrontOfDoor[0].EnemyId);
+        Assert.Equal(4, importedDoor.EnemyGroupInFrontOfDoor[0].Count);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_BloodDoorEnemyGroups_AddAndRemove()
+    {
+        var vm = new LevelLayoutViewModel();
+        var door = new PlacedDoorNode { Id = "door-test-1", HasBloodDoor = true };
+        vm.OpenEditDoorDialog(door);
+
+        Assert.True(vm.IsEditingDoor);
+        Assert.Same(door, vm.EditingDoor);
+
+        vm.AddEnemyGroupInAreaItem();
+        Assert.Single(door.EnemyGroupInArea);
+
+        vm.AddEnemyGroupInFrontOfDoorItem();
+        Assert.Single(door.EnemyGroupInFrontOfDoor);
+
+        var itemArea = door.EnemyGroupInArea[0];
+        vm.RemoveEnemyGroupInAreaItem(itemArea);
+        Assert.Empty(door.EnemyGroupInArea);
+
+        var itemFront = door.EnemyGroupInFrontOfDoor[0];
+        vm.RemoveEnemyGroupInFrontOfDoorItem(itemFront);
+        Assert.Empty(door.EnemyGroupInFrontOfDoor);
+    }
+
+    [Fact]
+    public void PlacedDoorNode_ApexDoor_SyncsWithConnectedDoor()
+    {
+        var door1 = new PlacedDoorNode { Id = "door-1", IsSecurityDoor = true };
+        var door2 = new PlacedDoorNode { Id = "door-2", IsSecurityDoor = true };
+
+        door1.ConnectedDoor = door2;
+        door2.ConnectedDoor = door1;
+
+        door1.IsApexDoor = true;
+        Assert.True(door2.IsApexDoor);
+
+        door2.IsApexDoor = false;
+        Assert.False(door1.IsApexDoor);
+    }
+
+    [Fact]
+    public void GridState_ExportAndImport_PreservesApexDoor()
+    {
+        var grid = new LevelLayoutGridState();
+        var geoNode = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_03.prefab", 0, 0);
+        grid.PlacedGeomorphs.Add(geoNode);
+
+        var door = new PlacedDoorNode
+        {
+            Id = "door-apex-1",
+            Geomorph = geoNode,
+            IsSecurityDoor = true,
+            IsApexDoor = true
+        };
+        grid.PlacedDoors.Add(door);
+        geoNode.Doors.Add(door);
+
+        var exported = grid.ExportStateData();
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(exported);
+
+        Assert.Single(newGrid.PlacedDoors);
+        var importedDoor = newGrid.PlacedDoors[0];
+        Assert.True(importedDoor.IsApexDoor);
+    }
+
+    [Fact]
+    public void LevelLayoutBlock_FogSettings_ClonesAndPersists()
+    {
+        var level = new LevelLayoutBlock
+        {
+            Name = "Test Level",
+            PersistentId = 42,
+            FogSettings = 136
+        };
+
+        var clone = level.Clone();
+        Assert.Equal(136u, clone.FogSettings);
+        Assert.Equal("Test Level", clone.Name);
+        Assert.Equal(42u, clone.PersistentId);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_CreateAndEditLevel_FogSettingsAndProperties()
+    {
+        var vm = new LevelLayoutViewModel();
+        var fog = new FogSettingsBlock { PersistentId = 136, Name = "Dense Fog" };
+        vm.AvailableFogSettings.Add(fog);
+
+        // Test create level flow
+        vm.OpenCreateLevelDialog();
+        Assert.True(vm.IsCreatingLevel);
+        Assert.False(vm.IsEditingExistingLevel);
+        Assert.Equal("Create New Level", vm.LevelDialogTitle);
+        Assert.Equal("Create", vm.LevelDialogConfirmButtonText);
+
+        vm.NewLevelName = "Level 1";
+        vm.NewLevelPersistentId = 101;
+        vm.SelectedFogSetting = fog;
+
+        bool created = vm.ConfirmCreateLevel();
+        Assert.True(created);
+        Assert.False(vm.IsCreatingLevel);
+        Assert.NotNull(vm.SelectedLevel);
+        Assert.Equal(101u, vm.SelectedLevel.PersistentId);
+        Assert.Equal("Level 1", vm.SelectedLevel.Name);
+        Assert.Equal(136u, vm.SelectedLevel.FogSettings);
+
+        // Test edit level flow
+        var fog2 = new FogSettingsBlock { PersistentId = 200, Name = "Clear Fog" };
+        vm.AvailableFogSettings.Add(fog2);
+
+        vm.OpenEditLevelDialog();
+        Assert.True(vm.IsCreatingLevel);
+        Assert.True(vm.IsEditingExistingLevel);
+        Assert.Equal("Edit Level", vm.LevelDialogTitle);
+        Assert.Equal("Save", vm.LevelDialogConfirmButtonText);
+        Assert.Equal(101u, vm.NewLevelPersistentId);
+        Assert.Equal("Level 1", vm.NewLevelName);
+
+        vm.NewLevelName = "Level 1 Renamed";
+        vm.SelectedFogSetting = fog2;
+
+        bool edited = vm.ConfirmCreateLevel();
+        Assert.True(edited);
+        Assert.False(vm.IsCreatingLevel);
+        Assert.Equal("Level 1 Renamed", vm.SelectedLevel.Name);
+        Assert.Equal(200u, vm.SelectedLevel.FogSettings);
+    }
+
+    [Fact]
+    public void PlacedDoorNode_ProgressionPuzzle_SyncsWithConnectedDoor()
+    {
+        var door1 = new PlacedDoorNode { Id = "door-1", IsSecurityDoor = true };
+        var door2 = new PlacedDoorNode { Id = "door-2", IsSecurityDoor = true };
+
+        door1.ConnectedDoor = door2;
+        door2.ConnectedDoor = door1;
+
+        door1.ProgressionPuzzleToEnter = ProgressionPuzzleType.Keycard_SecurityBox;
+        door1.ProgressionPuzzleCustomText = "Custom Keycard Door Text";
+        door1.ProgressionPuzzlePlacementCount = 1;
+
+        var cz1 = new CandidateZonePlacement
+        {
+            DimensionIndex = "Reality",
+            Zone = 3,
+            PlacementStartWeight = 0.2,
+            PlacementMiddleWeight = 0.5,
+            PlacementEndWeight = 0.3
+        };
+        door1.ProgressionPuzzleCandidateZones.Add(cz1);
+
+        Assert.Equal(ProgressionPuzzleType.Keycard_SecurityBox, door2.ProgressionPuzzleToEnter);
+        Assert.Equal("Custom Keycard Door Text", door2.ProgressionPuzzleCustomText);
+        Assert.True(door2.IsKeycardPuzzle);
+        Assert.True(door2.IsKeycardOrGeneratorPuzzle);
+        Assert.False(door2.IsGeneratorPuzzle);
+        Assert.False(door2.IsLockedNoKey);
+        Assert.True(door2.HasProgressionPuzzle);
+
+        door2.ProgressionPuzzleToEnter = ProgressionPuzzleType.PowerGenerator_And_PowerCell;
+        door2.ProgressionPuzzlePlacementCount = 3;
+
+        Assert.Equal(ProgressionPuzzleType.PowerGenerator_And_PowerCell, door1.ProgressionPuzzleToEnter);
+        Assert.Equal(3, door1.ProgressionPuzzlePlacementCount);
+        Assert.True(door1.IsGeneratorPuzzle);
+        Assert.True(door1.IsKeycardOrGeneratorPuzzle);
+        Assert.False(door1.IsKeycardPuzzle);
+    }
+
+    [Fact]
+    public void GridState_ExportAndImport_PreservesProgressionPuzzleSettings()
+    {
+        var grid = new LevelLayoutGridState();
+        var geoNode = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_HA_03.prefab", 0, 0);
+        grid.PlacedGeomorphs.Add(geoNode);
+
+        var door = new PlacedDoorNode
+        {
+            Id = "door-lock-1",
+            Geomorph = geoNode,
+            IsSecurityDoor = true,
+            ProgressionPuzzleToEnter = ProgressionPuzzleType.Keycard_SecurityBox,
+            ProgressionPuzzleCustomText = "Insert Blue Keycard",
+            ProgressionPuzzlePlacementCount = 1
+        };
+        door.ProgressionPuzzleCandidateZones.Add(new CandidateZonePlacement
+        {
+            DimensionIndex = "Reality",
+            Zone = 2,
+            PlacementStartWeight = 0.1,
+            PlacementMiddleWeight = 0.2,
+            PlacementEndWeight = 0.7
+        });
+
+        grid.PlacedDoors.Add(door);
+        geoNode.Doors.Add(door);
+
+        var exported = grid.ExportStateData();
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(exported);
+
+        Assert.Single(newGrid.PlacedDoors);
+        var importedDoor = newGrid.PlacedDoors[0];
+        Assert.Equal(ProgressionPuzzleType.Keycard_SecurityBox, importedDoor.ProgressionPuzzleToEnter);
+        Assert.Equal("Insert Blue Keycard", importedDoor.ProgressionPuzzleCustomText);
+        Assert.Equal(1, importedDoor.ProgressionPuzzlePlacementCount);
+        Assert.Single(importedDoor.ProgressionPuzzleCandidateZones);
+        Assert.Equal(2, importedDoor.ProgressionPuzzleCandidateZones[0].Zone);
+        Assert.Equal(0.7, importedDoor.ProgressionPuzzleCandidateZones[0].PlacementEndWeight);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_DoorCandidateZones_Commands()
+    {
+        var vm = new LevelLayoutViewModel();
+        var door = new PlacedDoorNode { Id = "door-test", IsSecurityDoor = true };
+
+        vm.OpenEditDoorDialog(door);
+        Assert.True(vm.IsEditingDoor);
+        Assert.Equal(door, vm.EditingDoor);
+
+        vm.AddDoorCandidateZone();
+        Assert.Single(door.ProgressionPuzzleCandidateZones);
+        Assert.NotNull(vm.SelectedDoorCandidateZonePlacement);
+        Assert.True(vm.HasSelectedDoorCandidateZonePlacement);
+
+        var cz = vm.SelectedDoorCandidateZonePlacement;
+        cz.PlacementStartWeight = 0.4;
+        cz.PlacementMiddleWeight = 0.4;
+        cz.PlacementEndWeight = 0.2;
+
+        vm.RemoveDoorCandidateZone(cz);
+        Assert.Empty(door.ProgressionPuzzleCandidateZones);
+        Assert.Null(vm.SelectedDoorCandidateZonePlacement);
+        Assert.False(vm.HasSelectedDoorCandidateZonePlacement);
+
+        vm.CloseEditDoorDialog();
+        Assert.False(vm.IsEditingDoor);
+        Assert.Null(vm.EditingDoor);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_DoorsOpenedByThisDc_ListsReachableDoors_Correctly()
+    {
+        var vm = new LevelLayoutViewModel();
+        var level = new LevelLayoutBlock { PersistentId = 1, Name = "Test Level" };
+        var grid = level.GridState;
+
+        var geo0 = new PlacedGeomorphNode { Id = "geo-0" };
+        geo0.SetRoomZone(0, 0);
+        geo0.GenerateRoom(0);
+        var room0 = new PlacedRoomNode { Geomorph = geo0, AreaIndex = 0, Zone = 0, Sector = SectorType.Main };
+        geo0.Rooms.Add(room0);
+        grid.PlacedGeomorphs.Add(geo0);
+        grid.PlacedRooms.Add(room0);
+
+        var geo1 = new PlacedGeomorphNode { Id = "geo-1" };
+        geo1.SetRoomZone(0, 1);
+        geo1.GenerateRoom(0);
+        var room1 = new PlacedRoomNode { Geomorph = geo1, AreaIndex = 0, Zone = 1, Sector = SectorType.Main };
+        geo1.Rooms.Add(room1);
+        grid.PlacedGeomorphs.Add(geo1);
+        grid.PlacedRooms.Add(room1);
+
+        var door = new PlacedDoorNode
+        {
+            Id = "door-0-1",
+            Geomorph = geo0,
+            AreaFrom = 0,
+            IsConnected = true,
+            DoorType = DoorType.SecurityDoor
+        };
+        var doorTarget = new PlacedDoorNode
+        {
+            Id = "door-1-0",
+            Geomorph = geo1,
+            AreaFrom = 0,
+            IsConnected = true,
+            DoorType = DoorType.SecurityDoor,
+            ConnectedDoor = door
+        };
+        door.ConnectedDoor = doorTarget;
+        geo0.Doors.Add(door);
+        geo1.Doors.Add(doorTarget);
+        grid.PlacedDoors.Add(door);
+        grid.PlacedDoors.Add(doorTarget);
+
+        vm.Levels.Add(level);
+        vm.SelectedLevel = level;
+
+        vm.EditingRoom = room0;
+        vm.ActiveZoneSettings!.ContainsDC = true;
+        vm.UpdateDoorsOpenedByThisDc();
+
+        Assert.True(vm.HasDoorsOpenedByThisDc);
+        Assert.Single(vm.DoorsOpenedByThisDc);
+        Assert.Contains("Security Door to Zone 1", vm.DoorsOpenedByThisDc[0]);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_BulkheadKeys_AddRemoveAndSelect()
+    {
+        var vm = new LevelLayoutViewModel();
+        var level = new LevelLayoutBlock { PersistentId = 1, Name = "Test Level" };
+        vm.Levels.Add(level);
+        vm.SelectedLevel = level;
+
+        vm.OpenSectorSettings(SectorType.Main);
+        Assert.True(vm.IsEditingSector);
+        Assert.NotNull(vm.EditingSectorSettings);
+
+        vm.AddBulkheadKey();
+        Assert.Single(vm.EditingSectorSettings.BulkheadKeyPlacements);
+        Assert.NotNull(vm.SelectedBulkheadKeyPlacement);
+        Assert.True(vm.HasSelectedBulkheadKeyPlacement);
+
+        vm.AddBulkheadKeyCandidateZone();
+        Assert.Equal(2, vm.SelectedBulkheadKeyPlacement.CandidateZones.Count);
+        Assert.NotNull(vm.SelectedBulkheadKeyCandidateZonePlacement);
+
+        vm.RemoveBulkheadKeyCandidateZone();
+        Assert.Single(vm.SelectedBulkheadKeyPlacement.CandidateZones);
+
+        vm.RemoveBulkheadKey();
+        Assert.Empty(vm.EditingSectorSettings.BulkheadKeyPlacements);
+        Assert.Null(vm.SelectedBulkheadKeyPlacement);
+        Assert.False(vm.HasSelectedBulkheadKeyPlacement);
+
+        vm.CloseSectorSettings();
+        Assert.False(vm.IsEditingSector);
+    }
 }

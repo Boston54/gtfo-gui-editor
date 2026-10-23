@@ -15,11 +15,12 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private ComplexType _complexType = ComplexType.Mining;
     private uint _complexResourceSet;
     private string _elevatorTile = string.Empty;
+    private uint _fogSettings;
     private ObservableCollection<DimensionLayoutBlock> _dimensions = new();
     private LevelLayoutGridState? _gridState;
-    private SectorSettings _mainSector = new() { ArtifactAmountMultiplier = 1.0 };
-    private SectorSettings _secondarySector = new() { ArtifactAmountMultiplier = 1.0 };
-    private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0 };
+    private SectorSettings _mainSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 0 };
+    private SectorSettings _secondarySector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 100 };
+    private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 200 };
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -68,6 +69,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _complexResourceSet;
         set => SetField(ref _complexResourceSet, value);
+    }
+
+    [JsonPropertyName("FogSettings")]
+    public uint FogSettings
+    {
+        get => _fogSettings;
+        set => SetField(ref _fogSettings, value);
     }
 
     [JsonPropertyName("ElevatorTile")]
@@ -132,6 +140,12 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     public string GetZoneDisplayName(int zoneIndex)
     {
         SectorType sector = GridState.GetSectorForZone(zoneIndex);
+        SectorSettings settings = GetSectorSettings(sector);
+        return settings.GetZoneDisplayName(zoneIndex);
+    }
+
+    public string GetZoneDisplayName(SectorType sector, int zoneIndex)
+    {
         SectorSettings settings = GetSectorSettings(sector);
         return settings.GetZoneDisplayName(zoneIndex);
     }
@@ -269,6 +283,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             PersistentId = PersistentId,
             ComplexType = ComplexType,
             ComplexResourceSet = ComplexResourceSet,
+            FogSettings = FogSettings,
             ElevatorTile = ElevatorTile,
             Dimensions = new ObservableCollection<DimensionLayoutBlock>(_dimensions.Select(d => d.Clone())),
             MainSector = MainSector.Clone(),

@@ -55,7 +55,6 @@ public class LevelLayoutTests
         Assert.NotEmpty(vm.Levels);
         Assert.NotNull(vm.SelectedLevel);
         Assert.True(vm.HasSelectedLevel);
-        Assert.NotEmpty(vm.AvailableComplexResourceSets);
         Assert.False(vm.HasDuplicatePersistentId);
     }
 
@@ -198,13 +197,12 @@ public class LevelLayoutTests
     }
 
     [Fact]
-    public void MainWindowViewModel_InitializesLevelLayoutWithComplexResourceSets()
+    public void MainWindowViewModel_InitializesLevelLayout()
     {
         var mainVm = new MainWindowViewModel();
 
         Assert.NotNull(mainVm.LevelLayout);
-        Assert.NotNull(mainVm.ComplexResourceSets);
-        Assert.Equal(mainVm.ComplexResourceSets.Blocks, mainVm.LevelLayout.AvailableComplexResourceSets);
+        Assert.NotEmpty(mainVm.LevelLayout.Levels);
     }
 
     [Fact]
@@ -642,16 +640,15 @@ public class LevelLayoutTests
 
         // Choose Custom Geomorph
         vm.SelectedTileSource = "Dimension Geomorphs (Custom Objective 1x1)";
-        Assert.Single(vm.AvailableDimensionTiles);
-        Assert.Equal("Dimension Geomorph", vm.AvailableDimensionTiles[0].Category);
-        Assert.Equal("Assets/Geomorphs/ObjectiveGeomorph1.prefab", vm.AvailableDimensionTiles[0].Prefab);
+        Assert.NotEmpty(vm.AvailableDimensionTiles);
+        Assert.All(vm.AvailableDimensionTiles, t => Assert.Equal("Dimension Geomorph", t.Category));
 
         vm.SelectedDimensionTile = vm.AvailableDimensionTiles[0];
         vm.ConfirmPromptDimension();
 
         var dim = level.GetDimension("Dimension_1");
         Assert.NotNull(dim);
-        Assert.Equal("Assets/Geomorphs/ObjectiveGeomorph1.prefab", dim.DimensionGeomorph);
+        Assert.Equal(vm.SelectedDimensionTile.Prefab, dim.DimensionGeomorph);
         Assert.Equal("Dimension Geomorph", dim.TileCategory);
     }
 
@@ -1793,9 +1790,10 @@ public class LevelLayoutTests
         bool expanded1 = vm.ConfirmRoomExpansion();
         Assert.True(expanded1);
 
-        // Area 0 is in Zone 0, Area 1 is in Zone 1 (Secondary Door separated zones)
+        // Area 0 is in Main Sector Zone 0, Area 1 is in Secondary Sector Zone 0 (Secondary Door separated sectors)
         Assert.Equal(0, geo.GetRoomZone(0));
-        Assert.NotEqual(0, geo.GetRoomZone(1));
+        Assert.Equal(SectorType.Secondary, geo.GetRoomSector(1));
+        Assert.Equal(0, geo.GetRoomZone(1));
         int secondaryZone = geo.GetRoomZone(1);
 
         Assert.True(door0To1.IsConnected);
@@ -1847,8 +1845,9 @@ public class LevelLayoutTests
         var northDoor10 = vm.GridState.PlacedDoors.First(d => d.Geomorph.GridX == 1 && d.Geomorph.GridY == 0 && d.Direction == "Forwards");
         var geo1neg1 = vm.GridState.ExpandFromDoor(northDoor10, elevatorPrefab, DoorType.OverloadDoor);
         Assert.NotNull(geo1neg1);
+        Assert.Equal(SectorType.Overload, geo1neg1.GetRoomSector(0));
+        Assert.Equal(0, geo1neg1.GetRoomZone(0));
         int overloadZone = geo1neg1.GetRoomZone(0);
-        Assert.NotEqual(0, overloadZone);
         Assert.True(northDoor10.IsOverloadDoor);
 
         // 3. Expand West from (1,-1) as Room Door
@@ -2449,14 +2448,14 @@ public class LevelLayoutTests
         // Elevator room is in Zone 0 (Main Sector)
         Assert.Equal("Zone 20", level.GetZoneDisplayName(0));
 
-        // Expand Secondary door -> New geomorph placed in Zone 1 (Secondary Sector)
+        // Expand Secondary door -> New geomorph placed in Secondary Sector, Zone 0
         var eastDoor = vm.GridState.PlacedDoors.First(d => d.Direction == "Right");
         vm.OpenDoorExpansionDialog(eastDoor);
         vm.IsExpansionSecondaryDoor = true;
         Assert.True(vm.ConfirmDoorExpansion());
 
         Assert.Equal("Zone 20", level.GetZoneDisplayName(0));
-        Assert.Equal("Zone 201", level.GetZoneDisplayName(1));
+        Assert.Equal("Zone 200", level.GetZoneDisplayName(SectorType.Secondary, 0));
     }
 
     [Fact]
@@ -2744,19 +2743,16 @@ public class LevelLayoutTests
         var gridState = new LevelLayoutGridState();
         var zs = gridState.GetOrCreateZoneSettings(3);
         zs.ContainsGenCluster = true;
-        zs.ContainsDisinfectStation = true;
 
         var exported = gridState.ExportStateData();
         var zsData = exported.ZoneSettings.FirstOrDefault(z => z.ZoneIndex == 3);
         Assert.NotNull(zsData);
         Assert.True(zsData.ContainsGenCluster);
-        Assert.True(zsData.ContainsDisinfectStation);
 
         var newGridState = new LevelLayoutGridState();
         newGridState.ImportStateData(exported);
         var importedZs = newGridState.GetOrCreateZoneSettings(3);
         Assert.True(importedZs.ContainsGenCluster);
-        Assert.True(importedZs.ContainsDisinfectStation);
     }
 
     [Fact]
@@ -3311,5 +3307,106 @@ public class LevelLayoutTests
         var gotoWinEv = sector.EventsOnGotoWin[0];
         vm.RemoveWardenEvent(gotoWinEv);
         Assert.Empty(sector.EventsOnGotoWin);
+    }
+
+    [Fact]
+    public void ZoneIndexing_StartsAtZeroPerSector_AndIncrementsPerSector()
+    {
+        var vm = new LevelLayoutViewModel();
+        string elevatorPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab";
+        vm.GridState.InitializeStartingTile(elevatorPrefab, 0, 0);
+
+        var elevator = vm.GridState.PlacedGeomorphs[0];
+        // 1. Elevator is in Main sector, Zone 0
+        Assert.Equal(SectorType.Main, elevator.GetRoomSector(0));
+        Assert.Equal(0, elevator.GetRoomZone(0));
+
+        // 2. Expand North with Security Door -> Main Sector, Zone 1
+        var northDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == elevator && d.Direction == "Forwards");
+        var geoMain1 = vm.GridState.ExpandFromDoor(northDoor, elevatorPrefab, DoorType.SecurityDoor);
+        Assert.NotNull(geoMain1);
+        Assert.Equal(SectorType.Main, geoMain1.GetRoomSector(0));
+        Assert.Equal(1, geoMain1.GetRoomZone(0));
+
+        // 3. Expand East with Secondary Door from Main Zone 0 -> Secondary Sector, Zone 0 (resets to 0!)
+        var eastDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == elevator && d.Direction == "Right");
+        var geoSec0 = vm.GridState.ExpandFromDoor(eastDoor, elevatorPrefab, DoorType.SecondaryDoor);
+        Assert.NotNull(geoSec0);
+        Assert.Equal(SectorType.Secondary, geoSec0.GetRoomSector(0));
+        Assert.Equal(0, geoSec0.GetRoomZone(0));
+
+        // 4. Expand North from Secondary Zone 0 with Security Door -> Secondary Sector, Zone 1
+        var secNorthDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == geoSec0 && d.Direction == "Forwards");
+        var geoSec1 = vm.GridState.ExpandFromDoor(secNorthDoor, elevatorPrefab, DoorType.SecurityDoor);
+        Assert.NotNull(geoSec1);
+        Assert.Equal(SectorType.Secondary, geoSec1.GetRoomSector(0));
+        Assert.Equal(1, geoSec1.GetRoomZone(0));
+
+        // 5. Expand West with Overload Door from Main Zone 0 -> Overload Sector, Zone 0 (resets to 0!)
+        var westDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == elevator && d.Direction == "Left");
+        var geoOver0 = vm.GridState.ExpandFromDoor(westDoor, elevatorPrefab, DoorType.OverloadDoor);
+        Assert.NotNull(geoOver0);
+        Assert.Equal(SectorType.Overload, geoOver0.GetRoomSector(0));
+        Assert.Equal(0, geoOver0.GetRoomZone(0));
+
+        // 6. Expand North from Overload Zone 0 with Security Door -> Overload Sector, Zone 1
+        var overNorthDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == geoOver0 && d.Direction == "Forwards");
+        var geoOver1 = vm.GridState.ExpandFromDoor(overNorthDoor, elevatorPrefab, DoorType.SecurityDoor);
+        Assert.NotNull(geoOver1);
+        Assert.Equal(SectorType.Overload, geoOver1.GetRoomSector(0));
+        Assert.Equal(1, geoOver1.GetRoomZone(0));
+
+        // Check zones for each sector
+        Assert.Equal(new List<int> { 0, 1 }, vm.GridState.GetZonesForSector(SectorType.Main));
+        Assert.Equal(new List<int> { 0, 1 }, vm.GridState.GetZonesForSector(SectorType.Secondary));
+        Assert.Equal(new List<int> { 0, 1 }, vm.GridState.GetZonesForSector(SectorType.Overload));
+    }
+
+    [Fact]
+    public void ZoneIndexing_WhenZoneDeleted_OtherZonesShiftDownwardWithNoGaps()
+    {
+        var vm = new LevelLayoutViewModel();
+        string elevatorPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_04.prefab";
+        vm.GridState.InitializeStartingTile(elevatorPrefab, 0, 0);
+
+        var elevator = vm.GridState.PlacedGeomorphs[0]; // Main, Zone 0
+
+        // Expand North with Security Door -> Main, Zone 1
+        var northDoor = vm.GridState.PlacedDoors.First(d => d.Geomorph == elevator && d.Direction == "Forwards");
+        var geoZone1 = vm.GridState.ExpandFromDoor(northDoor, elevatorPrefab, DoorType.SecurityDoor);
+        Assert.NotNull(geoZone1);
+        Assert.Equal(1, geoZone1.GetRoomZone(0));
+
+        // Configure zone settings for Zone 1 and Zone 2
+        var zs1 = vm.GridState.GetOrCreateZoneSettings(SectorType.Main, 1);
+        zs1.MedKitUses = 11;
+
+        // Expand North again from Zone 1 with Security Door -> Main, Zone 2
+        var northDoor2 = vm.GridState.PlacedDoors.First(d => d.Geomorph == geoZone1 && d.Direction == "Forwards");
+        var geoZone2 = vm.GridState.ExpandFromDoor(northDoor2, elevatorPrefab, DoorType.SecurityDoor);
+        Assert.NotNull(geoZone2);
+        Assert.Equal(2, geoZone2.GetRoomZone(0));
+
+        var zs2 = vm.GridState.GetOrCreateZoneSettings(SectorType.Main, 2);
+        zs2.MedKitUses = 22;
+
+        Assert.Equal(new List<int> { 0, 1, 2 }, vm.GridState.GetZonesForSector(SectorType.Main));
+
+        // Delete geoZone1 (which also removes geoZone2 or disconnects it)
+        // Let's test toggling the security door between Zone 0 and Zone 1 so Zone 0 and Zone 1 merge:
+        vm.GridState.ToggleSecurityDoor(northDoor);
+
+        // Now elevator (0,0) and geoZone1 (0,-1) are in Zone 0!
+        // geoZone2 (0,-2) was Zone 2, now shifts downward to Zone 1!
+        Assert.Equal(0, elevator.GetRoomZone(0));
+        Assert.Equal(0, geoZone1.GetRoomZone(0));
+        Assert.Equal(1, geoZone2.GetRoomZone(0));
+
+        // There are no gaps: zones in Main Sector are 0 and 1!
+        Assert.Equal(new List<int> { 0, 1 }, vm.GridState.GetZonesForSector(SectorType.Main));
+
+        // ZoneSettings for what was Zone 2 should now be at Zone 1 (MedKitUses == 22)
+        var shiftedZs1 = vm.GridState.GetOrCreateZoneSettings(SectorType.Main, 1);
+        Assert.Equal(22, shiftedZs1.MedKitUses);
     }
 }

@@ -3,6 +3,15 @@ using System.Text.Json.Serialization;
 namespace GTFO_GUIEditor.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ProgressionPuzzleType
+{
+    None,
+    Keycard_SecurityBox,
+    PowerGenerator_And_PowerCell,
+    Locked_No_Key
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ComplexType
 {
     Mining,
@@ -323,4 +332,21 @@ public enum TerminalStartingState
     Ping,
     PasswordProtected,
     EnterPassword
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum Consumables
+{
+    Flashlight = 30,
+    Glowstick = 114,
+    Glowstick_Christmas = 130,
+    Glowstick_Halloween = 167,
+    Glowstick_Yellow = 174,
+    Syringe_Health = 140,
+    Syringe_MeleeBuff = 142,
+    CFoamGrenade = 115,
+    LockMelter = 116,
+    FogRepeller = 117,
+    ExplosiveTripmine = 139,
+    CFoamTripmine = 144
 }

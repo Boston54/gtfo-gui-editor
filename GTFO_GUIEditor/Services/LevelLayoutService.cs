@@ -12,15 +12,8 @@ public static class LevelLayoutService
 
     public static LevelLayoutBlock CreateFreshLevel(uint persistentId, string name, ComplexType complexType, string elevatorTile, uint complexResourceSetId = 0)
     {
-        return new LevelLayoutBlock
-        {
-            PersistentId = persistentId,
-            Name = name,
-            InternalEnabled = true,
-            ComplexType = complexType,
-            ComplexResourceSet = complexResourceSetId,
-            ElevatorTile = elevatorTile ?? string.Empty
-        };
+        var level = EditorDefaultsService.CreateDefaultLevel(persistentId, name, complexType, elevatorTile);
+        return level;
     }
 
     public static LevelLayoutBlock CreateFreshLevel(uint persistentId, string name, uint complexResourceSetId, string elevatorTile)
@@ -30,19 +23,9 @@ public static class LevelLayoutService
 
     public static List<LevelLayoutBlock> GetInitialLevels(IEnumerable<ComplexResourceSetBlock>? complexResourceSets = null)
     {
-        var sets = (complexResourceSets ?? ComplexResourceSetService.LoadVanillaBlocks()).ToList();
-        var firstSet = sets.FirstOrDefault();
-
-        uint defaultSetId = firstSet?.PersistentId ?? 1;
-        ComplexType defaultComplexType = firstSet?.ComplexType ?? ComplexType.Mining;
-        var elevatorOptions = GeomorphService.GetElevatorOptionsForComplex(defaultComplexType);
-        string defaultElevator = elevatorOptions.FirstOrDefault()?.Prefab
-            ?? firstSet?.ElevatorShafts_1x1.FirstOrDefault()?.Prefab
-            ?? "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab";
-
         return new List<LevelLayoutBlock>
         {
-            CreateFreshLevel(1, "Level 1", defaultComplexType, defaultElevator, defaultSetId)
+            EditorDefaultsService.CreateDefaultLevel(1, "Level 1")
         };
     }
 

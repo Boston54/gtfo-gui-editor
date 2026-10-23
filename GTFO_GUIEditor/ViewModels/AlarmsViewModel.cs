@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
 
@@ -36,6 +37,9 @@ public class AlarmsViewModel : ViewModelBase
     public WaveFilterType[] FilterTypes => AvailableFilterTypes;
 
     public ObservableCollection<EnemyEntry> Enemies { get; }
+    public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes { get; }
+    public ICommand RemoveChainedPuzzleItemCommand { get; }
+    public ICommand AddChainedPuzzleItemCommand { get; }
 
     public ObservableCollection<AlarmBlock> Alarms
     {
@@ -46,14 +50,14 @@ public class AlarmsViewModel : ViewModelBase
     public ObservableCollection<AlarmBlock> AvailableTemplates { get; }
 
     public AlarmsViewModel()
-        : this(AlarmService.LoadVanillaAlarms(), AlarmService.LoadEnemies())
+        : this(new List<AlarmBlock>(), AlarmService.LoadEnemies(), AlarmService.LoadChainedPuzzleTypes())
     {
     }
 
-    public AlarmsViewModel(IEnumerable<AlarmBlock> initialAlarms, IEnumerable<EnemyEntry>? enemies = null)
+    public AlarmsViewModel(IEnumerable<AlarmBlock> initialAlarms, IEnumerable<EnemyEntry>? enemies = null, IEnumerable<ChainedPuzzleTypeEntry>? chainedPuzzleTypes = null)
     {
         var alarmList = initialAlarms.ToList();
-        _vanillaTemplates = alarmList.Select(a => a.Clone()).ToList();
+        _vanillaTemplates = AlarmService.LoadVanillaAlarms();
         _alarms = new ObservableCollection<AlarmBlock>(alarmList);
         _alarms.CollectionChanged += (s, e) =>
         {
@@ -65,6 +69,12 @@ public class AlarmsViewModel : ViewModelBase
 
         var enemyList = (enemies ?? AlarmService.LoadEnemies()).ToList();
         Enemies = new ObservableCollection<EnemyEntry>(enemyList);
+
+        var puzzleTypesList = (chainedPuzzleTypes ?? AlarmService.LoadChainedPuzzleTypes()).ToList();
+        ChainedPuzzleTypes = new ObservableCollection<ChainedPuzzleTypeEntry>(puzzleTypesList);
+
+        RemoveChainedPuzzleItemCommand = new RelayCommand<ChainedPuzzleItem>(RemoveChainedPuzzleItem);
+        AddChainedPuzzleItemCommand = new RelayCommand(AddChainedPuzzleItem);
 
         if (_alarms.Count > 0)
         {
@@ -386,6 +396,23 @@ public class AlarmsViewModel : ViewModelBase
         UpdateStatusText();
         StatusText = $"Deleted alarm [{deletedId}] {deletedName}. {_alarms.Count:N0} alarms remaining.";
         return true;
+    }
+
+    public void AddChainedPuzzleItem()
+    {
+        if (SelectedAlarm == null) return;
+        if (SelectedAlarm.ChainedPuzzle == null)
+        {
+            SelectedAlarm.ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>();
+        }
+        uint defaultType = ChainedPuzzleTypes.FirstOrDefault()?.PersistentId ?? 6;
+        SelectedAlarm.ChainedPuzzle.Add(new ChainedPuzzleItem { PuzzleType = defaultType });
+    }
+
+    public void RemoveChainedPuzzleItem(ChainedPuzzleItem? item)
+    {
+        if (SelectedAlarm == null || item == null) return;
+        SelectedAlarm.ChainedPuzzle?.Remove(item);
     }
 
     private void UpdateStatusText()

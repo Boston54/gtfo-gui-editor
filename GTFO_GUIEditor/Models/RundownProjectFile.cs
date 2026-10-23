@@ -12,6 +12,8 @@ public class RundownProjectFile
 
     [JsonPropertyName("modifiedAt")] public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
 
+    [JsonPropertyName("lastExportDirectory")] public string? LastExportDirectory { get; set; }
+
     [JsonPropertyName("rundown")] public RundownBlock Rundown { get; set; } = new();
 
     [JsonPropertyName("levels")] public List<LevelLayoutBlockData> Levels { get; set; } = new();
@@ -24,6 +26,9 @@ public class RundownProjectFile
     public List<ComplexResourceSetBlock> ComplexResourceSets { get; set; } = new();
 
     [JsonPropertyName("fogSettings")] public List<FogSettingsBlock> FogSettings { get; set; } = new();
+
+    [JsonPropertyName("consumableDistributions")]
+    public List<ConsumableDistributionBlock> ConsumableDistributions { get; set; } = new();
 }
 
 public class LevelLayoutBlockData
@@ -32,31 +37,44 @@ public class LevelLayoutBlockData
 
     [JsonPropertyName("persistentID")] public uint PersistentId { get; set; }
 
+    [JsonPropertyName("complexType")] public ComplexType ComplexType { get; set; } = ComplexType.Mining;
+
     [JsonPropertyName("ComplexResourceSet")]
     public uint ComplexResourceSet { get; set; }
 
     [JsonPropertyName("ElevatorTile")] public string ElevatorTile { get; set; } = string.Empty;
 
+    [JsonPropertyName("fogSettings")] public uint FogSettings { get; set; }
+
     [JsonPropertyName("internalEnabled")] public bool InternalEnabled { get; set; } = true;
 
     [JsonPropertyName("Dimensions")] public List<DimensionLayoutBlock> Dimensions { get; set; } = new();
 
-    [JsonPropertyName("mainSector")] public SectorSettingsData MainSector { get; set; } = new();
+    [JsonPropertyName("mainSector")] public SectorSettingsData MainSector { get; set; } = new() { ZoneAliasStart = 0 };
 
-    [JsonPropertyName("secondarySector")] public SectorSettingsData SecondarySector { get; set; } = new();
+    [JsonPropertyName("secondarySector")] public SectorSettingsData SecondarySector { get; set; } = new() { ZoneAliasStart = 100 };
 
-    [JsonPropertyName("overloadSector")] public SectorSettingsData OverloadSector { get; set; } = new();
+    [JsonPropertyName("overloadSector")] public SectorSettingsData OverloadSector { get; set; } = new() { ZoneAliasStart = 200 };
 
     [JsonPropertyName("gridState")] public LevelLayoutGridStateData GridState { get; set; } = new();
 }
 
-public class SectorSettingsData
+public class SectorSettingsData : WardenObjectiveData
 {
     [JsonPropertyName("artifactAmountMultiplier")]
     public double ArtifactAmountMultiplier { get; set; } = 1.0;
 
     [JsonPropertyName("zoneAliasStart")] public int ZoneAliasStart { get; set; } = 0;
 
+    [JsonPropertyName("bulkheadKeyPlacements")]
+    public List<GatherItemPlacement>? BulkheadKeyPlacements { get; set; }
+
+    [JsonPropertyName("objectives")]
+    public List<WardenObjectiveData>? Objectives { get; set; }
+}
+
+public class WardenObjectiveData
+{
     [JsonPropertyName("winCondition")] public WinCondition WinCondition { get; set; } = WinCondition.GoToElevator;
 
     [JsonPropertyName("exitZone")] public int ExitZone { get; set; } = 0;
@@ -317,6 +335,8 @@ public class PlacedGeomorphNodeData
     [JsonPropertyName("generatedRooms")] public List<int> GeneratedRooms { get; set; } = new();
 
     [JsonPropertyName("roomZones")] public Dictionary<int, int> RoomZones { get; set; } = new();
+
+    [JsonPropertyName("roomSectors")] public Dictionary<int, SectorType> RoomSectors { get; set; } = new();
 }
 
 public class PlacedDoorNodeData
@@ -367,6 +387,14 @@ public class PlacedDoorNodeData
     [JsonPropertyName("turnOffAlarmOnTerminal")] public bool TurnOffAlarmOnTerminal { get; set; }
     [JsonPropertyName("terminalZone")] public int TerminalZone { get; set; }
     [JsonPropertyName("terminalIndex")] public int TerminalIndex { get; set; }
+    [JsonPropertyName("isApexDoor")] public bool IsApexDoor { get; set; }
+    [JsonPropertyName("hasBloodDoor")] public bool HasBloodDoor { get; set; }
+    [JsonPropertyName("progressionPuzzleToEnter")] public ProgressionPuzzleType ProgressionPuzzleToEnter { get; set; } = ProgressionPuzzleType.None;
+    [JsonPropertyName("progressionPuzzleCustomText")] public string ProgressionPuzzleCustomText { get; set; } = string.Empty;
+    [JsonPropertyName("progressionPuzzlePlacementCount")] public int ProgressionPuzzlePlacementCount { get; set; } = 1;
+    [JsonPropertyName("progressionPuzzleCandidateZones")] public List<CandidateZonePlacement> ProgressionPuzzleCandidateZones { get; set; } = new();
+    [JsonPropertyName("enemyGroupInArea")] public List<EnemyGroupItem> EnemyGroupInArea { get; set; } = new();
+    [JsonPropertyName("enemyGroupInFrontOfDoor")] public List<EnemyGroupItem> EnemyGroupInFrontOfDoor { get; set; } = new();
     [JsonPropertyName("eventsOnPortalWarp")] public List<WardenEvent> EventsOnPortalWarp { get; set; } = new();
     [JsonPropertyName("eventsOnApproachDoor")] public List<WardenEvent> EventsOnApproachDoor { get; set; } = new();
     [JsonPropertyName("eventsOnUnlockDoor")] public List<WardenEvent> EventsOnUnlockDoor { get; set; } = new();
@@ -379,9 +407,13 @@ public class PlacedDoorNodeData
 
 public class ZoneSettingsData
 {
+    [JsonPropertyName("sector")] public SectorType Sector { get; set; } = SectorType.Main;
+
     [JsonPropertyName("zoneIndex")] public int ZoneIndex { get; set; }
 
     [JsonPropertyName("lighting")] public uint Lighting { get; set; }
+
+    [JsonPropertyName("consumableDistributionInZone")] public uint ConsumableDistributionInZone { get; set; }
 
     [JsonPropertyName("subSeed")] public int SubSeed { get; set; }
     [JsonPropertyName("markerSubSeed")] public int MarkerSubSeed { get; set; }
@@ -403,12 +435,7 @@ public class ZoneSettingsData
 
     [JsonPropertyName("disinfectKitUses")] public int DisinfectKitUses { get; set; }
 
-    [JsonPropertyName("bulkheadKeys")] public int BulkheadKeys { get; set; }
-
     [JsonPropertyName("containsDC")] public bool ContainsDC { get; set; }
-
-    [JsonPropertyName("containsDisinfectStation")]
-    public bool ContainsDisinfectStation { get; set; }
 
     [JsonPropertyName("containsGenCluster")]
     public bool ContainsGenCluster { get; set; }

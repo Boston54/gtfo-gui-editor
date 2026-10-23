@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
@@ -15,6 +16,10 @@ public class LightSettingsBlock : INotifyPropertyChanged
     private ObservableCollection<LightCategorySettingItem> _lightCategorySettings = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public LightSettingsBlock()
+    {
+    }
 
     [JsonPropertyName("persistentID")]
     public uint PersistentId

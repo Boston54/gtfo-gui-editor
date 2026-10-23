@@ -34,7 +34,7 @@ public class FogSettingsTests
         Assert.True(fresh.Enabled);
         Assert.NotNull(fresh.FogColor);
         Assert.NotNull(fresh.DensityNoiseDirection);
-        Assert.Equal(0.0, fresh.FogDensity);
+        Assert.Equal(0.02, fresh.FogDensity);
         Assert.Equal(0.0, fresh.Infection);
     }
 
@@ -60,9 +60,19 @@ public class FogSettingsTests
     }
 
     [Fact]
-    public void FogSettingsViewModel_InitializesAndSwapsConfigs()
+    public void FogSettingsViewModel_InitializesEmptyByDefault()
     {
         var vm = new FogSettingsViewModel();
+        Assert.Empty(vm.Blocks);
+        Assert.Null(vm.SelectedBlock);
+        Assert.False(vm.HasSelectedBlock);
+        Assert.Contains("0 configs loaded", vm.StatusText);
+    }
+
+    [Fact]
+    public void FogSettingsViewModel_InitializesAndSwapsConfigs()
+    {
+        var vm = new FogSettingsViewModel(FogSettingsService.LoadVanillaBlocks());
         Assert.NotEmpty(vm.Blocks);
         Assert.NotNull(vm.SelectedBlock);
         Assert.True(vm.HasSelectedBlock);
@@ -80,7 +90,7 @@ public class FogSettingsTests
     [Fact]
     public void FogSettingsViewModel_CreateBlock_ValidatesInputsAndAdds()
     {
-        var vm = new FogSettingsViewModel();
+        var vm = new FogSettingsViewModel(FogSettingsService.LoadVanillaBlocks());
         int initialCount = vm.Blocks.Count;
 
         vm.OpenCreateBlockDialog();

@@ -5,6 +5,7 @@ using System.ComponentModel;
 using System.Linq;
 using Avalonia;
 using GTFO_GUIEditor.Models;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.ViewModels;
 
@@ -238,33 +239,10 @@ public class RundownTierViewModel : ViewModelBase
     public void AddExpedition()
     {
         int nextIndex = _expeditions.Count + 1;
-        string defaultPrefix = _expeditions.FirstOrDefault()?.Descriptive?.Prefix ?? _tierLetter;
-        var newExp = new ExpeditionBlock
-        {
-            Enabled = true,
-            Accessibility = ExpeditionAccessibility.Normal,
-            ExpeditionIndexInTier = nextIndex,
-            TierColorHex = ColorHex,
-            Descriptive = new ExpeditionDescriptiveData
-            {
-                Prefix = defaultPrefix,
-                PublicName = $"Level {_tierLetter}{nextIndex}",
-                ExpeditionDepth = 500 + nextIndex * 100,
-                EstimatedDuration = 900,
-                ProgressionVisualStyle = "Normal",
-                SkipExpNumberInName = false
-            },
-            MainLayerData = new ExpeditionLayerData
-            {
-                ObjectiveData = new ExpeditionObjectiveData
-                {
-                    WinCondition = "GoToElevator",
-                    DataBlockId = 0
-                }
-            },
-            SecondaryLayerEnabled = false,
-            ThirdLayerEnabled = false
-        };
+        var newExp = EditorDefaultsService.CreateDefaultExpedition(_tierLetter, nextIndex);
+        newExp.Enabled = true;
+        newExp.ExpeditionIndexInTier = nextIndex;
+        newExp.TierColorHex = ColorHex;
 
         _expeditions.Add(newExp);
     }

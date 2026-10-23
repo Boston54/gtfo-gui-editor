@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -88,6 +89,48 @@ public static class AlarmService
         return File.Exists(directPath) ? directPath : null;
     }
 
+    public static string? FindChainedPuzzleTypeFile()
+    {
+        string dir = GetDatablocksDirectory();
+        string directPath = Path.Combine(dir, "ChainedPuzzleTypeDataBlock.json");
+        return File.Exists(directPath) ? directPath : null;
+    }
+
+    public static List<ChainedPuzzleTypeEntry> LoadChainedPuzzleTypes(string? filePath = null)
+    {
+        filePath ??= FindChainedPuzzleTypeFile();
+
+        var list = new List<ChainedPuzzleTypeEntry>();
+
+        if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+        {
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                var data = JsonSerializer.Deserialize<ChainedPuzzleTypeDataBlockFile>(json, JsonOptions);
+                if (data?.Blocks != null && data.Blocks.Count > 0)
+                {
+                    list.AddRange(data.Blocks);
+                }
+            }
+            catch
+            {
+                // Return fallback types if deserialization fails
+            }
+        }
+
+        if (list.Count == 0)
+        {
+            list.Add(new ChainedPuzzleTypeEntry { PersistentId = 2, Name = "SecurityScan_Big" });
+            list.Add(new ChainedPuzzleTypeEntry { PersistentId = 3, Name = "SecurityScan_Small" });
+            list.Add(new ChainedPuzzleTypeEntry { PersistentId = 4, Name = "SecurityScan_Cluster_Small" });
+            list.Add(new ChainedPuzzleTypeEntry { PersistentId = 5, Name = "SecurityScan_Cluster_Big" });
+            list.Add(new ChainedPuzzleTypeEntry { PersistentId = 6, Name = "SecurityScan_Big_RequireAll" });
+        }
+
+        return list;
+    }
+
     public static List<EnemyEntry> LoadEnemies(string? filePath = null)
     {
         filePath ??= FindEnemyDataBlockFile();
@@ -159,16 +202,28 @@ public static class AlarmService
         public List<AlarmBlock> Blocks { get; set; } = new();
     }
 
+    private class ChainedPuzzleTypeDataBlockFile
+    {
+        [JsonPropertyName("Blocks")]
+        public List<ChainedPuzzleTypeEntry> Blocks { get; set; } = new();
+    }
+
     private class ChainedPuzzleBlock
     {
         [JsonPropertyName("PublicAlarmName")]
         public string? PublicAlarmName { get; set; }
+
+        [JsonPropertyName("TriggerAlarmOnActivate")]
+        public bool TriggerAlarmOnActivate { get; set; } = true;
 
         [JsonPropertyName("SurvivalWaveSettings")]
         public uint SurvivalWaveSettings { get; set; }
 
         [JsonPropertyName("SurvivalWavePopulation")]
         public uint SurvivalWavePopulation { get; set; }
+
+        [JsonPropertyName("ChainedPuzzle")]
+        public List<ChainedPuzzleItem>? ChainedPuzzle { get; set; }
     }
 
     private class ChainedPuzzleDataBlockFile
@@ -270,6 +325,7 @@ public static class AlarmService
 
         var chainedPuzzleMap = new Dictionary<uint, uint>();
         var chainedPuzzlePublicAlarmMap = new Dictionary<uint, string>();
+        var chainedPuzzleBlockMap = new Dictionary<uint, ChainedPuzzleBlock>();
         if (!string.IsNullOrEmpty(chainedPuzzlePath) && File.Exists(chainedPuzzlePath))
         {
             try
@@ -280,14 +336,19 @@ public static class AlarmService
                 {
                     foreach (var block in puzzleFile.Blocks)
                     {
-                        if (block.SurvivalWaveSettings > 0 && block.SurvivalWavePopulation > 0)
+                        if (block.SurvivalWaveSettings > 0)
                         {
-                            chainedPuzzleMap[block.SurvivalWaveSettings] = block.SurvivalWavePopulation;
-                        }
+                            chainedPuzzleBlockMap[block.SurvivalWaveSettings] = block;
 
-                        if (block.SurvivalWaveSettings > 0 && !string.IsNullOrWhiteSpace(block.PublicAlarmName) && !chainedPuzzlePublicAlarmMap.ContainsKey(block.SurvivalWaveSettings))
-                        {
-                            chainedPuzzlePublicAlarmMap[block.SurvivalWaveSettings] = block.PublicAlarmName;
+                            if (block.SurvivalWavePopulation > 0)
+                            {
+                                chainedPuzzleMap[block.SurvivalWaveSettings] = block.SurvivalWavePopulation;
+                            }
+
+                            if (!string.IsNullOrWhiteSpace(block.PublicAlarmName) && !chainedPuzzlePublicAlarmMap.ContainsKey(block.SurvivalWaveSettings))
+                            {
+                                chainedPuzzlePublicAlarmMap[block.SurvivalWaveSettings] = block.PublicAlarmName;
+                            }
                         }
                     }
                 }
@@ -326,6 +387,15 @@ public static class AlarmService
                             alarm.PublicAlarmName = pubName;
                         }
 
+                        if (chainedPuzzleBlockMap.TryGetValue(alarm.PersistentId, out var puzzleBlock))
+                        {
+                            alarm.SpawnsEnemies = puzzleBlock.TriggerAlarmOnActivate;
+                            if (puzzleBlock.ChainedPuzzle != null && puzzleBlock.ChainedPuzzle.Count > 0)
+                            {
+                                alarm.ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(puzzleBlock.ChainedPuzzle.Select(c => c.Clone()));
+                            }
+                        }
+
                         alarms.Add(alarm);
                     }
                 }
@@ -346,12 +416,14 @@ public static class AlarmService
 
     public static AlarmBlock CreateFreshAlarm(uint id, string name)
     {
-        return new AlarmBlock
+        var alarm = new AlarmBlock
         {
             PersistentId = id,
             Name = name,
             InternalEnabled = true
         };
+        EditorDefaultsService.ApplyAlarmDefaults(alarm);
+        return alarm;
     }
 
     public static AlarmBlock CreateAlarmFromTemplate(AlarmBlock template, uint newId, string newName)

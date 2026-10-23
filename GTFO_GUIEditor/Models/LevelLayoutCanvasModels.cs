@@ -37,6 +37,10 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private bool _turnOffAlarmOnTerminal;
     private int _terminalZone;
     private int _terminalIndex;
+    private bool _isApexDoor;
+    private bool _hasBloodDoor;
+    private ObservableCollection<EnemyGroupItem> _enemyGroupInArea = new();
+    private ObservableCollection<EnemyGroupItem> _enemyGroupInFrontOfDoor = new();
     private ObservableCollection<WardenEvent> _eventsOnPortalWarp = new();
     private ObservableCollection<WardenEvent> _eventsOnApproachDoor = new();
     private ObservableCollection<WardenEvent> _eventsOnUnlockDoor = new();
@@ -45,8 +49,21 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private ObservableCollection<WardenEvent> _eventsOnDoorScanDone = new();
     private ObservableCollection<WardenEvent> _eventsOnBossDeath = new();
     private ObservableCollection<WardenEvent> _eventsOnTrigger = new();
+    private ProgressionPuzzleType _progressionPuzzleToEnter = ProgressionPuzzleType.None;
+    private string _progressionPuzzleCustomText = string.Empty;
+    private int _progressionPuzzlePlacementCount = 1;
+    private ObservableCollection<CandidateZonePlacement> _progressionPuzzleCandidateZones = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public PlacedDoorNode()
+    {
+        EditorDefaultsService.ApplySecurityDoorDefaults(this);
+        _isSecurityDoor = false;
+        _isMainDoor = false;
+        _isSecondaryDoor = false;
+        _isOverloadDoor = false;
+    }
 
     public string Id
     {
@@ -359,6 +376,21 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 if (value.TerminalIndex != TerminalIndex)
                     value.TerminalIndex = TerminalIndex;
 
+                if (value.IsApexDoor != IsApexDoor)
+                    value.IsApexDoor = IsApexDoor;
+
+                if (value.HasBloodDoor != HasBloodDoor)
+                    value.HasBloodDoor = HasBloodDoor;
+
+                if (value.ProgressionPuzzleToEnter != ProgressionPuzzleToEnter)
+                    value.ProgressionPuzzleToEnter = ProgressionPuzzleToEnter;
+
+                if (value.ProgressionPuzzleCustomText != ProgressionPuzzleCustomText)
+                    value.ProgressionPuzzleCustomText = ProgressionPuzzleCustomText;
+
+                if (value.ProgressionPuzzlePlacementCount != ProgressionPuzzlePlacementCount)
+                    value.ProgressionPuzzlePlacementCount = ProgressionPuzzlePlacementCount;
+
                 SyncEventCollections(this, value);
             }
         }
@@ -421,6 +453,27 @@ public class PlacedDoorNode : INotifyPropertyChanged
             a.EventsOnTrigger = b.EventsOnTrigger;
         else if (a.EventsOnTrigger != b.EventsOnTrigger && a.EventsOnTrigger.Count > 0)
             b.EventsOnTrigger = a.EventsOnTrigger;
+
+        if (a.EnemyGroupInArea.Count > 0 && b.EnemyGroupInArea.Count == 0)
+            b.EnemyGroupInArea = a.EnemyGroupInArea;
+        else if (b.EnemyGroupInArea.Count > 0 && a.EnemyGroupInArea.Count == 0)
+            a.EnemyGroupInArea = b.EnemyGroupInArea;
+        else if (a.EnemyGroupInArea != b.EnemyGroupInArea)
+            b.EnemyGroupInArea = a.EnemyGroupInArea;
+
+        if (a.EnemyGroupInFrontOfDoor.Count > 0 && b.EnemyGroupInFrontOfDoor.Count == 0)
+            b.EnemyGroupInFrontOfDoor = a.EnemyGroupInFrontOfDoor;
+        else if (b.EnemyGroupInFrontOfDoor.Count > 0 && a.EnemyGroupInFrontOfDoor.Count == 0)
+            a.EnemyGroupInFrontOfDoor = b.EnemyGroupInFrontOfDoor;
+        else if (a.EnemyGroupInFrontOfDoor != b.EnemyGroupInFrontOfDoor)
+            b.EnemyGroupInFrontOfDoor = a.EnemyGroupInFrontOfDoor;
+
+        if (a.ProgressionPuzzleCandidateZones.Count > 0 && b.ProgressionPuzzleCandidateZones.Count == 0)
+            b.ProgressionPuzzleCandidateZones = a.ProgressionPuzzleCandidateZones;
+        else if (b.ProgressionPuzzleCandidateZones.Count > 0 && a.ProgressionPuzzleCandidateZones.Count == 0)
+            a.ProgressionPuzzleCandidateZones = b.ProgressionPuzzleCandidateZones;
+        else if (a.ProgressionPuzzleCandidateZones != b.ProgressionPuzzleCandidateZones)
+            b.ProgressionPuzzleCandidateZones = a.ProgressionPuzzleCandidateZones;
     }
 
     public uint ChainedPuzzleToSolve
@@ -509,6 +562,66 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 if (ConnectedDoor != null && ConnectedDoor.TerminalIndex != value)
                 {
                     ConnectedDoor.TerminalIndex = value;
+                }
+            }
+        }
+    }
+
+    public bool IsApexDoor
+    {
+        get => _isApexDoor;
+        set
+        {
+            if (SetField(ref _isApexDoor, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.IsApexDoor != value)
+                {
+                    ConnectedDoor.IsApexDoor = value;
+                }
+            }
+        }
+    }
+
+    public bool HasBloodDoor
+    {
+        get => _hasBloodDoor;
+        set
+        {
+            if (SetField(ref _hasBloodDoor, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.HasBloodDoor != value)
+                {
+                    ConnectedDoor.HasBloodDoor = value;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<EnemyGroupItem> EnemyGroupInArea
+    {
+        get => _enemyGroupInArea;
+        set
+        {
+            if (SetField(ref _enemyGroupInArea, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EnemyGroupInArea != _enemyGroupInArea)
+                {
+                    ConnectedDoor.EnemyGroupInArea = _enemyGroupInArea;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<EnemyGroupItem> EnemyGroupInFrontOfDoor
+    {
+        get => _enemyGroupInFrontOfDoor;
+        set
+        {
+            if (SetField(ref _enemyGroupInFrontOfDoor, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EnemyGroupInFrontOfDoor != _enemyGroupInFrontOfDoor)
+                {
+                    ConnectedDoor.EnemyGroupInFrontOfDoor = _enemyGroupInFrontOfDoor;
                 }
             }
         }
@@ -634,6 +747,78 @@ public class PlacedDoorNode : INotifyPropertyChanged
         }
     }
 
+    public ProgressionPuzzleType ProgressionPuzzleToEnter
+    {
+        get => _progressionPuzzleToEnter;
+        set
+        {
+            if (SetField(ref _progressionPuzzleToEnter, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzleToEnter != value)
+                {
+                    ConnectedDoor.ProgressionPuzzleToEnter = value;
+                }
+                OnPropertyChanged(nameof(IsKeycardPuzzle));
+                OnPropertyChanged(nameof(IsGeneratorPuzzle));
+                OnPropertyChanged(nameof(IsKeycardOrGeneratorPuzzle));
+                OnPropertyChanged(nameof(IsLockedNoKey));
+                OnPropertyChanged(nameof(HasProgressionPuzzle));
+            }
+        }
+    }
+
+    public bool IsKeycardPuzzle => _progressionPuzzleToEnter == ProgressionPuzzleType.Keycard_SecurityBox;
+    public bool IsGeneratorPuzzle => _progressionPuzzleToEnter == ProgressionPuzzleType.PowerGenerator_And_PowerCell;
+    public bool IsKeycardOrGeneratorPuzzle => IsKeycardPuzzle || IsGeneratorPuzzle;
+    public bool IsLockedNoKey => _progressionPuzzleToEnter == ProgressionPuzzleType.Locked_No_Key;
+    public bool HasProgressionPuzzle => _progressionPuzzleToEnter != ProgressionPuzzleType.None;
+
+    public string ProgressionPuzzleCustomText
+    {
+        get => _progressionPuzzleCustomText;
+        set
+        {
+            string val = value ?? string.Empty;
+            if (SetField(ref _progressionPuzzleCustomText, val))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzleCustomText != val)
+                {
+                    ConnectedDoor.ProgressionPuzzleCustomText = val;
+                }
+            }
+        }
+    }
+
+    public int ProgressionPuzzlePlacementCount
+    {
+        get => _progressionPuzzlePlacementCount;
+        set
+        {
+            if (SetField(ref _progressionPuzzlePlacementCount, value))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzlePlacementCount != value)
+                {
+                    ConnectedDoor.ProgressionPuzzlePlacementCount = value;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<CandidateZonePlacement> ProgressionPuzzleCandidateZones
+    {
+        get => _progressionPuzzleCandidateZones;
+        set
+        {
+            if (SetField(ref _progressionPuzzleCandidateZones, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzleCandidateZones != _progressionPuzzleCandidateZones)
+                {
+                    ConnectedDoor.ProgressionPuzzleCandidateZones = _progressionPuzzleCandidateZones;
+                }
+            }
+        }
+    }
+
     public bool IsInternal => AreaTo >= 0;
 
     public string DoorBrush
@@ -740,8 +925,14 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     private ObservableCollection<PlacedRoomNode> _rooms = new();
     private readonly HashSet<int> _generatedRooms = new();
     private readonly Dictionary<int, int> _roomZones = new();
+    private readonly Dictionary<int, SectorType> _roomSectors = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public PlacedGeomorphNode()
+    {
+        EditorDefaultsService.ApplyGeomorphDefaults(this);
+    }
 
     public GeomorphAltitude Altitude
     {
@@ -796,6 +987,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
 
     public IReadOnlyCollection<int> GeneratedRooms => _generatedRooms;
     public IReadOnlyDictionary<int, int> RoomZones => _roomZones;
+    public IReadOnlyDictionary<int, SectorType> RoomSectors => _roomSectors;
 
     public bool IsRoomGenerated(int areaIndex) => _generatedRooms.Contains(areaIndex);
 
@@ -807,6 +999,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     public bool UngenerateRoom(int areaIndex)
     {
         _roomZones.Remove(areaIndex);
+        _roomSectors.Remove(areaIndex);
         var room = _rooms.FirstOrDefault(r => r.AreaIndex == areaIndex);
         if (room != null)
         {
@@ -827,6 +1020,21 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
         if (room != null)
         {
             room.Zone = zoneIndex;
+        }
+    }
+
+    public SectorType GetRoomSector(int areaIndex)
+    {
+        return _roomSectors.TryGetValue(areaIndex, out var sector) ? sector : SectorType.Main;
+    }
+
+    public void SetRoomSector(int areaIndex, SectorType sector)
+    {
+        _roomSectors[areaIndex] = sector;
+        var room = _rooms.FirstOrDefault(r => r.AreaIndex == areaIndex);
+        if (room != null)
+        {
+            room.Sector = sector;
         }
     }
 
@@ -1101,6 +1309,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
     private string _id = Guid.NewGuid().ToString();
     private PlacedGeomorphNode _geomorph = null!;
     private int _areaIndex;
+    private SectorType _sector = SectorType.Main;
     private int _zone;
     private int _roomNumber;
     private double _worldX;
@@ -1163,6 +1372,19 @@ public class PlacedRoomNode : INotifyPropertyChanged
         }
     }
 
+    public SectorType Sector
+    {
+        get => _sector;
+        set
+        {
+            if (SetField(ref _sector, value))
+            {
+                OnPropertyChanged(nameof(UserFacingDisplayName));
+                OnPropertyChanged(nameof(DisplayName));
+            }
+        }
+    }
+
     public int Zone
     {
         get => _zone;
@@ -1197,7 +1419,12 @@ public class PlacedRoomNode : INotifyPropertyChanged
 
     public string RoomName => $"Room {RoomLetter}";
 
-    public string UserFacingDisplayName => $"Zone {Zone}, {RoomName}";
+    public string UserFacingDisplayName => Sector switch
+    {
+        SectorType.Secondary => $"Zone {Zone} (Secondary), {RoomName}",
+        SectorType.Overload => $"Zone {Zone} (Overload), {RoomName}",
+        _ => $"Zone {Zone}, {RoomName}"
+    };
 
     public static string GetRoomLetter(int roomNumber)
     {

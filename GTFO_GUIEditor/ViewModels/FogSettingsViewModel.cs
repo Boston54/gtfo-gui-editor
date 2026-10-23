@@ -37,7 +37,7 @@ public class FogSettingsViewModel : ViewModelBase
     public ObservableCollection<FogSettingsBlock> AvailableTemplates { get; }
 
     public FogSettingsViewModel()
-        : this(FogSettingsService.LoadVanillaBlocks())
+        : this(new List<FogSettingsBlock>())
     {
     }
 

@@ -56,7 +56,7 @@ public class LightingTests
         var general = fresh.LightCategorySettings.FirstOrDefault(s => s.Category == LightCategory.General);
         Assert.NotNull(general);
         Assert.True(general.On);
-        Assert.Equal(1.0, general.Chance);
+        Assert.Equal(0.5, general.Chance);
     }
 
     [Fact]
@@ -86,9 +86,19 @@ public class LightingTests
     }
 
     [Fact]
-    public void LightingViewModel_InitializesAndSwapsConfigs()
+    public void LightingViewModel_InitializesEmptyByDefault()
     {
         var vm = new LightingViewModel();
+        Assert.Empty(vm.Blocks);
+        Assert.Null(vm.SelectedBlock);
+        Assert.False(vm.HasSelectedBlock);
+        Assert.Contains("0 configs loaded", vm.StatusText);
+    }
+
+    [Fact]
+    public void LightingViewModel_InitializesAndSwapsConfigs()
+    {
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         Assert.NotEmpty(vm.Blocks);
         Assert.NotNull(vm.SelectedBlock);
         Assert.True(vm.HasSelectedBlock);
@@ -106,7 +116,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_AddAndRemoveOption_UpdatesSelectedBlock()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         Assert.NotNull(vm.SelectedBlock);
         int initialCount = vm.SelectedBlock.LightCategorySettings.Count;
 
@@ -123,7 +133,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_DetectsDuplicatePersistentId()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         Assert.NotNull(vm.SelectedBlock);
         Assert.False(vm.HasDuplicatePersistentId);
 
@@ -143,7 +153,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_CreateBlock_ValidationAndFresh()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         vm.OpenCreateBlockDialog();
         Assert.True(vm.IsCreatingBlock);
         Assert.True(vm.IsCreatingFresh);
@@ -175,7 +185,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_CreateBlock_FromTemplate()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         vm.OpenCreateBlockDialog();
         vm.IsCreatingFromTemplate = true;
         vm.SelectedTemplate = vm.AvailableTemplates.First(t => t.PersistentId == 1);
@@ -191,7 +201,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_DeleteBlock_Workflow()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         int initialCount = vm.Blocks.Count;
         var toDelete = vm.Blocks.First();
 
@@ -280,15 +290,15 @@ public class LightingTests
     [Fact]
     public void MainWindowViewModel_ContainsLightingViewModel()
     {
-        var mainWindowVm = new MainWindowViewModel();
+        var mainWindowVm = new MainWindowViewModel(autoReopenLastRundown: false);
         Assert.NotNull(mainWindowVm.Lighting);
-        Assert.NotEmpty(mainWindowVm.Lighting.Blocks);
+        Assert.Empty(mainWindowVm.Lighting.Blocks);
     }
 
     [Fact]
     public void LightingViewModel_CategoryFiltering_UpdatesCurrentCategorySettings()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         Assert.NotNull(vm.SelectedBlock);
 
         // Vanilla block 1 has General, Special, Emergency, Independent, Door, Sign, DoorImportant
@@ -304,7 +314,7 @@ public class LightingTests
     [Fact]
     public void LightingViewModel_AddOption_UsesSelectedCategory()
     {
-        var vm = new LightingViewModel();
+        var vm = new LightingViewModel(LightSettingsService.LoadVanillaBlocks());
         Assert.NotNull(vm.SelectedBlock);
 
         vm.SelectedCategory = LightCategory.Sign;

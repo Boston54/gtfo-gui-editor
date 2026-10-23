@@ -1,0 +1,461 @@
+﻿{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "GTFO GUI Editor Defaults",
+  "description": "Default configuration values for all fields in GTFO GUI Editor, grouped by window and section.",
+
+  "LevelLayoutWindow": {
+    "LevelSettingsDialog": {
+      "Name": "My New Level",
+      "InternalEnabled": true,
+      "ComplexType": "Mining",
+      "FogSettings": 0,
+      "DimensionGeomorph": ""
+    },
+
+    "SecurityDoorSettings": {
+      "DoorType": "Security",
+      "IsSecurityDoor": true,
+      "IsApexDoor": false,
+      "ChainedPuzzleToSolve": 0,
+      "ProgressionPuzzleToEnter": "None",
+      "ProgressionPuzzleCustomText": "",
+      "ProgressionPuzzlePlacementCount": 1,
+      "ProgressionPuzzleCandidateZones": [],
+      "TurnOffAlarmOnTerminal": false,
+      "TerminalZone": 0,
+      "TerminalIndex": 0,
+      "AliasOverride": -1,
+      "AliasPrefixShortOverride": "",
+      "HasBloodDoor": false,
+      "EnemyGroupInFrontOfDoor": [],
+      "EnemyGroupInArea": [],
+      "DoorEvents": {
+        "EventsOnApproachDoor": [],
+        "EventsOnUnlockDoor": [],
+        "EventsOnOpenDoor": [],
+        "EventsOnPortalWarp": []
+      }
+    },
+
+    "ZoneSettings": {
+      "GeneralAndSeeds": {
+        "SubSeed": 0,
+        "MarkerSubSeed": 0,
+        "LightingSubSeed": 0,
+        "DcScanSeed": 0,
+        "BulkheadDCScanSeed": 0,
+        "AliasOverride": -1,
+        "OverrideAliasPrefix": false,
+        "SubComplex": "Lab"
+      },
+
+      "ExpansionAndAltitude": {
+        "AllowedZoneAltitude": "Unchanged",
+        "ChanceToChange": 0,
+        "StartPosition": "From_AverageCenter",
+        "StartPosition_IndexWeight": 0.0,
+        "StartExpansion": "Towards_Forward",
+        "ZoneExpansion": "Expansional",
+        "LightSettings": 0
+      },
+
+      "EnemyRespawning": {
+        "EnemyRespawning": false,
+        "RequireOtherZone": false,
+        "RoomDistance": 2,
+        "TimeInterval": 10.0,
+        "CountMultiplier": 1.0,
+        "ExcludeList": []
+      },
+
+      "ResourceContainers": {
+        "MedKitUses": 0,
+        "AmmoKitUses": 0,
+        "ToolKitUses": 0,
+        "DisinfectKitUses": 0,
+        "PowerCells": 0,
+        "FogTurbines": 0
+      },
+
+      "Terminals": {
+        "PlacementStartWeight": 0.33,
+        "PlacementMiddleWeight": 0.34,
+        "PlacementEndWeight": 0.33,
+        "AreaSeedOffset": 0,
+        "MarkerSeedOffset": 0,
+        "StartingState": "Awake",
+        "KeepShowingLocalLogCount": 0,
+        "UseCustomInfoText": false,
+        "CustomInfoText": "",
+        "PasswordProtected": false,
+        "GeneratePassword": false,
+        "ShowPasswordLength": false,
+        "ShowPasswordPartPositions": false,
+        "PasswordHintText": "",
+        "PasswordPartCount": 1,
+        "TerminalZoneSelectionDatas": [],
+        "UniqueCommands": []
+      },
+
+      "Events": {
+        "EventsOnEnter": [],
+        "EventsOnPortalWarp": [],
+        "EventsOnApproachDoor": [],
+        "EventsOnUnlockDoor": [],
+        "EventsOnOpenDoor": []
+      }
+    },
+
+    "GeomorphSettings": {
+      "Altitude": "Mid",
+      "RotationAngle": 0
+    },
+
+    "SectorAndWardenObjectives": {
+      "SectorCommon": {
+        "ZoneAliasStart": 100,
+        "WinCondition": "GoToElevator",
+        "ExitZone": 0,
+        "BulkheadDoorZone": 0,
+        "BulkheadDCZone": 0,
+        "BulkheadKeysPlacement": "None",
+        "BulkheadKeyZones": [],
+        "ChainedPuzzleToActive": 0,
+        "ChainedPuzzleMidObjective": 0,
+        "ArtifactAmountMultiplier": 1.0,
+        "FogTransitionDataOnGotoWin": 0,
+        "FogTransitionDataOnGotoWinDuration": 0.0,
+        "StopAllWavesBeforeGotoWin": false,
+        "WaveOnGotoWinTrigger": "OnObjectiveCompleted"
+      },
+
+      "ObjectiveTypes": {
+        "HSU_FindTakeSample": {
+          "HSUPlacementZone": 0,
+          "HSUPlacementStartWeight": 0.0,
+          "HSUPlacementMiddleWeight": 0.0,
+          "HSUPlacementEndWeight": 0.0
+        },
+
+        "Reactor_Startup": {
+          "ReactorPlacementZone": 0,
+          "DoNotSolveObjectiveOnReactorComplete": false,
+          "ReactorStartupStages": [
+            {
+              "WaveCount": 1,
+              "WarmupDuration": 15.0,
+              "VerifyDuration": 15.0
+            }
+          ]
+        },
+
+        "Reactor_Shutdown": {
+          "ReactorPlacementZone": 0,
+          "ShutdownDuration": 60.0
+        },
+
+        "GatherSmallItems": {
+          "GatherItem": "PersonnelID",
+          "GatherMaxPerZone": 3,
+          "GatherItemPlacements": []
+        },
+
+        "ClearAPath": {
+          "ExitZone": 0
+        },
+
+        "SpecialTerminalCommand": {
+          "SpecialTerminalCommandZone": 0,
+          "SpecialTerminalCommand": "OVERRIDE_LOCKDOWN",
+          "SpecialTerminalCommandDesc": "Execute override command on designated terminal",
+          "PostCommandOutput": "LOCKDOWN RELEASED. PROCEED TO EXTRACTION.",
+          "SpecialCommandRule": "Normal"
+        },
+
+        "RetrieveBigItems": {
+          "RetrieveItem": "PowerCell",
+          "RetrieveMaxPerZone": 2,
+          "RetrieveItemPlacements": [
+            {
+              "ItemNumber": 1,
+              "Zone": 0
+            }
+          ]
+        },
+
+        "DistributePowerCells": {
+          "DistributeGeneratorPlacements": [
+            {
+              "GeneratorNumber": 1,
+              "Zone": 0
+            }
+          ]
+        },
+
+        "TerminalUplink": {
+          "UplinkNumberOfVerificationRounds": 3,
+          "TerminalUplinkPlacements": [
+            {
+              "ItemNumber": 1,
+              "ItemPrefix": "Terminal",
+              "Zone": 0
+            }
+          ]
+        },
+
+        "CentralGeneratorCluster": {
+          "CentralGeneratorClusterZone": 0,
+          "CentralGeneratorClusterPowerCellPlacements": [
+            {
+              "ItemNumber": 1,
+              "ItemPrefix": "Power Cell",
+              "Zone": 0
+            },
+            {
+              "ItemNumber": 2,
+              "ItemPrefix": "Power Cell",
+              "Zone": 0
+            },
+            {
+              "ItemNumber": 3,
+              "ItemPrefix": "Power Cell",
+              "Zone": 0
+            },
+            {
+              "ItemNumber": 4,
+              "ItemPrefix": "Power Cell",
+              "Zone": 0
+            }
+          ],
+          "CentralGeneratorClusterFogTransitions": [
+            {
+              "StageNumber": 1,
+              "FogSetting": 0,
+              "TransitionDuration": 10.0
+            }
+          ]
+        },
+
+        "ActivateSmallHSU": {
+          "ActivateSmallHsuZone": 0,
+          "ItemFromStart": "PowerCell",
+          "ItemAfterActivation": "PowerCell",
+          "BringItemInElevator": false,
+          "StopEnemyWavesOnActivation": false,
+          "ObjectiveCompleteAfterInsertion": false
+        },
+
+        "Survival": {
+          "SurvivalDuration": 180.0,
+          "SurvivalZone": 0
+        },
+
+        "GatherTerminal": {
+          "GatherTerminalZone": 0,
+          "FilesToDownload": 3
+        },
+
+        "CorruptedTerminalUplink": {
+          "UplinkNumberOfVerificationRounds": 3,
+          "TerminalUplinkPlacements": [
+            {
+              "ItemNumber": 1,
+              "ItemPrefix": "Terminal",
+              "Zone": 0
+            }
+          ]
+        },
+
+        "TimedTerminalSequence": {
+          "SequenceDuration": 120.0,
+          "TerminalCount": 3
+        }
+      }
+    }
+  },
+
+  "AlarmsWindow": {
+    "SpawnsEnemies": true,
+    "ChainedPuzzle": [
+      6
+    ],
+
+    "WaveRoles": {
+      "WaveRoleWeakling": 21,
+      "WaveRoleStandard": 13,
+      "WaveRoleSpecial": 11,
+      "WaveRoleMiniBoss": 16,
+      "WaveRoleBoss": 18
+    },
+
+    "PopulationFilters": {
+      "FilterWeakling": true,
+      "FilterStandard": false,
+      "FilterSpecial": false,
+      "FilterMiniBoss": false,
+      "FilterBoss": false,
+      "FilterType": "Exclude"
+    },
+
+    "WaveSettingsAndTiming": {
+      "PublicAlarmName": "Class II Alarm",
+      "PauseBeforeStart": 3.0,
+      "PauseBetweenGroups": 5.0,
+      "WavePauseMin_AtCost": 3.0,
+      "WavePauseMax_AtCost": 10.0,
+      "WavePauseMin": 3.0,
+      "WavePauseMax": 30.0,
+      "ChanceToRandomizeSpawnDirectionPerWave": 1.0,
+      "ChanceToRandomizeSpawnDirectionPerGroup": 0.1,
+      "OverrideWaveSpawnType": false,
+      "SurvivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "PopulationPointsTotal": -1,
+      "PopulationPointsPerWaveStart": 17.0,
+      "PopulationPointsPerWaveEnd": 25.0,
+      "PopulationPointsMinPerGroup": 5.0,
+      "PopulationPointsPerGroupStart": 5.0,
+      "PopulationPointsPerGroupEnd": 10.0,
+      "PopulationRampOverTime": 200.0
+    }
+  },
+
+  "LightingWindow": {
+    "LightBlockDefaults": {
+      "Name": "New Lighting Configuration",
+      "InternalEnabled": true,
+      "PersistentId": 1
+    },
+
+    "LightCategoryDefaults": {
+      "General": {
+        "On": true,
+        "Chance": 0.5,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.62, "G": 0.69, "B": 0.72, "A": 0.0 },
+        "IntensityMul": 0.7,
+        "Weight": 1.0
+      },
+      "Special": {
+        "On": true,
+        "Chance": 0.5,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.75, "G": 0.58, "B": 0.47, "A": 0.0 },
+        "IntensityMul": 0.8,
+        "Weight": 1.0
+      },
+      "Emergency": {
+        "On": true,
+        "Chance": 0.0,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 1.0, "G": 0.27, "B": 0.27, "A": 0.0 },
+        "IntensityMul": 1.0,
+        "Weight": 1.0
+      },
+      "Independent": {
+        "On": true,
+        "Chance": 0.5,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.74, "G": 0.53, "B": 0.51, "A": 0.0 },
+        "IntensityMul": 1.0,
+        "Weight": 0.8
+      },
+      "Door": {
+        "On": true,
+        "Chance": 0.5,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.44, "G": 0.65, "B": 0.73, "A": 0.0 },
+        "IntensityMul": 1.0,
+        "Weight": 1.0
+      },
+      "Sign": {
+        "On": true,
+        "Chance": 1.0,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.44, "G": 0.65, "B": 0.73, "A": 0.0 },
+        "IntensityMul": 1.0,
+        "Weight": 1.0
+      },
+      "DoorImportant": {
+        "On": true,
+        "Chance": 1.0,
+        "ChanceBroken": 0.0,
+        "Color": { "R": 0.51, "G": 0.64, "B": 0.68, "A": 0.0 },
+        "IntensityMul": 1.0,
+        "Weight": 1.0
+      }
+    }
+  },
+
+  "FogSettingsWindow": {
+    "FogBlockDefaults": {
+      "Name": "New Fog Setting",
+      "InternalEnabled": true,
+      "FogDensity": 0.02,
+      "FogColor": { "R": 0.2, "G": 0.3, "B": 0.25, "A": 1.0 },
+      "DensityNoiseDirection": { "x": 1.48, "y": 0.0, "z": 0.0 },
+      "Infection": 0.0,
+      "DensityNoiseSpeed": 0.009,
+      "DensityNoiseScale": 0.06,
+      "DensityHeightAltitude": -0.91,
+      "DensityHeightRange": 1.01,
+      "DensityHeightMaxBoost": 0.09
+    }
+  },
+
+  "RundownWindow": {
+    "RundownSettings": {
+      "Name": "New Rundown",
+      "InternalEnabled": true,
+      "NeverShowRundownTree": false,
+      "UseTierUnlockRequirements": true
+    },
+
+    "Storytelling": {
+      "Title": "RUNDOWN EXAMPLE\nTITLE: EXAMPLE",
+      "TextLog": 0,
+      "Visuals": {
+        "ColorBackground": { "R": 0.05, "G": 0.05, "B": 0.07, "A": 1.0 },
+        "TierAVisuals": { "Color": { "R": 0.3, "G": 0.7, "B": 1.0, "A": 1.0 }, "Scale": 1.0, "ScaleYModifier": 1.0 },
+        "TierBVisuals": { "Color": { "R": 0.4, "G": 0.9, "B": 0.5, "A": 1.0 }, "Scale": 1.0, "ScaleYModifier": 1.0 },
+        "TierCVisuals": { "Color": { "R": 1.0, "G": 0.8, "B": 0.3, "A": 1.0 }, "Scale": 1.0, "ScaleYModifier": 1.0 },
+        "TierDVisuals": { "Color": { "R": 1.0, "G": 0.4, "B": 0.2, "A": 1.0 }, "Scale": 1.0, "ScaleYModifier": 1.0 },
+        "TierEVisuals": { "Color": { "R": 0.9, "G": 0.2, "B": 0.3, "A": 1.0 }, "Scale": 1.0, "ScaleYModifier": 1.0 }
+      }
+    },
+
+    "TierUnlockRequirements": {
+      "ReqToReachTierA": { "MainSectors": 0, "SecondarySectors": 0, "ThirdSectors": 0, "AllClearedSectors": 0 },
+      "ReqToReachTierB": { "MainSectors": 1, "SecondarySectors": 0, "ThirdSectors": 0, "AllClearedSectors": 0 },
+      "ReqToReachTierC": { "MainSectors": 2, "SecondarySectors": 0, "ThirdSectors": 0, "AllClearedSectors": 0 },
+      "ReqToReachTierD": { "MainSectors": 3, "SecondarySectors": 0, "ThirdSectors": 0, "AllClearedSectors": 0 },
+      "ReqToReachTierE": { "MainSectors": 4, "SecondarySectors": 0, "ThirdSectors": 0, "AllClearedSectors": 0 }
+    },
+
+    "ExpeditionDefaults": {
+      "Accessibility": "Normal",
+      "LevelLayoutData": 1,
+      "SecondaryLayout": 0,
+      "ThirdLayout": 0,
+      "FogSettings": 0,
+      "LightSettings": 1,
+      "ComplexResourceData": 1,
+      "Descriptive": {
+        "Prefix": "A",
+        "PublicName": "Expedition A",
+        "RoleplayedWardenIntel": "",
+        "ExpeditionDescription": ""
+      },
+      "MainLayerData": {
+        "ObjectiveDataId": 0
+      },
+      "SecondaryLayerData": {
+        "SecondaryLayerEnabled": false,
+        "ObjectiveDataId": 0
+      },
+      "ThirdLayerData": {
+        "ThirdLayerEnabled": false,
+        "ObjectiveDataId": 0
+      }
+    }
+  }
+}

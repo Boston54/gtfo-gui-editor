@@ -56,7 +56,9 @@ public class ComplexResourceSetTests
         Assert.Equal(BundleNameType.Complex_Tech, fresh.BundleName);
         Assert.True(fresh.InternalEnabled);
         Assert.NotNull(fresh.LevelGenConfig);
-        Assert.Empty(fresh.GeomorphTiles_1x1);
+        Assert.NotEmpty(fresh.SmallWeakGates);
+        Assert.NotEmpty(fresh.StraightPlugsNoGates);
+        Assert.NotEmpty(fresh.Ladders_4m);
     }
 
     [Fact]

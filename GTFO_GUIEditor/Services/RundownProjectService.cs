@@ -17,10 +17,17 @@ public static class RundownProjectService
         PropertyNameCaseInsensitive = true
     };
 
+    public static string? CustomRecentFilesConfigPath { get; set; }
+
     private static string RecentFilesConfigPath
     {
         get
         {
+            if (!string.IsNullOrWhiteSpace(CustomRecentFilesConfigPath))
+            {
+                return CustomRecentFilesConfigPath;
+            }
+
             string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             if (string.IsNullOrWhiteSpace(appData))
             {
@@ -51,11 +58,13 @@ public static class RundownProjectService
             FileVersion = 1,
             CreatedAt = DateTime.UtcNow,
             ModifiedAt = DateTime.UtcNow,
+            LastExportDirectory = vm.LastExportDirectory,
             Rundown = vm.Rundown.SelectedRundown?.Clone() ?? new RundownBlock(),
             Alarms = vm.Alarms.Alarms.Select(a => a.Clone()).ToList(),
             Lighting = vm.Lighting.Blocks.Select(b => b.Clone()).ToList(),
-            ComplexResourceSets = vm.ComplexResourceSets.Blocks.Select(s => s.Clone()).ToList(),
-            FogSettings = vm.FogSettings.Blocks.Select(b => b.Clone()).ToList()
+            ComplexResourceSets = new List<ComplexResourceSetBlock>(),
+            FogSettings = vm.FogSettings.Blocks.Select(b => b.Clone()).ToList(),
+            ConsumableDistributions = vm.Consumables.Blocks.Select(b => b.Clone()).ToList()
         };
 
         foreach (var level in vm.LevelLayout.Levels)
@@ -64,8 +73,10 @@ public static class RundownProjectService
             {
                 Name = level.Name,
                 PersistentId = level.PersistentId,
+                ComplexType = level.ComplexType,
                 ComplexResourceSet = level.ComplexResourceSet,
                 ElevatorTile = level.ElevatorTile,
+                FogSettings = level.FogSettings,
                 InternalEnabled = level.InternalEnabled,
                 Dimensions = level.Dimensions.Select(d => d.Clone()).ToList(),
                 MainSector = ExportSectorSettings(level.MainSector),
@@ -147,22 +158,7 @@ public static class RundownProjectService
             vm.Lighting.SelectedBlock = vm.Lighting.Blocks[0];
         }
 
-        // 3. Complex Resource Sets
-        vm.ComplexResourceSets.Blocks.Clear();
-        if (project.ComplexResourceSets != null)
-        {
-            foreach (var compSet in project.ComplexResourceSets)
-            {
-                vm.ComplexResourceSets.Blocks.Add(compSet.Clone());
-            }
-        }
-
-        if (vm.ComplexResourceSets.Blocks.Count > 0)
-        {
-            vm.ComplexResourceSets.SelectedBlock = vm.ComplexResourceSets.Blocks[0];
-        }
-
-        // 3.5 Fog Settings
+        // 3. Fog Settings
         vm.FogSettings.Blocks.Clear();
         if (project.FogSettings != null)
         {
@@ -177,6 +173,21 @@ public static class RundownProjectService
             vm.FogSettings.SelectedBlock = vm.FogSettings.Blocks[0];
         }
 
+        // 3.5. Consumable Distributions
+        vm.Consumables.Blocks.Clear();
+        if (project.ConsumableDistributions != null)
+        {
+            foreach (var consumableBlock in project.ConsumableDistributions)
+            {
+                vm.Consumables.Blocks.Add(consumableBlock.Clone());
+            }
+        }
+
+        if (vm.Consumables.Blocks.Count > 0)
+        {
+            vm.Consumables.SelectedBlock = vm.Consumables.Blocks[0];
+        }
+
         // 4. Level Layouts
         vm.LevelLayout.Levels.Clear();
         if (project.Levels != null)
@@ -187,8 +198,10 @@ public static class RundownProjectService
                 {
                     Name = levelData.Name,
                     PersistentId = levelData.PersistentId,
+                    ComplexType = levelData.ComplexType,
                     ComplexResourceSet = levelData.ComplexResourceSet,
                     ElevatorTile = levelData.ElevatorTile,
+                    FogSettings = levelData.FogSettings,
                     InternalEnabled = levelData.InternalEnabled,
                     Dimensions = new ObservableCollection<DimensionLayoutBlock>(
                         levelData.Dimensions?.Select(d => d.Clone()) ?? Enumerable.Empty<DimensionLayoutBlock>()),
@@ -224,101 +237,99 @@ public static class RundownProjectService
             vm.CurrentFilePath = filePath;
             AddRecentFile(filePath);
         }
+
+        vm.LastExportDirectory = project.LastExportDirectory;
     }
 
-    private static SectorSettingsData ExportSectorSettings(SectorSettings sector)
+    private static WardenObjectiveData ExportWardenObjective(WardenObjective obj)
     {
-        return new SectorSettingsData
+        return new WardenObjectiveData
         {
-            ArtifactAmountMultiplier = sector.ArtifactAmountMultiplier,
-            ZoneAliasStart = sector.ZoneAliasStart,
-            WinCondition = sector.WinCondition,
-            ExitZone = sector.ExitZone,
-            ObjectiveType = sector.ObjectiveType,
-            HsuPlacementZone = sector.HsuPlacementZone,
-            HsuPlacementStartWeight = sector.HsuPlacementStartWeight,
-            HsuPlacementMiddleWeight = sector.HsuPlacementMiddleWeight,
-            HsuPlacementEndWeight = sector.HsuPlacementEndWeight,
-            ReactorPlacementZone = sector.ReactorPlacementZone,
-            ReactorStartupStages = sector.ReactorStartupStages.Select(s => s.Clone()).ToList(),
-            ChainedPuzzleToActive = sector.ChainedPuzzleToActive,
-            ChainedPuzzleMidObjective = sector.ChainedPuzzleMidObjective,
-            DoNotSolveObjectiveOnReactorComplete = sector.DoNotSolveObjectiveOnReactorComplete,
-            SpecialTerminalCommandZone = sector.SpecialTerminalCommandZone,
-            SpecialTerminalCommand = sector.SpecialTerminalCommand,
-            SpecialTerminalCommandDesc = sector.SpecialTerminalCommandDesc,
-            PostCommandOutput = sector.PostCommandOutput,
-            SpecialCommandRule = sector.SpecialCommandRule,
-            GatherItem = sector.GatherItem,
-            GatherMaxPerZone = sector.GatherMaxPerZone,
-            RetrieveItem = sector.RetrieveItem,
-            RetrieveMaxPerZone = sector.RetrieveMaxPerZone,
-            GatherItemPlacements = sector.GatherItemPlacements.Select(p => p.Clone()).ToList(),
-            RetrieveItemPlacements = sector.RetrieveItemPlacements.Select(p => p.Clone()).ToList(),
-            DistributeGeneratorPlacements = sector.DistributeGeneratorPlacements.Select(g => g.Clone()).ToList(),
-            UplinkNumberOfVerificationRounds = sector.UplinkNumberOfVerificationRounds,
-            TerminalUplinkPlacements = sector.TerminalUplinkPlacements.Select(p => p.Clone()).ToList(),
-            CentralGeneratorClusterZone = sector.CentralGeneratorClusterZone,
+            WinCondition = obj.WinCondition,
+            ExitZone = obj.ExitZone,
+            ObjectiveType = obj.ObjectiveType,
+            HsuPlacementZone = obj.HsuPlacementZone,
+            HsuPlacementStartWeight = obj.HsuPlacementStartWeight,
+            HsuPlacementMiddleWeight = obj.HsuPlacementMiddleWeight,
+            HsuPlacementEndWeight = obj.HsuPlacementEndWeight,
+            ReactorPlacementZone = obj.ReactorPlacementZone,
+            ReactorStartupStages = obj.ReactorStartupStages.Select(s => s.Clone()).ToList(),
+            ChainedPuzzleToActive = obj.ChainedPuzzleToActive,
+            ChainedPuzzleMidObjective = obj.ChainedPuzzleMidObjective,
+            DoNotSolveObjectiveOnReactorComplete = obj.DoNotSolveObjectiveOnReactorComplete,
+            SpecialTerminalCommandZone = obj.SpecialTerminalCommandZone,
+            SpecialTerminalCommand = obj.SpecialTerminalCommand,
+            SpecialTerminalCommandDesc = obj.SpecialTerminalCommandDesc,
+            PostCommandOutput = obj.PostCommandOutput,
+            SpecialCommandRule = obj.SpecialCommandRule,
+            GatherItem = obj.GatherItem,
+            GatherMaxPerZone = obj.GatherMaxPerZone,
+            RetrieveItem = obj.RetrieveItem,
+            RetrieveMaxPerZone = obj.RetrieveMaxPerZone,
+            GatherItemPlacements = obj.GatherItemPlacements.Select(p => p.Clone()).ToList(),
+            RetrieveItemPlacements = obj.RetrieveItemPlacements.Select(p => p.Clone()).ToList(),
+            DistributeGeneratorPlacements = obj.DistributeGeneratorPlacements.Select(g => g.Clone()).ToList(),
+            UplinkNumberOfVerificationRounds = obj.UplinkNumberOfVerificationRounds,
+            TerminalUplinkPlacements = obj.TerminalUplinkPlacements.Select(p => p.Clone()).ToList(),
+            CentralGeneratorClusterZone = obj.CentralGeneratorClusterZone,
             CentralGeneratorClusterFogTransitions =
-                sector.CentralGeneratorClusterFogTransitions.Select(s => s.Clone()).ToList(),
+                obj.CentralGeneratorClusterFogTransitions.Select(s => s.Clone()).ToList(),
             CentralGeneratorClusterPowerCellPlacements =
-                sector.CentralGeneratorClusterPowerCellPlacements.Select(p => p.Clone()).ToList(),
-            GatherTerminalSpawnCount = sector.GatherTerminalSpawnCount,
-            GatherTerminalRequiredCount = sector.GatherTerminalRequiredCount,
-            GatherTerminalCommand = sector.GatherTerminalCommand,
-            GatherTerminalCommandHelp = sector.GatherTerminalCommandHelp,
-            GatherTerminalDownloadingText = sector.GatherTerminalDownloadingText,
-            GatherTerminalDownloadCompleteText = sector.GatherTerminalDownloadCompleteText,
-            GatherTerminalDownloadTime = sector.GatherTerminalDownloadTime,
-            GatherTerminalPlacements = sector.GatherTerminalPlacements.Select(p => p.Clone()).ToList(),
-            TimedTerminalSequenceMainLocation = sector.TimedTerminalSequenceMainLocation.Clone(),
-            TimedTerminalSequenceNumberOfRounds = sector.TimedTerminalSequenceNumberOfRounds,
-            TimedTerminalSequenceTimePerRound = sector.TimedTerminalSequenceTimePerRound,
-            TimedTerminalSequenceTimeForConfirmation = sector.TimedTerminalSequenceTimeForConfirmation,
-            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = sector.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter,
-            TimedTerminalSequenceNumberOfTerminals = sector.TimedTerminalSequenceNumberOfTerminals,
-            TimedTerminalSequencePlacements = sector.TimedTerminalSequencePlacements.Select(p => p.Clone()).ToList(),
-            ActivateSmallHsuZone = sector.ActivateSmallHsuZone,
-            ItemFromStart = sector.ItemFromStart,
-            ItemAfterActivation = sector.ItemAfterActivation,
-            BringItemInElevator = sector.BringItemInElevator,
-            StopEnemyWavesOnActivation = sector.StopEnemyWavesOnActivation,
-            ObjectiveCompleteAfterInsertion = sector.ObjectiveCompleteAfterInsertion,
-            RequireItemAfterActivationInExitScan = sector.RequireItemAfterActivationInExitScan,
-            TimeToActivate = sector.TimeToActivate,
-            TimeToSurvive = sector.TimeToSurvive,
-            TimerTitle = sector.TimerTitle,
-            TimerToActivateTitle = sector.TimerToActivateTitle,
-            Header = sector.Header,
-            MainObjective = sector.MainObjective,
-            FindLocationInfo = sector.FindLocationInfo,
-            FindLocationInfoHelp = sector.FindLocationInfoHelp,
-            GoToZone = sector.GoToZone,
-            InZoneFindItem = sector.InZoneFindItem,
-            SolveItem = sector.SolveItem,
-            WavesOnGotoWin = sector.WavesOnGotoWin.Clone(),
-            WaveOnGotoWinTrigger = sector.WaveOnGotoWinTrigger,
-            StopAllWavesBeforeGotoWin = sector.StopAllWavesBeforeGotoWin,
-            WavesOnElevatorLand = sector.WavesOnElevatorLand.Clone(),
-            FogTransitionDataOnGotoWin = sector.FogTransitionDataOnGotoWin,
-            FogTransitionDataOnGotoWinDuration = sector.FogTransitionDataOnGotoWinDuration,
-            EventsOnActivation = sector.EventsOnActivation.Select(e => e.Clone()).ToList(),
-            EventsOnSequenceStart = sector.EventsOnSequenceStart.Select(e => e.Clone()).ToList(),
-            EventsOnSequenceDone = sector.EventsOnSequenceDone.Select(e => e.Clone()).ToList(),
-            EventsOnSequenceFail = sector.EventsOnSequenceFail.Select(e => e.Clone()).ToList(),
-            EventsOnElevatorLand = sector.EventsOnElevatorLand.Select(e => e.Clone()).ToList(),
-            EventsOnGotoWin = sector.EventsOnGotoWin.Select(e => e.Clone()).ToList(),
-            EventsOnActivate = sector.EventsOnActivate.Select(e => e.Clone()).ToList()
+                obj.CentralGeneratorClusterPowerCellPlacements.Select(p => p.Clone()).ToList(),
+            GatherTerminalSpawnCount = obj.GatherTerminalSpawnCount,
+            GatherTerminalRequiredCount = obj.GatherTerminalRequiredCount,
+            GatherTerminalCommand = obj.GatherTerminalCommand,
+            GatherTerminalCommandHelp = obj.GatherTerminalCommandHelp,
+            GatherTerminalDownloadingText = obj.GatherTerminalDownloadingText,
+            GatherTerminalDownloadCompleteText = obj.GatherTerminalDownloadCompleteText,
+            GatherTerminalDownloadTime = obj.GatherTerminalDownloadTime,
+            GatherTerminalPlacements = obj.GatherTerminalPlacements.Select(p => p.Clone()).ToList(),
+            TimedTerminalSequenceMainLocation = obj.TimedTerminalSequenceMainLocation.Clone(),
+            TimedTerminalSequenceNumberOfRounds = obj.TimedTerminalSequenceNumberOfRounds,
+            TimedTerminalSequenceTimePerRound = obj.TimedTerminalSequenceTimePerRound,
+            TimedTerminalSequenceTimeForConfirmation = obj.TimedTerminalSequenceTimeForConfirmation,
+            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = obj.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter,
+            TimedTerminalSequenceNumberOfTerminals = obj.TimedTerminalSequenceNumberOfTerminals,
+            TimedTerminalSequencePlacements = obj.TimedTerminalSequencePlacements.Select(p => p.Clone()).ToList(),
+            ActivateSmallHsuZone = obj.ActivateSmallHsuZone,
+            ItemFromStart = obj.ItemFromStart,
+            ItemAfterActivation = obj.ItemAfterActivation,
+            BringItemInElevator = obj.BringItemInElevator,
+            StopEnemyWavesOnActivation = obj.StopEnemyWavesOnActivation,
+            ObjectiveCompleteAfterInsertion = obj.ObjectiveCompleteAfterInsertion,
+            RequireItemAfterActivationInExitScan = obj.RequireItemAfterActivationInExitScan,
+            TimeToActivate = obj.TimeToActivate,
+            TimeToSurvive = obj.TimeToSurvive,
+            TimerTitle = obj.TimerTitle,
+            TimerToActivateTitle = obj.TimerToActivateTitle,
+            Header = obj.Header,
+            MainObjective = obj.MainObjective,
+            FindLocationInfo = obj.FindLocationInfo,
+            FindLocationInfoHelp = obj.FindLocationInfoHelp,
+            GoToZone = obj.GoToZone,
+            InZoneFindItem = obj.InZoneFindItem,
+            SolveItem = obj.SolveItem,
+            WavesOnGotoWin = obj.WavesOnGotoWin.Clone(),
+            WaveOnGotoWinTrigger = obj.WaveOnGotoWinTrigger,
+            StopAllWavesBeforeGotoWin = obj.StopAllWavesBeforeGotoWin,
+            WavesOnElevatorLand = obj.WavesOnElevatorLand.Clone(),
+            FogTransitionDataOnGotoWin = obj.FogTransitionDataOnGotoWin,
+            FogTransitionDataOnGotoWinDuration = obj.FogTransitionDataOnGotoWinDuration,
+            EventsOnActivation = obj.EventsOnActivation.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceStart = obj.EventsOnSequenceStart.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceDone = obj.EventsOnSequenceDone.Select(e => e.Clone()).ToList(),
+            EventsOnSequenceFail = obj.EventsOnSequenceFail.Select(e => e.Clone()).ToList(),
+            EventsOnElevatorLand = obj.EventsOnElevatorLand.Select(e => e.Clone()).ToList(),
+            EventsOnGotoWin = obj.EventsOnGotoWin.Select(e => e.Clone()).ToList(),
+            EventsOnActivate = obj.EventsOnActivate.Select(e => e.Clone()).ToList()
         };
     }
 
-    private static SectorSettings ImportSectorSettings(SectorSettingsData? data)
+    private static WardenObjective ImportWardenObjective(WardenObjectiveData data, int objectiveNumber = 1)
     {
-        if (data == null) return new SectorSettings();
-        var sector = new SectorSettings
+        var obj = new WardenObjective
         {
-            ArtifactAmountMultiplier = data.ArtifactAmountMultiplier,
-            ZoneAliasStart = data.ZoneAliasStart,
+            ObjectiveNumber = objectiveNumber,
             WinCondition = data.WinCondition,
             ExitZone = data.ExitZone,
             ObjectiveType = data.ObjectiveType,
@@ -365,6 +376,7 @@ public static class RundownProjectService
             TimeToSurvive = data.TimeToSurvive,
             TimerTitle = data.TimerTitle ?? string.Empty,
             TimerToActivateTitle = data.TimerToActivateTitle ?? string.Empty,
+            GatherTerminalSpawnCount = data.GatherTerminalSpawnCount,
             GatherTerminalRequiredCount = data.GatherTerminalRequiredCount,
             GatherTerminalCommand = data.GatherTerminalCommand ?? string.Empty,
             GatherTerminalCommandHelp = data.GatherTerminalCommandHelp ?? string.Empty,
@@ -375,173 +387,311 @@ public static class RundownProjectService
             TimedTerminalSequenceNumberOfRounds = data.TimedTerminalSequenceNumberOfRounds,
             TimedTerminalSequenceTimePerRound = data.TimedTerminalSequenceTimePerRound,
             TimedTerminalSequenceTimeForConfirmation = data.TimedTerminalSequenceTimeForConfirmation,
-            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = data.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter ?? "MainTerminal"
+            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = data.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter ?? "MainTerminal",
+            TimedTerminalSequenceNumberOfTerminals = data.TimedTerminalSequenceNumberOfTerminals
         };
 
+        obj.ReactorStartupStages.Clear();
         if (data.ReactorStartupStages != null)
         {
             foreach (var stage in data.ReactorStartupStages)
             {
-                sector.ReactorStartupStages.Add(stage.Clone());
+                obj.ReactorStartupStages.Add(stage.Clone());
             }
         }
 
-        if (data.GatherItemPlacements != null && data.GatherItemPlacements.Count > 0)
+        obj.GatherItemPlacements.Clear();
+        if (data.GatherItemPlacements != null)
         {
-            sector.GatherItemPlacements.Clear();
             int idx = 1;
             foreach (var placement in data.GatherItemPlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
-                sector.GatherItemPlacements.Add(clone);
+                obj.GatherItemPlacements.Add(clone);
             }
         }
 
-        if (data.RetrieveItemPlacements != null && data.RetrieveItemPlacements.Count > 0)
+        obj.RetrieveItemPlacements.Clear();
+        if (data.RetrieveItemPlacements != null)
         {
-            sector.RetrieveItemPlacements.Clear();
             int idx = 1;
             foreach (var placement in data.RetrieveItemPlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
-                sector.RetrieveItemPlacements.Add(clone);
+                obj.RetrieveItemPlacements.Add(clone);
             }
         }
 
-        if (data.DistributeGeneratorPlacements != null && data.DistributeGeneratorPlacements.Count > 0)
+        obj.DistributeGeneratorPlacements.Clear();
+        if (data.DistributeGeneratorPlacements != null)
         {
-            sector.DistributeGeneratorPlacements.Clear();
             int idx = 1;
             foreach (var generator in data.DistributeGeneratorPlacements)
             {
                 var clone = generator.Clone();
                 clone.GeneratorNumber = idx++;
-                sector.DistributeGeneratorPlacements.Add(clone);
+                obj.DistributeGeneratorPlacements.Add(clone);
             }
         }
 
-        if (data.TerminalUplinkPlacements != null && data.TerminalUplinkPlacements.Count > 0)
+        obj.TerminalUplinkPlacements.Clear();
+        if (data.TerminalUplinkPlacements != null)
         {
-            sector.TerminalUplinkPlacements.Clear();
             int idx = 1;
             foreach (var placement in data.TerminalUplinkPlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
                 clone.ItemPrefix = "Terminal";
-                sector.TerminalUplinkPlacements.Add(clone);
+                obj.TerminalUplinkPlacements.Add(clone);
             }
         }
 
-        if (data.CentralGeneratorClusterFogTransitions != null && data.CentralGeneratorClusterFogTransitions.Count > 0)
+        obj.CentralGeneratorClusterFogTransitions.Clear();
+        if (data.CentralGeneratorClusterFogTransitions != null)
         {
-            sector.CentralGeneratorClusterFogTransitions.Clear();
             int idx = 1;
             foreach (var stage in data.CentralGeneratorClusterFogTransitions)
             {
                 var clone = stage.Clone();
                 clone.StageNumber = idx++;
-                sector.CentralGeneratorClusterFogTransitions.Add(clone);
+                obj.CentralGeneratorClusterFogTransitions.Add(clone);
             }
         }
 
-        if (data.CentralGeneratorClusterPowerCellPlacements != null &&
-            data.CentralGeneratorClusterPowerCellPlacements.Count > 0)
+        obj.CentralGeneratorClusterPowerCellPlacements.Clear();
+        if (data.CentralGeneratorClusterPowerCellPlacements != null)
         {
-            sector.CentralGeneratorClusterPowerCellPlacements.Clear();
             int idx = 1;
             foreach (var placement in data.CentralGeneratorClusterPowerCellPlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
                 clone.ItemPrefix = "Power Cell";
-                sector.CentralGeneratorClusterPowerCellPlacements.Add(clone);
+                obj.CentralGeneratorClusterPowerCellPlacements.Add(clone);
             }
         }
 
-        if (data.GatherTerminalPlacements != null && data.GatherTerminalPlacements.Count > 0)
+        obj.GatherTerminalPlacements.Clear();
+        if (data.GatherTerminalPlacements != null)
         {
-            sector.GatherTerminalPlacements.Clear();
             int idx = 1;
             foreach (var placement in data.GatherTerminalPlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
                 clone.ItemPrefix = "Terminal";
-                sector.GatherTerminalPlacements.Add(clone);
+                obj.GatherTerminalPlacements.Add(clone);
             }
         }
 
-        if (data.TimedTerminalSequencePlacements != null && data.TimedTerminalSequencePlacements.Count > 0)
+        obj.TimedTerminalSequencePlacements.Clear();
+        if (data.TimedTerminalSequencePlacements != null)
         {
-            sector.TimedTerminalSequencePlacements.Clear();
             int idx = 1;
             foreach (var placement in data.TimedTerminalSequencePlacements)
             {
                 var clone = placement.Clone();
                 clone.ItemNumber = idx++;
                 clone.ItemPrefix = "Terminal";
-                sector.TimedTerminalSequencePlacements.Add(clone);
+                obj.TimedTerminalSequencePlacements.Add(clone);
             }
         }
 
+        obj.EventsOnActivation.Clear();
         if (data.EventsOnActivation != null)
         {
             foreach (var ev in data.EventsOnActivation)
             {
-                sector.EventsOnActivation.Add(ev.Clone());
+                obj.EventsOnActivation.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnSequenceStart.Clear();
         if (data.EventsOnSequenceStart != null)
         {
             foreach (var ev in data.EventsOnSequenceStart)
             {
-                sector.EventsOnSequenceStart.Add(ev.Clone());
+                obj.EventsOnSequenceStart.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnSequenceDone.Clear();
         if (data.EventsOnSequenceDone != null)
         {
             foreach (var ev in data.EventsOnSequenceDone)
             {
-                sector.EventsOnSequenceDone.Add(ev.Clone());
+                obj.EventsOnSequenceDone.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnSequenceFail.Clear();
         if (data.EventsOnSequenceFail != null)
         {
             foreach (var ev in data.EventsOnSequenceFail)
             {
-                sector.EventsOnSequenceFail.Add(ev.Clone());
+                obj.EventsOnSequenceFail.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnElevatorLand.Clear();
         if (data.EventsOnElevatorLand != null)
         {
             foreach (var ev in data.EventsOnElevatorLand)
             {
-                sector.EventsOnElevatorLand.Add(ev.Clone());
+                obj.EventsOnElevatorLand.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnGotoWin.Clear();
         if (data.EventsOnGotoWin != null)
         {
             foreach (var ev in data.EventsOnGotoWin)
             {
-                sector.EventsOnGotoWin.Add(ev.Clone());
+                obj.EventsOnGotoWin.Add(ev.Clone());
             }
         }
 
+        obj.EventsOnActivate.Clear();
         if (data.EventsOnActivate != null)
         {
             foreach (var ev in data.EventsOnActivate)
             {
-                sector.EventsOnActivate.Add(ev.Clone());
+                obj.EventsOnActivate.Add(ev.Clone());
             }
         }
+
+        return obj;
+    }
+
+    private static SectorSettingsData ExportSectorSettings(SectorSettings sector)
+    {
+        var primaryData = ExportWardenObjective(sector.PrimaryObjective);
+        var data = new SectorSettingsData
+        {
+            ArtifactAmountMultiplier = sector.ArtifactAmountMultiplier,
+            ZoneAliasStart = sector.ZoneAliasStart,
+            BulkheadKeyPlacements = sector.BulkheadKeyPlacements.Select(p => p.Clone()).ToList(),
+            Objectives = sector.Objectives.Select(ExportWardenObjective).ToList(),
+
+            // Copy flat properties for backwards compatibility
+            WinCondition = primaryData.WinCondition,
+            ExitZone = primaryData.ExitZone,
+            ObjectiveType = primaryData.ObjectiveType,
+            HsuPlacementZone = primaryData.HsuPlacementZone,
+            HsuPlacementStartWeight = primaryData.HsuPlacementStartWeight,
+            HsuPlacementMiddleWeight = primaryData.HsuPlacementMiddleWeight,
+            HsuPlacementEndWeight = primaryData.HsuPlacementEndWeight,
+            ReactorPlacementZone = primaryData.ReactorPlacementZone,
+            ReactorStartupStages = primaryData.ReactorStartupStages,
+            ChainedPuzzleToActive = primaryData.ChainedPuzzleToActive,
+            ChainedPuzzleMidObjective = primaryData.ChainedPuzzleMidObjective,
+            DoNotSolveObjectiveOnReactorComplete = primaryData.DoNotSolveObjectiveOnReactorComplete,
+            SpecialTerminalCommandZone = primaryData.SpecialTerminalCommandZone,
+            SpecialTerminalCommand = primaryData.SpecialTerminalCommand,
+            SpecialTerminalCommandDesc = primaryData.SpecialTerminalCommandDesc,
+            PostCommandOutput = primaryData.PostCommandOutput,
+            SpecialCommandRule = primaryData.SpecialCommandRule,
+            GatherItem = primaryData.GatherItem,
+            GatherMaxPerZone = primaryData.GatherMaxPerZone,
+            RetrieveItem = primaryData.RetrieveItem,
+            RetrieveMaxPerZone = primaryData.RetrieveMaxPerZone,
+            GatherItemPlacements = primaryData.GatherItemPlacements,
+            RetrieveItemPlacements = primaryData.RetrieveItemPlacements,
+            DistributeGeneratorPlacements = primaryData.DistributeGeneratorPlacements,
+            UplinkNumberOfVerificationRounds = primaryData.UplinkNumberOfVerificationRounds,
+            TerminalUplinkPlacements = primaryData.TerminalUplinkPlacements,
+            CentralGeneratorClusterZone = primaryData.CentralGeneratorClusterZone,
+            CentralGeneratorClusterFogTransitions = primaryData.CentralGeneratorClusterFogTransitions,
+            CentralGeneratorClusterPowerCellPlacements = primaryData.CentralGeneratorClusterPowerCellPlacements,
+            GatherTerminalSpawnCount = primaryData.GatherTerminalSpawnCount,
+            GatherTerminalRequiredCount = primaryData.GatherTerminalRequiredCount,
+            GatherTerminalCommand = primaryData.GatherTerminalCommand,
+            GatherTerminalCommandHelp = primaryData.GatherTerminalCommandHelp,
+            GatherTerminalDownloadingText = primaryData.GatherTerminalDownloadingText,
+            GatherTerminalDownloadCompleteText = primaryData.GatherTerminalDownloadCompleteText,
+            GatherTerminalDownloadTime = primaryData.GatherTerminalDownloadTime,
+            GatherTerminalPlacements = primaryData.GatherTerminalPlacements,
+            TimedTerminalSequenceMainLocation = primaryData.TimedTerminalSequenceMainLocation,
+            TimedTerminalSequenceNumberOfRounds = primaryData.TimedTerminalSequenceNumberOfRounds,
+            TimedTerminalSequenceTimePerRound = primaryData.TimedTerminalSequenceTimePerRound,
+            TimedTerminalSequenceTimeForConfirmation = primaryData.TimedTerminalSequenceTimeForConfirmation,
+            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = primaryData.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter,
+            TimedTerminalSequenceNumberOfTerminals = primaryData.TimedTerminalSequenceNumberOfTerminals,
+            TimedTerminalSequencePlacements = primaryData.TimedTerminalSequencePlacements,
+            ActivateSmallHsuZone = primaryData.ActivateSmallHsuZone,
+            ItemFromStart = primaryData.ItemFromStart,
+            ItemAfterActivation = primaryData.ItemAfterActivation,
+            BringItemInElevator = primaryData.BringItemInElevator,
+            StopEnemyWavesOnActivation = primaryData.StopEnemyWavesOnActivation,
+            ObjectiveCompleteAfterInsertion = primaryData.ObjectiveCompleteAfterInsertion,
+            RequireItemAfterActivationInExitScan = primaryData.RequireItemAfterActivationInExitScan,
+            TimeToActivate = primaryData.TimeToActivate,
+            TimeToSurvive = primaryData.TimeToSurvive,
+            TimerTitle = primaryData.TimerTitle,
+            TimerToActivateTitle = primaryData.TimerToActivateTitle,
+            Header = primaryData.Header,
+            MainObjective = primaryData.MainObjective,
+            FindLocationInfo = primaryData.FindLocationInfo,
+            FindLocationInfoHelp = primaryData.FindLocationInfoHelp,
+            GoToZone = primaryData.GoToZone,
+            InZoneFindItem = primaryData.InZoneFindItem,
+            SolveItem = primaryData.SolveItem,
+            WavesOnGotoWin = primaryData.WavesOnGotoWin,
+            WaveOnGotoWinTrigger = primaryData.WaveOnGotoWinTrigger,
+            StopAllWavesBeforeGotoWin = primaryData.StopAllWavesBeforeGotoWin,
+            WavesOnElevatorLand = primaryData.WavesOnElevatorLand,
+            FogTransitionDataOnGotoWin = primaryData.FogTransitionDataOnGotoWin,
+            FogTransitionDataOnGotoWinDuration = primaryData.FogTransitionDataOnGotoWinDuration,
+            EventsOnActivation = primaryData.EventsOnActivation,
+            EventsOnSequenceStart = primaryData.EventsOnSequenceStart,
+            EventsOnSequenceDone = primaryData.EventsOnSequenceDone,
+            EventsOnSequenceFail = primaryData.EventsOnSequenceFail,
+            EventsOnElevatorLand = primaryData.EventsOnElevatorLand,
+            EventsOnGotoWin = primaryData.EventsOnGotoWin,
+            EventsOnActivate = primaryData.EventsOnActivate
+        };
+        return data;
+    }
+
+    private static SectorSettings ImportSectorSettings(SectorSettingsData? data)
+    {
+        if (data == null) return new SectorSettings();
+        var sector = new SectorSettings
+        {
+            ArtifactAmountMultiplier = data.ArtifactAmountMultiplier,
+            ZoneAliasStart = data.ZoneAliasStart
+        };
+
+        if (data.BulkheadKeyPlacements != null)
+        {
+            sector.BulkheadKeyPlacements.Clear();
+            int idx = 1;
+            foreach (var placement in data.BulkheadKeyPlacements)
+            {
+                var clone = placement.Clone();
+                clone.ItemNumber = idx++;
+                if (string.IsNullOrWhiteSpace(clone.ItemPrefix)) clone.ItemPrefix = "Bulkhead Key";
+                sector.BulkheadKeyPlacements.Add(clone);
+            }
+        }
+
+        var importedObjectives = new ObservableCollection<WardenObjective>();
+        if (data.Objectives != null && data.Objectives.Count > 0)
+        {
+            int objNum = 1;
+            foreach (var objData in data.Objectives)
+            {
+                importedObjectives.Add(ImportWardenObjective(objData, objNum++));
+            }
+        }
+        else
+        {
+            importedObjectives.Add(ImportWardenObjective(data, 1));
+        }
+        sector.Objectives = importedObjectives;
 
         return sector;
     }

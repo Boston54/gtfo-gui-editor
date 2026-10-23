@@ -106,22 +106,7 @@ public static class LightSettingsService
 
     public static LightSettingsBlock CreateFreshBlock(uint id, string name)
     {
-        return new LightSettingsBlock
-        {
-            PersistentId = id,
-            Name = name,
-            InternalEnabled = true,
-            LightCategorySettings = new ObservableCollection<LightCategorySettingItem>
-            {
-                new() { Category = LightCategory.General, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } },
-                new() { Category = LightCategory.Independent, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } },
-                new() { Category = LightCategory.Door, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } },
-                new() { Category = LightCategory.Sign, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } },
-                new() { Category = LightCategory.Emergency, On = true, Chance = 0.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 0.26, B = 0.26, A = 0.0 } },
-                new() { Category = LightCategory.DoorImportant, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } },
-                new() { Category = LightCategory.Special, On = true, Chance = 1.0, ChanceBroken = 0.0, IntensityMul = 1.0, Weight = 1.0, Color = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 0.0 } }
-            }
-        };
+        return EditorDefaultsService.CreateDefaultLightBlock(id, name);
     }
 
     public static LightSettingsBlock CreateBlockFromTemplate(LightSettingsBlock template, uint newId, string newName)

@@ -89,32 +89,34 @@ public class AlarmTests
         var alarm = AlarmService.CreateFreshAlarm(500, "Custom_Test_Alarm");
         Assert.Equal((uint)500, alarm.PersistentId);
         Assert.Equal("Custom_Test_Alarm", alarm.Name);
-        Assert.Equal((uint)0, alarm.WaveRoleWeakling);
-        Assert.Equal((uint)0, alarm.WaveRoleStandard);
-        Assert.Equal((uint)0, alarm.WaveRoleSpecial);
-        Assert.Equal((uint)0, alarm.WaveRoleMiniBoss);
-        Assert.Equal((uint)0, alarm.WaveRoleBoss);
-        Assert.Equal(0.0, alarm.PauseBeforeStart);
-        Assert.Equal(0.0, alarm.PauseBetweenGroups);
-        Assert.Equal(0.0, alarm.WavePauseMin_AtCost);
-        Assert.Equal(0.0, alarm.WavePauseMax_AtCost);
-        Assert.Equal(0.0, alarm.WavePauseMin);
-        Assert.Equal(0.0, alarm.WavePauseMax);
-        Assert.Equal(0.0, alarm.ChanceToRandomizeSpawnDirectionPerWave);
-        Assert.Equal(0.0, alarm.ChanceToRandomizeSpawnDirectionPerGroup);
-        Assert.Equal(0.0, alarm.PopulationPointsTotal);
-        Assert.Equal(0.0, alarm.PopulationPointsPerWaveStart);
-        Assert.Equal(0.0, alarm.PopulationPointsPerWaveEnd);
-        Assert.Equal(0.0, alarm.PopulationPointsMinPerGroup);
-        Assert.Equal(0.0, alarm.PopulationPointsPerGroupStart);
-        Assert.Equal(0.0, alarm.PopulationPointsPerGroupEnd);
-        Assert.Equal(0.0, alarm.PopulationRampOverTime);
-        Assert.False(alarm.FilterWeakling);
+        Assert.Equal("Class II Alarm", alarm.PublicAlarmName);
+        Assert.Equal((uint)21, alarm.WaveRoleWeakling);
+        Assert.Equal((uint)13, alarm.WaveRoleStandard);
+        Assert.Equal((uint)11, alarm.WaveRoleSpecial);
+        Assert.Equal((uint)16, alarm.WaveRoleMiniBoss);
+        Assert.Equal((uint)18, alarm.WaveRoleBoss);
+        Assert.Equal(3.0, alarm.PauseBeforeStart);
+        Assert.Equal(5.0, alarm.PauseBetweenGroups);
+        Assert.Equal(3.0, alarm.WavePauseMin_AtCost);
+        Assert.Equal(10.0, alarm.WavePauseMax_AtCost);
+        Assert.Equal(3.0, alarm.WavePauseMin);
+        Assert.Equal(30.0, alarm.WavePauseMax);
+        Assert.Equal(1.0, alarm.ChanceToRandomizeSpawnDirectionPerWave);
+        Assert.Equal(0.1, alarm.ChanceToRandomizeSpawnDirectionPerGroup);
+        Assert.Equal(-1.0, alarm.PopulationPointsTotal);
+        Assert.Equal(17.0, alarm.PopulationPointsPerWaveStart);
+        Assert.Equal(25.0, alarm.PopulationPointsPerWaveEnd);
+        Assert.Equal(5.0, alarm.PopulationPointsMinPerGroup);
+        Assert.Equal(5.0, alarm.PopulationPointsPerGroupStart);
+        Assert.Equal(10.0, alarm.PopulationPointsPerGroupEnd);
+        Assert.Equal(200.0, alarm.PopulationRampOverTime);
+        Assert.True(alarm.FilterWeakling);
         Assert.False(alarm.FilterStandard);
         Assert.False(alarm.FilterSpecial);
         Assert.False(alarm.FilterMiniBoss);
         Assert.False(alarm.FilterBoss);
-        Assert.Empty(alarm.PopulationFilter);
+        Assert.Single(alarm.PopulationFilter);
+        Assert.Contains("Weakling", alarm.PopulationFilter);
         Assert.False(alarm.OverrideWaveSpawnType);
         Assert.Equal(WaveFilterType.Exclude, alarm.FilterType);
         Assert.Equal(SurvivalWaveSpawnType.InRelationToClosestAlivePlayer, alarm.SurvivalWaveSpawnType);
@@ -153,11 +155,11 @@ public class AlarmTests
     public void AlarmsViewModel_InitializesWithAlarmsAndEnemies()
     {
         var vm = new AlarmsViewModel();
-        Assert.NotEmpty(vm.Alarms);
+        Assert.Empty(vm.Alarms);
         Assert.NotEmpty(vm.Enemies);
-        Assert.NotNull(vm.SelectedAlarm);
-        Assert.True(vm.HasSelectedAlarm);
-        Assert.Contains("alarms loaded", vm.StatusText);
+        Assert.Null(vm.SelectedAlarm);
+        Assert.False(vm.HasSelectedAlarm);
+        Assert.Contains("0 alarms loaded", vm.StatusText);
     }
 
     [Fact]
@@ -268,6 +270,68 @@ public class AlarmTests
         var mainVm = new MainWindowViewModel();
         Assert.NotNull(mainVm.Alarms);
         Assert.NotNull(mainVm.Sounds);
-        Assert.NotNull(mainVm.ComplexResourceSets);
+        Assert.NotNull(mainVm.LevelLayout);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_ChainedPuzzle_AddAndRemoveItems()
+    {
+        var alarm = AlarmService.CreateFreshAlarm(1, "Test Alarm");
+        alarm.ChainedPuzzle.Clear();
+        var types = new List<ChainedPuzzleTypeEntry>
+        {
+            new() { PersistentId = 6, Name = "SecurityScan_Big_RequireAll" },
+            new() { PersistentId = 22, Name = "SecurityScan_Big_Moving" }
+        };
+        var vm = new AlarmsViewModel(new[] { alarm }, chainedPuzzleTypes: types);
+
+        Assert.Equal(alarm, vm.SelectedAlarm);
+        Assert.NotNull(vm.SelectedAlarm);
+        Assert.Empty(vm.SelectedAlarm.ChainedPuzzle);
+
+        vm.AddChainedPuzzleItem();
+        Assert.Single(vm.SelectedAlarm.ChainedPuzzle);
+        Assert.Equal((uint)6, vm.SelectedAlarm.ChainedPuzzle[0].PuzzleType);
+
+        vm.AddChainedPuzzleItem();
+        Assert.Equal(2, vm.SelectedAlarm.ChainedPuzzle.Count);
+
+        var itemToRemove = vm.SelectedAlarm.ChainedPuzzle[0];
+        vm.RemoveChainedPuzzleItem(itemToRemove);
+        Assert.Single(vm.SelectedAlarm.ChainedPuzzle);
+
+        Assert.NotNull(vm.RemoveChainedPuzzleItemCommand);
+        Assert.NotNull(vm.AddChainedPuzzleItemCommand);
+
+        // Test command execution
+        var secondItemToRemove = vm.SelectedAlarm.ChainedPuzzle[0];
+        vm.RemoveChainedPuzzleItemCommand.Execute(secondItemToRemove);
+        Assert.Empty(vm.SelectedAlarm.ChainedPuzzle);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_DefaultConstructor_LoadsChainedPuzzleTypesFromDataBlock()
+    {
+        var vm = new AlarmsViewModel();
+        Assert.NotEmpty(vm.ChainedPuzzleTypes);
+
+        // Verify key vanilla chained puzzle types from ChainedPuzzleTypeDataBlock.json are present
+        Assert.Contains(vm.ChainedPuzzleTypes, t => t.PersistentId == 2);
+        Assert.Contains(vm.ChainedPuzzleTypes, t => t.PersistentId == 6);
+        Assert.Contains(vm.ChainedPuzzleTypes, t => t.PersistentId == 22);
+        Assert.Contains(vm.ChainedPuzzleTypes, t => t.PersistentId == 56);
+    }
+
+    [Fact]
+    public void AlarmBlock_SpawnsEnemies_CanBeToggled()
+    {
+        var alarm = AlarmService.CreateFreshAlarm(1, "Test Alarm");
+        Assert.True(alarm.SpawnsEnemies);
+
+        alarm.SpawnsEnemies = false;
+        Assert.False(alarm.SpawnsEnemies);
+
+        var clone = alarm.Clone();
+        Assert.False(clone.SpawnsEnemies);
     }
 }

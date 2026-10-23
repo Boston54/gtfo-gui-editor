@@ -9,13 +9,37 @@ using Xunit;
 
 namespace GTFO_GUIEditor.Tests;
 
-public class RundownFileTests
+[Collection("RecentFiles")]
+public class RundownFileTests : IDisposable
 {
+    private readonly string _tempTestDir;
+
+    public RundownFileTests()
+    {
+        _tempTestDir = Path.Combine(Path.GetTempPath(), $"RundownFileTests_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(_tempTestDir);
+        RundownProjectService.CustomRecentFilesConfigPath = Path.Combine(_tempTestDir, "recent_files.json");
+    }
+
+    public void Dispose()
+    {
+        RundownProjectService.CustomRecentFilesConfigPath = null;
+        try
+        {
+            if (Directory.Exists(_tempTestDir))
+            {
+                Directory.Delete(_tempTestDir, true);
+            }
+        }
+        catch { }
+    }
+
     private class FakeFileDialogService : IFileDialogService
     {
         public string DefaultRundownsDirectory => Path.Combine(Path.GetTempPath(), "GTFO_Test_Rundowns");
         public string? NextOpenPath { get; set; }
         public string? NextSavePath { get; set; }
+        public string? NextFolderPath { get; set; }
 
         public Task<string?> ShowOpenFileDialogAsync(string? defaultDirectory = null, string? filter = null)
         {
@@ -25,6 +49,11 @@ public class RundownFileTests
         public Task<string?> ShowSaveFileDialogAsync(string? defaultFileName = null, string? defaultDirectory = null, string? defaultExtension = "rundown")
         {
             return Task.FromResult(NextSavePath);
+        }
+
+        public Task<string?> ShowOpenFolderDialogAsync(string? defaultDirectory = null, string? title = "Select Export Destination Directory")
+        {
+            return Task.FromResult(NextFolderPath);
         }
     }
 
@@ -70,22 +99,7 @@ public class RundownFileTests
             });
             vm.Lighting.Blocks.Add(customLighting);
 
-            // 3. Modify Complex Resource Sets
-            var customSet = new ComplexResourceSetBlock
-            {
-                Name = "Custom Tech Set",
-                PersistentId = 777333,
-                ComplexType = ComplexType.Tech,
-                LevelGenConfig = new LevelGenConfig
-                {
-                    GridSize = 50,
-                    CellDimension = 64.0,
-                    AltitudeOffset = 12.0
-                }
-            };
-            vm.ComplexResourceSets.Blocks.Add(customSet);
-
-            // 3.5 Modify Fog Settings
+            // 3. Modify Fog Settings
             var customFog = new FogSettingsBlock
             {
                 Name = "Custom Test Fog",
@@ -107,7 +121,6 @@ public class RundownFileTests
             {
                 Name = "Complex Level Test",
                 PersistentId = 555444,
-                ComplexResourceSet = customSet.PersistentId,
                 ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab",
                 InternalEnabled = true
             };
@@ -132,24 +145,16 @@ public class RundownFileTests
             customLevel.OverloadSector.ArtifactAmountMultiplier = 2.15;
             customLevel.OverloadSector.ZoneAliasStart = 200;
 
-            // Place an adjacent geomorph
+            // Place an adjacent geomorph via Security Door into Zone 1
             var geoPrefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
-            var placedGeo = customLevel.GridState.CreateGeomorphNode(
-                prefabPath: geoPrefab,
-                gridX: 0,
-                gridY: -1,
-                initialAreaIndex: 0,
-                rotationAngle: 0.0,
+            var forwardDoor = customLevel.GridState.PlacedDoors.First(d => d.Direction == "Forwards");
+            var placedGeo = customLevel.GridState.ExpandFromDoor(
+                forwardDoor,
+                geoPrefab,
+                DoorType.SecurityDoor,
                 altitude: GeomorphAltitude.High,
                 lighting: customLighting.PersistentId);
-            customLevel.GridState.PlacedGeomorphs.Add(placedGeo);
-            foreach (var door in placedGeo.Doors)
-            {
-                if (!customLevel.GridState.PlacedDoors.Contains(door))
-                {
-                    customLevel.GridState.PlacedDoors.Add(door);
-                }
-            }
+            Assert.NotNull(placedGeo);
 
             // Configure Zone Settings for Zone 1
             var zs = customLevel.GridState.GetOrCreateZoneSettings(1);
@@ -158,10 +163,8 @@ public class RundownFileTests
             zs.AmmoKitUses = 8;
             zs.ToolKitUses = 4;
             zs.DisinfectKitUses = 2;
-            zs.BulkheadKeys = 3;
             zs.PowerCells = 2;
             zs.FogTurbines = 1;
-            zs.ContainsDisinfectStation = true;
             zs.ContainsDC = true;
             zs.DcOpensSecondary = true;
             zs.DcOpensOverload = true;
@@ -214,13 +217,6 @@ public class RundownFileTests
             Assert.Equal(2.5, loadedLighting.LightCategorySettings[0].IntensityMul);
             Assert.Equal(1.0, loadedLighting.LightCategorySettings[0].Color.R);
 
-            // Verify Complex Resource Sets
-            var loadedSet = loadedVm.ComplexResourceSets.Blocks.FirstOrDefault(s => s.PersistentId == 777333);
-            Assert.NotNull(loadedSet);
-            Assert.Equal("Custom Tech Set", loadedSet.Name);
-            Assert.Equal(50, loadedSet.LevelGenConfig.GridSize);
-            Assert.Equal(12.0, loadedSet.LevelGenConfig.AltitudeOffset);
-
             // Verify Fog Settings
             var loadedFog = loadedVm.FogSettings.Blocks.FirstOrDefault(f => f.PersistentId == 666444);
             Assert.NotNull(loadedFog);
@@ -269,10 +265,8 @@ public class RundownFileTests
             Assert.Equal(8, loadedZs.AmmoKitUses);
             Assert.Equal(4, loadedZs.ToolKitUses);
             Assert.Equal(2, loadedZs.DisinfectKitUses);
-            Assert.Equal(3, loadedZs.BulkheadKeys);
             Assert.Equal(2, loadedZs.PowerCells);
             Assert.Equal(1, loadedZs.FogTurbines);
-            Assert.True(loadedZs.ContainsDisinfectStation);
             Assert.True(loadedZs.ContainsDC);
             Assert.True(loadedZs.DcOpensSecondary);
             Assert.True(loadedZs.DcOpensOverload);
@@ -371,15 +365,307 @@ public class RundownFileTests
     }
 
     [Fact]
+    public void InitialLoadAndNewRundown_DoesNotLoadVanillaRundownFogLightingOrAlarms_ButKeepsEnemies()
+    {
+        var vm = new MainWindowViewModel(new FakeFileDialogService());
+
+        // Alarms: empty alarms collection, but Enemies are loaded in the background
+        Assert.Empty(vm.Alarms.Alarms);
+        Assert.Null(vm.Alarms.SelectedAlarm);
+        Assert.NotEmpty(vm.Alarms.Enemies);
+
+        // Lighting: empty collection
+        Assert.Empty(vm.Lighting.Blocks);
+        Assert.Null(vm.Lighting.SelectedBlock);
+
+        // Fog: empty collection
+        Assert.Empty(vm.FogSettings.Blocks);
+        Assert.Null(vm.FogSettings.SelectedBlock);
+
+        // Rundown: clean fresh default rundown, not loaded from vanilla datablocks
+        Assert.NotNull(vm.Rundown.SelectedRundown);
+        Assert.Equal("New Rundown", vm.Rundown.SelectedRundown?.Name);
+        Assert.Equal((uint)1, vm.Rundown.SelectedRundown?.PersistentId);
+
+        // Call NewRundown() and ensure it remains clean
+        vm.NewRundown();
+
+        Assert.Empty(vm.Alarms.Alarms);
+        Assert.Null(vm.Alarms.SelectedAlarm);
+        Assert.NotEmpty(vm.Alarms.Enemies);
+
+        Assert.Empty(vm.Lighting.Blocks);
+        Assert.Null(vm.Lighting.SelectedBlock);
+
+        Assert.Empty(vm.FogSettings.Blocks);
+        Assert.Null(vm.FogSettings.SelectedBlock);
+
+        Assert.NotNull(vm.Rundown.SelectedRundown);
+        Assert.Equal("New Rundown", vm.Rundown.SelectedRundown?.Name);
+    }
+
+    [Fact]
     public void RecentFiles_LimitsAndOrdersCorrectly()
     {
-        string baseDir = Path.GetTempPath();
-        for (int i = 0; i < 15; i++)
+        string tempDir = Path.Combine(Path.GetTempPath(), $"RecentFiles_Limits_{Guid.NewGuid():N}");
+        Directory.CreateDirectory(tempDir);
+        string tempConfig = Path.Combine(tempDir, "recent_files.json");
+        try
         {
-            string path = Path.Combine(baseDir, $"rundown_{i}.rundown");
-            var list = RundownProjectService.AddRecentFile(path);
-            Assert.True(list.Count <= 10);
-            Assert.Equal(path, list[0].FilePath);
+            RundownProjectService.CustomRecentFilesConfigPath = tempConfig;
+            string baseDir = Path.GetTempPath();
+            for (int i = 0; i < 15; i++)
+            {
+                string path = Path.Combine(baseDir, $"rundown_{i}.rundown");
+                var list = RundownProjectService.AddRecentFile(path);
+                Assert.True(list.Count <= 10);
+                Assert.Equal(path, list[0].FilePath);
+            }
+        }
+        finally
+        {
+            RundownProjectService.CustomRecentFilesConfigPath = null;
+            try
+            {
+                if (Directory.Exists(tempDir))
+                {
+                    Directory.Delete(tempDir, true);
+                }
+            }
+            catch
+            {
+            }
+        }
+    }
+
+    [Fact]
+    public void RundownBlock_ExpeditionsProperty_ReturnsAllExpeditionsAcrossTiers()
+    {
+        var rundown = new RundownBlock();
+        rundown.TierA.Clear();
+        rundown.TierB.Clear();
+        rundown.TierC.Clear();
+        rundown.TierD.Clear();
+        rundown.TierE.Clear();
+
+        rundown.TierA.Add(new ExpeditionBlock());
+        rundown.TierB.Add(new ExpeditionBlock());
+        rundown.TierC.Add(new ExpeditionBlock());
+
+        Assert.Equal(3, rundown.Expeditions.Count());
+        Assert.Equal(3, rundown.GetAllExpeditions().Count);
+    }
+
+    [Fact]
+    public void SaveAndLoad_Roundtrip_PreservesReactorStagesAndEvents()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"test_reactor_events_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var fakeDialog = new FakeFileDialogService();
+            var vm = new MainWindowViewModel(fakeDialog);
+
+            var customLevel = new LevelLayoutBlock
+            {
+                Name = "Reactor Level Test",
+                PersistentId = 444333,
+                ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"
+            };
+
+            customLevel.MainSector.ObjectiveType = ObjectiveType.Reactor_Startup;
+            customLevel.MainSector.ReactorStartupStages.Clear();
+            customLevel.MainSector.ReactorStartupStages.Add(new ReactorStartupStage
+            {
+                StageNumber = 1,
+                Warmup = 45.0,
+                Wave = 60.0,
+                Verify = 30.0,
+                VerifyInOtherZone = true,
+                ZoneForVerification = 2
+            });
+
+            customLevel.MainSector.EventsOnActivation.Add(new WardenEvent
+            {
+                Type = EventType.SpawnEnemyWave,
+                Trigger = EventTrigger.OnEnd,
+                Delay = 5.0
+            });
+
+            customLevel.MainSector.EventsOnActivate.Add(new WardenEvent
+            {
+                Type = EventType.UpdateCustomSubObjective,
+                Trigger = EventTrigger.OnStart,
+                CustomSubObjective = "Test Activate Sub Objective"
+            });
+
+            vm.LevelLayout.Levels.Add(customLevel);
+
+            RundownProjectService.SaveProject(vm, tempFile);
+
+            var loadedVm = new MainWindowViewModel(fakeDialog);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadedVm, project, tempFile);
+
+            var loadedLevel = loadedVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == 444333);
+            Assert.NotNull(loadedLevel);
+            Assert.Single(loadedLevel.MainSector.ReactorStartupStages);
+            Assert.Equal(45.0, loadedLevel.MainSector.ReactorStartupStages[0].Warmup);
+            Assert.Equal(2, loadedLevel.MainSector.ReactorStartupStages[0].ZoneForVerification);
+
+            Assert.Single(loadedLevel.MainSector.EventsOnActivation);
+            Assert.Equal(EventType.SpawnEnemyWave, loadedLevel.MainSector.EventsOnActivation[0].Type);
+
+            Assert.Single(loadedLevel.MainSector.EventsOnActivate);
+            Assert.Equal("Test Activate Sub Objective", loadedLevel.MainSector.EventsOnActivate[0].CustomSubObjective);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public void SaveAndLoad_Roundtrip_PreservesAlarmScanTypes()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"test_alarm_scans_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var fakeDialog = new FakeFileDialogService();
+            var vm = new MainWindowViewModel(fakeDialog);
+
+            var customAlarm = new AlarmBlock
+            {
+                PersistentId = 9988,
+                Name = "Custom Test Alarm"
+            };
+            customAlarm.ChainedPuzzle.Clear();
+            customAlarm.ChainedPuzzle.Add(new ChainedPuzzleItem { PuzzleType = 12 });
+            customAlarm.ChainedPuzzle.Add(new ChainedPuzzleItem { PuzzleType = 24 });
+            customAlarm.ChainedPuzzle.Add(new ChainedPuzzleItem { PuzzleType = 35 });
+
+            vm.Alarms.Alarms.Add(customAlarm);
+
+            RundownProjectService.SaveProject(vm, tempFile);
+
+            var loadedVm = new MainWindowViewModel(fakeDialog);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadedVm, project, tempFile);
+
+            var loadedAlarm = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 9988);
+            Assert.NotNull(loadedAlarm);
+            Assert.Equal(3, loadedAlarm.ChainedPuzzle.Count);
+            Assert.Equal((uint)12, loadedAlarm.ChainedPuzzle[0].PuzzleType);
+            Assert.Equal((uint)24, loadedAlarm.ChainedPuzzle[1].PuzzleType);
+            Assert.Equal((uint)35, loadedAlarm.ChainedPuzzle[2].PuzzleType);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public void LoadProject_ParsesIntegerArrayAndObjectArrayScans()
+    {
+        string rawJson = @"
+{
+  ""fileVersion"": 1,
+  ""alarms"": [
+    {
+      ""persistentID"": 101,
+      ""name"": ""IntegerScansAlarm"",
+      ""ChainedPuzzle"": [ 2, 6, 22 ]
+    },
+    {
+      ""persistentID"": 102,
+      ""name"": ""ObjectScansAlarm"",
+      ""ChainedPuzzle"": [
+        { ""PuzzleType"": 3 },
+        { ""PuzzleType"": 4 }
+      ]
+    }
+  ]
+}";
+        string tempFile = Path.Combine(Path.GetTempPath(), $"test_compat_scans_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            File.WriteAllText(tempFile, rawJson);
+
+            var fakeDialog = new FakeFileDialogService();
+            var loadedVm = new MainWindowViewModel(fakeDialog);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadedVm, project, tempFile);
+
+            var alarm101 = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 101);
+            Assert.NotNull(alarm101);
+            Assert.Equal(3, alarm101.ChainedPuzzle.Count);
+            Assert.Equal((uint)2, alarm101.ChainedPuzzle[0].PuzzleType);
+            Assert.Equal((uint)6, alarm101.ChainedPuzzle[1].PuzzleType);
+            Assert.Equal((uint)22, alarm101.ChainedPuzzle[2].PuzzleType);
+
+            var alarm102 = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 102);
+            Assert.NotNull(alarm102);
+            Assert.Equal(2, alarm102.ChainedPuzzle.Count);
+            Assert.Equal((uint)3, alarm102.ChainedPuzzle[0].PuzzleType);
+            Assert.Equal((uint)4, alarm102.ChainedPuzzle[1].PuzzleType);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public void SaveAndLoad_Roundtrip_PreservesTerminalSettingsAndCounts()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"test_terminal_counts_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var fakeDialog = new FakeFileDialogService();
+            var vm = new MainWindowViewModel(fakeDialog);
+
+            var customLevel = new LevelLayoutBlock
+            {
+                Name = "Terminal Level Test",
+                PersistentId = 555666,
+                ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"
+            };
+
+            customLevel.MainSector.GatherTerminalSpawnCount = 7;
+            customLevel.MainSector.GatherTerminalRequiredCount = 4;
+            customLevel.MainSector.TimedTerminalSequenceNumberOfTerminals = 5;
+            customLevel.MainSector.TimedTerminalSequenceNumberOfRounds = 3;
+
+            vm.LevelLayout.Levels.Add(customLevel);
+
+            RundownProjectService.SaveProject(vm, tempFile);
+
+            var loadedVm = new MainWindowViewModel(fakeDialog);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadedVm, project, tempFile);
+
+            var loadedLevel = loadedVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == 555666);
+            Assert.NotNull(loadedLevel);
+            Assert.Equal(7, loadedLevel.MainSector.GatherTerminalSpawnCount);
+            Assert.Equal(4, loadedLevel.MainSector.GatherTerminalRequiredCount);
+            Assert.Equal(5, loadedLevel.MainSector.TimedTerminalSequenceNumberOfTerminals);
+            Assert.Equal(3, loadedLevel.MainSector.TimedTerminalSequenceNumberOfRounds);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
         }
     }
 }

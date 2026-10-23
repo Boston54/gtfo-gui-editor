@@ -20,7 +20,6 @@ public class RundownViewModel : ViewModelBase
 
     // Available Level Layouts for Expedition linking
     private ObservableCollection<LevelLayoutBlock> _availableLevelLayouts = new();
-    private ObservableCollection<ComplexResourceSetBlock> _availableComplexResourceSets = new();
 
     // Active editing tier modal
     private RundownTierViewModel? _activeEditingTier;
@@ -45,7 +44,7 @@ public class RundownViewModel : ViewModelBase
     private RundownTierViewModel? _expeditionTierToDelete;
 
     public RundownViewModel()
-        : this(RundownService.LoadVanillaBlocks().FirstOrDefault() ?? RundownService.CreateFreshBlock(1, "Rundown"))
+        : this(RundownService.CreateFreshBlock(1, "New Rundown"))
     {
     }
 
@@ -54,7 +53,7 @@ public class RundownViewModel : ViewModelBase
         ObservableCollection<LevelLayoutBlock>? levelLayouts = null,
         ObservableCollection<ComplexResourceSetBlock>? complexSets = null)
     {
-        _selectedRundown = rundown ?? RundownService.LoadVanillaBlocks().FirstOrDefault() ?? RundownService.CreateFreshBlock(1, "Rundown");
+        _selectedRundown = rundown ?? RundownService.CreateFreshBlock(1, "New Rundown");
         _selectedRundown.PropertyChanged += SelectedRundown_PropertyChanged;
 
         if (levelLayouts != null)
@@ -65,11 +64,6 @@ public class RundownViewModel : ViewModelBase
             {
                 level.PropertyChanged += Level_PropertyChanged;
             }
-        }
-
-        if (complexSets != null)
-        {
-            _availableComplexResourceSets = complexSets;
         }
 
         RebuildTiers();
@@ -146,6 +140,27 @@ public class RundownViewModel : ViewModelBase
         {
             expedition.SecondaryLayerEnabled = level.HasSecondaryDoor;
             expedition.ThirdLayerEnabled = level.HasOverloadDoor;
+            if (level.GridState != null)
+            {
+                if (level.HasSecondaryDoor)
+                {
+                    var resolvedSec = DatablockExportService.ResolveBuildFrom(level.GridState, DoorType.SecondaryDoor);
+                    if (resolvedSec.HasValue)
+                    {
+                        expedition.BuildSecondaryFrom.LayerType = resolvedSec.Value.LayerType;
+                        expedition.BuildSecondaryFrom.Zone = resolvedSec.Value.Zone;
+                    }
+                }
+                if (level.HasOverloadDoor)
+                {
+                    var resolvedThird = DatablockExportService.ResolveBuildFrom(level.GridState, DoorType.OverloadDoor);
+                    if (resolvedThird.HasValue)
+                    {
+                        expedition.BuildThirdFrom.LayerType = resolvedThird.Value.LayerType;
+                        expedition.BuildThirdFrom.Zone = resolvedThird.Value.Zone;
+                    }
+                }
+            }
         }
     }
 
@@ -157,12 +172,6 @@ public class RundownViewModel : ViewModelBase
         foreach (var exp in _selectedRundown.TierC) SyncExpeditionSectorsWithLevel(exp);
         foreach (var exp in _selectedRundown.TierD) SyncExpeditionSectorsWithLevel(exp);
         foreach (var exp in _selectedRundown.TierE) SyncExpeditionSectorsWithLevel(exp);
-    }
-
-    public ObservableCollection<ComplexResourceSetBlock> AvailableComplexResourceSets
-    {
-        get => _availableComplexResourceSets;
-        set => SetField(ref _availableComplexResourceSets, value);
     }
 
     public ObservableCollection<RundownTierViewModel> Tiers

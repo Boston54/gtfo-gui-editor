@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,158 +13,132 @@ namespace GTFO_GUIEditor.Models;
 public class SectorSettings : INotifyPropertyChanged
 {
     private double _artifactAmountMultiplier = 1.0;
-    private int _zoneAliasStart = 0;
-    private WinCondition _winCondition = WinCondition.GoToElevator;
-    private int _exitZone = 0;
-    private ObjectiveType _objectiveType = ObjectiveType.HSU_FindTakeSample;
-    private int _hsuPlacementZone = 0;
-    private double _hsuPlacementStartWeight = 0.0;
-    private double _hsuPlacementMiddleWeight = 0.0;
-    private double _hsuPlacementEndWeight = 0.0;
-    private int _reactorPlacementZone = 0;
-    private ObservableCollection<ReactorStartupStage> _reactorStartupStages = new();
-    private uint _chainedPuzzleToActive = 0;
-    private uint _chainedPuzzleMidObjective = 0;
-    private bool _doNotSolveObjectiveOnReactorComplete = false;
-    private int _specialTerminalCommandZone = 0;
-    private string _specialTerminalCommand = string.Empty;
-    private string _specialTerminalCommandDesc = string.Empty;
-    private string _postCommandOutput = string.Empty;
-    private SpecialCommandRule _specialCommandRule = SpecialCommandRule.Normal;
-    private GatherSmallItemType _gatherItem = GatherSmallItemType.PersonnelID;
-    private RetrieveBigItemType _retrieveItem = RetrieveBigItemType.PowerCell;
-    private string _header = string.Empty;
-    private string _mainObjective = string.Empty;
-    private string _findLocationInfo = string.Empty;
-    private string _findLocationInfoHelp = string.Empty;
-    private string _goToZone = string.Empty;
-    private string _inZoneFindItem = string.Empty;
-    private string _solveItem = string.Empty;
-    private GenericWaveSettings _wavesOnGotoWin = new();
-    private WaveOnGotoWinTrigger _waveOnGotoWinTrigger = WaveOnGotoWinTrigger.OnObjectiveCompleted;
-    private bool _stopAllWavesBeforeGotoWin = false;
-    private GenericWaveSettings _wavesOnElevatorLand = new();
-    private uint _fogTransitionDataOnGotoWin = 0;
-    private double _fogTransitionDataOnGotoWinDuration = 0.0;
-
-    private ObservableCollection<GatherItemPlacement> _gatherItemPlacements = new()
-    {
-        new GatherItemPlacement
-        {
-            ItemNumber = 1
-        }
-    };
-
-    private ObservableCollection<GatherItemPlacement> _retrieveItemPlacements = new()
-    {
-        new GatherItemPlacement
-        {
-            ItemNumber = 1
-        }
-    };
-
-    private int _gatherMaxPerZone = 0;
-    private int _retrieveMaxPerZone = 0;
-
-    private ObservableCollection<DistributeGeneratorPlacement> _distributeGeneratorPlacements = new()
-    {
-        new DistributeGeneratorPlacement
-        {
-            GeneratorNumber = 1,
-            Zone = 0
-        }
-    };
-
-    private int _uplinkNumberOfVerificationRounds = 1;
-
-    private ObservableCollection<GatherItemPlacement> _terminalUplinkPlacements = new()
-    {
-        new GatherItemPlacement
-        {
-            ItemNumber = 1,
-            ItemPrefix = "Terminal"
-        }
-    };
-
-    private int _centralGeneratorClusterZone = 0;
-
-    private ObservableCollection<GatherItemPlacement> _centralGeneratorClusterPowerCellPlacements = new()
-    {
-        new GatherItemPlacement { ItemNumber = 1, ItemPrefix = "Power Cell" },
-        new GatherItemPlacement { ItemNumber = 2, ItemPrefix = "Power Cell" },
-        new GatherItemPlacement { ItemNumber = 3, ItemPrefix = "Power Cell" },
-        new GatherItemPlacement { ItemNumber = 4, ItemPrefix = "Power Cell" }
-    };
-
-    private ObservableCollection<CentralGeneratorFogTransitionStage> _centralGeneratorClusterFogTransitions = new()
-    {
-        new CentralGeneratorFogTransitionStage { StageNumber = 1, FogSetting = 0, TransitionDuration = 0.0 },
-        new CentralGeneratorFogTransitionStage { StageNumber = 2, FogSetting = 0, TransitionDuration = 0.0 },
-        new CentralGeneratorFogTransitionStage { StageNumber = 3, FogSetting = 0, TransitionDuration = 0.0 },
-        new CentralGeneratorFogTransitionStage { StageNumber = 4, FogSetting = 0, TransitionDuration = 0.0 }
-    };
-
-    private int _activateSmallHsuZone = 0;
-    private RetrieveBigItemType _itemFromStart = RetrieveBigItemType.PowerCell;
-    private RetrieveBigItemType _itemAfterActivation = RetrieveBigItemType.PowerCell;
-    private bool _bringItemInElevator = false;
-    private bool _stopEnemyWavesOnActivation = false;
-    private bool _objectiveCompleteAfterInsertion = false;
-    private bool _requireItemAfterActivationInExitScan = false;
-    private int _timeToActivate = 0;
-    private int _timeToSurvive = 0;
-    private string _timerTitle = string.Empty;
-    private string _timerToActivateTitle = string.Empty;
-
-    private int _gatherTerminalRequiredCount = 1;
-    private string _gatherTerminalCommand = string.Empty;
-    private string _gatherTerminalCommandHelp = string.Empty;
-    private string _gatherTerminalDownloadingText = string.Empty;
-    private string _gatherTerminalDownloadCompleteText = string.Empty;
-    private double _gatherTerminalDownloadTime = 0.0;
-    private ObservableCollection<GatherItemPlacement> _gatherTerminalPlacements = new()
-    {
-        new GatherItemPlacement
-        {
-            ItemNumber = 1,
-            ItemPrefix = "Terminal"
-        }
-    };
-
-    private CandidateZonePlacement _timedTerminalSequenceMainLocation = new()
-    {
-        DimensionIndex = "Reality",
-        Zone = 0,
-        PlacementStartWeight = 0.0,
-        PlacementMiddleWeight = 0.0,
-        PlacementEndWeight = 0.0
-    };
-    private int _timedTerminalSequenceNumberOfRounds = 1;
-    private double _timedTerminalSequenceTimePerRound = 0.0;
-    private double _timedTerminalSequenceTimeForConfirmation = 0.0;
-    private string _timedTerminalSequenceSourceTerminalWorldEventObjectFilter = "MainTerminal";
-    private ObservableCollection<GatherItemPlacement> _timedTerminalSequencePlacements = new()
-    {
-        new GatherItemPlacement
-        {
-            ItemNumber = 1,
-            ItemPrefix = "Terminal"
-        }
-    };
-
-    private ObservableCollection<WardenEvent> _eventsOnActivation = new();
-    private ObservableCollection<WardenEvent> _eventsOnSequenceStart = new();
-    private ObservableCollection<WardenEvent> _eventsOnSequenceDone = new();
-    private ObservableCollection<WardenEvent> _eventsOnSequenceFail = new();
-    private ObservableCollection<WardenEvent> _eventsOnElevatorLand = new();
-    private ObservableCollection<WardenEvent> _eventsOnGotoWin = new();
-    private ObservableCollection<WardenEvent> _eventsOnActivate = new();
+    private int _zoneAliasStart;
+    private ObservableCollection<GatherItemPlacement> _bulkheadKeyPlacements = new();
+    private ObservableCollection<WardenObjective> _objectives = new();
+    private WardenObjective? _hookedPrimaryObjective;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public SectorSettings()
     {
-        ApplyDefaultsForObjectiveType(_objectiveType);
+        _bulkheadKeyPlacements.CollectionChanged += BulkheadKeyPlacements_CollectionChanged;
+        var primary = new WardenObjective { ObjectiveNumber = 1 };
+        _objectives.Add(primary);
+        _objectives.CollectionChanged += Objectives_CollectionChanged;
+        HookPrimaryObjective(primary);
+        EditorDefaultsService.ApplySectorCommonDefaults(this);
+    }
+
+    private void HookPrimaryObjective(WardenObjective? obj)
+    {
+        if (_hookedPrimaryObjective != null)
+        {
+            _hookedPrimaryObjective.PropertyChanged -= PrimaryObjective_PropertyChanged;
+        }
+
+        _hookedPrimaryObjective = obj;
+        if (_hookedPrimaryObjective != null)
+        {
+            _hookedPrimaryObjective.PropertyChanged += PrimaryObjective_PropertyChanged;
+        }
+    }
+
+    private void PrimaryObjective_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        OnPropertyChanged(e.PropertyName);
+    }
+
+    private void Objectives_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        if (_objectives.Count == 0)
+        {
+            var fallback = new WardenObjective { ObjectiveNumber = 1 };
+            _objectives.Add(fallback);
+        }
+
+        for (int i = 0; i < _objectives.Count; i++)
+        {
+            _objectives[i].ObjectiveNumber = i + 1;
+        }
+
+        HookPrimaryObjective(PrimaryObjective);
+        OnPropertyChanged(nameof(Objectives));
+        OnPropertyChanged(nameof(PrimaryObjective));
+    }
+
+    private void BulkheadKeyPlacements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        OnPropertyChanged(nameof(BulkheadKeyPlacements));
+    }
+
+    [JsonPropertyName("Objectives")]
+    public ObservableCollection<WardenObjective> Objectives
+    {
+        get => _objectives;
+        set
+        {
+            if (_objectives != null)
+            {
+                _objectives.CollectionChanged -= Objectives_CollectionChanged;
+            }
+
+            var nonNull = value ?? new ObservableCollection<WardenObjective>();
+            if (nonNull.Count == 0)
+            {
+                nonNull.Add(new WardenObjective { ObjectiveNumber = 1 });
+            }
+
+            for (int i = 0; i < nonNull.Count; i++)
+            {
+                nonNull[i].ObjectiveNumber = i + 1;
+            }
+
+            SetField(ref _objectives, nonNull);
+            if (_objectives != null)
+            {
+                _objectives.CollectionChanged += Objectives_CollectionChanged;
+            }
+
+            HookPrimaryObjective(PrimaryObjective);
+            OnPropertyChanged(nameof(PrimaryObjective));
+        }
+    }
+
+    [JsonIgnore]
+    public WardenObjective PrimaryObjective
+    {
+        get
+        {
+            if (_objectives.Count == 0)
+            {
+                var newObj = new WardenObjective { ObjectiveNumber = 1 };
+                _objectives.Add(newObj);
+                return newObj;
+            }
+
+            return _objectives[0];
+        }
+    }
+
+    [JsonPropertyName("BulkheadKeyPlacements")]
+    public ObservableCollection<GatherItemPlacement> BulkheadKeyPlacements
+    {
+        get => _bulkheadKeyPlacements;
+        set
+        {
+            var nonNull = value ?? new ObservableCollection<GatherItemPlacement>();
+            if (_bulkheadKeyPlacements != null)
+            {
+                _bulkheadKeyPlacements.CollectionChanged -= BulkheadKeyPlacements_CollectionChanged;
+            }
+
+            SetField(ref _bulkheadKeyPlacements, nonNull);
+            if (_bulkheadKeyPlacements != null)
+            {
+                _bulkheadKeyPlacements.CollectionChanged += BulkheadKeyPlacements_CollectionChanged;
+            }
+        }
     }
 
     [JsonPropertyName("ArtifactAmountMultiplier")]
@@ -180,740 +155,689 @@ public class SectorSettings : INotifyPropertyChanged
         set => SetField(ref _zoneAliasStart, value);
     }
 
+    // --- Forwarding Properties to PrimaryObjective ---
+
     [JsonPropertyName("WinCondition")]
     public WinCondition WinCondition
     {
-        get => _winCondition;
-        set => SetField(ref _winCondition, value);
+        get => PrimaryObjective.WinCondition;
+        set => PrimaryObjective.WinCondition = value;
     }
 
     [JsonPropertyName("ExitZone")]
     public int ExitZone
     {
-        get => _exitZone;
-        set => SetField(ref _exitZone, value);
+        get => PrimaryObjective.ExitZone;
+        set => PrimaryObjective.ExitZone = value;
     }
 
     [JsonPropertyName("ObjectiveType")]
     public ObjectiveType ObjectiveType
     {
-        get => _objectiveType;
-        set => SetField(ref _objectiveType, value);
+        get => PrimaryObjective.ObjectiveType;
+        set => PrimaryObjective.ObjectiveType = value;
     }
 
     [JsonPropertyName("HsuPlacementZone")]
     public int HsuPlacementZone
     {
-        get => _hsuPlacementZone;
-        set => SetField(ref _hsuPlacementZone, value);
+        get => PrimaryObjective.HsuPlacementZone;
+        set => PrimaryObjective.HsuPlacementZone = value;
     }
 
     [JsonPropertyName("HsuPlacementStartWeight")]
     public double HsuPlacementStartWeight
     {
-        get => _hsuPlacementStartWeight;
-        set => SetField(ref _hsuPlacementStartWeight, value);
+        get => PrimaryObjective.HsuPlacementStartWeight;
+        set => PrimaryObjective.HsuPlacementStartWeight = value;
     }
 
     [JsonPropertyName("HsuPlacementMiddleWeight")]
     public double HsuPlacementMiddleWeight
     {
-        get => _hsuPlacementMiddleWeight;
-        set => SetField(ref _hsuPlacementMiddleWeight, value);
+        get => PrimaryObjective.HsuPlacementMiddleWeight;
+        set => PrimaryObjective.HsuPlacementMiddleWeight = value;
     }
 
     [JsonPropertyName("HsuPlacementEndWeight")]
     public double HsuPlacementEndWeight
     {
-        get => _hsuPlacementEndWeight;
-        set => SetField(ref _hsuPlacementEndWeight, value);
+        get => PrimaryObjective.HsuPlacementEndWeight;
+        set => PrimaryObjective.HsuPlacementEndWeight = value;
     }
 
     [JsonPropertyName("ReactorPlacementZone")]
     public int ReactorPlacementZone
     {
-        get => _reactorPlacementZone;
-        set => SetField(ref _reactorPlacementZone, value);
+        get => PrimaryObjective.ReactorPlacementZone;
+        set => PrimaryObjective.ReactorPlacementZone = value;
     }
 
     [JsonPropertyName("ReactorStartupStages")]
     public ObservableCollection<ReactorStartupStage> ReactorStartupStages
     {
-        get => _reactorStartupStages;
-        set => SetField(ref _reactorStartupStages, value);
+        get => PrimaryObjective.ReactorStartupStages;
+        set => PrimaryObjective.ReactorStartupStages = value;
     }
 
     [JsonPropertyName("ChainedPuzzleToActive")]
     public uint ChainedPuzzleToActive
     {
-        get => _chainedPuzzleToActive;
-        set => SetField(ref _chainedPuzzleToActive, value);
+        get => PrimaryObjective.ChainedPuzzleToActive;
+        set => PrimaryObjective.ChainedPuzzleToActive = value;
     }
 
     [JsonPropertyName("ChainedPuzzleMidObjective")]
     public uint ChainedPuzzleMidObjective
     {
-        get => _chainedPuzzleMidObjective;
-        set => SetField(ref _chainedPuzzleMidObjective, value);
+        get => PrimaryObjective.ChainedPuzzleMidObjective;
+        set => PrimaryObjective.ChainedPuzzleMidObjective = value;
     }
 
     [JsonPropertyName("DoNotSolveObjectiveOnReactorComplete")]
     public bool DoNotSolveObjectiveOnReactorComplete
     {
-        get => _doNotSolveObjectiveOnReactorComplete;
-        set => SetField(ref _doNotSolveObjectiveOnReactorComplete, value);
+        get => PrimaryObjective.DoNotSolveObjectiveOnReactorComplete;
+        set => PrimaryObjective.DoNotSolveObjectiveOnReactorComplete = value;
     }
 
     [JsonPropertyName("SpecialTerminalCommandZone")]
     public int SpecialTerminalCommandZone
     {
-        get => _specialTerminalCommandZone;
-        set => SetField(ref _specialTerminalCommandZone, value);
+        get => PrimaryObjective.SpecialTerminalCommandZone;
+        set => PrimaryObjective.SpecialTerminalCommandZone = value;
     }
 
     [JsonPropertyName("SpecialTerminalCommand")]
     public string SpecialTerminalCommand
     {
-        get => _specialTerminalCommand;
-        set => SetField(ref _specialTerminalCommand, value);
+        get => PrimaryObjective.SpecialTerminalCommand;
+        set => PrimaryObjective.SpecialTerminalCommand = value;
     }
 
     [JsonPropertyName("SpecialTerminalCommandDesc")]
     public string SpecialTerminalCommandDesc
     {
-        get => _specialTerminalCommandDesc;
-        set => SetField(ref _specialTerminalCommandDesc, value);
+        get => PrimaryObjective.SpecialTerminalCommandDesc;
+        set => PrimaryObjective.SpecialTerminalCommandDesc = value;
     }
 
     [JsonPropertyName("PostCommandOutput")]
     public string PostCommandOutput
     {
-        get => _postCommandOutput;
-        set => SetField(ref _postCommandOutput, value);
+        get => PrimaryObjective.PostCommandOutput;
+        set => PrimaryObjective.PostCommandOutput = value;
     }
 
     [JsonPropertyName("SpecialCommandRule")]
     public SpecialCommandRule SpecialCommandRule
     {
-        get => _specialCommandRule;
-        set => SetField(ref _specialCommandRule, value);
+        get => PrimaryObjective.SpecialCommandRule;
+        set => PrimaryObjective.SpecialCommandRule = value;
     }
 
     [JsonPropertyName("GatherItem")]
     public GatherSmallItemType GatherItem
     {
-        get => _gatherItem;
-        set => SetField(ref _gatherItem, value);
+        get => PrimaryObjective.GatherItem;
+        set => PrimaryObjective.GatherItem = value;
     }
 
     [JsonPropertyName("RetrieveItem")]
     public RetrieveBigItemType RetrieveItem
     {
-        get => _retrieveItem;
-        set => SetField(ref _retrieveItem, value);
-    }
-
-    [JsonPropertyName("Header")]
-    public string Header
-    {
-        get => _header;
-        set => SetField(ref _header, value);
-    }
-
-    [JsonPropertyName("MainObjective")]
-    public string MainObjective
-    {
-        get => _mainObjective;
-        set => SetField(ref _mainObjective, value);
-    }
-
-    [JsonPropertyName("FindLocationInfo")]
-    public string FindLocationInfo
-    {
-        get => _findLocationInfo;
-        set => SetField(ref _findLocationInfo, value);
-    }
-
-    [JsonPropertyName("FindLocationInfoHelp")]
-    public string FindLocationInfoHelp
-    {
-        get => _findLocationInfoHelp;
-        set => SetField(ref _findLocationInfoHelp, value);
-    }
-
-    [JsonPropertyName("GoToZone")]
-    public string GoToZone
-    {
-        get => _goToZone;
-        set => SetField(ref _goToZone, value);
-    }
-
-    [JsonPropertyName("InZoneFindItem")]
-    public string InZoneFindItem
-    {
-        get => _inZoneFindItem;
-        set => SetField(ref _inZoneFindItem, value);
-    }
-
-    [JsonPropertyName("SolveItem")]
-    public string SolveItem
-    {
-        get => _solveItem;
-        set => SetField(ref _solveItem, value);
-    }
-
-    public void ApplyDefaultsForObjectiveType(ObjectiveType type)
-    {
-        var defaults = ObjectiveDefaultsService.GetDefaults(type);
-        Header = defaults.Header;
-        MainObjective = defaults.MainObjective;
-        FindLocationInfo = defaults.FindLocationInfo;
-        FindLocationInfoHelp = defaults.FindLocationInfoHelp;
-        GoToZone = defaults.GoToZone;
-        InZoneFindItem = defaults.InZoneFindItem;
-        SolveItem = defaults.SolveItem;
-    }
-
-    [JsonPropertyName("WavesOnGotoWin")]
-    public GenericWaveSettings WavesOnGotoWin
-    {
-        get => _wavesOnGotoWin;
-        set => SetField(ref _wavesOnGotoWin, value);
-    }
-
-    [JsonPropertyName("WaveOnGotoWinTrigger")]
-    public WaveOnGotoWinTrigger WaveOnGotoWinTrigger
-    {
-        get => _waveOnGotoWinTrigger;
-        set => SetField(ref _waveOnGotoWinTrigger, value);
-    }
-
-    [JsonPropertyName("StopAllWavesBeforeGotoWin")]
-    public bool StopAllWavesBeforeGotoWin
-    {
-        get => _stopAllWavesBeforeGotoWin;
-        set => SetField(ref _stopAllWavesBeforeGotoWin, value);
-    }
-
-    [JsonPropertyName("WavesOnElevatorLand")]
-    public GenericWaveSettings WavesOnElevatorLand
-    {
-        get => _wavesOnElevatorLand;
-        set => SetField(ref _wavesOnElevatorLand, value);
-    }
-
-    [JsonPropertyName("FogTransitionDataOnGotoWin")]
-    public uint FogTransitionDataOnGotoWin
-    {
-        get => _fogTransitionDataOnGotoWin;
-        set => SetField(ref _fogTransitionDataOnGotoWin, value);
-    }
-
-    [JsonPropertyName("FogTransitionDataOnGotoWinDuration")]
-    public double FogTransitionDataOnGotoWinDuration
-    {
-        get => _fogTransitionDataOnGotoWinDuration;
-        set => SetField(ref _fogTransitionDataOnGotoWinDuration, value);
+        get => PrimaryObjective.RetrieveItem;
+        set => PrimaryObjective.RetrieveItem = value;
     }
 
     [JsonPropertyName("GatherItemPlacements")]
     public ObservableCollection<GatherItemPlacement> GatherItemPlacements
     {
-        get => _gatherItemPlacements;
-        set => SetField(ref _gatherItemPlacements, value);
-    }
-
-    [JsonIgnore]
-    public int GatherSpawnCount
-    {
-        get => _gatherItemPlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_gatherItemPlacements.Count < target)
-            {
-                _gatherItemPlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _gatherItemPlacements.Count + 1,
-                    DimensionIndex = "Reality",
-                    Zone = 0,
-                    PlacementStartWeight = 0.0,
-                    PlacementMiddleWeight = 0.0,
-                    PlacementEndWeight = 0.0
-                });
-            }
-
-            while (_gatherItemPlacements.Count > target)
-            {
-                _gatherItemPlacements.RemoveAt(_gatherItemPlacements.Count - 1);
-            }
-
-            OnPropertyChanged(nameof(GatherSpawnCount));
-        }
+        get => PrimaryObjective.GatherItemPlacements;
+        set => PrimaryObjective.GatherItemPlacements = value;
     }
 
     [JsonPropertyName("RetrieveItemPlacements")]
     public ObservableCollection<GatherItemPlacement> RetrieveItemPlacements
     {
-        get => _retrieveItemPlacements;
-        set => SetField(ref _retrieveItemPlacements, value);
-    }
-
-    [JsonIgnore]
-    public int RetrieveSpawnCount
-    {
-        get => _retrieveItemPlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_retrieveItemPlacements.Count < target)
-            {
-                _retrieveItemPlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _retrieveItemPlacements.Count + 1,
-                    DimensionIndex = "Reality",
-                    Zone = 0,
-                    PlacementStartWeight = 0.0,
-                    PlacementMiddleWeight = 0.0,
-                    PlacementEndWeight = 0.0
-                });
-            }
-
-            while (_retrieveItemPlacements.Count > target)
-            {
-                _retrieveItemPlacements.RemoveAt(_retrieveItemPlacements.Count - 1);
-            }
-
-            OnPropertyChanged(nameof(RetrieveSpawnCount));
-        }
+        get => PrimaryObjective.RetrieveItemPlacements;
+        set => PrimaryObjective.RetrieveItemPlacements = value;
     }
 
     [JsonPropertyName("GatherMaxPerZone")]
     public int GatherMaxPerZone
     {
-        get => _gatherMaxPerZone;
-        set => SetField(ref _gatherMaxPerZone, value);
+        get => PrimaryObjective.GatherMaxPerZone;
+        set => PrimaryObjective.GatherMaxPerZone = value;
     }
 
     [JsonPropertyName("RetrieveMaxPerZone")]
     public int RetrieveMaxPerZone
     {
-        get => _retrieveMaxPerZone;
-        set => SetField(ref _retrieveMaxPerZone, value);
+        get => PrimaryObjective.RetrieveMaxPerZone;
+        set => PrimaryObjective.RetrieveMaxPerZone = value;
     }
 
     [JsonPropertyName("DistributeGeneratorPlacements")]
     public ObservableCollection<DistributeGeneratorPlacement> DistributeGeneratorPlacements
     {
-        get => _distributeGeneratorPlacements;
-        set => SetField(ref _distributeGeneratorPlacements, value);
+        get => PrimaryObjective.DistributeGeneratorPlacements;
+        set => PrimaryObjective.DistributeGeneratorPlacements = value;
     }
 
-    [JsonIgnore]
+    [JsonPropertyName("DistributeGeneratorCount")]
     public int DistributeGeneratorCount
     {
-        get => _distributeGeneratorPlacements.Count;
+        get => PrimaryObjective.DistributeGeneratorPlacements.Count;
         set
         {
-            int target = Math.Max(1, value);
-            while (_distributeGeneratorPlacements.Count < target)
+            int current = PrimaryObjective.DistributeGeneratorPlacements.Count;
+            if (value > current)
             {
-                _distributeGeneratorPlacements.Add(new DistributeGeneratorPlacement
+                for (int i = current; i < value; i++)
                 {
-                    GeneratorNumber = _distributeGeneratorPlacements.Count + 1,
-                    Zone = 0
-                });
+                    PrimaryObjective.DistributeGeneratorPlacements.Add(new DistributeGeneratorPlacement { GeneratorNumber = i + 1 });
+                }
             }
-
-            while (_distributeGeneratorPlacements.Count > target)
+            else if (value < current && value >= 0)
             {
-                _distributeGeneratorPlacements.RemoveAt(_distributeGeneratorPlacements.Count - 1);
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.DistributeGeneratorPlacements.RemoveAt(i);
+                }
             }
-
             OnPropertyChanged(nameof(DistributeGeneratorCount));
+        }
+    }
+
+    [JsonPropertyName("GatherSpawnCount")]
+    public int GatherSpawnCount
+    {
+        get => PrimaryObjective.GatherItemPlacements.Count;
+        set
+        {
+            int current = PrimaryObjective.GatherItemPlacements.Count;
+            if (value > current)
+            {
+                for (int i = current; i < value; i++)
+                {
+                    PrimaryObjective.GatherItemPlacements.Add(new GatherItemPlacement { ItemNumber = i + 1 });
+                }
+            }
+            else if (value < current && value >= 0)
+            {
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.GatherItemPlacements.RemoveAt(i);
+                }
+            }
+            OnPropertyChanged(nameof(GatherSpawnCount));
+        }
+    }
+
+    [JsonPropertyName("RetrieveSpawnCount")]
+    public int RetrieveSpawnCount
+    {
+        get => PrimaryObjective.RetrieveItemPlacements.Count;
+        set
+        {
+            int current = PrimaryObjective.RetrieveItemPlacements.Count;
+            if (value > current)
+            {
+                for (int i = current; i < value; i++)
+                {
+                    PrimaryObjective.RetrieveItemPlacements.Add(new GatherItemPlacement { ItemNumber = i + 1 });
+                }
+            }
+            else if (value < current && value >= 0)
+            {
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.RetrieveItemPlacements.RemoveAt(i);
+                }
+            }
+            OnPropertyChanged(nameof(RetrieveSpawnCount));
+        }
+    }
+
+    [JsonPropertyName("UplinkNumberOfTerminals")]
+    public int UplinkNumberOfTerminals
+    {
+        get => PrimaryObjective.TerminalUplinkPlacements.Count;
+        set
+        {
+            int current = PrimaryObjective.TerminalUplinkPlacements.Count;
+            if (value > current)
+            {
+                for (int i = current; i < value; i++)
+                {
+                    PrimaryObjective.TerminalUplinkPlacements.Add(new GatherItemPlacement { ItemNumber = i + 1, ItemPrefix = "Terminal" });
+                }
+            }
+            else if (value < current && value >= 0)
+            {
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.TerminalUplinkPlacements.RemoveAt(i);
+                }
+            }
+            OnPropertyChanged(nameof(UplinkNumberOfTerminals));
+        }
+    }
+
+    [JsonPropertyName("CentralGeneratorClusterGeneratorCount")]
+    public int CentralGeneratorClusterGeneratorCount
+    {
+        get => PrimaryObjective.CentralGeneratorClusterFogTransitions.Count;
+        set
+        {
+            int current = PrimaryObjective.CentralGeneratorClusterFogTransitions.Count;
+            if (value > current)
+            {
+                for (int i = current; i < value; i++)
+                {
+                    PrimaryObjective.CentralGeneratorClusterFogTransitions.Add(new CentralGeneratorFogTransitionStage { StageNumber = i + 1 });
+                }
+            }
+            else if (value < current && value >= 0)
+            {
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.CentralGeneratorClusterFogTransitions.RemoveAt(i);
+                }
+            }
+            OnPropertyChanged(nameof(CentralGeneratorClusterGeneratorCount));
+        }
+    }
+
+    [JsonPropertyName("CentralGeneratorClusterPowerCellCount")]
+    public int CentralGeneratorClusterPowerCellCount
+    {
+        get => PrimaryObjective.CentralGeneratorClusterPowerCellPlacements.Count;
+        set
+        {
+            int current = PrimaryObjective.CentralGeneratorClusterPowerCellPlacements.Count;
+            if (value > current)
+            {
+                for (int i = current; i < value; i++)
+                {
+                    PrimaryObjective.CentralGeneratorClusterPowerCellPlacements.Add(new GatherItemPlacement { ItemNumber = i + 1, ItemPrefix = "Power Cell" });
+                }
+            }
+            else if (value < current && value >= 0)
+            {
+                for (int i = current - 1; i >= value; i--)
+                {
+                    PrimaryObjective.CentralGeneratorClusterPowerCellPlacements.RemoveAt(i);
+                }
+            }
+            OnPropertyChanged(nameof(CentralGeneratorClusterPowerCellCount));
         }
     }
 
     [JsonPropertyName("UplinkNumberOfVerificationRounds")]
     public int UplinkNumberOfVerificationRounds
     {
-        get => _uplinkNumberOfVerificationRounds;
-        set => SetField(ref _uplinkNumberOfVerificationRounds, value);
+        get => PrimaryObjective.UplinkNumberOfVerificationRounds;
+        set => PrimaryObjective.UplinkNumberOfVerificationRounds = value;
     }
 
     [JsonPropertyName("TerminalUplinkPlacements")]
     public ObservableCollection<GatherItemPlacement> TerminalUplinkPlacements
     {
-        get => _terminalUplinkPlacements;
-        set => SetField(ref _terminalUplinkPlacements, value);
-    }
-
-    [JsonIgnore]
-    public int UplinkNumberOfTerminals
-    {
-        get => _terminalUplinkPlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_terminalUplinkPlacements.Count < target)
-            {
-                _terminalUplinkPlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _terminalUplinkPlacements.Count + 1,
-                    ItemPrefix = "Terminal"
-                });
-            }
-
-            while (_terminalUplinkPlacements.Count > target)
-            {
-                _terminalUplinkPlacements.RemoveAt(_terminalUplinkPlacements.Count - 1);
-            }
-
-            OnPropertyChanged(nameof(UplinkNumberOfTerminals));
-        }
+        get => PrimaryObjective.TerminalUplinkPlacements;
+        set => PrimaryObjective.TerminalUplinkPlacements = value;
     }
 
     [JsonPropertyName("CentralGeneratorClusterZone")]
     public int CentralGeneratorClusterZone
     {
-        get => _centralGeneratorClusterZone;
-        set => SetField(ref _centralGeneratorClusterZone, value);
-    }
-
-    [JsonPropertyName("CentralGeneratorClusterFogTransitions")]
-    public ObservableCollection<CentralGeneratorFogTransitionStage> CentralGeneratorClusterFogTransitions
-    {
-        get => _centralGeneratorClusterFogTransitions;
-        set => SetField(ref _centralGeneratorClusterFogTransitions, value);
-    }
-
-    [JsonIgnore]
-    public int CentralGeneratorClusterGeneratorCount
-    {
-        get => _centralGeneratorClusterFogTransitions.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_centralGeneratorClusterFogTransitions.Count < target)
-            {
-                _centralGeneratorClusterFogTransitions.Add(new CentralGeneratorFogTransitionStage
-                {
-                    StageNumber = _centralGeneratorClusterFogTransitions.Count + 1,
-                    FogSetting = 0,
-                    TransitionDuration = 0.0
-                });
-            }
-
-            while (_centralGeneratorClusterFogTransitions.Count > target)
-            {
-                _centralGeneratorClusterFogTransitions.RemoveAt(_centralGeneratorClusterFogTransitions.Count - 1);
-            }
-
-            OnPropertyChanged(nameof(CentralGeneratorClusterGeneratorCount));
-        }
+        get => PrimaryObjective.CentralGeneratorClusterZone;
+        set => PrimaryObjective.CentralGeneratorClusterZone = value;
     }
 
     [JsonPropertyName("CentralGeneratorClusterPowerCellPlacements")]
     public ObservableCollection<GatherItemPlacement> CentralGeneratorClusterPowerCellPlacements
     {
-        get => _centralGeneratorClusterPowerCellPlacements;
-        set => SetField(ref _centralGeneratorClusterPowerCellPlacements, value);
+        get => PrimaryObjective.CentralGeneratorClusterPowerCellPlacements;
+        set => PrimaryObjective.CentralGeneratorClusterPowerCellPlacements = value;
     }
 
-    [JsonIgnore]
-    public int CentralGeneratorClusterPowerCellCount
+    [JsonPropertyName("CentralGeneratorClusterFogTransitions")]
+    public ObservableCollection<CentralGeneratorFogTransitionStage> CentralGeneratorClusterFogTransitions
     {
-        get => _centralGeneratorClusterPowerCellPlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_centralGeneratorClusterPowerCellPlacements.Count < target)
-            {
-                _centralGeneratorClusterPowerCellPlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _centralGeneratorClusterPowerCellPlacements.Count + 1,
-                    ItemPrefix = "Power Cell"
-                });
-            }
-
-            while (_centralGeneratorClusterPowerCellPlacements.Count > target)
-            {
-                _centralGeneratorClusterPowerCellPlacements.RemoveAt(_centralGeneratorClusterPowerCellPlacements.Count -
-                                                                     1);
-            }
-
-            OnPropertyChanged(nameof(CentralGeneratorClusterPowerCellCount));
-        }
+        get => PrimaryObjective.CentralGeneratorClusterFogTransitions;
+        set => PrimaryObjective.CentralGeneratorClusterFogTransitions = value;
     }
 
     [JsonPropertyName("ActivateSmallHsuZone")]
     public int ActivateSmallHsuZone
     {
-        get => _activateSmallHsuZone;
-        set => SetField(ref _activateSmallHsuZone, value);
+        get => PrimaryObjective.ActivateSmallHsuZone;
+        set => PrimaryObjective.ActivateSmallHsuZone = value;
     }
 
     [JsonPropertyName("ItemFromStart")]
     public RetrieveBigItemType ItemFromStart
     {
-        get => _itemFromStart;
-        set => SetField(ref _itemFromStart, value);
+        get => PrimaryObjective.ItemFromStart;
+        set => PrimaryObjective.ItemFromStart = value;
     }
 
     [JsonPropertyName("ItemAfterActivation")]
     public RetrieveBigItemType ItemAfterActivation
     {
-        get => _itemAfterActivation;
-        set => SetField(ref _itemAfterActivation, value);
+        get => PrimaryObjective.ItemAfterActivation;
+        set => PrimaryObjective.ItemAfterActivation = value;
     }
 
     [JsonPropertyName("BringItemInElevator")]
     public bool BringItemInElevator
     {
-        get => _bringItemInElevator;
-        set => SetField(ref _bringItemInElevator, value);
+        get => PrimaryObjective.BringItemInElevator;
+        set => PrimaryObjective.BringItemInElevator = value;
     }
 
     [JsonPropertyName("StopEnemyWavesOnActivation")]
     public bool StopEnemyWavesOnActivation
     {
-        get => _stopEnemyWavesOnActivation;
-        set => SetField(ref _stopEnemyWavesOnActivation, value);
+        get => PrimaryObjective.StopEnemyWavesOnActivation;
+        set => PrimaryObjective.StopEnemyWavesOnActivation = value;
     }
 
     [JsonPropertyName("ObjectiveCompleteAfterInsertion")]
     public bool ObjectiveCompleteAfterInsertion
     {
-        get => _objectiveCompleteAfterInsertion;
-        set => SetField(ref _objectiveCompleteAfterInsertion, value);
+        get => PrimaryObjective.ObjectiveCompleteAfterInsertion;
+        set => PrimaryObjective.ObjectiveCompleteAfterInsertion = value;
     }
 
     [JsonPropertyName("RequireItemAfterActivationInExitScan")]
     public bool RequireItemAfterActivationInExitScan
     {
-        get => _requireItemAfterActivationInExitScan;
-        set => SetField(ref _requireItemAfterActivationInExitScan, value);
+        get => PrimaryObjective.RequireItemAfterActivationInExitScan;
+        set => PrimaryObjective.RequireItemAfterActivationInExitScan = value;
     }
 
     [JsonPropertyName("TimeToActivate")]
     public int TimeToActivate
     {
-        get => _timeToActivate;
-        set => SetField(ref _timeToActivate, value);
+        get => PrimaryObjective.TimeToActivate;
+        set => PrimaryObjective.TimeToActivate = value;
     }
 
     [JsonPropertyName("TimeToSurvive")]
     public int TimeToSurvive
     {
-        get => _timeToSurvive;
-        set => SetField(ref _timeToSurvive, value);
+        get => PrimaryObjective.TimeToSurvive;
+        set => PrimaryObjective.TimeToSurvive = value;
     }
 
     [JsonPropertyName("TimerTitle")]
     public string TimerTitle
     {
-        get => _timerTitle;
-        set => SetField(ref _timerTitle, value);
+        get => PrimaryObjective.TimerTitle;
+        set => PrimaryObjective.TimerTitle = value;
     }
 
     [JsonPropertyName("TimerToActivateTitle")]
     public string TimerToActivateTitle
     {
-        get => _timerToActivateTitle;
-        set => SetField(ref _timerToActivateTitle, value);
+        get => PrimaryObjective.TimerToActivateTitle;
+        set => PrimaryObjective.TimerToActivateTitle = value;
+    }
+
+    [JsonPropertyName("GatherTerminalSpawnCount")]
+    public int GatherTerminalSpawnCount
+    {
+        get => PrimaryObjective.GatherTerminalSpawnCount;
+        set => PrimaryObjective.GatherTerminalSpawnCount = value;
     }
 
     [JsonPropertyName("GatherTerminalRequiredCount")]
     public int GatherTerminalRequiredCount
     {
-        get => _gatherTerminalRequiredCount;
-        set => SetField(ref _gatherTerminalRequiredCount, value);
+        get => PrimaryObjective.GatherTerminalRequiredCount;
+        set => PrimaryObjective.GatherTerminalRequiredCount = value;
     }
 
     [JsonPropertyName("GatherTerminalCommand")]
     public string GatherTerminalCommand
     {
-        get => _gatherTerminalCommand;
-        set => SetField(ref _gatherTerminalCommand, value);
+        get => PrimaryObjective.GatherTerminalCommand;
+        set => PrimaryObjective.GatherTerminalCommand = value;
     }
 
     [JsonPropertyName("GatherTerminalCommandHelp")]
     public string GatherTerminalCommandHelp
     {
-        get => _gatherTerminalCommandHelp;
-        set => SetField(ref _gatherTerminalCommandHelp, value);
+        get => PrimaryObjective.GatherTerminalCommandHelp;
+        set => PrimaryObjective.GatherTerminalCommandHelp = value;
     }
 
     [JsonPropertyName("GatherTerminalDownloadingText")]
     public string GatherTerminalDownloadingText
     {
-        get => _gatherTerminalDownloadingText;
-        set => SetField(ref _gatherTerminalDownloadingText, value);
+        get => PrimaryObjective.GatherTerminalDownloadingText;
+        set => PrimaryObjective.GatherTerminalDownloadingText = value;
     }
 
     [JsonPropertyName("GatherTerminalDownloadCompleteText")]
     public string GatherTerminalDownloadCompleteText
     {
-        get => _gatherTerminalDownloadCompleteText;
-        set => SetField(ref _gatherTerminalDownloadCompleteText, value);
+        get => PrimaryObjective.GatherTerminalDownloadCompleteText;
+        set => PrimaryObjective.GatherTerminalDownloadCompleteText = value;
     }
 
     [JsonPropertyName("GatherTerminalDownloadTime")]
     public double GatherTerminalDownloadTime
     {
-        get => _gatherTerminalDownloadTime;
-        set => SetField(ref _gatherTerminalDownloadTime, value);
+        get => PrimaryObjective.GatherTerminalDownloadTime;
+        set => PrimaryObjective.GatherTerminalDownloadTime = value;
     }
 
     [JsonPropertyName("GatherTerminalPlacements")]
     public ObservableCollection<GatherItemPlacement> GatherTerminalPlacements
     {
-        get => _gatherTerminalPlacements;
-        set => SetField(ref _gatherTerminalPlacements, value);
-    }
-
-    [JsonIgnore]
-    public int GatherTerminalSpawnCount
-    {
-        get => _gatherTerminalPlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_gatherTerminalPlacements.Count < target)
-            {
-                _gatherTerminalPlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _gatherTerminalPlacements.Count + 1,
-                    ItemPrefix = "Terminal"
-                });
-            }
-
-            while (_gatherTerminalPlacements.Count > target)
-            {
-                _gatherTerminalPlacements.RemoveAt(_gatherTerminalPlacements.Count - 1);
-            }
-
-            OnPropertyChanged(nameof(GatherTerminalSpawnCount));
-        }
+        get => PrimaryObjective.GatherTerminalPlacements;
+        set => PrimaryObjective.GatherTerminalPlacements = value;
     }
 
     [JsonPropertyName("TimedTerminalSequenceMainLocation")]
     public CandidateZonePlacement TimedTerminalSequenceMainLocation
     {
-        get => _timedTerminalSequenceMainLocation;
-        set => SetField(ref _timedTerminalSequenceMainLocation, value ?? new CandidateZonePlacement());
+        get => PrimaryObjective.TimedTerminalSequenceMainLocation;
+        set => PrimaryObjective.TimedTerminalSequenceMainLocation = value;
     }
 
     [JsonPropertyName("TimedTerminalSequenceNumberOfRounds")]
     public int TimedTerminalSequenceNumberOfRounds
     {
-        get => _timedTerminalSequenceNumberOfRounds;
-        set => SetField(ref _timedTerminalSequenceNumberOfRounds, value);
+        get => PrimaryObjective.TimedTerminalSequenceNumberOfRounds;
+        set => PrimaryObjective.TimedTerminalSequenceNumberOfRounds = value;
     }
 
     [JsonPropertyName("TimedTerminalSequenceTimePerRound")]
     public double TimedTerminalSequenceTimePerRound
     {
-        get => _timedTerminalSequenceTimePerRound;
-        set => SetField(ref _timedTerminalSequenceTimePerRound, value);
+        get => PrimaryObjective.TimedTerminalSequenceTimePerRound;
+        set => PrimaryObjective.TimedTerminalSequenceTimePerRound = value;
     }
 
     [JsonPropertyName("TimedTerminalSequenceTimeForConfirmation")]
     public double TimedTerminalSequenceTimeForConfirmation
     {
-        get => _timedTerminalSequenceTimeForConfirmation;
-        set => SetField(ref _timedTerminalSequenceTimeForConfirmation, value);
+        get => PrimaryObjective.TimedTerminalSequenceTimeForConfirmation;
+        set => PrimaryObjective.TimedTerminalSequenceTimeForConfirmation = value;
     }
 
     [JsonPropertyName("TimedTerminalSequenceSourceTerminalWorldEventObjectFilter")]
     public string TimedTerminalSequenceSourceTerminalWorldEventObjectFilter
     {
-        get => _timedTerminalSequenceSourceTerminalWorldEventObjectFilter;
-        set => SetField(ref _timedTerminalSequenceSourceTerminalWorldEventObjectFilter, value);
+        get => PrimaryObjective.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter;
+        set => PrimaryObjective.TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = value;
+    }
+
+    [JsonPropertyName("TimedTerminalSequenceNumberOfTerminals")]
+    public int TimedTerminalSequenceNumberOfTerminals
+    {
+        get => PrimaryObjective.TimedTerminalSequenceNumberOfTerminals;
+        set => PrimaryObjective.TimedTerminalSequenceNumberOfTerminals = value;
     }
 
     [JsonPropertyName("TimedTerminalSequencePlacements")]
     public ObservableCollection<GatherItemPlacement> TimedTerminalSequencePlacements
     {
-        get => _timedTerminalSequencePlacements;
-        set => SetField(ref _timedTerminalSequencePlacements, value);
+        get => PrimaryObjective.TimedTerminalSequencePlacements;
+        set => PrimaryObjective.TimedTerminalSequencePlacements = value;
     }
 
-    [JsonIgnore]
-    public int TimedTerminalSequenceNumberOfTerminals
+    [JsonPropertyName("Header")]
+    public string Header
     {
-        get => _timedTerminalSequencePlacements.Count;
-        set
-        {
-            int target = Math.Max(1, value);
-            while (_timedTerminalSequencePlacements.Count < target)
-            {
-                _timedTerminalSequencePlacements.Add(new GatherItemPlacement
-                {
-                    ItemNumber = _timedTerminalSequencePlacements.Count + 1,
-                    ItemPrefix = "Terminal"
-                });
-            }
+        get => PrimaryObjective.Header;
+        set => PrimaryObjective.Header = value;
+    }
 
-            while (_timedTerminalSequencePlacements.Count > target)
-            {
-                _timedTerminalSequencePlacements.RemoveAt(_timedTerminalSequencePlacements.Count - 1);
-            }
+    [JsonPropertyName("MainObjective")]
+    public string MainObjective
+    {
+        get => PrimaryObjective.MainObjective;
+        set => PrimaryObjective.MainObjective = value;
+    }
 
-            OnPropertyChanged(nameof(TimedTerminalSequenceNumberOfTerminals));
-        }
+    [JsonPropertyName("FindLocationInfo")]
+    public string FindLocationInfo
+    {
+        get => PrimaryObjective.FindLocationInfo;
+        set => PrimaryObjective.FindLocationInfo = value;
+    }
+
+    [JsonPropertyName("FindLocationInfoHelp")]
+    public string FindLocationInfoHelp
+    {
+        get => PrimaryObjective.FindLocationInfoHelp;
+        set => PrimaryObjective.FindLocationInfoHelp = value;
+    }
+
+    [JsonPropertyName("GoToZone")]
+    public string GoToZone
+    {
+        get => PrimaryObjective.GoToZone;
+        set => PrimaryObjective.GoToZone = value;
+    }
+
+    [JsonPropertyName("InZoneFindItem")]
+    public string InZoneFindItem
+    {
+        get => PrimaryObjective.InZoneFindItem;
+        set => PrimaryObjective.InZoneFindItem = value;
+    }
+
+    [JsonPropertyName("SolveItem")]
+    public string SolveItem
+    {
+        get => PrimaryObjective.SolveItem;
+        set => PrimaryObjective.SolveItem = value;
+    }
+
+    [JsonPropertyName("WavesOnGotoWin")]
+    public GenericWaveSettings WavesOnGotoWin
+    {
+        get => PrimaryObjective.WavesOnGotoWin;
+        set => PrimaryObjective.WavesOnGotoWin = value;
+    }
+
+    [JsonPropertyName("WaveOnGotoWinTrigger")]
+    public WaveOnGotoWinTrigger WaveOnGotoWinTrigger
+    {
+        get => PrimaryObjective.WaveOnGotoWinTrigger;
+        set => PrimaryObjective.WaveOnGotoWinTrigger = value;
+    }
+
+    [JsonPropertyName("StopAllWavesBeforeGotoWin")]
+    public bool StopAllWavesBeforeGotoWin
+    {
+        get => PrimaryObjective.StopAllWavesBeforeGotoWin;
+        set => PrimaryObjective.StopAllWavesBeforeGotoWin = value;
+    }
+
+    [JsonPropertyName("WavesOnElevatorLand")]
+    public GenericWaveSettings WavesOnElevatorLand
+    {
+        get => PrimaryObjective.WavesOnElevatorLand;
+        set => PrimaryObjective.WavesOnElevatorLand = value;
+    }
+
+    [JsonPropertyName("FogTransitionDataOnGotoWin")]
+    public uint FogTransitionDataOnGotoWin
+    {
+        get => PrimaryObjective.FogTransitionDataOnGotoWin;
+        set => PrimaryObjective.FogTransitionDataOnGotoWin = value;
+    }
+
+    [JsonPropertyName("FogTransitionDataOnGotoWinDuration")]
+    public double FogTransitionDataOnGotoWinDuration
+    {
+        get => PrimaryObjective.FogTransitionDataOnGotoWinDuration;
+        set => PrimaryObjective.FogTransitionDataOnGotoWinDuration = value;
     }
 
     [JsonPropertyName("EventsOnActivation")]
     public ObservableCollection<WardenEvent> EventsOnActivation
     {
-        get => _eventsOnActivation;
-        set => SetField(ref _eventsOnActivation, value);
+        get => PrimaryObjective.EventsOnActivation;
+        set => PrimaryObjective.EventsOnActivation = value;
     }
 
     [JsonPropertyName("EventsOnSequenceStart")]
     public ObservableCollection<WardenEvent> EventsOnSequenceStart
     {
-        get => _eventsOnSequenceStart;
-        set => SetField(ref _eventsOnSequenceStart, value);
+        get => PrimaryObjective.EventsOnSequenceStart;
+        set => PrimaryObjective.EventsOnSequenceStart = value;
     }
 
     [JsonPropertyName("EventsOnSequenceDone")]
     public ObservableCollection<WardenEvent> EventsOnSequenceDone
     {
-        get => _eventsOnSequenceDone;
-        set => SetField(ref _eventsOnSequenceDone, value);
+        get => PrimaryObjective.EventsOnSequenceDone;
+        set => PrimaryObjective.EventsOnSequenceDone = value;
     }
 
     [JsonPropertyName("EventsOnSequenceFail")]
     public ObservableCollection<WardenEvent> EventsOnSequenceFail
     {
-        get => _eventsOnSequenceFail;
-        set => SetField(ref _eventsOnSequenceFail, value);
+        get => PrimaryObjective.EventsOnSequenceFail;
+        set => PrimaryObjective.EventsOnSequenceFail = value;
     }
 
     [JsonPropertyName("EventsOnElevatorLand")]
     public ObservableCollection<WardenEvent> EventsOnElevatorLand
     {
-        get => _eventsOnElevatorLand;
-        set => SetField(ref _eventsOnElevatorLand, value);
+        get => PrimaryObjective.EventsOnElevatorLand;
+        set => PrimaryObjective.EventsOnElevatorLand = value;
     }
 
     [JsonPropertyName("EventsOnGotoWin")]
     public ObservableCollection<WardenEvent> EventsOnGotoWin
     {
-        get => _eventsOnGotoWin;
-        set => SetField(ref _eventsOnGotoWin, value);
+        get => PrimaryObjective.EventsOnGotoWin;
+        set => PrimaryObjective.EventsOnGotoWin = value;
     }
 
     [JsonPropertyName("EventsOnActivate")]
     public ObservableCollection<WardenEvent> EventsOnActivate
     {
-        get => _eventsOnActivate;
-        set => SetField(ref _eventsOnActivate, value);
+        get => PrimaryObjective.EventsOnActivate;
+        set => PrimaryObjective.EventsOnActivate = value;
     }
 
     public string GetZoneDisplayName(int zoneIndex) => $"Zone {ZoneAliasStart + zoneIndex}";
+
+    public void ApplyDefaultsForObjectiveType(ObjectiveType type)
+    {
+        PrimaryObjective.ApplyDefaultsForObjectiveType(type);
+    }
 
     public SectorSettings Clone()
     {
@@ -921,160 +845,9 @@ public class SectorSettings : INotifyPropertyChanged
         {
             ArtifactAmountMultiplier = ArtifactAmountMultiplier,
             ZoneAliasStart = ZoneAliasStart,
-            WinCondition = WinCondition,
-            ExitZone = ExitZone,
-            ObjectiveType = ObjectiveType,
-            HsuPlacementZone = HsuPlacementZone,
-            HsuPlacementStartWeight = HsuPlacementStartWeight,
-            HsuPlacementMiddleWeight = HsuPlacementMiddleWeight,
-            HsuPlacementEndWeight = HsuPlacementEndWeight,
-            ReactorPlacementZone = ReactorPlacementZone,
-            ChainedPuzzleToActive = ChainedPuzzleToActive,
-            ChainedPuzzleMidObjective = ChainedPuzzleMidObjective,
-            DoNotSolveObjectiveOnReactorComplete = DoNotSolveObjectiveOnReactorComplete,
-            SpecialTerminalCommandZone = SpecialTerminalCommandZone,
-            SpecialTerminalCommand = SpecialTerminalCommand,
-            SpecialTerminalCommandDesc = SpecialTerminalCommandDesc,
-            PostCommandOutput = PostCommandOutput,
-            SpecialCommandRule = SpecialCommandRule,
-            GatherItem = GatherItem,
-            GatherMaxPerZone = GatherMaxPerZone,
-            RetrieveItem = RetrieveItem,
-            RetrieveMaxPerZone = RetrieveMaxPerZone,
-            Header = Header,
-            MainObjective = MainObjective,
-            FindLocationInfo = FindLocationInfo,
-            FindLocationInfoHelp = FindLocationInfoHelp,
-            GoToZone = GoToZone,
-            InZoneFindItem = InZoneFindItem,
-            SolveItem = SolveItem,
-            WaveOnGotoWinTrigger = WaveOnGotoWinTrigger,
-            StopAllWavesBeforeGotoWin = StopAllWavesBeforeGotoWin,
-            WavesOnGotoWin = WavesOnGotoWin.Clone(),
-            WavesOnElevatorLand = WavesOnElevatorLand.Clone(),
-            FogTransitionDataOnGotoWin = FogTransitionDataOnGotoWin,
-            FogTransitionDataOnGotoWinDuration = FogTransitionDataOnGotoWinDuration,
-            UplinkNumberOfVerificationRounds = UplinkNumberOfVerificationRounds,
-            CentralGeneratorClusterZone = CentralGeneratorClusterZone,
-            ActivateSmallHsuZone = ActivateSmallHsuZone,
-            ItemFromStart = ItemFromStart,
-            ItemAfterActivation = ItemAfterActivation,
-            BringItemInElevator = BringItemInElevator,
-            StopEnemyWavesOnActivation = StopEnemyWavesOnActivation,
-            ObjectiveCompleteAfterInsertion = ObjectiveCompleteAfterInsertion,
-            RequireItemAfterActivationInExitScan = RequireItemAfterActivationInExitScan,
-            TimeToActivate = TimeToActivate,
-            TimeToSurvive = TimeToSurvive,
-            TimerTitle = TimerTitle,
-            TimerToActivateTitle = TimerToActivateTitle,
-            GatherTerminalRequiredCount = GatherTerminalRequiredCount,
-            GatherTerminalCommand = GatherTerminalCommand,
-            GatherTerminalCommandHelp = GatherTerminalCommandHelp,
-            GatherTerminalDownloadingText = GatherTerminalDownloadingText,
-            GatherTerminalDownloadCompleteText = GatherTerminalDownloadCompleteText,
-            GatherTerminalDownloadTime = GatherTerminalDownloadTime,
-            TimedTerminalSequenceMainLocation = TimedTerminalSequenceMainLocation.Clone(),
-            TimedTerminalSequenceNumberOfRounds = TimedTerminalSequenceNumberOfRounds,
-            TimedTerminalSequenceTimePerRound = TimedTerminalSequenceTimePerRound,
-            TimedTerminalSequenceTimeForConfirmation = TimedTerminalSequenceTimeForConfirmation,
-            TimedTerminalSequenceSourceTerminalWorldEventObjectFilter = TimedTerminalSequenceSourceTerminalWorldEventObjectFilter
+            BulkheadKeyPlacements = new ObservableCollection<GatherItemPlacement>(BulkheadKeyPlacements.Select(p => p.Clone())),
+            Objectives = new ObservableCollection<WardenObjective>(Objectives.Select(o => o.Clone()))
         };
-
-        clone.ReactorStartupStages.Clear();
-        foreach (var stage in ReactorStartupStages)
-        {
-            clone.ReactorStartupStages.Add(stage.Clone());
-        }
-
-        clone.GatherItemPlacements.Clear();
-        foreach (var placement in GatherItemPlacements)
-        {
-            clone.GatherItemPlacements.Add(placement.Clone());
-        }
-
-        clone.RetrieveItemPlacements.Clear();
-        foreach (var placement in RetrieveItemPlacements)
-        {
-            clone.RetrieveItemPlacements.Add(placement.Clone());
-        }
-
-        clone.DistributeGeneratorPlacements.Clear();
-        foreach (var placement in DistributeGeneratorPlacements)
-        {
-            clone.DistributeGeneratorPlacements.Add(placement.Clone());
-        }
-
-        clone.TerminalUplinkPlacements.Clear();
-        foreach (var placement in TerminalUplinkPlacements)
-        {
-            clone.TerminalUplinkPlacements.Add(placement.Clone());
-        }
-
-        clone.CentralGeneratorClusterPowerCellPlacements.Clear();
-        foreach (var placement in CentralGeneratorClusterPowerCellPlacements)
-        {
-            clone.CentralGeneratorClusterPowerCellPlacements.Add(placement.Clone());
-        }
-
-        clone.CentralGeneratorClusterFogTransitions.Clear();
-        foreach (var stage in CentralGeneratorClusterFogTransitions)
-        {
-            clone.CentralGeneratorClusterFogTransitions.Add(stage.Clone());
-        }
-
-        clone.GatherTerminalPlacements.Clear();
-        foreach (var placement in GatherTerminalPlacements)
-        {
-            clone.GatherTerminalPlacements.Add(placement.Clone());
-        }
-
-        clone.TimedTerminalSequencePlacements.Clear();
-        foreach (var placement in TimedTerminalSequencePlacements)
-        {
-            clone.TimedTerminalSequencePlacements.Add(placement.Clone());
-        }
-
-        clone.EventsOnActivation.Clear();
-        foreach (var ev in EventsOnActivation)
-        {
-            clone.EventsOnActivation.Add(ev.Clone());
-        }
-
-        clone.EventsOnSequenceStart.Clear();
-        foreach (var ev in EventsOnSequenceStart)
-        {
-            clone.EventsOnSequenceStart.Add(ev.Clone());
-        }
-
-        clone.EventsOnSequenceDone.Clear();
-        foreach (var ev in EventsOnSequenceDone)
-        {
-            clone.EventsOnSequenceDone.Add(ev.Clone());
-        }
-
-        clone.EventsOnSequenceFail.Clear();
-        foreach (var ev in EventsOnSequenceFail)
-        {
-            clone.EventsOnSequenceFail.Add(ev.Clone());
-        }
-
-        clone.EventsOnElevatorLand.Clear();
-        foreach (var ev in EventsOnElevatorLand)
-        {
-            clone.EventsOnElevatorLand.Add(ev.Clone());
-        }
-
-        clone.EventsOnGotoWin.Clear();
-        foreach (var ev in EventsOnGotoWin)
-        {
-            clone.EventsOnGotoWin.Add(ev.Clone());
-        }
-
-        clone.EventsOnActivate.Clear();
-        foreach (var ev in EventsOnActivate)
-        {
-            clone.EventsOnActivate.Add(ev.Clone());
-        }
 
         return clone;
     }

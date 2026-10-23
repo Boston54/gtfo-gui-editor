@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using GTFO_GUIEditor.Models;
 
@@ -17,6 +19,81 @@ public static class ComplexResourceSetService
         WriteIndented = true,
         Converters = { new JsonStringEnumConverter() }
     };
+
+    public static string? FindTemplateFile()
+    {
+        string[] candidates =
+        {
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Templates", "ComplexResourceSet.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "Data", "Templates", "ComplexResourceSet.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Templates", "ComplexResourceSet.json")
+        };
+
+        foreach (var c in candidates)
+        {
+            if (File.Exists(c)) return c;
+        }
+
+        var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        while (dir != null)
+        {
+            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "Data", "Templates", "ComplexResourceSet.json");
+            if (File.Exists(candidateProject)) return candidateProject;
+
+            string candidateData = Path.Combine(dir.FullName, "Data", "Templates", "ComplexResourceSet.json");
+            if (File.Exists(candidateData)) return candidateData;
+
+            dir = dir.Parent;
+        }
+
+        return null;
+    }
+
+    public static JsonObject? LoadTemplateJsonObject(ComplexType complexType)
+    {
+        string? path = FindTemplateFile();
+        if (string.IsNullOrEmpty(path) || !File.Exists(path)) return null;
+
+        try
+        {
+            string json = File.ReadAllText(path);
+            var node = JsonNode.Parse(json)?.AsObject();
+            if (node == null) return null;
+
+            string key = complexType.ToString().ToLowerInvariant();
+            if (node.TryGetPropertyValue(key, out var val) && val is JsonObject obj)
+            {
+                return JsonNode.Parse(obj.ToJsonString())?.AsObject();
+            }
+
+            var match = node.FirstOrDefault(kv => string.Equals(kv.Key, complexType.ToString(), StringComparison.OrdinalIgnoreCase));
+            if (match.Value is JsonObject matchObj)
+            {
+                return JsonNode.Parse(matchObj.ToJsonString())?.AsObject();
+            }
+
+            return null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public static ComplexResourceSetBlock? LoadTemplateBlock(ComplexType complexType)
+    {
+        var obj = LoadTemplateJsonObject(complexType);
+        if (obj == null) return null;
+
+        try
+        {
+            return JsonSerializer.Deserialize<ComplexResourceSetBlock>(obj.ToJsonString(), JsonOptions);
+        }
+        catch
+        {
+            return null;
+        }
+    }
 
     public static string GetDatablocksDirectory()
     {
@@ -105,6 +182,17 @@ public static class ComplexResourceSetService
 
     public static ComplexResourceSetBlock CreateFreshBlock(uint id, string name, ComplexType complexType = ComplexType.Mining, SubComplexType primarySubComplex = SubComplexType.DigSite)
     {
+        var templateBlock = LoadTemplateBlock(complexType);
+        if (templateBlock != null)
+        {
+            templateBlock.PersistentId = id;
+            templateBlock.Name = name;
+            templateBlock.InternalEnabled = true;
+            templateBlock.ComplexType = complexType;
+            templateBlock.PrimareSubComplexUsed = primarySubComplex;
+            return templateBlock;
+        }
+
         BundleNameType bundle = complexType switch
         {
             ComplexType.Mining => BundleNameType.Complex_Mining,

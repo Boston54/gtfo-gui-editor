@@ -1182,15 +1182,11 @@ public class RoomSvgTests
         Assert.Equal(4, vm.ActiveZoneSettings.ToolKitUses);
         Assert.Equal(2, vm.ActiveZoneSettings.DisinfectKitUses);
 
-        // Configure Bulkhead Keys, Power Cells, Fog Turbines, Disinfect Station
-        vm.ActiveZoneSettings.BulkheadKeys = 3;
+        // Configure Power Cells, Fog Turbines
         vm.ActiveZoneSettings.PowerCells = 2;
         vm.ActiveZoneSettings.FogTurbines = 1;
-        vm.ActiveZoneSettings.ContainsDisinfectStation = true;
-        Assert.Equal(3, vm.ActiveZoneSettings.BulkheadKeys);
         Assert.Equal(2, vm.ActiveZoneSettings.PowerCells);
         Assert.Equal(1, vm.ActiveZoneSettings.FogTurbines);
-        Assert.True(vm.ActiveZoneSettings.ContainsDisinfectStation);
 
         // Change Zone Lighting via Dropdown Selection
         var customLighting = new LightSettingsBlock { PersistentId = 88801, Name = "Test_Zone_Blue" };

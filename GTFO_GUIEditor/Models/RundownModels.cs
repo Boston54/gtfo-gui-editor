@@ -1596,6 +1596,8 @@ public class ExpeditionBlock : INotifyPropertyChanged
             SpecialOverrideData = SpecialOverrideData.Clone(),
             HasExternalStyle = HasExternalStyle,
             HasStoryStyle = HasStoryStyle,
+            ExpeditionIndexInTier = ExpeditionIndexInTier,
+            TierColorHex = TierColorHex,
             ExtensionData = ExtensionData != null ? new Dictionary<string, JsonElement>(ExtensionData) : null
         };
     }
@@ -1638,6 +1640,7 @@ public class RundownBlock : INotifyPropertyChanged
 
     public RundownBlock()
     {
+        EditorDefaultsService.ApplyRundownDefaults(this);
         _storytellingData.PropertyChanged += (s, e) => OnPropertyChanged(nameof(StorytellingData));
     }
 
@@ -1780,6 +1783,16 @@ public class RundownBlock : INotifyPropertyChanged
 
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? ExtensionData { get; set; }
+
+    [JsonIgnore]
+    public IEnumerable<ExpeditionBlock> Expeditions =>
+        (TierA ?? Enumerable.Empty<ExpeditionBlock>())
+        .Concat(TierB ?? Enumerable.Empty<ExpeditionBlock>())
+        .Concat(TierC ?? Enumerable.Empty<ExpeditionBlock>())
+        .Concat(TierD ?? Enumerable.Empty<ExpeditionBlock>())
+        .Concat(TierE ?? Enumerable.Empty<ExpeditionBlock>());
+
+    public List<ExpeditionBlock> GetAllExpeditions() => Expeditions.ToList();
 
     [JsonIgnore]
     public string DisplayText => string.IsNullOrWhiteSpace(Name)

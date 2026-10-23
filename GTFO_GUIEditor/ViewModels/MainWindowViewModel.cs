@@ -12,13 +12,15 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly IFileDialogService _fileDialogService;
     private string? _currentFilePath;
+    private string? _lastExportDirectory;
     private string _statusMessage = string.Empty;
     private ObservableCollection<RecentFileItem> _recentFiles = new();
 
+    public DocumentationViewModel Documentation { get; }
     public SoundsViewModel Sounds { get; }
     public GeomorphsViewModel Geomorphs { get; }
-    public ComplexResourceSetsViewModel ComplexResourceSets { get; }
     public AlarmsViewModel Alarms { get; }
+    public ConsumablesViewModel Consumables { get; }
     public LightingViewModel Lighting { get; }
     public FogSettingsViewModel FogSettings { get; }
     public LevelLayoutViewModel LevelLayout { get; }
@@ -45,6 +47,12 @@ public class MainWindowViewModel : ViewModelBase
 
     public bool HasCurrentFilePath => !string.IsNullOrWhiteSpace(CurrentFilePath);
 
+    public string? LastExportDirectory
+    {
+        get => _lastExportDirectory;
+        set => SetField(ref _lastExportDirectory, value);
+    }
+
     public string CurrentFileTitle => string.IsNullOrWhiteSpace(CurrentFilePath)
         ? "Untitled Rundown"
         : Path.GetFileName(CurrentFilePath);
@@ -56,24 +64,59 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public MainWindowViewModel()
-        : this(new AvaloniaFileDialogService())
+        : this(new AvaloniaFileDialogService(), autoReopenLastRundown: true)
     {
     }
 
-    public MainWindowViewModel(IFileDialogService? fileDialogService)
+    public MainWindowViewModel(bool autoReopenLastRundown)
+        : this(new AvaloniaFileDialogService(), autoReopenLastRundown)
+    {
+    }
+
+    public MainWindowViewModel(IFileDialogService? fileDialogService, bool autoReopenLastRundown = true)
     {
         _fileDialogService = fileDialogService ?? new AvaloniaFileDialogService();
 
+        Documentation = new DocumentationViewModel();
         Sounds = new SoundsViewModel();
         Geomorphs = new GeomorphsViewModel();
-        ComplexResourceSets = new ComplexResourceSetsViewModel();
         Alarms = new AlarmsViewModel();
+        Consumables = new ConsumablesViewModel();
         Lighting = new LightingViewModel();
         FogSettings = new FogSettingsViewModel();
-        LevelLayout = new LevelLayoutViewModel(ComplexResourceSets.Blocks, null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks);
-        Rundown = new RundownViewModel(Services.RundownService.LoadVanillaBlocks(), LevelLayout.Levels, ComplexResourceSets.Blocks);
+        LevelLayout = new LevelLayoutViewModel(null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks, Consumables.Blocks);
+        Rundown = new RundownViewModel(Services.RundownService.CreateFreshBlock(1, "New Rundown"), LevelLayout.Levels);
 
         RefreshRecentFiles();
+
+        if (autoReopenLastRundown)
+        {
+            TryReopenLastRundown();
+        }
+    }
+
+    public bool TryReopenLastRundown()
+    {
+        var recentFiles = RundownProjectService.LoadRecentFiles();
+        var lastFile = recentFiles.FirstOrDefault(f => !f.IsPlaceholder && !string.IsNullOrWhiteSpace(f.FilePath) && File.Exists(f.FilePath));
+        if (lastFile == null)
+        {
+            return false;
+        }
+
+        try
+        {
+            var project = RundownProjectService.LoadProject(lastFile.FilePath);
+            RundownProjectService.ApplyProject(this, project, lastFile.FilePath);
+            RefreshRecentFiles();
+            StatusMessage = $"Reopened: {Path.GetFileName(lastFile.FilePath)}";
+            return true;
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Failed to reopen last rundown: {ex.Message}";
+            return false;
+        }
     }
 
     public void RefreshRecentFiles()
@@ -95,49 +138,26 @@ public class MainWindowViewModel : ViewModelBase
     public void NewRundown()
     {
         CurrentFilePath = null;
+        LastExportDirectory = null;
 
         Alarms.Alarms.Clear();
-        foreach (var alarm in Services.AlarmService.LoadVanillaAlarms())
-        {
-            Alarms.Alarms.Add(alarm.Clone());
-        }
-        if (Alarms.Alarms.Count > 0) Alarms.SelectedAlarm = Alarms.Alarms[0];
+        Alarms.SelectedAlarm = null;
+
+        Consumables.Blocks.Clear();
+        Consumables.SelectedBlock = null;
 
         Lighting.Blocks.Clear();
-        foreach (var light in Services.LightSettingsService.LoadVanillaBlocks())
-        {
-            Lighting.Blocks.Add(light.Clone());
-        }
-        if (Lighting.Blocks.Count > 0) Lighting.SelectedBlock = Lighting.Blocks[0];
+        Lighting.SelectedBlock = null;
 
         FogSettings.Blocks.Clear();
-        foreach (var fog in Services.FogSettingsService.LoadVanillaBlocks())
-        {
-            FogSettings.Blocks.Add(fog.Clone());
-        }
-        if (FogSettings.Blocks.Count > 0) FogSettings.SelectedBlock = FogSettings.Blocks[0];
-
-        ComplexResourceSets.Blocks.Clear();
-        foreach (var set in Services.ComplexResourceSetService.LoadVanillaBlocks())
-        {
-            ComplexResourceSets.Blocks.Add(set.Clone());
-        }
-        if (ComplexResourceSets.Blocks.Count > 0) ComplexResourceSets.SelectedBlock = ComplexResourceSets.Blocks[0];
+        FogSettings.SelectedBlock = null;
 
         LevelLayout.Levels.Clear();
-        var defaultLevel = new LevelLayoutBlock
-        {
-            Name = "Level A1",
-            PersistentId = 1,
-            ComplexResourceSet = ComplexResourceSets.Blocks.FirstOrDefault()?.PersistentId ?? 1,
-            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab",
-            InternalEnabled = true
-        };
+        var defaultLevel = EditorDefaultsService.CreateDefaultLevel(1);
         LevelLayout.Levels.Add(defaultLevel);
         LevelLayout.SelectedLevel = defaultLevel;
 
-        var freshRundown = Services.RundownService.LoadVanillaBlocks().FirstOrDefault()?.Clone()
-            ?? Services.RundownService.CreateFreshBlock(1, "New Rundown");
+        var freshRundown = Services.RundownService.CreateFreshBlock(1, "New Rundown");
         Rundown.SelectedRundown = freshRundown;
 
         StatusMessage = "Created new rundown.";
@@ -241,8 +261,71 @@ public class MainWindowViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
+    public async Task QuickExportDatablocksAsync()
+    {
+        if (string.IsNullOrWhiteSpace(LastExportDirectory))
+        {
+            await ExportDatablocksToAsync();
+            return;
+        }
+
+        try
+        {
+            var result = DatablockExportService.ExportAll(this, LastExportDirectory);
+            if (result.Success)
+            {
+                StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(LastExportDirectory)}";
+            }
+            else
+            {
+                StatusMessage = $"Export error: {result.Message}";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Export error: {ex.Message}";
+        }
+    }
+
+    public async Task ExportDatablocksToAsync()
+    {
+        string initialDir = !string.IsNullOrWhiteSpace(LastExportDirectory) && Directory.Exists(LastExportDirectory)
+            ? LastExportDirectory
+            : _fileDialogService.DefaultRundownsDirectory;
+
+        string? selectedFolder = await _fileDialogService.ShowOpenFolderDialogAsync(
+            defaultDirectory: initialDir,
+            title: "Select Mod / Export Destination Directory");
+
+        if (string.IsNullOrWhiteSpace(selectedFolder))
+        {
+            return;
+        }
+
+        try
+        {
+            LastExportDirectory = selectedFolder;
+            var result = DatablockExportService.ExportAll(this, selectedFolder);
+            if (result.Success)
+            {
+                StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(selectedFolder)}";
+            }
+            else
+            {
+                StatusMessage = $"Export error: {result.Message}";
+            }
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Export error: {ex.Message}";
+        }
+    }
+
     public void SaveRundown() => _ = SaveRundownAsync();
     public void SaveAsRundown() => _ = SaveAsRundownAsync();
     public void OpenRundown() => _ = OpenRundownAsync();
     public void OpenRecentFile(string? filePath) => _ = OpenRecentFileAsync(filePath);
+    public void QuickExportDatablocks() => _ = QuickExportDatablocksAsync();
+    public void ExportDatablocksTo() => _ = ExportDatablocksToAsync();
+    public void ExportDatablocks() => _ = QuickExportDatablocksAsync();
 }

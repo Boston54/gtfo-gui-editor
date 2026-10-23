@@ -105,23 +105,7 @@ public static class FogSettingsService
 
     public static FogSettingsBlock CreateFreshBlock(uint id, string name)
     {
-        return new FogSettingsBlock
-        {
-            PersistentId = id,
-            Name = name,
-            InternalEnabled = true,
-            Enabled = true,
-            FogColor = new LightColor { R = 1.0, G = 1.0, B = 1.0, A = 1.0 },
-            FogDensity = 0.0,
-            FogAmbience = 0.0,
-            DensityNoiseDirection = new Vector3Data(0.0, 0.0, 0.0),
-            DensityNoiseSpeed = 0.0,
-            DensityNoiseScale = 0.1,
-            DensityHeightAltitude = 0.0,
-            DensityHeightRange = 0.0,
-            DensityHeightMaxBoost = 0.0,
-            Infection = 0.0
-        };
+        return EditorDefaultsService.CreateDefaultFogBlock(id, name);
     }
 
     public static FogSettingsBlock CreateBlockFromTemplate(FogSettingsBlock template, uint newId, string newName)

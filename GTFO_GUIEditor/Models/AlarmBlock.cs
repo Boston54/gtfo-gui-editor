@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
@@ -13,6 +16,8 @@ public class AlarmBlock : INotifyPropertyChanged
     private string _name = "";
     private string _publicAlarmName = "";
     private bool _internalEnabled = true;
+    private bool _spawnsEnemies = true;
+    private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
 
     // Wave Roles (Enemy References)
     private uint _waveRoleWeakling = 0;
@@ -54,6 +59,10 @@ public class AlarmBlock : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
+    public AlarmBlock()
+    {
+    }
+
     [JsonPropertyName("persistentID")]
     public uint PersistentId
     {
@@ -92,6 +101,20 @@ public class AlarmBlock : INotifyPropertyChanged
     {
         get => _internalEnabled;
         set => SetField(ref _internalEnabled, value);
+    }
+
+    [JsonPropertyName("SpawnsEnemies")]
+    public bool SpawnsEnemies
+    {
+        get => _spawnsEnemies;
+        set => SetField(ref _spawnsEnemies, value);
+    }
+
+    [JsonPropertyName("ChainedPuzzle")]
+    public ObservableCollection<ChainedPuzzleItem> ChainedPuzzle
+    {
+        get => _chainedPuzzle;
+        set => SetField(ref _chainedPuzzle, value);
     }
 
     // Wave Roles
@@ -364,6 +387,8 @@ public class AlarmBlock : INotifyPropertyChanged
             Name = Name,
             PublicAlarmName = PublicAlarmName,
             InternalEnabled = InternalEnabled,
+            SpawnsEnemies = SpawnsEnemies,
+            ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(ChainedPuzzle.Select(c => c.Clone())),
 
             WaveRoleWeakling = WaveRoleWeakling,
             WaveRoleStandard = WaveRoleStandard,

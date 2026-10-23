@@ -25,26 +25,39 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     private double _viewportHeight = 600;
     private string _currentStartingPrefab = string.Empty;
     private int _nextZoneIndex = 1;
-    private readonly Dictionary<int, ZoneSettings> _zoneSettings = new();
+    private readonly Dictionary<(SectorType Sector, int ZoneIndex), ZoneSettings> _zoneSettings = new();
 
     public LevelLayoutGridState()
     {
         _placedDoors.CollectionChanged += PlacedDoors_CollectionChanged;
     }
 
-    public ZoneSettings GetOrCreateZoneSettings(int zoneIndex)
+    public ZoneSettings GetOrCreateZoneSettings(SectorType sector, int zoneIndex)
     {
-        if (!_zoneSettings.TryGetValue(zoneIndex, out var settings))
+        if (!_zoneSettings.TryGetValue((sector, zoneIndex), out var settings))
         {
-            settings = new ZoneSettings { ZoneIndex = zoneIndex };
-            _zoneSettings[zoneIndex] = settings;
+            settings = new ZoneSettings { Sector = sector, ZoneIndex = zoneIndex };
+            _zoneSettings[(sector, zoneIndex)] = settings;
         }
+
         return settings;
     }
 
-    public IReadOnlyDictionary<int, ZoneSettings> ZoneSettingsMap => _zoneSettings;
+    public ZoneSettings GetOrCreateZoneSettings(int zoneIndex)
+    {
+        var sector = GetSectorForZone(zoneIndex);
+        return GetOrCreateZoneSettings(sector, zoneIndex);
+    }
 
-    private void PlacedDoors_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    public ZoneSettings? GetZoneSettings(SectorType sector, int zoneIndex)
+    {
+        return _zoneSettings.TryGetValue((sector, zoneIndex), out var settings) ? settings : null;
+    }
+
+    public IReadOnlyDictionary<(SectorType Sector, int ZoneIndex), ZoneSettings> ZoneSettingsMap => _zoneSettings;
+
+    private void PlacedDoors_CollectionChanged(object? sender,
+        System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset)
         {
@@ -59,6 +72,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     door.PropertyChanged += OnDoorPropertyChanged;
                 }
             }
+
             if (e.OldItems != null)
             {
                 foreach (PlacedDoorNode door in e.OldItems)
@@ -67,6 +81,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 }
             }
         }
+
         NotifyLegendProperties();
     }
 
@@ -111,7 +126,23 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     public bool HasOverloadDoors => PlacedDoors.Any(d => d.DoorBrush == "#00F2FF");
     public bool HasBlockedDoors => PlacedDoors.Any(d => d.DoorBrush == "#757575");
 
-    public int GetNextZoneId() => _nextZoneIndex++;
+    public int GetNextZoneForSector(SectorType sector)
+    {
+        var zones = PlacedRooms
+            .Where(r => r.Sector == sector)
+            .Select(r => r.Zone)
+            .Distinct()
+            .ToList();
+
+        if (zones.Count == 0)
+        {
+            return 0;
+        }
+
+        return zones.Max() + 1;
+    }
+
+    public int GetNextZoneId(SectorType sector = SectorType.Main) => GetNextZoneForSector(sector);
     public void ResetZoneIdCounter() => _nextZoneIndex = 1;
 
     public int GridSize
@@ -229,7 +260,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         get
         {
             var (width, height, _, _, _, _) = GetLayoutBounds();
-            return $"Warning: Current level layout dimensions ({width}x{height} cells) exceed the grid size ({GridSize}x{GridSize}). Increase the grid size in the Complex Resource Set.";
+            return
+                $"Warning: Current level layout dimensions ({width}x{height} cells) exceed the grid size ({GridSize}x{GridSize}). Increase the grid size in the Complex Resource Set.";
         }
     }
 
@@ -259,16 +291,17 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
     public void UpdateRoomNumbers()
     {
-        var zoneCounters = new Dictionary<int, int>();
+        var zoneCounters = new Dictionary<(SectorType, int), int>();
         foreach (var room in _placedRooms)
         {
-            int z = room.Zone;
-            if (!zoneCounters.TryGetValue(z, out int nextNum))
+            var key = (room.Sector, room.Zone);
+            if (!zoneCounters.TryGetValue(key, out int nextNum))
             {
                 nextNum = 0;
             }
+
             room.RoomNumber = nextNum;
-            zoneCounters[z] = nextNum + 1;
+            zoneCounters[key] = nextNum + 1;
         }
     }
 
@@ -286,11 +319,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
     public void UpdateRoomHighlightStates()
     {
+        var activeSector = _hoveredRoom?.Sector;
         int? activeZone = _hoveredRoom?.Zone;
         foreach (var room in _placedRooms)
         {
             bool isHovered = room == _hoveredRoom;
-            bool isZoneHighlighted = !isHovered && activeZone.HasValue && room.Zone == activeZone.Value;
+            bool isZoneHighlighted = !isHovered && activeZone.HasValue && activeSector.HasValue && room.Sector == activeSector.Value && room.Zone == activeZone.Value;
             room.SetHighlightState(isHovered, isZoneHighlighted);
         }
     }
@@ -398,6 +432,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             door.PropertyChanged -= OnDoorPropertyChanged;
         }
+
         HoveredRoom = null;
         PlacedGeomorphs.Clear();
         PlacedDoors.Clear();
@@ -421,6 +456,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
 
         var geoNode = CreateGeomorphNode(startingPrefab, gridX, gridY);
+        geoNode.SetRoomSector(0, SectorType.Main);
         geoNode.SetRoomZone(0, 0);
         PlacedGeomorphs.Add(geoNode);
 
@@ -545,8 +581,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         foreach (double angle in candidateAngles)
         {
             double normAngle = ((angle % 360) + 360) % 360;
-            int widthInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseHeight : baseWidth;
-            int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseWidth : baseHeight;
+            int widthInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1)
+                ? baseHeight
+                : baseWidth;
+            int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1)
+                ? baseWidth
+                : baseHeight;
 
             double tempWorldLeft = targetX * CellDimension;
             double tempWorldTop = targetY * CellDimension;
@@ -561,10 +601,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 {
                     if (exp.AreaTo < 0) // External expander
                     {
-                        var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, angle);
+                        var (localX, localY) =
+                            RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, angle);
                         double expWorldX = tempWorldCenterX + localX;
                         double expWorldY = tempWorldCenterY + localY;
-                        double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) + Math.Pow(expWorldY - sourceDoor.WorldY, 2));
+                        double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) +
+                                                Math.Pow(expWorldY - sourceDoor.WorldY, 2));
                         if (dist < 10.0)
                         {
                             hasMatchingDoor = true;
@@ -572,6 +614,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         }
                     }
                 }
+
                 if (hasMatchingDoor) break;
             }
 
@@ -593,14 +636,17 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             return (geo.GridX, geo.GridY - 1, "North (Forwards)");
         }
+
         if (dir.Contains("backward") || dir.Contains("south"))
         {
             return (geo.GridX, geo.GridY + geo.HeightInCells, "South (Backwards)");
         }
+
         if (dir.Contains("left") || dir.Contains("west"))
         {
             return (geo.GridX - 1, geo.GridY, "West (Left)");
         }
+
         if (dir.Contains("right") || dir.Contains("east"))
         {
             return (geo.GridX + geo.WidthInCells, geo.GridY, "East (Right)");
@@ -611,14 +657,17 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             return (geo.GridX, geo.GridY - 1, "North (Forwards)");
         }
+
         if (door.LocalY >= 20)
         {
             return (geo.GridX, geo.GridY + geo.HeightInCells, "South (Backwards)");
         }
+
         if (door.LocalX <= -20)
         {
             return (geo.GridX - 1, geo.GridY, "West (Left)");
         }
+
         if (door.LocalX >= 20)
         {
             return (geo.GridX + geo.WidthInCells, geo.GridY, "East (Right)");
@@ -632,7 +681,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return ExpandFromDoor(sourceDoor, geomorphPrefab, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab, DoorType doorType = DoorType.RoomDoor, double? rotationAngle = null, GeomorphAltitude? altitude = null, uint? lighting = null)
+    public PlacedGeomorphNode? ExpandFromDoor(PlacedDoorNode sourceDoor, string geomorphPrefab,
+        DoorType doorType = DoorType.RoomDoor, double? rotationAngle = null, GeomorphAltitude? altitude = null,
+        uint? lighting = null)
     {
         if (sourceDoor.IsInternal) return null;
 
@@ -677,7 +728,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
         double normAngle = ((actualRotation % 360) + 360) % 360;
         int widthInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseHeight : baseWidth;
-        int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1) ? baseWidth : baseHeight;
+        int heightInCells = (Math.Abs(normAngle - 90) < 0.1 || Math.Abs(normAngle - 270) < 0.1)
+            ? baseWidth
+            : baseHeight;
 
         for (int cx = targetX; cx < targetX + widthInCells; cx++)
         {
@@ -688,9 +741,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
+        SectorType sourceSector = sourceDoor.Geomorph?.GetRoomSector(sourceDoor.AreaFrom) ?? SectorType.Main;
         int sourceZone = sourceDoor.Geomorph?.GetRoomZone(sourceDoor.AreaFrom) ?? 0;
-        bool isZoneBoundary = doorType != DoorType.RoomDoor;
-        int targetZone = isZoneBoundary ? GetNextZoneId() : sourceZone;
+
+        SectorType targetSector = sourceSector;
+        if (doorType == DoorType.SecondaryDoor || sourceDoor.IsSecondaryDoor)
+        {
+            targetSector = SectorType.Secondary;
+        }
+        else if (doorType == DoorType.OverloadDoor || sourceDoor.IsOverloadDoor)
+        {
+            targetSector = SectorType.Overload;
+        }
+
+        bool isZoneBoundary = (doorType != DoorType.RoomDoor || targetSector != sourceSector);
+        int targetZone = isZoneBoundary ? GetNextZoneForSector(targetSector) : sourceZone;
 
         // Find which area in the new geomorph connects to sourceDoor
         var metadata = GeomorphMetadataService.GetMetadata(geomorphPrefab) ?? new GeomorphMetadata
@@ -717,10 +782,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 {
                     if (exp.AreaTo < 0) // External expander
                     {
-                        var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, actualRotation);
+                        var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z,
+                            actualRotation);
                         double expWorldX = tempWorldCenterX + localX;
                         double expWorldY = tempWorldCenterY + localY;
-                        double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) + Math.Pow(expWorldY - sourceDoor.WorldY, 2));
+                        double dist = Math.Sqrt(Math.Pow(expWorldX - sourceDoor.WorldX, 2) +
+                                                Math.Pow(expWorldY - sourceDoor.WorldY, 2));
                         if (dist < bestDist)
                         {
                             bestDist = dist;
@@ -733,12 +800,15 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
         GeomorphAltitude actualAltitude = altitude ?? sourceDoor.Altitude;
         uint actualLighting = lighting ?? 0;
-        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea, rotationAngle: actualRotation, altitude: actualAltitude, lighting: actualLighting);
+        var newGeo = CreateGeomorphNode(geomorphPrefab, targetX, targetY, initialAreaIndex: connectingArea,
+            rotationAngle: actualRotation, altitude: actualAltitude, lighting: actualLighting);
+        newGeo.SetRoomSector(connectingArea, targetSector);
         newGeo.SetRoomZone(connectingArea, targetZone);
         if (isZoneBoundary && actualLighting > 0)
         {
-            GetOrCreateZoneSettings(targetZone).Lighting = actualLighting;
+            GetOrCreateZoneSettings(targetSector, targetZone).Lighting = actualLighting;
         }
+
         PlacedGeomorphs.Add(newGeo);
 
         foreach (var room in newGeo.Rooms)
@@ -770,7 +840,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return GenerateRoomFromDoor(roomDoor, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public int GenerateRoomFromDoor(PlacedDoorNode roomDoor, DoorType doorType = DoorType.RoomDoor, uint? lighting = null)
+    public int GenerateRoomFromDoor(PlacedDoorNode roomDoor, DoorType doorType = DoorType.RoomDoor,
+        uint? lighting = null)
     {
         if (!roomDoor.IsInternal || roomDoor.Geomorph == null) return -1;
 
@@ -791,13 +862,26 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
         if (targetArea >= 0 && sourceArea >= 0)
         {
+            SectorType sourceSector = geo.GetRoomSector(sourceArea);
             int sourceZone = geo.GetRoomZone(sourceArea);
-            bool isZoneBoundary = (doorType != DoorType.RoomDoor || roomDoor.IsZoneBoundary);
-            int targetZone = isZoneBoundary ? GetNextZoneId() : sourceZone;
+
+            SectorType targetSector = sourceSector;
+            if (doorType == DoorType.SecondaryDoor || roomDoor.IsSecondaryDoor)
+            {
+                targetSector = SectorType.Secondary;
+            }
+            else if (doorType == DoorType.OverloadDoor || roomDoor.IsOverloadDoor)
+            {
+                targetSector = SectorType.Overload;
+            }
+
+            bool isZoneBoundary = (doorType != DoorType.RoomDoor || roomDoor.IsZoneBoundary || targetSector != sourceSector);
+            int targetZone = isZoneBoundary ? GetNextZoneForSector(targetSector) : sourceZone;
+            geo.SetRoomSector(targetArea, targetSector);
             geo.SetRoomZone(targetArea, targetZone);
             if (isZoneBoundary && lighting.HasValue && lighting.Value > 0)
             {
-                GetOrCreateZoneSettings(targetZone).Lighting = lighting.Value;
+                GetOrCreateZoneSettings(targetSector, targetZone).Lighting = lighting.Value;
             }
 
             var newDoors = GenerateDoorsForRoom(geo, targetArea);
@@ -836,12 +920,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         OnPropertyChanged(nameof(HasOverloadDoor));
     }
 
-    public void ConnectAdjacentDoors(PlacedGeomorphNode newGeo, PlacedDoorNode? sourceDoor = null, bool isSecurityDoor = false)
+    public void ConnectAdjacentDoors(PlacedGeomorphNode newGeo, PlacedDoorNode? sourceDoor = null,
+        bool isSecurityDoor = false)
     {
         ConnectAdjacentDoors(newGeo, sourceDoor, isSecurityDoor ? DoorType.SecurityDoor : DoorType.RoomDoor);
     }
 
-    public void ConnectAdjacentDoors(PlacedGeomorphNode newGeo, PlacedDoorNode? sourceDoor = null, DoorType doorType = DoorType.RoomDoor)
+    public void ConnectAdjacentDoors(PlacedGeomorphNode newGeo, PlacedDoorNode? sourceDoor = null,
+        DoorType doorType = DoorType.RoomDoor)
     {
         if (sourceDoor != null)
         {
@@ -857,7 +943,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
             foreach (var door in newGeo.Doors.Where(d => !d.IsInternal))
             {
-                double dist = Math.Sqrt(Math.Pow(door.WorldX - sourceDoor.WorldX, 2) + Math.Pow(door.WorldY - sourceDoor.WorldY, 2));
+                double dist = Math.Sqrt(Math.Pow(door.WorldX - sourceDoor.WorldX, 2) +
+                                        Math.Pow(door.WorldY - sourceDoor.WorldY, 2));
                 if (dist < bestDist)
                 {
                     bestDist = dist;
@@ -880,9 +967,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         // Also connect any other facing external doors between newGeo and other placed geomorphs
         foreach (var door in newGeo.Doors.Where(d => !d.IsInternal && d.ConnectedDoor == null))
         {
-            foreach (var otherDoor in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph != newGeo && d.ConnectedDoor == null))
+            foreach (var otherDoor in PlacedDoors.Where(d =>
+                         !d.IsInternal && d.Geomorph != newGeo && d.ConnectedDoor == null))
             {
-                double dist = Math.Sqrt(Math.Pow(door.WorldX - otherDoor.WorldX, 2) + Math.Pow(door.WorldY - otherDoor.WorldY, 2));
+                double dist = Math.Sqrt(Math.Pow(door.WorldX - otherDoor.WorldX, 2) +
+                                        Math.Pow(door.WorldY - otherDoor.WorldY, 2));
                 if (dist < 4.0)
                 {
                     door.ConnectedDoor = otherDoor;
@@ -916,25 +1005,34 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
-        // Traverse layout from root (Starting elevator room 0) using BFS to assign Zone IDs to all generated rooms
+        // Traverse layout from root (Starting elevator room 0) using BFS to assign Sector and Zone IDs to all generated rooms
         var roomZones = new Dictionary<(string geoId, int areaIdx), int>();
+        var roomSectors = new Dictionary<(string geoId, int areaIdx), SectorType>();
         var visited = new HashSet<(string geoId, int areaIdx)>();
         var primaryZoneConnections = new Dictionary<string, (PlacedDoorNode d1, PlacedDoorNode? d2)>();
 
-        int nextZone = 1;
-        var queue = new Queue<((PlacedGeomorphNode geo, int areaIdx) room, int zone)>();
+        var nextZonePerSector = new Dictionary<SectorType, int>
+        {
+            [SectorType.Main] = 1,
+            [SectorType.Secondary] = 0,
+            [SectorType.Overload] = 0
+        };
+
+        var queue = new Queue<((PlacedGeomorphNode geo, int areaIdx) room, SectorType sector, int zone)>();
 
         var rootRoom = (rootGeo, 0);
         visited.Add((rootGeo.Id, 0));
         roomZones[(rootGeo.Id, 0)] = 0;
-        queue.Enqueue((rootRoom, 0));
+        roomSectors[(rootGeo.Id, 0)] = SectorType.Main;
+        queue.Enqueue((rootRoom, SectorType.Main, 0));
 
         while (queue.Count > 0)
         {
-            var (curr, currZone) = queue.Dequeue();
+            var (curr, currSector, currZone) = queue.Dequeue();
 
             // Internal door connections from PlacedDoors (only follow connected doors or zone boundaries)
-            foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == curr.geo && (d.IsConnected || d.IsZoneBoundary)))
+            foreach (var d in PlacedDoors.Where(d =>
+                         d.IsInternal && d.Geomorph == curr.geo && (d.IsConnected || d.IsZoneBoundary)))
             {
                 int neighborArea = -1;
                 if (d.AreaFrom == curr.areaIdx)
@@ -949,14 +1047,17 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 if (neighborArea >= 0 && curr.geo.IsRoomGenerated(neighborArea))
                 {
                     var neighborKey = (curr.geo.Id, neighborArea);
-                    if (!visited.Contains(neighborKey))
+                    if (visited.Add(neighborKey))
                     {
-                        visited.Add(neighborKey);
+                        SectorType nextSector = currSector;
+                        if (d.IsSecondaryDoor || d.DoorType == DoorType.SecondaryDoor) nextSector = SectorType.Secondary;
+                        else if (d.IsOverloadDoor || d.DoorType == DoorType.OverloadDoor) nextSector = SectorType.Overload;
+
                         int targetZone;
-                        if (d.IsZoneBoundary)
+                        if (d.IsZoneBoundary || nextSector != currSector)
                         {
-                            targetZone = nextZone++;
-                            string pairKey = GetZonePairKey(currZone, targetZone);
+                            targetZone = nextZonePerSector[nextSector]++;
+                            string pairKey = GetZonePairKey(currSector, currZone, nextSector, targetZone);
                             if (!primaryZoneConnections.ContainsKey(pairKey))
                             {
                                 primaryZoneConnections[pairKey] = (d, null);
@@ -966,28 +1067,38 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         {
                             targetZone = currZone;
                         }
+
                         roomZones[neighborKey] = targetZone;
-                        queue.Enqueue(((curr.geo, neighborArea), targetZone));
+                        roomSectors[neighborKey] = nextSector;
+                        queue.Enqueue(((curr.geo, neighborArea), nextSector, targetZone));
                     }
                 }
             }
 
             // External connected doors to other geomorphs from PlacedDoors (only follow connected doors or zone boundaries)
-            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == curr.geo && d.AreaFrom == curr.areaIdx && d.ConnectedDoor != null && (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary)))
+            foreach (var d in PlacedDoors.Where(d =>
+                         !d.IsInternal && d.Geomorph == curr.geo && d.AreaFrom == curr.areaIdx &&
+                         d.ConnectedDoor != null &&
+                         (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary)))
             {
                 var otherDoor = d.ConnectedDoor!;
                 var otherGeo = otherDoor.Geomorph;
                 if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
                 {
                     var neighborKey = (otherGeo.Id, otherDoor.AreaFrom);
-                    if (!visited.Contains(neighborKey))
+                    if (visited.Add(neighborKey))
                     {
-                        visited.Add(neighborKey);
+                        SectorType nextSector = currSector;
+                        if (d.IsSecondaryDoor || otherDoor.IsSecondaryDoor || d.DoorType == DoorType.SecondaryDoor ||
+                            otherDoor.DoorType == DoorType.SecondaryDoor) nextSector = SectorType.Secondary;
+                        else if (d.IsOverloadDoor || otherDoor.IsOverloadDoor || d.DoorType == DoorType.OverloadDoor ||
+                                 otherDoor.DoorType == DoorType.OverloadDoor) nextSector = SectorType.Overload;
+
                         int targetZone;
-                        if (d.IsZoneBoundary || otherDoor.IsZoneBoundary)
+                        if (d.IsZoneBoundary || otherDoor.IsZoneBoundary || nextSector != currSector)
                         {
-                            targetZone = nextZone++;
-                            string pairKey = GetZonePairKey(currZone, targetZone);
+                            targetZone = nextZonePerSector[nextSector]++;
+                            string pairKey = GetZonePairKey(currSector, currZone, nextSector, targetZone);
                             if (!primaryZoneConnections.ContainsKey(pairKey))
                             {
                                 primaryZoneConnections[pairKey] = (d, otherDoor);
@@ -997,8 +1108,10 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         {
                             targetZone = currZone;
                         }
+
                         roomZones[neighborKey] = targetZone;
-                        queue.Enqueue(((otherGeo, otherDoor.AreaFrom), targetZone));
+                        roomSectors[neighborKey] = nextSector;
+                        queue.Enqueue(((otherGeo, otherDoor.AreaFrom), nextSector, targetZone));
                     }
                 }
             }
@@ -1012,17 +1125,20 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 var key = (geo.Id, area);
                 if (!visited.Contains(key))
                 {
+                    SectorType startSector = geo.GetRoomSector(area);
                     int startZone = geo.GetRoomZone(area);
                     visited.Add(key);
                     roomZones[key] = startZone;
-                    queue.Enqueue(((geo, area), startZone));
+                    roomSectors[key] = startSector;
+                    queue.Enqueue(((geo, area), startSector, startZone));
 
                     while (queue.Count > 0)
                     {
-                        var (curr, currZone) = queue.Dequeue();
+                        var (curr, currSector, currZone) = queue.Dequeue();
 
                         // Internal door connections
-                        foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == curr.geo && (d.IsConnected || d.IsZoneBoundary)))
+                        foreach (var d in PlacedDoors.Where(d =>
+                                     d.IsInternal && d.Geomorph == curr.geo && (d.IsConnected || d.IsZoneBoundary)))
                         {
                             int neighborArea = -1;
                             if (d.AreaFrom == curr.areaIdx) neighborArea = d.AreaTo;
@@ -1031,30 +1147,47 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                             if (neighborArea >= 0 && curr.geo.IsRoomGenerated(neighborArea))
                             {
                                 var neighborKey = (curr.geo.Id, neighborArea);
-                                if (!visited.Contains(neighborKey))
+                                if (visited.Add(neighborKey))
                                 {
-                                    visited.Add(neighborKey);
-                                    int targetZone = d.IsZoneBoundary ? nextZone++ : currZone;
+                                    SectorType nextSector = currSector;
+                                    if (d.IsSecondaryDoor || d.DoorType == DoorType.SecondaryDoor) nextSector = SectorType.Secondary;
+                                    else if (d.IsOverloadDoor || d.DoorType == DoorType.OverloadDoor) nextSector = SectorType.Overload;
+
+                                    int targetZone = (d.IsZoneBoundary || nextSector != currSector)
+                                        ? nextZonePerSector[nextSector]++
+                                        : currZone;
                                     roomZones[neighborKey] = targetZone;
-                                    queue.Enqueue(((curr.geo, neighborArea), targetZone));
+                                    roomSectors[neighborKey] = nextSector;
+                                    queue.Enqueue(((curr.geo, neighborArea), nextSector, targetZone));
                                 }
                             }
                         }
 
                         // External door connections
-                        foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == curr.geo && d.AreaFrom == curr.areaIdx && d.ConnectedDoor != null && (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary)))
+                        foreach (var d in PlacedDoors.Where(d =>
+                                     !d.IsInternal && d.Geomorph == curr.geo && d.AreaFrom == curr.areaIdx &&
+                                     d.ConnectedDoor != null &&
+                                     (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary)))
                         {
                             var otherDoor = d.ConnectedDoor!;
                             var otherGeo = otherDoor.Geomorph;
                             if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
                             {
                                 var neighborKey = (otherGeo.Id, otherDoor.AreaFrom);
-                                if (!visited.Contains(neighborKey))
+                                if (visited.Add(neighborKey))
                                 {
-                                    visited.Add(neighborKey);
-                                    int targetZone = (d.IsZoneBoundary || otherDoor.IsZoneBoundary) ? nextZone++ : currZone;
+                                    SectorType nextSector = currSector;
+                                    if (d.IsSecondaryDoor || otherDoor.IsSecondaryDoor || d.DoorType == DoorType.SecondaryDoor ||
+                                        otherDoor.DoorType == DoorType.SecondaryDoor) nextSector = SectorType.Secondary;
+                                    else if (d.IsOverloadDoor || otherDoor.IsOverloadDoor || d.DoorType == DoorType.OverloadDoor ||
+                                             otherDoor.DoorType == DoorType.OverloadDoor) nextSector = SectorType.Overload;
+
+                                    int targetZone = (d.IsZoneBoundary || otherDoor.IsZoneBoundary || nextSector != currSector)
+                                        ? nextZonePerSector[nextSector]++
+                                        : currZone;
                                     roomZones[neighborKey] = targetZone;
-                                    queue.Enqueue(((otherGeo, otherDoor.AreaFrom), targetZone));
+                                    roomSectors[neighborKey] = nextSector;
+                                    queue.Enqueue(((otherGeo, otherDoor.AreaFrom), nextSector, targetZone));
                                 }
                             }
                         }
@@ -1063,6 +1196,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
+        var zoneRemap = new Dictionary<(SectorType Sector, int Zone), (SectorType Sector, int Zone)>();
         foreach (var geo in PlacedGeomorphs)
         {
             foreach (var area in geo.GeneratedRooms)
@@ -1070,11 +1204,66 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 var key = (geo.Id, area);
                 if (roomZones.TryGetValue(key, out int z))
                 {
+                    var newSector = roomSectors[key];
+                    var oldSector = geo.GetRoomSector(area);
+                    var oldZone = geo.GetRoomZone(area);
+                    zoneRemap[(oldSector, oldZone)] = (newSector, z);
+
+                    geo.SetRoomSector(area, newSector);
                     geo.SetRoomZone(area, z);
                 }
             }
         }
-        _nextZoneIndex = Math.Max(_nextZoneIndex, nextZone);
+
+        if (zoneRemap.Count > 0)
+        {
+            // Remap _zoneSettings
+            var remappedZoneSettings = new Dictionary<(SectorType, int), ZoneSettings>();
+            foreach (var kvp in _zoneSettings)
+            {
+                if (zoneRemap.TryGetValue(kvp.Key, out var newKey))
+                {
+                    var zs = kvp.Value;
+                    zs.Sector = newKey.Sector;
+                    zs.ZoneIndex = newKey.Zone;
+                    remappedZoneSettings[newKey] = zs;
+                }
+            }
+            _zoneSettings.Clear();
+            foreach (var kvp in remappedZoneSettings)
+            {
+                _zoneSettings[kvp.Key] = kvp.Value;
+            }
+
+            // Remap door terminal and progression puzzle candidate zones
+            foreach (var door in PlacedDoors)
+            {
+                if (door.TurnOffAlarmOnTerminal && door.Geomorph != null)
+                {
+                    var doorSec = door.Geomorph.GetRoomSector(door.AreaFrom);
+                    if (zoneRemap.TryGetValue((doorSec, door.TerminalZone), out var newTz))
+                    {
+                        door.TerminalZone = newTz.Zone;
+                    }
+                }
+
+                foreach (var cz in door.ProgressionPuzzleCandidateZones)
+                {
+                    SectorType candSec = cz.DimensionIndex switch
+                    {
+                        "Secondary" or "SecondaryLayer" => SectorType.Secondary,
+                        "Third" or "ThirdLayer" or "Overload" or "OverloadLayer" => SectorType.Overload,
+                        _ => SectorType.Main
+                    };
+                    if (zoneRemap.TryGetValue((candSec, cz.Zone), out var newCz))
+                    {
+                        cz.Zone = newCz.Zone;
+                    }
+                }
+            }
+        }
+
+        _nextZoneIndex = Math.Max(_nextZoneIndex, nextZonePerSector.Values.Max());
 
         // Validate all internal doors
         var internalGroups = PlacedDoors
@@ -1117,10 +1306,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
             else
             {
+                var s1 = geo.GetRoomSector(first.AreaFrom);
+                var s2 = geo.GetRoomSector(first.AreaTo);
                 int z1 = geo.GetRoomZone(first.AreaFrom);
                 int z2 = geo.GetRoomZone(first.AreaTo);
 
-                if (z1 == z2)
+                if (s1 == s2 && z1 == z2)
                 {
                     foreach (var d in group)
                     {
@@ -1131,13 +1322,15 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 else
                 {
                     // Different zones: check if one of the doors is the primary security / zone boundary door
-                    string pairKey = GetZonePairKey(z1, z2);
+                    string pairKey = GetZonePairKey(s1, z1, s2, z2);
                     primaryZoneConnections.TryGetValue(pairKey, out var primaryPair);
 
                     var primarySecDoor = group.FirstOrDefault(d => d == primaryPair.d1 || d == primaryPair.d2);
                     if (primarySecDoor != null)
                     {
-                        var primaryDoorType = primarySecDoor.DoorType != DoorType.RoomDoor ? primarySecDoor.DoorType : DoorType.SecurityDoor;
+                        var primaryDoorType = primarySecDoor.DoorType != DoorType.RoomDoor
+                            ? primarySecDoor.DoorType
+                            : DoorType.SecurityDoor;
                         foreach (var d in group)
                         {
                             if (d == primarySecDoor)
@@ -1177,6 +1370,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     string k2 = $"{d.ConnectedDoor.Geomorph.Id}:{d.ConnectedDoor.AreaFrom}";
                     return string.CompareOrdinal(k1, k2) < 0 ? $"{k1}__{k2}" : $"{k2}__{k1}";
                 }
+
                 return d.Id;
             });
 
@@ -1190,6 +1384,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     d.IsConnected = false;
                     d.IsBlocked = false;
                 }
+
                 continue;
             }
 
@@ -1203,7 +1398,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             if (secDoor != null)
             {
                 var partner = secDoor.ConnectedDoor;
-                var primaryDoorType = secDoor.DoorType != DoorType.RoomDoor ? secDoor.DoorType : (partner?.DoorType ?? DoorType.SecurityDoor);
+                var primaryDoorType = secDoor.DoorType != DoorType.RoomDoor
+                    ? secDoor.DoorType
+                    : (partner?.DoorType ?? DoorType.SecurityDoor);
                 if (primaryDoorType == DoorType.RoomDoor) primaryDoorType = DoorType.SecurityDoor;
 
                 foreach (var d in group)
@@ -1231,10 +1428,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
             else
             {
+                var s1 = geo1.GetRoomSector(first.AreaFrom);
+                var s2 = geo2.GetRoomSector(otherDoor.AreaFrom);
                 int z1 = geo1.GetRoomZone(first.AreaFrom);
                 int z2 = geo2.GetRoomZone(otherDoor.AreaFrom);
 
-                if (z1 == z2)
+                if (s1 == s2 && z1 == z2)
                 {
                     foreach (var d in group)
                     {
@@ -1245,15 +1444,20 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 else
                 {
                     // Different zones: only the single primary security door can connect them
-                    string pairKey = GetZonePairKey(z1, z2);
+                    string pairKey = GetZonePairKey(s1, z1, s2, z2);
                     primaryZoneConnections.TryGetValue(pairKey, out var primaryPair);
 
-                    var primarySecDoor = group.FirstOrDefault(d => d == primaryPair.d1 || d == primaryPair.d2 || (d.ConnectedDoor != null && (d.ConnectedDoor == primaryPair.d1 || d.ConnectedDoor == primaryPair.d2)));
+                    var primarySecDoor = group.FirstOrDefault(d =>
+                        d == primaryPair.d1 || d == primaryPair.d2 || (d.ConnectedDoor != null &&
+                                                                       (d.ConnectedDoor == primaryPair.d1 ||
+                                                                        d.ConnectedDoor == primaryPair.d2)));
 
                     if (primarySecDoor != null)
                     {
                         var partner = primarySecDoor.ConnectedDoor;
-                        var primaryDoorType = primarySecDoor.DoorType != DoorType.RoomDoor ? primarySecDoor.DoorType : (partner?.DoorType ?? DoorType.SecurityDoor);
+                        var primaryDoorType = primarySecDoor.DoorType != DoorType.RoomDoor
+                            ? primarySecDoor.DoorType
+                            : (partner?.DoorType ?? DoorType.SecurityDoor);
                         if (primaryDoorType == DoorType.RoomDoor) primaryDoorType = DoorType.SecurityDoor;
 
                         foreach (var d in group)
@@ -1285,6 +1489,15 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
     }
 
+    private static string GetZonePairKey(SectorType s1, int z1, SectorType s2, int z2)
+    {
+        if (s1 < s2 || (s1 == s2 && z1 <= z2))
+        {
+            return $"{s1}_{z1}_{s2}_{z2}";
+        }
+        return $"{s2}_{z2}_{s1}_{z1}";
+    }
+
     private static string GetZonePairKey(int z1, int z2)
     {
         return z1 < z2 ? $"{z1}_{z2}" : $"{z2}_{z1}";
@@ -1307,7 +1520,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         for (int expIdx = 0; expIdx < areaData.ExpanderDatas.Count; expIdx++)
         {
             var exp = areaData.ExpanderDatas[expIdx];
-            var (localX, localY) = RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, geoNode.RotationAngle);
+            var (localX, localY) =
+                RotateLocalOffset(exp.ExpanderPosition.X, -exp.ExpanderPosition.Z, geoNode.RotationAngle);
             double rotatedAngle = Math.Round(((exp.YAngle + geoNode.RotationAngle) % 360 + 360) % 360, 4);
             if (Math.Abs(rotatedAngle - 360.0) < 0.0001) rotatedAngle = 0.0;
             string rotatedDirection = RotateDirection(exp.Direction, geoNode.RotationAngle);
@@ -1323,17 +1537,19 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     d.IsInternal &&
                     d.AreaFrom == minArea &&
                     d.AreaTo == maxArea &&
-                    Math.Abs(d.LocalX - localX) < 1.0 &&
-                    Math.Abs(d.LocalY - localY) < 1.0);
+                    Math.Abs(d.LocalX - localX) < 10.0 &&
+                    Math.Abs(d.LocalY - localY) < 10.0);
 
                 if (existingDoor != null)
                 {
                     // If both areas are now generated, mark as connected (if same zone or valid security door)
                     if (geoNode.IsRoomGenerated(minArea) && geoNode.IsRoomGenerated(maxArea))
                     {
+                        var s1 = geoNode.GetRoomSector(minArea);
+                        var s2 = geoNode.GetRoomSector(maxArea);
                         int z1 = geoNode.GetRoomZone(minArea);
                         int z2 = geoNode.GetRoomZone(maxArea);
-                        if (z1 == z2 || existingDoor.IsZoneBoundary)
+                        if ((s1 == s2 && z1 == z2) || existingDoor.IsZoneBoundary)
                         {
                             existingDoor.IsConnected = true;
                             existingDoor.IsBlocked = false;
@@ -1353,9 +1569,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
                     if (isBothGenerated)
                     {
+                        var s1 = geoNode.GetRoomSector(minArea);
+                        var s2 = geoNode.GetRoomSector(maxArea);
                         int z1 = geoNode.GetRoomZone(minArea);
                         int z2 = geoNode.GetRoomZone(maxArea);
-                        if (z1 == z2)
+                        if (s1 == s2 && z1 == z2)
                         {
                             isConnected = true;
                         }
@@ -1428,6 +1646,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             {
                 PlacedRooms.Add(existingRoom);
             }
+
             return existingRoom;
         }
 
@@ -1436,16 +1655,19 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             : null;
 
         int zone = geoNode.GetRoomZone(areaIdx);
+        SectorType sector = geoNode.GetRoomSector(areaIdx);
         var mesh = areaData?.Mesh;
         double meshHeight = RoomSvgService.CalculateMeshHeight(mesh);
         double totalHeight = geoNode.AltitudeOffsetValue + meshHeight;
-        var (svgContent, svgPathData, geometry) = RoomSvgService.LoadRoomSvg(mesh, totalHeight, geoNode.AltitudeOffset, geoNode.RotationAngle);
+        var (svgContent, svgPathData, geometry) =
+            RoomSvgService.LoadRoomSvg(mesh, totalHeight, geoNode.AltitudeOffset, geoNode.RotationAngle);
         var (triangles, bounds, area) = RoomSvgService.Extract2DTriangles(mesh, geoNode.RotationAngle);
 
         var roomNode = new PlacedRoomNode
         {
             Geomorph = geoNode,
             AreaIndex = areaIdx,
+            Sector = sector,
             Zone = zone,
             MeshHeight = meshHeight,
             WorldX = geoNode.WorldX,
@@ -1467,12 +1689,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             PlacedRooms.Add(roomNode);
         }
+
         UpdateRoomNumbers();
 
         return roomNode;
     }
 
-    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0, double rotationAngle = 0.0, GeomorphAltitude altitude = GeomorphAltitude.Mid, uint lighting = 0)
+    public PlacedGeomorphNode CreateGeomorphNode(string prefabPath, int gridX, int gridY, int initialAreaIndex = 0,
+        double rotationAngle = 0.0, GeomorphAltitude altitude = GeomorphAltitude.Mid, uint lighting = 0)
     {
         var metadata = GeomorphMetadataService.GetMetadata(prefabPath) ?? new GeomorphMetadata
         {
@@ -1579,7 +1803,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
 
             // 2. External doors to other geomorphs
-            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
+            foreach (var d in PlacedDoors.Where(d =>
+                         !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected &&
+                         d.ConnectedDoor != null))
             {
                 var otherDoor = d.ConnectedDoor!;
                 var otherGeo = otherDoor.Geomorph;
@@ -1601,78 +1827,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     public Dictionary<int, SectorType> GetZoneSectorMap()
     {
         var map = new Dictionary<int, SectorType>();
-        if (PlacedGeomorphs.Count == 0)
-        {
-            map[0] = SectorType.Main;
-            return map;
-        }
-
-        var rootGeo = PlacedGeomorphs[0];
-        int rootZone = rootGeo.GetRoomZone(0);
-        map[rootZone] = SectorType.Main;
-
-        var queue = new Queue<(PlacedGeomorphNode geo, int area, SectorType sector)>();
-        var visited = new HashSet<(PlacedGeomorphNode geo, int area)>();
-
-        if (rootGeo.IsRoomGenerated(0))
-        {
-            visited.Add((rootGeo, 0));
-            queue.Enqueue((rootGeo, 0, SectorType.Main));
-        }
-
-        while (queue.Count > 0)
-        {
-            var (currGeo, currArea, currSector) = queue.Dequeue();
-            int currZone = currGeo.GetRoomZone(currArea);
-            map[currZone] = currSector;
-
-            // 1. Internal doors
-            foreach (var d in PlacedDoors.Where(d => d.IsInternal && d.Geomorph == currGeo && d.IsConnected))
-            {
-                int neighborArea = -1;
-                if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
-                else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
-
-                if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
-                {
-                    var neighbor = (currGeo, neighborArea);
-                    if (!visited.Contains(neighbor))
-                    {
-                        visited.Add(neighbor);
-                        SectorType nextSector = currSector;
-                        if (d.IsSecondaryDoor) nextSector = SectorType.Secondary;
-                        else if (d.IsOverloadDoor) nextSector = SectorType.Overload;
-                        queue.Enqueue((currGeo, neighborArea, nextSector));
-                    }
-                }
-            }
-
-            // 2. External doors
-            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
-            {
-                var otherDoor = d.ConnectedDoor!;
-                var otherGeo = otherDoor.Geomorph;
-                if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
-                {
-                    var neighbor = (otherGeo, otherDoor.AreaFrom);
-                    if (!visited.Contains(neighbor))
-                    {
-                        visited.Add(neighbor);
-                        SectorType nextSector = currSector;
-                        if (d.IsSecondaryDoor || otherDoor.IsSecondaryDoor) nextSector = SectorType.Secondary;
-                        else if (d.IsOverloadDoor || otherDoor.IsOverloadDoor) nextSector = SectorType.Overload;
-                        queue.Enqueue((otherGeo, otherDoor.AreaFrom, nextSector));
-                    }
-                }
-            }
-        }
-
         foreach (var room in PlacedRooms)
         {
-            if (!map.ContainsKey(room.Zone))
-            {
-                map[room.Zone] = SectorType.Main;
-            }
+            map[room.Zone] = room.Sector;
+        }
+
+        if (map.Count == 0)
+        {
+            map[0] = SectorType.Main;
         }
 
         return map;
@@ -1680,26 +1842,33 @@ public class LevelLayoutGridState : INotifyPropertyChanged
 
     public SectorType GetSectorForZone(int zoneIndex)
     {
-        var map = GetZoneSectorMap();
-        return map.TryGetValue(zoneIndex, out var sector) ? sector : SectorType.Main;
+        var room = PlacedRooms.FirstOrDefault(r => r.Zone == zoneIndex);
+        return room?.Sector ?? SectorType.Main;
     }
 
     public List<int> GetZonesForSector(SectorType sector)
     {
-        var map = GetZoneSectorMap();
-        var list = map.Where(kvp => kvp.Value == sector).Select(kvp => kvp.Key).Distinct().OrderBy(z => z).ToList();
-        if (list.Count == 0 && sector == SectorType.Main)
+        var list = PlacedRooms
+            .Where(r => r.Sector == sector)
+            .Select(r => r.Zone)
+            .Distinct()
+            .OrderBy(z => z)
+            .ToList();
+
+        if (list.Count == 0 && sector == SectorType.Main && PlacedGeomorphs.Count > 0)
         {
             list.Add(0);
         }
+
         return list;
     }
 
-    public bool ZoneHasGenClusterTile(int zoneIndex, ComplexType? complexType = null)
+    public bool ZoneHasGenClusterTile(SectorType sector, int zoneIndex, ComplexType? complexType = null)
     {
         var geosInZone = PlacedGeomorphs
-            .Where(g => (g.RoomZones != null && g.RoomZones.Values.Contains(zoneIndex)) || g.Rooms.Any(r => r.Zone == zoneIndex))
-            .Concat(PlacedRooms.Where(r => r.Zone == zoneIndex && r.Geomorph != null).Select(r => r.Geomorph!))
+            .Where(g => (g.RoomZones != null && g.GeneratedRooms.Any(a => g.GetRoomSector(a) == sector && g.GetRoomZone(a) == zoneIndex)) ||
+                        g.Rooms.Any(r => r.Sector == sector && r.Zone == zoneIndex))
+            .Concat(PlacedRooms.Where(r => r.Sector == sector && r.Zone == zoneIndex && r.Geomorph != null).Select(r => r.Geomorph!))
             .Distinct();
 
         foreach (var geo in geosInZone)
@@ -1711,6 +1880,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
 
         return false;
+    }
+
+    public bool ZoneHasGenClusterTile(int zoneIndex, ComplexType? complexType = null)
+    {
+        return ZoneHasGenClusterTile(GetSectorForZone(zoneIndex), zoneIndex, complexType);
     }
 
     public bool ZoneHasGenClusterTile(int zoneIndex, string? complexName)
@@ -1752,6 +1926,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         other.IsOverloadDoor = false;
                     }
                 }
+
                 PlacedDoors.Remove(door);
             }
 
@@ -1784,7 +1959,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return toDelete;
     }
 
-    public (List<PlacedRoomNode> DisconnectedRooms, List<PlacedGeomorphNode> DisconnectedGeomorphs) GetDisconnectedRoomsOnDelete(PlacedRoomNode targetRoom)
+    public (List<PlacedRoomNode> DisconnectedRooms, List<PlacedGeomorphNode> DisconnectedGeomorphs)
+        GetDisconnectedRoomsOnDelete(PlacedRoomNode targetRoom)
     {
         if (PlacedGeomorphs.Count == 0 || targetRoom.Geomorph == null)
             return (new List<PlacedRoomNode>(), new List<PlacedGeomorphNode>());
@@ -1831,7 +2007,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
 
             // 2. External doors
-            foreach (var d in PlacedDoors.Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected && d.ConnectedDoor != null))
+            foreach (var d in PlacedDoors.Where(d =>
+                         !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea && d.IsConnected &&
+                         d.ConnectedDoor != null))
             {
                 var otherDoor = d.ConnectedDoor!;
                 var otherGeo = otherDoor.Geomorph;
@@ -1849,14 +2027,16 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             }
         }
 
-        var disconnectedRooms = PlacedRooms.Where(r => r != targetRoom && !reachableRooms.Contains((r.Geomorph!, r.AreaIndex))).ToList();
+        var disconnectedRooms = PlacedRooms
+            .Where(r => r != targetRoom && !reachableRooms.Contains((r.Geomorph!, r.AreaIndex))).ToList();
         var reachableGeomorphs = reachableRooms.Select(r => r.geo).ToHashSet();
         var disconnectedGeomorphs = PlacedGeomorphs.Where(g => !reachableGeomorphs.Contains(g)).ToList();
 
         return (disconnectedRooms, disconnectedGeomorphs);
     }
 
-    public (List<PlacedRoomNode> DeletedRooms, List<PlacedGeomorphNode> DeletedGeomorphs) DeleteRoom(PlacedRoomNode targetRoom)
+    public (List<PlacedRoomNode> DeletedRooms, List<PlacedGeomorphNode> DeletedGeomorphs) DeleteRoom(
+        PlacedRoomNode targetRoom)
     {
         if (!PlacedRooms.Contains(targetRoom) || targetRoom.Geomorph == null)
             return (new List<PlacedRoomNode>(), new List<PlacedGeomorphNode>());
@@ -1873,7 +2053,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 geo.UngenerateRoom(room.AreaIndex);
 
                 // Handle internal doors involving this room
-                foreach (var d in geo.Doors.Where(d => d.IsInternal && (d.AreaFrom == room.AreaIndex || d.AreaTo == room.AreaIndex)).ToList())
+                foreach (var d in geo.Doors
+                             .Where(d => d.IsInternal && (d.AreaFrom == room.AreaIndex || d.AreaTo == room.AreaIndex))
+                             .ToList())
                 {
                     int otherArea = (d.AreaFrom == room.AreaIndex) ? d.AreaTo : d.AreaFrom;
                     if (geo.IsRoomGenerated(otherArea))
@@ -1900,6 +2082,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                             other.IsOverloadDoor = false;
                             d.ConnectedDoor = null;
                         }
+
                         d.IsConnected = false;
                         geo.Doors.Remove(d);
                         PlacedDoors.Remove(d);
@@ -1920,11 +2103,13 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         other.IsOverloadDoor = false;
                         d.ConnectedDoor = null;
                     }
+
                     d.IsConnected = false;
                     geo.Doors.Remove(d);
                     PlacedDoors.Remove(d);
                 }
             }
+
             PlacedRooms.Remove(room);
         }
 
@@ -1949,10 +2134,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         other.IsOverloadDoor = false;
                         door.ConnectedDoor = null;
                     }
+
                     door.IsConnected = false;
                     geo.Doors.Remove(door);
                     PlacedDoors.Remove(door);
                 }
+
                 PlacedGeomorphs.Remove(geo);
             }
         }
@@ -2004,7 +2191,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 AltitudeOffset = geo.AltitudeOffset,
                 Lighting = geo.Lighting,
                 GeneratedRooms = geo.GeneratedRooms.ToList(),
-                RoomZones = new Dictionary<int, int>(geo.RoomZones)
+                RoomZones = new Dictionary<int, int>(geo.RoomZones),
+                RoomSectors = new Dictionary<int, SectorType>(geo.RoomSectors)
             });
         }
 
@@ -2037,6 +2225,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 TurnOffAlarmOnTerminal = door.TurnOffAlarmOnTerminal,
                 TerminalZone = door.TerminalZone,
                 TerminalIndex = door.TerminalIndex,
+                IsApexDoor = door.IsApexDoor,
+                HasBloodDoor = door.HasBloodDoor,
+                ProgressionPuzzleToEnter = door.ProgressionPuzzleToEnter,
+                ProgressionPuzzleCustomText = door.ProgressionPuzzleCustomText,
+                ProgressionPuzzlePlacementCount = door.ProgressionPuzzlePlacementCount,
+                ProgressionPuzzleCandidateZones = door.ProgressionPuzzleCandidateZones.Select(c => c.Clone()).ToList(),
+                EnemyGroupInArea = door.EnemyGroupInArea.Select(e => e.Clone()).ToList(),
+                EnemyGroupInFrontOfDoor = door.EnemyGroupInFrontOfDoor.Select(e => e.Clone()).ToList(),
                 EventsOnPortalWarp = door.EventsOnPortalWarp.Select(e => e.Clone()).ToList(),
                 EventsOnApproachDoor = door.EventsOnApproachDoor.Select(e => e.Clone()).ToList(),
                 EventsOnUnlockDoor = door.EventsOnUnlockDoor.Select(e => e.Clone()).ToList(),
@@ -2053,8 +2249,10 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             var zs = kvp.Value;
             data.ZoneSettings.Add(new ZoneSettingsData
             {
+                Sector = zs.Sector,
                 ZoneIndex = zs.ZoneIndex,
                 Lighting = zs.Lighting,
+                ConsumableDistributionInZone = zs.ConsumableDistributionInZone,
                 SubSeed = zs.SubSeed,
                 MarkerSubSeed = zs.MarkerSubSeed,
                 LightingSubSeed = zs.LightingSubSeed,
@@ -2069,9 +2267,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 AmmoKitUses = zs.AmmoKitUses,
                 ToolKitUses = zs.ToolKitUses,
                 DisinfectKitUses = zs.DisinfectKitUses,
-                BulkheadKeys = zs.BulkheadKeys,
                 ContainsDC = zs.ContainsDC,
-                ContainsDisinfectStation = zs.ContainsDisinfectStation,
                 ContainsGenCluster = zs.ContainsGenCluster,
                 PowerCells = zs.PowerCells,
                 FogTurbines = zs.FogTurbines,
@@ -2118,8 +2314,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         {
             foreach (var zsData in data.ZoneSettings)
             {
-                var zs = GetOrCreateZoneSettings(zsData.ZoneIndex);
+                var zs = GetOrCreateZoneSettings(zsData.Sector, zsData.ZoneIndex);
                 zs.Lighting = zsData.Lighting;
+                zs.ConsumableDistributionInZone = zsData.ConsumableDistributionInZone;
                 zs.SubSeed = zsData.SubSeed;
                 zs.MarkerSubSeed = zsData.MarkerSubSeed;
                 zs.LightingSubSeed = zsData.LightingSubSeed;
@@ -2135,13 +2332,12 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     foreach (var item in zsData.ExcludeList)
                         zs.ExcludeList.Add(item.Clone());
                 }
+
                 zs.MedKitUses = zsData.MedKitUses;
                 zs.AmmoKitUses = zsData.AmmoKitUses;
                 zs.ToolKitUses = zsData.ToolKitUses;
                 zs.DisinfectKitUses = zsData.DisinfectKitUses;
-                zs.BulkheadKeys = zsData.BulkheadKeys;
                 zs.ContainsDC = zsData.ContainsDC;
-                zs.ContainsDisinfectStation = zsData.ContainsDisinfectStation;
                 zs.ContainsGenCluster = zsData.ContainsGenCluster;
                 zs.PowerCells = zsData.PowerCells;
                 zs.FogTurbines = zsData.FogTurbines;
@@ -2155,6 +2351,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         zs.DcOpenedMainDoorIds.Add(id);
                     }
                 }
+
                 zs.HSUClusters = zsData.HSUClusters;
                 zs.CorpseClusters = zsData.CorpseClusters;
                 zs.ResourceContainerClusters = zsData.ResourceContainerClusters;
@@ -2168,12 +2365,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     foreach (var item in zsData.BigPickupDistributionInZone)
                         zs.BigPickupDistributionInZone.Add(item.Clone());
                 }
+
                 zs.DisinfectionStationPlacements.Clear();
                 if (zsData.DisinfectionStationPlacements != null)
                 {
                     foreach (var item in zsData.DisinfectionStationPlacements)
                         zs.DisinfectionStationPlacements.Add(item.Clone());
                 }
+
                 zs.TerminalPlacements.Clear();
                 if (zsData.TerminalPlacements != null)
                 {
@@ -2204,7 +2403,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     AltitudeOffset = gData.AltitudeOffset > 0 ? gData.AltitudeOffset : AltitudeOffset,
                     Lighting = gData.Lighting,
                     Metadata = metadata,
-                    DisplayName = string.IsNullOrEmpty(gData.DisplayName) ? Path.GetFileNameWithoutExtension(gData.PrefabPath ?? string.Empty) : gData.DisplayName,
+                    DisplayName = string.IsNullOrEmpty(gData.DisplayName)
+                        ? Path.GetFileNameWithoutExtension(gData.PrefabPath ?? string.Empty)
+                        : gData.DisplayName,
                     RotationAngle = gData.RotationAngle
                 };
 
@@ -2251,6 +2452,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                         {
                             zone = z;
                         }
+
+                        SectorType sector = SectorType.Main;
+                        if (gData.RoomSectors != null && gData.RoomSectors.TryGetValue(areaIndex, out var sec))
+                        {
+                            sector = sec;
+                        }
+
+                        geoNode.SetRoomSector(areaIndex, sector);
                         geoNode.SetRoomZone(areaIndex, zone);
                         CreateRoomNode(geoNode, areaIndex);
                     }
@@ -2297,14 +2506,36 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     TurnOffAlarmOnTerminal = dData.TurnOffAlarmOnTerminal,
                     TerminalZone = dData.TerminalZone,
                     TerminalIndex = dData.TerminalIndex,
-                    EventsOnPortalWarp = new ObservableCollection<WardenEvent>(dData.EventsOnPortalWarp?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnApproachDoor = new ObservableCollection<WardenEvent>(dData.EventsOnApproachDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnUnlockDoor = new ObservableCollection<WardenEvent>(dData.EventsOnUnlockDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnOpenDoor = new ObservableCollection<WardenEvent>(dData.EventsOnOpenDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnDoorScanStart = new ObservableCollection<WardenEvent>(dData.EventsOnDoorScanStart?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnDoorScanDone = new ObservableCollection<WardenEvent>(dData.EventsOnDoorScanDone?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnBossDeath = new ObservableCollection<WardenEvent>(dData.EventsOnBossDeath?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
-                    EventsOnTrigger = new ObservableCollection<WardenEvent>(dData.EventsOnTrigger?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>())
+                    IsApexDoor = dData.IsApexDoor,
+                    HasBloodDoor = dData.HasBloodDoor,
+                    ProgressionPuzzleToEnter = dData.ProgressionPuzzleToEnter,
+                    ProgressionPuzzleCustomText = dData.ProgressionPuzzleCustomText ?? string.Empty,
+                    ProgressionPuzzlePlacementCount = dData.ProgressionPuzzlePlacementCount > 0
+                        ? dData.ProgressionPuzzlePlacementCount
+                        : 1,
+                    ProgressionPuzzleCandidateZones = new ObservableCollection<CandidateZonePlacement>(
+                        dData.ProgressionPuzzleCandidateZones?.Select(c => c.Clone()) ??
+                        Enumerable.Empty<CandidateZonePlacement>()),
+                    EnemyGroupInArea = new ObservableCollection<EnemyGroupItem>(
+                        dData.EnemyGroupInArea?.Select(e => e.Clone()) ?? Enumerable.Empty<EnemyGroupItem>()),
+                    EnemyGroupInFrontOfDoor = new ObservableCollection<EnemyGroupItem>(
+                        dData.EnemyGroupInFrontOfDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<EnemyGroupItem>()),
+                    EventsOnPortalWarp = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnPortalWarp?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnApproachDoor = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnApproachDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnUnlockDoor = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnUnlockDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnOpenDoor = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnOpenDoor?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnDoorScanStart = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnDoorScanStart?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnDoorScanDone = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnDoorScanDone?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnBossDeath = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnBossDeath?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnTrigger = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnTrigger?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>())
                 };
 
                 geoNode.Doors.Add(doorNode);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Serialization;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
@@ -85,6 +86,11 @@ public class FogSettingsBlock : INotifyPropertyChanged
     private double _infection;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public FogSettingsBlock()
+    {
+        EditorDefaultsService.ApplyFogBlockDefaults(this);
+    }
 
     [JsonPropertyName("name")]
     public string Name

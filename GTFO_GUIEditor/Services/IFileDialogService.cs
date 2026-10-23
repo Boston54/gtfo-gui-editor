@@ -14,6 +14,7 @@ public interface IFileDialogService
     string DefaultRundownsDirectory { get; }
     Task<string?> ShowOpenFileDialogAsync(string? defaultDirectory = null, string? filter = null);
     Task<string?> ShowSaveFileDialogAsync(string? defaultFileName = null, string? defaultDirectory = null, string? defaultExtension = "rundown");
+    Task<string?> ShowOpenFolderDialogAsync(string? defaultDirectory = null, string? title = "Select Export Destination Directory");
 }
 
 public class AvaloniaFileDialogService : IFileDialogService
@@ -151,6 +152,44 @@ public class AvaloniaFileDialogService : IFileDialogService
         if (result != null)
         {
             return result.Path.LocalPath;
+        }
+
+        return null;
+    }
+
+    public async Task<string?> ShowOpenFolderDialogAsync(string? defaultDirectory = null, string? title = "Select Export Destination Directory")
+    {
+        var storage = GetStorageProvider();
+        if (storage == null)
+        {
+            return null;
+        }
+
+        string initialDir = !string.IsNullOrWhiteSpace(defaultDirectory) && Directory.Exists(defaultDirectory)
+            ? defaultDirectory
+            : DefaultRundownsDirectory;
+
+        IStorageFolder? startFolder = null;
+        try
+        {
+            startFolder = await storage.TryGetFolderFromPathAsync(initialDir);
+        }
+        catch
+        {
+            // Ignore error retrieving folder
+        }
+
+        var options = new FolderPickerOpenOptions
+        {
+            Title = title ?? "Select Export Destination Directory",
+            AllowMultiple = false,
+            SuggestedStartLocation = startFolder
+        };
+
+        var result = await storage.OpenFolderPickerAsync(options);
+        if (result != null && result.Count > 0)
+        {
+            return result[0].Path.LocalPath;
         }
 
         return null;

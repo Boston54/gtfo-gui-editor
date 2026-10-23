@@ -4,8 +4,8 @@
     {
       "HealthPerZone": 1.0,
       "DisinfectionPerZone": 1.0,
-      "WeaponAmmoPerZone": 0.8,
-      "ToolAmmoPerZone": 0.7,
+      "WeaponAmmoPerZone": 1.0,
+      "ToolAmmoPerZone": 1.0,
       "CommodityValuePerZone": 0.0,
       "ChanceToPutCommodityInResourceContainer": 0.7,
       "ChanceToPutArtifactInResourceContainer": 0.15,
@@ -71,8 +71,8 @@
     {
       "HealthPerZone": 1.0,
       "DisinfectionPerZone": 1.0,
-      "WeaponAmmoPerZone": 0.8,
-      "ToolAmmoPerZone": 0.7,
+      "WeaponAmmoPerZone": 1.0,
+      "ToolAmmoPerZone": 1.0,
       "CommodityValuePerZone": 0.0,
       "ChanceToPutCommodityInResourceContainer": 0.7,
       "ChanceToPutArtifactInResourceContainer": 0.15,

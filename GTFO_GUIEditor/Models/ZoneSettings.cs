@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using GTFO_GUIEditor.Services;
 
 namespace GTFO_GUIEditor.Models;
 
 public class ZoneSettings : INotifyPropertyChanged
 {
+    private SectorType _sector = SectorType.Main;
     private int _zoneIndex;
     private uint _lighting;
+    private uint _consumableDistributionInZone;
     private int _medKitUses;
     private int _ammoKitUses;
     private int _toolKitUses;
     private int _disinfectKitUses;
-    private int _bulkheadKeys;
     private bool _containsDC;
     private bool _dcOpensSecondary;
     private bool _dcOpensOverload;
     private ObservableCollection<string> _dcOpenedMainDoorIds = new();
-    private bool _containsDisinfectStation;
     private bool _containsGenCluster;
     private int _powerCells;
     private int _fogTurbines;
@@ -51,6 +52,17 @@ public class ZoneSettings : INotifyPropertyChanged
     private ObservableCollection<TerminalPlacement> _terminalPlacements = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public ZoneSettings()
+    {
+        EditorDefaultsService.ApplyZoneSettingsDefaults(this);
+    }
+
+    public SectorType Sector
+    {
+        get => _sector;
+        set => SetField(ref _sector, value);
+    }
 
     public int SubSeed
     {
@@ -184,6 +196,12 @@ public class ZoneSettings : INotifyPropertyChanged
         set => SetField(ref _lighting, value);
     }
 
+    public uint ConsumableDistributionInZone
+    {
+        get => _consumableDistributionInZone;
+        set => SetField(ref _consumableDistributionInZone, value);
+    }
+
     public int MedKitUses
     {
         get => _medKitUses;
@@ -208,12 +226,6 @@ public class ZoneSettings : INotifyPropertyChanged
         set => SetField(ref _disinfectKitUses, Math.Max(0, value));
     }
 
-    public int BulkheadKeys
-    {
-        get => _bulkheadKeys;
-        set => SetField(ref _bulkheadKeys, Math.Max(0, value));
-    }
-
     public bool ContainsDC
     {
         get => _containsDC;
@@ -236,12 +248,6 @@ public class ZoneSettings : INotifyPropertyChanged
     {
         get => _dcOpenedMainDoorIds;
         set => SetField(ref _dcOpenedMainDoorIds, value ?? new ObservableCollection<string>());
-    }
-
-    public bool ContainsDisinfectStation
-    {
-        get => _containsDisinfectStation;
-        set => SetField(ref _containsDisinfectStation, value);
     }
 
     public bool ContainsGenCluster

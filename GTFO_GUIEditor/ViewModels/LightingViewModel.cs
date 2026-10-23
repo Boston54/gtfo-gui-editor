@@ -43,7 +43,7 @@ public class LightingViewModel : ViewModelBase
     public ObservableCollection<LightSettingsBlock> AvailableTemplates { get; }
 
     public LightingViewModel()
-        : this(LightSettingsService.LoadVanillaBlocks())
+        : this(new List<LightSettingsBlock>())
     {
     }
 

@@ -229,43 +229,7 @@ public static class RundownService
 
     public static RundownBlock CreateFreshBlock(uint id, string name)
     {
-        return new RundownBlock
-        {
-            PersistentId = id,
-            Name = name,
-            InternalEnabled = true,
-            NeverShowRundownTree = false,
-            UseTierUnlockRequirements = false,
-            ReqToReachTierA = new TierRequirements { MainSectors = 0, SecondarySectors = 0, ThirdSectors = 0, AllClearedSectors = 0 },
-            ReqToReachTierB = new TierRequirements { MainSectors = 0, SecondarySectors = 0, ThirdSectors = 0, AllClearedSectors = 0 },
-            ReqToReachTierC = new TierRequirements { MainSectors = 0, SecondarySectors = 0, ThirdSectors = 0, AllClearedSectors = 0 },
-            ReqToReachTierD = new TierRequirements { MainSectors = 0, SecondarySectors = 0, ThirdSectors = 0, AllClearedSectors = 0 },
-            ReqToReachTierE = new TierRequirements { MainSectors = 0, SecondarySectors = 0, ThirdSectors = 0, AllClearedSectors = 0 },
-            StorytellingData = new StorytellingData
-            {
-                Title = string.Empty,
-                TextLog = 0,
-                TextLogPos = new Vector2Data { X = 0.0, Y = 0.0 },
-                Visuals = new RundownVisuals
-                {
-                    ColorBackground = new ColorData(1.0, 0.0, 0.0, 0.0),
-                    TierAVisuals = new TierVisuals { Color = new ColorData(1.0, 0.97, 0.88, 0.79), Scale = 0.65, ScaleYModifier = 0.3 },
-                    TierBVisuals = new TierVisuals { Color = new ColorData(1.0, 0.91, 0.77, 0.66), Scale = 0.65, ScaleYModifier = 0.3 },
-                    TierCVisuals = new TierVisuals { Color = new ColorData(1.0, 0.81, 0.66, 0.54), Scale = 0.65, ScaleYModifier = 0.3 },
-                    TierDVisuals = new TierVisuals { Color = new ColorData(1.0, 0.68, 0.49, 0.32), Scale = 0.65, ScaleYModifier = 0.3 },
-                    TierEVisuals = new TierVisuals { Color = new ColorData(1.0, 0.68, 0.41, 0.18), Scale = 0.65, ScaleYModifier = 0.3 }
-                },
-                SurfaceIconPosition = new Vector2Data { X = 0.0, Y = 0.0 },
-                SurfaceDescription = string.Empty,
-                ExternalExpTitle = 0
-            },
-            VanityItemLayerDropDataBlock = 0,
-            TierA = new List<ExpeditionBlock>(),
-            TierB = new List<ExpeditionBlock>(),
-            TierC = new List<ExpeditionBlock>(),
-            TierD = new List<ExpeditionBlock>(),
-            TierE = new List<ExpeditionBlock>()
-        };
+        return EditorDefaultsService.CreateDefaultRundownBlock(id, name);
     }
 
     public static RundownBlock CreateBlockFromTemplate(RundownBlock template, uint newId, string newName)
