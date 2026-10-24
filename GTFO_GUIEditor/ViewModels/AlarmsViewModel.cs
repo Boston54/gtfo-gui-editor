@@ -19,8 +19,10 @@ public class AlarmsViewModel : ViewModelBase
     // Create alarm modal state
     private bool _isCreatingAlarm;
     private bool _isCreatingFresh = true;
-    private bool _isCreatingFromTemplate;
-    private AlarmBlock? _selectedTemplate;
+    private bool _isCreatingFromExisting;
+    private bool _isCreatingFromVanilla;
+    private AlarmBlock? _selectedExistingAlarm;
+    private AlarmBlock? _selectedVanillaTemplate;
     private string _newAlarmName = string.Empty;
     private string _newAlarmPublicAlarmName = string.Empty;
     private uint _newAlarmPersistentId;
@@ -61,6 +63,7 @@ public class AlarmsViewModel : ViewModelBase
         _alarms = new ObservableCollection<AlarmBlock>(alarmList);
         _alarms.CollectionChanged += (s, e) =>
         {
+            OnPropertyChanged(nameof(HasExistingAlarms));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
         };
@@ -147,6 +150,8 @@ public class AlarmsViewModel : ViewModelBase
 
     // --- Create Alarm Workflow ---
 
+    public bool HasExistingAlarms => _alarms.Count > 0;
+
     public bool IsCreatingAlarm
     {
         get => _isCreatingAlarm;
@@ -160,34 +165,129 @@ public class AlarmsViewModel : ViewModelBase
         {
             if (SetField(ref _isCreatingFresh, value) && value)
             {
-                IsCreatingFromTemplate = false;
+                _isCreatingFromExisting = false;
+                _isCreatingFromVanilla = false;
+                OnPropertyChanged(nameof(IsCreatingFromExisting));
+                OnPropertyChanged(nameof(IsCreatingFromVanilla));
+                OnPropertyChanged(nameof(IsCreatingFromTemplate));
+            }
+        }
+    }
+
+    public bool IsCreatingFromExisting
+    {
+        get => _isCreatingFromExisting;
+        set
+        {
+            if (SetField(ref _isCreatingFromExisting, value) && value)
+            {
+                _isCreatingFresh = false;
+                _isCreatingFromVanilla = false;
+                OnPropertyChanged(nameof(IsCreatingFresh));
+                OnPropertyChanged(nameof(IsCreatingFromVanilla));
+                OnPropertyChanged(nameof(IsCreatingFromTemplate));
+                if (SelectedExistingAlarm != null)
+                {
+                    NewAlarmPublicAlarmName = SelectedExistingAlarm.PublicAlarmName;
+                    if (!string.IsNullOrWhiteSpace(SelectedExistingAlarm.Name))
+                    {
+                        NewAlarmName = $"{SelectedExistingAlarm.Name}_Copy";
+                    }
+                }
+            }
+        }
+    }
+
+    public bool IsCreatingFromVanilla
+    {
+        get => _isCreatingFromVanilla;
+        set
+        {
+            if (SetField(ref _isCreatingFromVanilla, value) && value)
+            {
+                _isCreatingFresh = false;
+                _isCreatingFromExisting = false;
+                OnPropertyChanged(nameof(IsCreatingFresh));
+                OnPropertyChanged(nameof(IsCreatingFromExisting));
+                OnPropertyChanged(nameof(IsCreatingFromTemplate));
+                if (SelectedVanillaTemplate != null)
+                {
+                    NewAlarmPublicAlarmName = SelectedVanillaTemplate.PublicAlarmName;
+                    if (!string.IsNullOrWhiteSpace(SelectedVanillaTemplate.Name))
+                    {
+                        NewAlarmName = SelectedVanillaTemplate.Name;
+                    }
+                }
             }
         }
     }
 
     public bool IsCreatingFromTemplate
     {
-        get => _isCreatingFromTemplate;
+        get => _isCreatingFromVanilla || _isCreatingFromExisting;
         set
         {
-            if (SetField(ref _isCreatingFromTemplate, value) && value)
+            if (value)
             {
-                IsCreatingFresh = false;
+                IsCreatingFromVanilla = true;
+            }
+            else
+            {
+                IsCreatingFresh = true;
+            }
+        }
+    }
+
+    public AlarmBlock? SelectedExistingAlarm
+    {
+        get => _selectedExistingAlarm;
+        set
+        {
+            if (SetField(ref _selectedExistingAlarm, value) && value != null)
+            {
+                if (IsCreatingFromExisting)
+                {
+                    NewAlarmPublicAlarmName = value.PublicAlarmName;
+                    if (!string.IsNullOrWhiteSpace(value.Name))
+                    {
+                        NewAlarmName = $"{value.Name}_Copy";
+                    }
+                }
+            }
+        }
+    }
+
+    public AlarmBlock? SelectedVanillaTemplate
+    {
+        get => _selectedVanillaTemplate;
+        set
+        {
+            if (SetField(ref _selectedVanillaTemplate, value) && value != null)
+            {
+                if (IsCreatingFromVanilla || IsCreatingFromTemplate)
+                {
+                    NewAlarmPublicAlarmName = value.PublicAlarmName;
+                    if (!string.IsNullOrWhiteSpace(value.Name))
+                    {
+                        NewAlarmName = value.Name;
+                    }
+                }
             }
         }
     }
 
     public AlarmBlock? SelectedTemplate
     {
-        get => _selectedTemplate;
+        get => _isCreatingFromExisting ? _selectedExistingAlarm : _selectedVanillaTemplate;
         set
         {
-            if (SetField(ref _selectedTemplate, value) && value != null)
+            if (_isCreatingFromExisting)
             {
-                if (IsCreatingFromTemplate)
-                {
-                    NewAlarmPublicAlarmName = value.PublicAlarmName;
-                }
+                SelectedExistingAlarm = value;
+            }
+            else
+            {
+                SelectedVanillaTemplate = value;
             }
         }
     }
@@ -231,10 +331,28 @@ public class AlarmsViewModel : ViewModelBase
         NewAlarmName = $"Alarm_Custom_{randomId}";
         NewAlarmPublicAlarmName = string.Empty;
         IsCreatingFresh = true;
-        IsCreatingFromTemplate = false;
-        SelectedTemplate = AvailableTemplates.FirstOrDefault();
+        _isCreatingFromExisting = false;
+        _isCreatingFromVanilla = false;
+        OnPropertyChanged(nameof(IsCreatingFresh));
+        OnPropertyChanged(nameof(IsCreatingFromExisting));
+        OnPropertyChanged(nameof(IsCreatingFromVanilla));
+        OnPropertyChanged(nameof(IsCreatingFromTemplate));
+
+        SelectedExistingAlarm = _selectedAlarm ?? _alarms.FirstOrDefault();
+        SelectedVanillaTemplate = AvailableTemplates.FirstOrDefault();
         CreationErrorMessage = string.Empty;
         IsCreatingAlarm = true;
+    }
+
+    public void OpenDuplicateAlarmDialog(AlarmBlock? alarm = null)
+    {
+        var target = alarm ?? _selectedAlarm ?? _alarms.FirstOrDefault();
+        OpenCreateAlarmDialog();
+        if (target != null)
+        {
+            SelectedExistingAlarm = target;
+            IsCreatingFromExisting = true;
+        }
     }
 
     private uint GenerateUniquePersistentId()
@@ -272,14 +390,23 @@ public class AlarmsViewModel : ViewModelBase
         }
 
         AlarmBlock newAlarm;
-        if (IsCreatingFromTemplate)
+        if (IsCreatingFromExisting)
         {
-            if (SelectedTemplate == null)
+            if (SelectedExistingAlarm == null)
             {
-                CreationErrorMessage = "Please select a template alarm.";
+                CreationErrorMessage = "Please select an existing alarm to duplicate.";
                 return false;
             }
-            newAlarm = AlarmService.CreateAlarmFromTemplate(SelectedTemplate, NewAlarmPersistentId, NewAlarmName.Trim());
+            newAlarm = AlarmService.CreateAlarmFromTemplate(SelectedExistingAlarm, NewAlarmPersistentId, NewAlarmName.Trim());
+        }
+        else if (IsCreatingFromVanilla)
+        {
+            if (SelectedVanillaTemplate == null)
+            {
+                CreationErrorMessage = "Please select a vanilla alarm to import.";
+                return false;
+            }
+            newAlarm = AlarmService.CreateAlarmFromTemplate(SelectedVanillaTemplate, NewAlarmPersistentId, NewAlarmName.Trim());
         }
         else
         {

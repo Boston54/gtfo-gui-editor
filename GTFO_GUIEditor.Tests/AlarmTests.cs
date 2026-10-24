@@ -30,36 +30,46 @@ public class AlarmTests
         Assert.NotNull(alarms);
         Assert.NotEmpty(alarms);
 
-        var apex = alarms.FirstOrDefault(a => a.PersistentId == 1);
-        Assert.NotNull(apex);
-        Assert.Equal("Apex", apex.Name);
-        Assert.Equal(3.0, apex.PauseBeforeStart);
-        Assert.Equal(5.0, apex.PauseBetweenGroups);
-        Assert.Equal(3.0, apex.WavePauseMin_AtCost);
-        Assert.Equal(10.0, apex.WavePauseMax_AtCost);
-        Assert.Equal(3.0, apex.WavePauseMin);
-        Assert.Equal(30.0, apex.WavePauseMax);
-        Assert.Equal(WaveFilterType.Exclude, apex.FilterType);
-        Assert.True(apex.FilterWeakling);
-        Assert.False(apex.FilterStandard);
-        Assert.Equal(1.0, apex.ChanceToRandomizeSpawnDirectionPerWave);
-        Assert.Equal(0.1, apex.ChanceToRandomizeSpawnDirectionPerGroup);
-        Assert.False(apex.OverrideWaveSpawnType);
-        Assert.Equal(SurvivalWaveSpawnType.InRelationToClosestAlivePlayer, apex.SurvivalWaveSpawnType);
-        Assert.Equal(-1.0, apex.PopulationPointsTotal);
-        Assert.Equal(17.0, apex.PopulationPointsPerWaveStart);
-        Assert.Equal(25.0, apex.PopulationPointsPerWaveEnd);
-        Assert.Equal(5.0, apex.PopulationPointsMinPerGroup);
-        Assert.Equal(5.0, apex.PopulationPointsPerGroupStart);
-        Assert.Equal(10.0, apex.PopulationPointsPerGroupEnd);
-        Assert.Equal(200.0, apex.PopulationRampOverTime);
+        // ChainedPuzzle 513 is "R1A1 ZONE_50 (Main)" with SurvivalWaveSettings=1 (Apex) and SurvivalWavePopulation=1 (Baseline)
+        var alarm513 = alarms.FirstOrDefault(a => a.PersistentId == 513);
+        Assert.NotNull(alarm513);
+        Assert.Equal("R1A1 ZONE_50 (Main)", alarm513.Name);
+        Assert.Equal("Class II Alarm", alarm513.PublicAlarmName);
+        Assert.True(alarm513.SpawnsEnemies);
+        Assert.Equal(0.0, alarm513.WantedDistanceFromStartPos);
+        Assert.Equal(10.0, alarm513.WantedDistanceBetweenPuzzleComponents);
+        Assert.Equal(2, alarm513.ChainedPuzzle.Count);
+        Assert.Equal((uint)6, alarm513.ChainedPuzzle[0].PuzzleType);
+        Assert.Equal((uint)4, alarm513.ChainedPuzzle[1].PuzzleType);
 
-        // Check wave roles from baseline population
-        Assert.Equal((uint)21, apex.WaveRoleWeakling);
-        Assert.Equal((uint)13, apex.WaveRoleStandard);
-        Assert.Equal((uint)11, apex.WaveRoleSpecial);
-        Assert.Equal((uint)16, apex.WaveRoleMiniBoss);
-        Assert.Equal((uint)18, apex.WaveRoleBoss);
+        // Survival Wave Settings from Apex (1)
+        Assert.Equal(3.0, alarm513.PauseBeforeStart);
+        Assert.Equal(5.0, alarm513.PauseBetweenGroups);
+        Assert.Equal(3.0, alarm513.WavePauseMin_AtCost);
+        Assert.Equal(10.0, alarm513.WavePauseMax_AtCost);
+        Assert.Equal(3.0, alarm513.WavePauseMin);
+        Assert.Equal(30.0, alarm513.WavePauseMax);
+        Assert.Equal(WaveFilterType.Exclude, alarm513.FilterType);
+        Assert.True(alarm513.FilterWeakling);
+        Assert.False(alarm513.FilterStandard);
+        Assert.Equal(1.0, alarm513.ChanceToRandomizeSpawnDirectionPerWave);
+        Assert.Equal(0.1, alarm513.ChanceToRandomizeSpawnDirectionPerGroup);
+        Assert.False(alarm513.OverrideWaveSpawnType);
+        Assert.Equal(SurvivalWaveSpawnType.InRelationToClosestAlivePlayer, alarm513.SurvivalWaveSpawnType);
+        Assert.Equal(-1.0, alarm513.PopulationPointsTotal);
+        Assert.Equal(17.0, alarm513.PopulationPointsPerWaveStart);
+        Assert.Equal(25.0, alarm513.PopulationPointsPerWaveEnd);
+        Assert.Equal(5.0, alarm513.PopulationPointsMinPerGroup);
+        Assert.Equal(5.0, alarm513.PopulationPointsPerGroupStart);
+        Assert.Equal(10.0, alarm513.PopulationPointsPerGroupEnd);
+        Assert.Equal(200.0, alarm513.PopulationRampOverTime);
+
+        // Wave roles from Baseline population (1)
+        Assert.Equal((uint)21, alarm513.WaveRoleWeakling);
+        Assert.Equal((uint)13, alarm513.WaveRoleStandard);
+        Assert.Equal((uint)11, alarm513.WaveRoleSpecial);
+        Assert.Equal((uint)16, alarm513.WaveRoleMiniBoss);
+        Assert.Equal((uint)18, alarm513.WaveRoleBoss);
     }
 
     [Fact]
@@ -239,29 +249,144 @@ public class AlarmTests
     }
 
     [Fact]
-    public void LoadVanillaAlarms_ResolvesWaveRolesByThemeAndId()
+    public void LoadVanillaAlarms_ResolvesChainedPuzzleAndCorruptedPopulation()
     {
         var alarms = AlarmService.LoadVanillaAlarms();
         Assert.NotNull(alarms);
 
-        // Apex [1] uses Baseline population
-        var apex = alarms.FirstOrDefault(a => a.PersistentId == 1);
-        Assert.NotNull(apex);
-        Assert.Equal((uint)21, apex.WaveRoleWeakling);
-        Assert.Equal((uint)13, apex.WaveRoleStandard);
+        // ChainedPuzzle 545: R1C2 ZONE_3 (Main), SurvivalWaveSettings=228, SurvivalWavePopulation=47
+        var alarm545 = alarms.FirstOrDefault(a => a.PersistentId == 545);
+        Assert.NotNull(alarm545);
+        Assert.Equal("R1C2 ZONE_3 (Main)", alarm545.Name);
+        Assert.Equal("Class III Alarm", alarm545.PublicAlarmName);
+        Assert.True(alarm545.SpawnsEnemies);
+        Assert.Equal(0.0, alarm545.WantedDistanceFromStartPos);
+        Assert.Equal(11.0, alarm545.WantedDistanceBetweenPuzzleComponents);
+        Assert.Equal(3, alarm545.ChainedPuzzle.Count);
 
-        // Apex_Bullrush [228] resolves to Bullrush population
-        var apexBullrush = alarms.FirstOrDefault(a => a.PersistentId == 228);
-        Assert.NotNull(apexBullrush);
-        Assert.Equal("Apex_Bullrush", apexBullrush.Name);
-        Assert.Equal((uint)30, apexBullrush.WaveRoleWeakling);
-        Assert.Equal((uint)30, apexBullrush.WaveRoleStandard);
-        Assert.Equal((uint)39, apexBullrush.WaveRoleMiniBoss);
+        // Population 47 wave roles
+        Assert.Equal((uint)30, alarm545.WaveRoleWeakling);
+        Assert.Equal((uint)30, alarm545.WaveRoleStandard);
+        Assert.Equal((uint)30, alarm545.WaveRoleSpecial);
+        Assert.Equal((uint)30, alarm545.WaveRoleMiniBoss);
+        Assert.Equal((uint)30, alarm545.WaveRoleBoss);
 
-        // Trickle 4-45 SSpB [15] resolves properly to BullrushBigs
-        var trickle = alarms.FirstOrDefault(a => a.PersistentId == 15);
-        Assert.NotNull(trickle);
-        Assert.Equal((uint)39, trickle.WaveRoleWeakling);
+        // SurvivalWaveSettings 228
+        Assert.Equal(5.0, alarm545.PauseBetweenGroups);
+        Assert.Equal(15.0, alarm545.PopulationPointsPerWaveStart);
+        Assert.Equal(25.0, alarm545.PopulationPointsPerWaveEnd);
+
+        // ChainedPuzzle 514: R1A1 ZONE_51 (Main), TriggerAlarmOnActivate=false, SurvivalWaveSettings=0, SurvivalWavePopulation=0
+        var scanOnly = alarms.FirstOrDefault(a => a.PersistentId == 514);
+        Assert.NotNull(scanOnly);
+        Assert.Equal("R1A1 ZONE_51 (Main)", scanOnly.Name);
+        Assert.Equal("Scan", scanOnly.PublicAlarmName);
+        Assert.False(scanOnly.SpawnsEnemies);
+        Assert.Single(scanOnly.ChainedPuzzle);
+        Assert.Equal((uint)6, scanOnly.ChainedPuzzle[0].PuzzleType);
+        Assert.Equal(0.0, scanOnly.WantedDistanceFromStartPos);
+        Assert.Equal(1.0, scanOnly.WantedDistanceBetweenPuzzleComponents);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_CreateAlarmDialog_ImportFromVanillaTemplate()
+    {
+        var vm = new AlarmsViewModel();
+        Assert.NotEmpty(vm.AvailableTemplates);
+
+        var template = vm.AvailableTemplates.FirstOrDefault(a => a.PersistentId == 513);
+        Assert.NotNull(template);
+
+        vm.OpenCreateAlarmDialog();
+        Assert.True(vm.IsCreatingAlarm);
+
+        vm.IsCreatingFromVanilla = true;
+        vm.SelectedVanillaTemplate = template;
+
+        Assert.Equal("R1A1 ZONE_50 (Main)", vm.NewAlarmName);
+        Assert.Equal("Class II Alarm", vm.NewAlarmPublicAlarmName);
+
+        vm.NewAlarmPersistentId = 7777;
+        vm.NewAlarmName = "My Custom Portal Alarm";
+
+        bool created = vm.ConfirmCreateAlarm();
+        Assert.True(created);
+        Assert.False(vm.IsCreatingAlarm);
+
+        var createdAlarm = vm.SelectedAlarm;
+        Assert.NotNull(createdAlarm);
+        Assert.Equal((uint)7777, createdAlarm.PersistentId);
+        Assert.Equal("My Custom Portal Alarm", createdAlarm.Name);
+        Assert.Equal("Class II Alarm", createdAlarm.PublicAlarmName);
+        Assert.True(createdAlarm.SpawnsEnemies);
+        Assert.Equal(0.0, createdAlarm.WantedDistanceFromStartPos);
+        Assert.Equal(10.0, createdAlarm.WantedDistanceBetweenPuzzleComponents);
+        Assert.Equal(2, createdAlarm.ChainedPuzzle.Count);
+        Assert.Equal((uint)6, createdAlarm.ChainedPuzzle[0].PuzzleType);
+        Assert.Equal((uint)4, createdAlarm.ChainedPuzzle[1].PuzzleType);
+        Assert.Equal((uint)21, createdAlarm.WaveRoleWeakling);
+        Assert.Equal((uint)13, createdAlarm.WaveRoleStandard);
+        Assert.Equal(5.0, createdAlarm.PauseBetweenGroups);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_CreateAlarmDialog_DuplicateFromExistingAlarm()
+    {
+        var existing = AlarmService.CreateFreshAlarm(101, "My_Existing_Alarm");
+        existing.ChainedPuzzle.Clear();
+        existing.PublicAlarmName = "Class VI Alarm";
+        existing.PauseBeforeStart = 8.5;
+        existing.ChainedPuzzle.Add(new ChainedPuzzleItem { PuzzleType = 22 });
+
+        var vm = new AlarmsViewModel(new[] { existing });
+        Assert.True(vm.HasExistingAlarms);
+
+        vm.OpenCreateAlarmDialog();
+        Assert.True(vm.IsCreatingAlarm);
+        Assert.True(vm.IsCreatingFresh);
+
+        vm.IsCreatingFromExisting = true;
+        Assert.True(vm.IsCreatingFromExisting);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.False(vm.IsCreatingFromVanilla);
+
+        Assert.Equal(existing, vm.SelectedExistingAlarm);
+        Assert.Equal("My_Existing_Alarm_Copy", vm.NewAlarmName);
+        Assert.Equal("Class VI Alarm", vm.NewAlarmPublicAlarmName);
+
+        vm.NewAlarmPersistentId = 202;
+        vm.NewAlarmName = "Duplicated Alarm Custom";
+
+        bool created = vm.ConfirmCreateAlarm();
+        Assert.True(created);
+        Assert.False(vm.IsCreatingAlarm);
+        Assert.Equal(2, vm.Alarms.Count);
+
+        var duplicated = vm.SelectedAlarm;
+        Assert.NotNull(duplicated);
+        Assert.Equal((uint)202, duplicated.PersistentId);
+        Assert.Equal("Duplicated Alarm Custom", duplicated.Name);
+        Assert.Equal("Class VI Alarm", duplicated.PublicAlarmName);
+        Assert.Equal(8.5, duplicated.PauseBeforeStart);
+        Assert.Single(duplicated.ChainedPuzzle);
+        Assert.Equal((uint)22, duplicated.ChainedPuzzle[0].PuzzleType);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_OpenDuplicateAlarmDialog_PreselectsExistingAlarm()
+    {
+        var existing = AlarmService.CreateFreshAlarm(300, "Base Alarm");
+        existing.PublicAlarmName = "Class I Alarm";
+
+        var vm = new AlarmsViewModel(new[] { existing });
+        vm.OpenDuplicateAlarmDialog(existing);
+
+        Assert.True(vm.IsCreatingAlarm);
+        Assert.True(vm.IsCreatingFromExisting);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.Equal(existing, vm.SelectedExistingAlarm);
+        Assert.Equal("Base Alarm_Copy", vm.NewAlarmName);
+        Assert.Equal("Class I Alarm", vm.NewAlarmPublicAlarmName);
     }
 
     [Fact]
@@ -333,5 +458,96 @@ public class AlarmTests
 
         var clone = alarm.Clone();
         Assert.False(clone.SpawnsEnemies);
+    }
+
+    [Fact]
+    public void AlarmBlock_DistanceSettings_GetSetAndClone()
+    {
+        var alarm = new AlarmBlock
+        {
+            WantedDistanceFromStartPos = 12.5,
+            WantedDistanceBetweenPuzzleComponents = 24.0
+        };
+
+        Assert.Equal(12.5, alarm.WantedDistanceFromStartPos);
+        Assert.Equal(24.0, alarm.WantedDistanceBetweenPuzzleComponents);
+
+        var clone = alarm.Clone();
+        Assert.Equal(12.5, clone.WantedDistanceFromStartPos);
+        Assert.Equal(24.0, clone.WantedDistanceBetweenPuzzleComponents);
+    }
+
+    [Fact]
+    public void AlarmBlock_DistanceSettings_ProjectSerializationRoundtrip()
+    {
+        string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_test_{System.Guid.NewGuid():N}.rundown");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var customAlarm = AlarmService.CreateFreshAlarm(777, "Custom Distance Alarm");
+            customAlarm.WantedDistanceFromStartPos = 15.5;
+            customAlarm.WantedDistanceBetweenPuzzleComponents = 30.25;
+
+            mainVm.Alarms.Alarms.Add(customAlarm);
+
+            RundownProjectService.SaveProject(mainVm, tempFile);
+
+            var loadedProject = RundownProjectService.LoadProject(tempFile);
+            var loadedVm = new MainWindowViewModel();
+            RundownProjectService.ApplyProject(loadedVm, loadedProject);
+
+            var loadedAlarm = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 777);
+            Assert.NotNull(loadedAlarm);
+            Assert.Equal("Custom Distance Alarm", loadedAlarm.Name);
+            Assert.Equal(15.5, loadedAlarm.WantedDistanceFromStartPos);
+            Assert.Equal(30.25, loadedAlarm.WantedDistanceBetweenPuzzleComponents);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempFile))
+            {
+                try { System.IO.File.Delete(tempFile); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void DatablockExport_ExportsAlarmDistanceSettings()
+    {
+        string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_export_{System.Guid.NewGuid():N}");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var customAlarm = AlarmService.CreateFreshAlarm(99999, "Export Distance Alarm");
+            customAlarm.WantedDistanceFromStartPos = 7.5;
+            customAlarm.WantedDistanceBetweenPuzzleComponents = 14.25;
+
+            mainVm.Alarms.Alarms.Clear();
+            mainVm.Alarms.Alarms.Add(customAlarm);
+
+            var result = DatablockExportService.ExportAll(mainVm, tempDir);
+            Assert.True(result.Success, result.Message);
+
+            string chainedPuzzlePath = System.IO.Path.Combine(tempDir, "GameData_ChainedPuzzleDataBlock_bin.json");
+            Assert.True(System.IO.File.Exists(chainedPuzzlePath));
+
+            var jsonDoc = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(chainedPuzzlePath))?.AsObject();
+            Assert.NotNull(jsonDoc);
+
+            var blocks = jsonDoc["Blocks"]?.AsArray();
+            Assert.NotNull(blocks);
+
+            var exportedBlock = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 99999)?.AsObject();
+            Assert.NotNull(exportedBlock);
+            Assert.Equal(7.5, exportedBlock["WantedDistanceFromStartPos"]?.GetValue<double>());
+            Assert.Equal(14.25, exportedBlock["WantedDistanceBetweenPuzzleComponents"]?.GetValue<double>());
+        }
+        finally
+        {
+            if (System.IO.Directory.Exists(tempDir))
+            {
+                try { System.IO.Directory.Delete(tempDir, true); } catch { }
+            }
+        }
     }
 }

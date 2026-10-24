@@ -17,6 +17,8 @@ public class AlarmBlock : INotifyPropertyChanged
     private string _publicAlarmName = "";
     private bool _internalEnabled = true;
     private bool _spawnsEnemies = true;
+    private double _wantedDistanceFromStartPos = 0;
+    private double _wantedDistanceBetweenPuzzleComponents = 0;
     private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
 
     // Wave Roles (Enemy References)
@@ -108,6 +110,20 @@ public class AlarmBlock : INotifyPropertyChanged
     {
         get => _spawnsEnemies;
         set => SetField(ref _spawnsEnemies, value);
+    }
+
+    [JsonPropertyName("WantedDistanceFromStartPos")]
+    public double WantedDistanceFromStartPos
+    {
+        get => _wantedDistanceFromStartPos;
+        set => SetField(ref _wantedDistanceFromStartPos, value);
+    }
+
+    [JsonPropertyName("WantedDistanceBetweenPuzzleComponents")]
+    public double WantedDistanceBetweenPuzzleComponents
+    {
+        get => _wantedDistanceBetweenPuzzleComponents;
+        set => SetField(ref _wantedDistanceBetweenPuzzleComponents, value);
     }
 
     [JsonPropertyName("ChainedPuzzle")]
@@ -388,6 +404,8 @@ public class AlarmBlock : INotifyPropertyChanged
             PublicAlarmName = PublicAlarmName,
             InternalEnabled = InternalEnabled,
             SpawnsEnemies = SpawnsEnemies,
+            WantedDistanceFromStartPos = WantedDistanceFromStartPos,
+            WantedDistanceBetweenPuzzleComponents = WantedDistanceBetweenPuzzleComponents,
             ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(ChainedPuzzle.Select(c => c.Clone())),
 
             WaveRoleWeakling = WaveRoleWeakling,

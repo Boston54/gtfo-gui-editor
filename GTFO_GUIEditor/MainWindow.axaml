@@ -6153,6 +6153,15 @@
                                                         FontWeight="SemiBold"/>
                                             </Grid>
 
+                                            <!-- Scan Settings -->
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*" Margin="0,5,0,0">
+                                                <TextBlock Grid.Column="0" Text="Wanted Distance From Start Pos:" ToolTip.Tip="The desired distance for the first scan from the door. A value of 0 means the first scan will be in front of the door, a non-zero value means it will move." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Column="1" Text="{Binding SelectedAlarm.WantedDistanceFromStartPos, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                <TextBlock Grid.Column="2" Text="Wanted Distance Between Puzzle Components:" ToolTip.Tip="The desired distance between each of the scans. If this is 0, then every scan will be in the same spot (this is useful for things like the R8E2 exit scan or the R8C2 MRI scan)" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                <TextBox Grid.Column="3" Text="{Binding SelectedAlarm.WantedDistanceBetweenPuzzleComponents, Mode=TwoWay}"/>
+                                            </Grid>
+
                                             <ItemsControl ItemsSource="{Binding SelectedAlarm.ChainedPuzzle}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="models:ChainedPuzzleItem" x:CompileBindings="False">
@@ -6426,17 +6435,34 @@
                                                Foreground="LightGray"
                                                FontSize="12"/>
 
-                                    <!-- Option: Blank or Template -->
+                                    <!-- Option: Blank, Existing Alarm, or Vanilla Import -->
                                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
                                         <StackPanel Spacing="10">
                                             <RadioButton Content="Create a new fresh (blank) alarm" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
-                                            <RadioButton Content="Use an existing alarm as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
 
-                                            <!-- Template Selector -->
-                                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
-                                                <TextBlock Text="Select Alarm Template:" ToolTip.Tip="Select an alarm to copy the properties from." FontSize="12" Foreground="LightGray"/>
+                                            <RadioButton Content="Use an existing alarm as a template" IsChecked="{Binding IsCreatingFromExisting, Mode=TwoWay}" IsEnabled="{Binding HasExistingAlarms}"/>
+
+                                            <!-- Existing Alarm Selector -->
+                                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromExisting}" Margin="20,4,0,0">
+                                                <TextBlock Text="Select Existing Alarm:" ToolTip.Tip="Select an existing alarm from this project to copy properties from." FontSize="12" Foreground="LightGray"/>
+                                                <ComboBox ItemsSource="{Binding Alarms}"
+                                                          SelectedItem="{Binding SelectedExistingAlarm, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                                            <TextBlock Text="{Binding DisplayText}"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                            </StackPanel>
+
+                                            <RadioButton Content="Import an alarm from vanilla" IsChecked="{Binding IsCreatingFromVanilla, Mode=TwoWay}"/>
+
+                                            <!-- Vanilla Template Selector -->
+                                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromVanilla}" Margin="20,4,0,0">
+                                                <TextBlock Text="Select Vanilla Alarm:" ToolTip.Tip="Select a vanilla alarm to import properties from." FontSize="12" Foreground="LightGray"/>
                                                 <ComboBox ItemsSource="{Binding AvailableTemplates}"
-                                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                                          SelectedItem="{Binding SelectedVanillaTemplate, Mode=TwoWay}"
                                                           HorizontalAlignment="Stretch">
                                                     <ComboBox.ItemTemplate>
                                                         <DataTemplate x:DataType="models:AlarmBlock">

@@ -210,6 +210,12 @@ public static class AlarmService
 
     private class ChainedPuzzleBlock
     {
+        [JsonPropertyName("persistentID")]
+        public uint PersistentId { get; set; }
+
+        [JsonPropertyName("name")]
+        public string? Name { get; set; }
+
         [JsonPropertyName("PublicAlarmName")]
         public string? PublicAlarmName { get; set; }
 
@@ -222,6 +228,15 @@ public static class AlarmService
         [JsonPropertyName("SurvivalWavePopulation")]
         public uint SurvivalWavePopulation { get; set; }
 
+        [JsonPropertyName("internalEnabled")]
+        public bool InternalEnabled { get; set; } = true;
+
+        [JsonPropertyName("WantedDistanceFromStartPos")]
+        public double WantedDistanceFromStartPos { get; set; }
+
+        [JsonPropertyName("WantedDistanceBetweenPuzzleComponents")]
+        public double WantedDistanceBetweenPuzzleComponents { get; set; }
+
         [JsonPropertyName("ChainedPuzzle")]
         public List<ChainedPuzzleItem>? ChainedPuzzle { get; set; }
     }
@@ -230,70 +245,6 @@ public static class AlarmService
     {
         [JsonPropertyName("Blocks")]
         public List<ChainedPuzzleBlock> Blocks { get; set; } = new();
-    }
-
-    private static PopulationBlock? FindBestPopulationMatch(
-        AlarmBlock alarm,
-        Dictionary<uint, PopulationBlock> populations,
-        Dictionary<uint, uint> chainedPuzzleMap)
-    {
-        if (populations.Count == 0)
-        {
-            return null;
-        }
-
-        // Exact name match
-        var exactName = populations.Values.FirstOrDefault(p => string.Equals(p.Name, alarm.Name, StringComparison.OrdinalIgnoreCase));
-        if (exactName != null)
-        {
-            return exactName;
-        }
-
-        // Specialized substring match (excluding generic "Baseline")
-        var nonBaselinePops = populations.Values
-            .Where(p => !string.IsNullOrWhiteSpace(p.Name) && !p.Name.Equals("Baseline", StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        var substringMatch = nonBaselinePops
-            .Where(p => p.Name.Length > 2 && alarm.Name.Contains(p.Name, StringComparison.OrdinalIgnoreCase))
-            .OrderByDescending(p => p.Name.Length)
-            .FirstOrDefault();
-        if (substringMatch != null)
-        {
-            return substringMatch;
-        }
-
-        // Specialized token overlap match (e.g. Bullrush, Shadows, Flyers, Tank, Mother, Pouncers, Birthers, Snatchers, SquidBoss, Hybrids, Corrupted)
-        var alarmTokens = alarm.Name.Split(new[] { '_', ' ', '-' }, StringSplitOptions.RemoveEmptyEntries);
-        var tokenMatch = nonBaselinePops
-            .Select(p => new
-            {
-                Population = p,
-                Score = alarmTokens.Count(t => t.Length > 2 && p.Name.Contains(t, StringComparison.OrdinalIgnoreCase))
-            })
-            .Where(x => x.Score > 0)
-            .OrderByDescending(x => x.Score)
-            .ThenBy(x => Math.Abs(x.Population.Name.Length - alarm.Name.Length))
-            .Select(x => x.Population)
-            .FirstOrDefault();
-        if (tokenMatch != null)
-        {
-            return tokenMatch;
-        }
-
-        // Direct PersistentId match (if IDs match directly)
-        if (populations.TryGetValue(alarm.PersistentId, out var idMatch))
-        {
-            return idMatch;
-        }
-
-        // Chained Puzzle explicit mapping
-        if (chainedPuzzleMap.TryGetValue(alarm.PersistentId, out uint popId) && populations.TryGetValue(popId, out var popFromPuzzle))
-        {
-            return popFromPuzzle;
-        }
-
-        return null;
     }
 
     public static List<AlarmBlock> LoadVanillaAlarms(string? settingsPath = null, string? populationPath = null, string? chainedPuzzlePath = null)
@@ -323,39 +274,24 @@ public static class AlarmService
             }
         }
 
-        var chainedPuzzleMap = new Dictionary<uint, uint>();
-        var chainedPuzzlePublicAlarmMap = new Dictionary<uint, string>();
-        var chainedPuzzleBlockMap = new Dictionary<uint, ChainedPuzzleBlock>();
-        if (!string.IsNullOrEmpty(chainedPuzzlePath) && File.Exists(chainedPuzzlePath))
+        var waveSettingsMap = new Dictionary<uint, AlarmBlock>();
+        if (!string.IsNullOrEmpty(settingsPath) && File.Exists(settingsPath))
         {
             try
             {
-                string puzzleJson = File.ReadAllText(chainedPuzzlePath);
-                var puzzleFile = JsonSerializer.Deserialize<ChainedPuzzleDataBlockFile>(puzzleJson, JsonOptions);
-                if (puzzleFile?.Blocks != null)
+                string settingsJson = File.ReadAllText(settingsPath);
+                var settingsFile = JsonSerializer.Deserialize<SurvivalWaveSettingsDataBlockFile>(settingsJson, JsonOptions);
+                if (settingsFile?.Blocks != null)
                 {
-                    foreach (var block in puzzleFile.Blocks)
+                    foreach (var block in settingsFile.Blocks)
                     {
-                        if (block.SurvivalWaveSettings > 0)
-                        {
-                            chainedPuzzleBlockMap[block.SurvivalWaveSettings] = block;
-
-                            if (block.SurvivalWavePopulation > 0)
-                            {
-                                chainedPuzzleMap[block.SurvivalWaveSettings] = block.SurvivalWavePopulation;
-                            }
-
-                            if (!string.IsNullOrWhiteSpace(block.PublicAlarmName) && !chainedPuzzlePublicAlarmMap.ContainsKey(block.SurvivalWaveSettings))
-                            {
-                                chainedPuzzlePublicAlarmMap[block.SurvivalWaveSettings] = block.PublicAlarmName;
-                            }
-                        }
+                        waveSettingsMap[block.PersistentId] = block;
                     }
                 }
             }
             catch
             {
-                // Ignore puzzle load failures
+                // Ignore settings file load failures
             }
         }
 
@@ -364,36 +300,87 @@ public static class AlarmService
                           ?? new PopulationBlock();
 
         var alarms = new List<AlarmBlock>();
-        if (!string.IsNullOrEmpty(settingsPath) && File.Exists(settingsPath))
+        if (!string.IsNullOrEmpty(chainedPuzzlePath) && File.Exists(chainedPuzzlePath))
         {
             try
             {
-                string settingsJson = File.ReadAllText(settingsPath);
-                var settingsFile = JsonSerializer.Deserialize<SurvivalWaveSettingsDataBlockFile>(settingsJson, JsonOptions);
-                if (settingsFile?.Blocks != null && settingsFile.Blocks.Count > 0)
+                string puzzleJson = File.ReadAllText(chainedPuzzlePath);
+                var puzzleFile = JsonSerializer.Deserialize<ChainedPuzzleDataBlockFile>(puzzleJson, JsonOptions);
+                if (puzzleFile?.Blocks != null && puzzleFile.Blocks.Count > 0)
                 {
-                    foreach (var alarm in settingsFile.Blocks)
+                    foreach (var puzzleBlock in puzzleFile.Blocks)
                     {
-                        var pop = FindBestPopulationMatch(alarm, populations, chainedPuzzleMap) ?? baselinePop;
+                        var alarm = new AlarmBlock();
+                        EditorDefaultsService.ApplyAlarmDefaults(alarm);
 
-                        alarm.WaveRoleWeakling = pop.WaveRoleWeakling;
-                        alarm.WaveRoleStandard = pop.WaveRoleStandard;
-                        alarm.WaveRoleSpecial = pop.WaveRoleSpecial;
-                        alarm.WaveRoleMiniBoss = pop.WaveRoleMiniBoss;
-                        alarm.WaveRoleBoss = pop.WaveRoleBoss;
+                        alarm.PersistentId = puzzleBlock.PersistentId;
+                        alarm.Name = puzzleBlock.Name ?? $"ChainedPuzzle_{puzzleBlock.PersistentId}";
+                        alarm.PublicAlarmName = puzzleBlock.PublicAlarmName ?? string.Empty;
+                        alarm.InternalEnabled = puzzleBlock.InternalEnabled;
+                        alarm.SpawnsEnemies = puzzleBlock.TriggerAlarmOnActivate;
+                        alarm.WantedDistanceFromStartPos = puzzleBlock.WantedDistanceFromStartPos;
+                        alarm.WantedDistanceBetweenPuzzleComponents = puzzleBlock.WantedDistanceBetweenPuzzleComponents;
 
-                        if (chainedPuzzlePublicAlarmMap.TryGetValue(alarm.PersistentId, out var pubName))
+                        if (puzzleBlock.ChainedPuzzle != null && puzzleBlock.ChainedPuzzle.Count > 0)
                         {
-                            alarm.PublicAlarmName = pubName;
+                            alarm.ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(
+                                puzzleBlock.ChainedPuzzle.Select(c => c.Clone())
+                            );
+                        }
+                        else
+                        {
+                            alarm.ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>();
                         }
 
-                        if (chainedPuzzleBlockMap.TryGetValue(alarm.PersistentId, out var puzzleBlock))
+                        // Populate Wave Roles from SurvivalWavePopulation
+                        if (puzzleBlock.SurvivalWavePopulation > 0 &&
+                            populations.TryGetValue(puzzleBlock.SurvivalWavePopulation, out var pop))
                         {
-                            alarm.SpawnsEnemies = puzzleBlock.TriggerAlarmOnActivate;
-                            if (puzzleBlock.ChainedPuzzle != null && puzzleBlock.ChainedPuzzle.Count > 0)
-                            {
-                                alarm.ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(puzzleBlock.ChainedPuzzle.Select(c => c.Clone()));
-                            }
+                            alarm.WaveRoleWeakling = pop.WaveRoleWeakling;
+                            alarm.WaveRoleStandard = pop.WaveRoleStandard;
+                            alarm.WaveRoleSpecial = pop.WaveRoleSpecial;
+                            alarm.WaveRoleMiniBoss = pop.WaveRoleMiniBoss;
+                            alarm.WaveRoleBoss = pop.WaveRoleBoss;
+                        }
+                        else
+                        {
+                            alarm.WaveRoleWeakling = baselinePop.WaveRoleWeakling;
+                            alarm.WaveRoleStandard = baselinePop.WaveRoleStandard;
+                            alarm.WaveRoleSpecial = baselinePop.WaveRoleSpecial;
+                            alarm.WaveRoleMiniBoss = baselinePop.WaveRoleMiniBoss;
+                            alarm.WaveRoleBoss = baselinePop.WaveRoleBoss;
+                        }
+
+                        // Populate Wave Settings from SurvivalWaveSettings
+                        if (puzzleBlock.SurvivalWaveSettings > 0 &&
+                            waveSettingsMap.TryGetValue(puzzleBlock.SurvivalWaveSettings, out var waveSettings))
+                        {
+                            alarm.PauseBeforeStart = waveSettings.PauseBeforeStart;
+                            alarm.PauseBetweenGroups = waveSettings.PauseBetweenGroups;
+                            alarm.WavePauseMin_AtCost = waveSettings.WavePauseMin_AtCost;
+                            alarm.WavePauseMax_AtCost = waveSettings.WavePauseMax_AtCost;
+                            alarm.WavePauseMin = waveSettings.WavePauseMin;
+                            alarm.WavePauseMax = waveSettings.WavePauseMax;
+
+                            alarm.FilterType = waveSettings.FilterType;
+                            alarm.FilterWeakling = waveSettings.FilterWeakling;
+                            alarm.FilterStandard = waveSettings.FilterStandard;
+                            alarm.FilterSpecial = waveSettings.FilterSpecial;
+                            alarm.FilterMiniBoss = waveSettings.FilterMiniBoss;
+                            alarm.FilterBoss = waveSettings.FilterBoss;
+
+                            alarm.ChanceToRandomizeSpawnDirectionPerWave = waveSettings.ChanceToRandomizeSpawnDirectionPerWave;
+                            alarm.ChanceToRandomizeSpawnDirectionPerGroup = waveSettings.ChanceToRandomizeSpawnDirectionPerGroup;
+                            alarm.OverrideWaveSpawnType = waveSettings.OverrideWaveSpawnType;
+                            alarm.SurvivalWaveSpawnType = waveSettings.SurvivalWaveSpawnType;
+
+                            alarm.PopulationPointsTotal = waveSettings.PopulationPointsTotal;
+                            alarm.PopulationPointsPerWaveStart = waveSettings.PopulationPointsPerWaveStart;
+                            alarm.PopulationPointsPerWaveEnd = waveSettings.PopulationPointsPerWaveEnd;
+                            alarm.PopulationPointsMinPerGroup = waveSettings.PopulationPointsMinPerGroup;
+                            alarm.PopulationPointsPerGroupStart = waveSettings.PopulationPointsPerGroupStart;
+                            alarm.PopulationPointsPerGroupEnd = waveSettings.PopulationPointsPerGroupEnd;
+                            alarm.PopulationRampOverTime = waveSettings.PopulationRampOverTime;
                         }
 
                         alarms.Add(alarm);
@@ -402,7 +389,7 @@ public static class AlarmService
             }
             catch
             {
-                // Fallback to fresh alarm
+                // Ignore puzzle load failures
             }
         }
 
