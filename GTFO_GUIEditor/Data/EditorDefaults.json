@@ -70,9 +70,21 @@
 
       "ResourceContainers": {
         "MedKitUses": 0,
+        "MedKitPlacementStart": 0.0,
+        "MedKitPlacementMiddle": 0.0,
+        "MedKitPlacementEnd": 0.0,
         "AmmoKitUses": 0,
+        "AmmoKitPlacementStart": 0.0,
+        "AmmoKitPlacementMiddle": 0.0,
+        "AmmoKitPlacementEnd": 0.0,
         "ToolKitUses": 0,
+        "ToolKitPlacementStart": 0.0,
+        "ToolKitPlacementMiddle": 0.0,
+        "ToolKitPlacementEnd": 0.0,
         "DisinfectKitUses": 0,
+        "DisinfectKitPlacementStart": 0.0,
+        "DisinfectKitPlacementMiddle": 0.0,
+        "DisinfectKitPlacementEnd": 0.0,
         "PowerCells": 0,
         "FogTurbines": 0
       },

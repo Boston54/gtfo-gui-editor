@@ -963,13 +963,33 @@ public static class DatablockExportService
                             ["DisinfectionStationPlacements"] = disinfPlacementsArray,
                             ["DumbwaiterPlacements"] = new JsonArray(),
                             ["HealthMulti"] = zoneSettings.MedKitUses * 0.25,
-                            ["HealthPlacement"] = new JsonObject { ["Start"] = 0.0, ["Middle"] = 0.0, ["End"] = 0.0 },
+                            ["HealthPlacement"] = new JsonObject
+                            {
+                                ["Start"] = zoneSettings.MedKitPlacementStart,
+                                ["Middle"] = zoneSettings.MedKitPlacementMiddle,
+                                ["End"] = zoneSettings.MedKitPlacementEnd
+                            },
                             ["WeaponAmmoMulti"] = zoneSettings.AmmoKitUses * 0.25,
-                            ["WeaponAmmoPlacement"] = new JsonObject { ["Start"] = 0.0, ["Middle"] = 0.0, ["End"] = 0.0 },
+                            ["WeaponAmmoPlacement"] = new JsonObject
+                            {
+                                ["Start"] = zoneSettings.AmmoKitPlacementStart,
+                                ["Middle"] = zoneSettings.AmmoKitPlacementMiddle,
+                                ["End"] = zoneSettings.AmmoKitPlacementEnd
+                            },
                             ["ToolAmmoMulti"] = zoneSettings.ToolKitUses * 0.25,
-                            ["ToolAmmoPlacement"] = new JsonObject { ["Start"] = 0.0, ["Middle"] = 0.0, ["End"] = 0.0 },
+                            ["ToolAmmoPlacement"] = new JsonObject
+                            {
+                                ["Start"] = zoneSettings.ToolKitPlacementStart,
+                                ["Middle"] = zoneSettings.ToolKitPlacementMiddle,
+                                ["End"] = zoneSettings.ToolKitPlacementEnd
+                            },
                             ["DisinfectionMulti"] = zoneSettings.DisinfectKitUses * 0.25,
-                            ["DisinfectionPlacement"] = new JsonObject { ["Start"] = 0.0, ["Middle"] = 0.0, ["End"] = 0.0 },
+                            ["DisinfectionPlacement"] = new JsonObject
+                            {
+                                ["Start"] = zoneSettings.DisinfectKitPlacementStart,
+                                ["Middle"] = zoneSettings.DisinfectKitPlacementMiddle,
+                                ["End"] = zoneSettings.DisinfectKitPlacementEnd
+                            },
                             ["StaticSpawnDataContainers"] = new JsonArray()
                         };
 

@@ -195,22 +195,44 @@
                                                     </StackPanel>
                                                 </Border>
 
-                                                <!-- Resource Kit Uses (Med, Ammo, Tool, Disinfect) -->
+                                                <!-- Resource Kit Placements Matrix (Med, Ammo, Tool, Disinfect) -->
                                                 <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
                                                     <StackPanel Spacing="8">
-                                                        <TextBlock Text="Resource Kit Uses" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" ToolTip.Tip="Number of resource kit uses in the zone."/>
-                                                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
-                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Med Uses:" ToolTip.Tip="Number of medical kit uses in this zone." VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
-                                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitUses, Mode=TwoWay}" Margin="0,0,14,8"/>
+                                                        <TextBlock Text="Resource Kit Placements" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+                                                        <Grid ColumnDefinitions="Auto,*,*,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                                            <!-- Column Headers -->
+                                                            <TextBlock Grid.Row="0" Grid.Column="1" Text="Med" ToolTip.Tip="Medical kit resources" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,6,6"/>
+                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Ammo" ToolTip.Tip="Weapon ammo resources" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,6,6"/>
+                                                            <TextBlock Grid.Row="0" Grid.Column="3" Text="Tool" ToolTip.Tip="Tool refill resources" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,6,6"/>
+                                                            <TextBlock Grid.Row="0" Grid.Column="4" Text="Disinfect" ToolTip.Tip="Disinfection pack resources" HorizontalAlignment="Center" FontWeight="SemiBold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
 
-                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Ammo Uses:" ToolTip.Tip="Number of ammo pack uses in this zone." VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
-                                                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.AmmoKitUses, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                                            <!-- Row 1: Uses -->
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Uses:" ToolTip.Tip="Number of resource kit uses in this zone (1 use = 20%)." VerticalAlignment="Center" Margin="0,0,8,6" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitUses, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding ActiveZoneSettings.AmmoKitUses, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveZoneSettings.ToolKitUses, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding ActiveZoneSettings.DisinfectKitUses, Mode=TwoWay}" Margin="0,0,0,6"/>
 
-                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool Uses:" ToolTip.Tip="Number of tool refill uses in this zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
-                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.ToolKitUses, Mode=TwoWay}" Margin="0,0,14,0"/>
+                                                            <!-- Row 2: Start -->
+                                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Start:" ToolTip.Tip="Placement weight for the start of the zone." VerticalAlignment="Center" Margin="0,0,8,6" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitPlacementStart, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="2" Grid.Column="2" Text="{Binding ActiveZoneSettings.AmmoKitPlacementStart, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding ActiveZoneSettings.ToolKitPlacementStart, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="2" Grid.Column="4" Text="{Binding ActiveZoneSettings.DisinfectKitPlacementStart, Mode=TwoWay}" Margin="0,0,0,6"/>
 
-                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Disinfect Uses:" ToolTip.Tip="Number of disinfection pack uses in this zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
-                                                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveZoneSettings.DisinfectKitUses, Mode=TwoWay}"/>
+                                                            <!-- Row 3: Middle -->
+                                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Middle:" ToolTip.Tip="Placement weight for the middle of the zone." VerticalAlignment="Center" Margin="0,0,8,6" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitPlacementMiddle, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="3" Grid.Column="2" Text="{Binding ActiveZoneSettings.AmmoKitPlacementMiddle, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="3" Grid.Column="3" Text="{Binding ActiveZoneSettings.ToolKitPlacementMiddle, Mode=TwoWay}" Margin="0,0,6,6"/>
+                                                            <TextBox Grid.Row="3" Grid.Column="4" Text="{Binding ActiveZoneSettings.DisinfectKitPlacementMiddle, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                                            <!-- Row 4: End -->
+                                                            <TextBlock Grid.Row="4" Grid.Column="0" Text="End:" ToolTip.Tip="Placement weight for the end of the zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitPlacementEnd, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                            <TextBox Grid.Row="4" Grid.Column="2" Text="{Binding ActiveZoneSettings.AmmoKitPlacementEnd, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                            <TextBox Grid.Row="4" Grid.Column="3" Text="{Binding ActiveZoneSettings.ToolKitPlacementEnd, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                            <TextBox Grid.Row="4" Grid.Column="4" Text="{Binding ActiveZoneSettings.DisinfectKitPlacementEnd, Mode=TwoWay}" Margin="0,0,0,0"/>
                                                         </Grid>
                                                     </StackPanel>
                                                 </Border>

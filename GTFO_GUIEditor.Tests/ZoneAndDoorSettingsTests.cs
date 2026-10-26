@@ -1,5 +1,9 @@
+using System;
+using System.IO;
 using System.Linq;
+using System.Text.Json;
 using GTFO_GUIEditor.Models;
+using GTFO_GUIEditor.Services;
 using GTFO_GUIEditor.ViewModels;
 using Xunit;
 
@@ -846,5 +850,202 @@ public class ZoneAndDoorSettingsTests
 
         vm.CloseSectorSettings();
         Assert.False(vm.IsEditingSector);
+    }
+
+    [Fact]
+    public void ZoneSettings_ResourceKitPlacementWeights_PropertiesAndDefaults()
+    {
+        var zs = new ZoneSettings();
+        Assert.Equal(0, zs.MedKitUses);
+        Assert.Equal(0.0, zs.MedKitPlacementStart);
+        Assert.Equal(0.0, zs.MedKitPlacementMiddle);
+        Assert.Equal(0.0, zs.MedKitPlacementEnd);
+
+        Assert.Equal(0, zs.AmmoKitUses);
+        Assert.Equal(0.0, zs.AmmoKitPlacementStart);
+        Assert.Equal(0.0, zs.AmmoKitPlacementMiddle);
+        Assert.Equal(0.0, zs.AmmoKitPlacementEnd);
+
+        Assert.Equal(0, zs.ToolKitUses);
+        Assert.Equal(0.0, zs.ToolKitPlacementStart);
+        Assert.Equal(0.0, zs.ToolKitPlacementMiddle);
+        Assert.Equal(0.0, zs.ToolKitPlacementEnd);
+
+        Assert.Equal(0, zs.DisinfectKitUses);
+        Assert.Equal(0.0, zs.DisinfectKitPlacementStart);
+        Assert.Equal(0.0, zs.DisinfectKitPlacementMiddle);
+        Assert.Equal(0.0, zs.DisinfectKitPlacementEnd);
+
+        // Test mutating values
+        zs.MedKitUses = 4;
+        zs.MedKitPlacementStart = 0.5;
+        zs.MedKitPlacementMiddle = 0.3;
+        zs.MedKitPlacementEnd = 0.2;
+
+        zs.AmmoKitUses = 6;
+        zs.AmmoKitPlacementStart = 0.1;
+        zs.AmmoKitPlacementMiddle = 0.8;
+        zs.AmmoKitPlacementEnd = 0.1;
+
+        zs.ToolKitUses = 2;
+        zs.ToolKitPlacementStart = 0.33;
+        zs.ToolKitPlacementMiddle = 0.34;
+        zs.ToolKitPlacementEnd = 0.33;
+
+        zs.DisinfectKitUses = 1;
+        zs.DisinfectKitPlacementStart = 0.0;
+        zs.DisinfectKitPlacementMiddle = 1.0;
+        zs.DisinfectKitPlacementEnd = 0.0;
+
+        Assert.Equal(4, zs.MedKitUses);
+        Assert.Equal(0.5, zs.MedKitPlacementStart);
+        Assert.Equal(0.3, zs.MedKitPlacementMiddle);
+        Assert.Equal(0.2, zs.MedKitPlacementEnd);
+
+        Assert.Equal(6, zs.AmmoKitUses);
+        Assert.Equal(0.1, zs.AmmoKitPlacementStart);
+        Assert.Equal(0.8, zs.AmmoKitPlacementMiddle);
+        Assert.Equal(0.1, zs.AmmoKitPlacementEnd);
+
+        Assert.Equal(2, zs.ToolKitUses);
+        Assert.Equal(0.33, zs.ToolKitPlacementStart);
+        Assert.Equal(0.34, zs.ToolKitPlacementMiddle);
+        Assert.Equal(0.33, zs.ToolKitPlacementEnd);
+
+        Assert.Equal(1, zs.DisinfectKitUses);
+        Assert.Equal(0.0, zs.DisinfectKitPlacementStart);
+        Assert.Equal(1.0, zs.DisinfectKitPlacementMiddle);
+        Assert.Equal(0.0, zs.DisinfectKitPlacementEnd);
+    }
+
+    [Fact]
+    public void GridState_ResourceKitPlacementWeights_ExportAndImport()
+    {
+        var grid = new LevelLayoutGridState();
+        var zs = grid.GetOrCreateZoneSettings(SectorType.Main, 1);
+        zs.MedKitUses = 5;
+        zs.MedKitPlacementStart = 0.7;
+        zs.MedKitPlacementMiddle = 0.2;
+        zs.MedKitPlacementEnd = 0.1;
+
+        zs.AmmoKitUses = 8;
+        zs.AmmoKitPlacementStart = 0.25;
+        zs.AmmoKitPlacementMiddle = 0.5;
+        zs.AmmoKitPlacementEnd = 0.25;
+
+        zs.ToolKitUses = 3;
+        zs.ToolKitPlacementStart = 0.4;
+        zs.ToolKitPlacementMiddle = 0.4;
+        zs.ToolKitPlacementEnd = 0.2;
+
+        zs.DisinfectKitUses = 2;
+        zs.DisinfectKitPlacementStart = 0.6;
+        zs.DisinfectKitPlacementMiddle = 0.3;
+        zs.DisinfectKitPlacementEnd = 0.1;
+
+        var stateData = grid.ExportStateData();
+        Assert.NotNull(stateData);
+
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(stateData);
+
+        var importedZs = newGrid.GetOrCreateZoneSettings(SectorType.Main, 1);
+        Assert.Equal(5, importedZs.MedKitUses);
+        Assert.Equal(0.7, importedZs.MedKitPlacementStart);
+        Assert.Equal(0.2, importedZs.MedKitPlacementMiddle);
+        Assert.Equal(0.1, importedZs.MedKitPlacementEnd);
+
+        Assert.Equal(8, importedZs.AmmoKitUses);
+        Assert.Equal(0.25, importedZs.AmmoKitPlacementStart);
+        Assert.Equal(0.5, importedZs.AmmoKitPlacementMiddle);
+        Assert.Equal(0.25, importedZs.AmmoKitPlacementEnd);
+
+        Assert.Equal(3, importedZs.ToolKitUses);
+        Assert.Equal(0.4, importedZs.ToolKitPlacementStart);
+        Assert.Equal(0.4, importedZs.ToolKitPlacementMiddle);
+        Assert.Equal(0.2, importedZs.ToolKitPlacementEnd);
+
+        Assert.Equal(2, importedZs.DisinfectKitUses);
+        Assert.Equal(0.6, importedZs.DisinfectKitPlacementStart);
+        Assert.Equal(0.3, importedZs.DisinfectKitPlacementMiddle);
+        Assert.Equal(0.1, importedZs.DisinfectKitPlacementEnd);
+    }
+
+    [Fact]
+    public void DatablockExportService_ExportsResourceKitPlacementWeights_InLevelLayout()
+    {
+        var tempExportDir = Path.Combine(Path.GetTempPath(), $"gtfo_export_resources_{Guid.NewGuid()}");
+        try
+        {
+            var vm = new MainWindowViewModel();
+            var layoutVm = vm.LevelLayout;
+            var level = layoutVm.SelectedLevel;
+            Assert.NotNull(level);
+
+            var zs = level.GridState.GetOrCreateZoneSettings(SectorType.Main, 0);
+            zs.MedKitUses = 4;
+            zs.MedKitPlacementStart = 0.6;
+            zs.MedKitPlacementMiddle = 0.3;
+            zs.MedKitPlacementEnd = 0.1;
+
+            zs.AmmoKitUses = 8;
+            zs.AmmoKitPlacementStart = 0.2;
+            zs.AmmoKitPlacementMiddle = 0.5;
+            zs.AmmoKitPlacementEnd = 0.3;
+
+            zs.ToolKitUses = 2;
+            zs.ToolKitPlacementStart = 0.1;
+            zs.ToolKitPlacementMiddle = 0.2;
+            zs.ToolKitPlacementEnd = 0.7;
+
+            zs.DisinfectKitUses = 3;
+            zs.DisinfectKitPlacementStart = 0.4;
+            zs.DisinfectKitPlacementMiddle = 0.4;
+            zs.DisinfectKitPlacementEnd = 0.2;
+
+            var result = DatablockExportService.ExportAll(vm, tempExportDir);
+            Assert.True(result.Success, result.Message);
+
+            string layoutPath = Path.Combine(tempExportDir, "GameData_LevelLayoutDataBlock_bin.json");
+            Assert.True(File.Exists(layoutPath));
+            string json = File.ReadAllText(layoutPath);
+
+            using var doc = JsonDocument.Parse(json);
+            var blocks = doc.RootElement.GetProperty("Blocks");
+            var firstLayout = blocks.EnumerateArray().First();
+            var zones = firstLayout.GetProperty("Zones");
+            var firstZone = zones.EnumerateArray().First();
+
+            Assert.Equal(1.0, firstZone.GetProperty("HealthMulti").GetDouble());
+            var healthPlacement = firstZone.GetProperty("HealthPlacement");
+            Assert.Equal(0.6, healthPlacement.GetProperty("Start").GetDouble());
+            Assert.Equal(0.3, healthPlacement.GetProperty("Middle").GetDouble());
+            Assert.Equal(0.1, healthPlacement.GetProperty("End").GetDouble());
+
+            Assert.Equal(2.0, firstZone.GetProperty("WeaponAmmoMulti").GetDouble());
+            var ammoPlacement = firstZone.GetProperty("WeaponAmmoPlacement");
+            Assert.Equal(0.2, ammoPlacement.GetProperty("Start").GetDouble());
+            Assert.Equal(0.5, ammoPlacement.GetProperty("Middle").GetDouble());
+            Assert.Equal(0.3, ammoPlacement.GetProperty("End").GetDouble());
+
+            Assert.Equal(0.5, firstZone.GetProperty("ToolAmmoMulti").GetDouble());
+            var toolPlacement = firstZone.GetProperty("ToolAmmoPlacement");
+            Assert.Equal(0.1, toolPlacement.GetProperty("Start").GetDouble());
+            Assert.Equal(0.2, toolPlacement.GetProperty("Middle").GetDouble());
+            Assert.Equal(0.7, toolPlacement.GetProperty("End").GetDouble());
+
+            Assert.Equal(0.75, firstZone.GetProperty("DisinfectionMulti").GetDouble());
+            var disinfPlacement = firstZone.GetProperty("DisinfectionPlacement");
+            Assert.Equal(0.4, disinfPlacement.GetProperty("Start").GetDouble());
+            Assert.Equal(0.4, disinfPlacement.GetProperty("Middle").GetDouble());
+            Assert.Equal(0.2, disinfPlacement.GetProperty("End").GetDouble());
+        }
+        finally
+        {
+            if (Directory.Exists(tempExportDir))
+            {
+                Directory.Delete(tempExportDir, true);
+            }
+        }
     }
 }

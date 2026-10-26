@@ -135,9 +135,25 @@ public class EnemyRespawningDefaults
 public class ResourceContainersDefaults
 {
     public int MedKitUses { get; set; } = 0;
+    public double MedKitPlacementStart { get; set; } = 0.0;
+    public double MedKitPlacementMiddle { get; set; } = 0.0;
+    public double MedKitPlacementEnd { get; set; } = 0.0;
+
     public int AmmoKitUses { get; set; } = 0;
+    public double AmmoKitPlacementStart { get; set; } = 0.0;
+    public double AmmoKitPlacementMiddle { get; set; } = 0.0;
+    public double AmmoKitPlacementEnd { get; set; } = 0.0;
+
     public int ToolKitUses { get; set; } = 0;
+    public double ToolKitPlacementStart { get; set; } = 0.0;
+    public double ToolKitPlacementMiddle { get; set; } = 0.0;
+    public double ToolKitPlacementEnd { get; set; } = 0.0;
+
     public int DisinfectKitUses { get; set; } = 0;
+    public double DisinfectKitPlacementStart { get; set; } = 0.0;
+    public double DisinfectKitPlacementMiddle { get; set; } = 0.0;
+    public double DisinfectKitPlacementEnd { get; set; } = 0.0;
+
     public int PowerCells { get; set; } = 0;
     public int FogTurbines { get; set; } = 0;
 }

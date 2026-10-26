@@ -194,9 +194,25 @@ public static class EditorDefaultsService
 
         // Resource Containers
         zone.MedKitUses = d.ResourceContainers.MedKitUses;
+        zone.MedKitPlacementStart = d.ResourceContainers.MedKitPlacementStart;
+        zone.MedKitPlacementMiddle = d.ResourceContainers.MedKitPlacementMiddle;
+        zone.MedKitPlacementEnd = d.ResourceContainers.MedKitPlacementEnd;
+
         zone.AmmoKitUses = d.ResourceContainers.AmmoKitUses;
+        zone.AmmoKitPlacementStart = d.ResourceContainers.AmmoKitPlacementStart;
+        zone.AmmoKitPlacementMiddle = d.ResourceContainers.AmmoKitPlacementMiddle;
+        zone.AmmoKitPlacementEnd = d.ResourceContainers.AmmoKitPlacementEnd;
+
         zone.ToolKitUses = d.ResourceContainers.ToolKitUses;
+        zone.ToolKitPlacementStart = d.ResourceContainers.ToolKitPlacementStart;
+        zone.ToolKitPlacementMiddle = d.ResourceContainers.ToolKitPlacementMiddle;
+        zone.ToolKitPlacementEnd = d.ResourceContainers.ToolKitPlacementEnd;
+
         zone.DisinfectKitUses = d.ResourceContainers.DisinfectKitUses;
+        zone.DisinfectKitPlacementStart = d.ResourceContainers.DisinfectKitPlacementStart;
+        zone.DisinfectKitPlacementMiddle = d.ResourceContainers.DisinfectKitPlacementMiddle;
+        zone.DisinfectKitPlacementEnd = d.ResourceContainers.DisinfectKitPlacementEnd;
+
         zone.PowerCells = d.ResourceContainers.PowerCells;
         zone.FogTurbines = d.ResourceContainers.FogTurbines;
     }

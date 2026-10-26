@@ -41,6 +41,7 @@ This section is divided into four sections:
 | Markers | Geomorphs define the overall layout and shape of a tile, while markers fill in the blanks. Bridges, objects, boxes, terminals, etc, are all placed via Markers. In some tiles, markers can completely change the flow of a tile. These are randomly generated based on the Marker seed offset. |
 | Plugs | Plugs define the asset that is placed at the edge of a geomorph to connect with other geomorphs. These can include simple doors with surrounding structure, staircases between altitudes, and open room dividers with no doors. |
 | Boss Aligns | Some geomorphs contain a Boss Align point which defines static points where 'boss' enemeis (such as Tanks or Mothers) will spawn if they are spawned in this tile.|
+| Weighted Probability | Weighted probability used to determine the probability of something happening relative to other options. For example, if you have two options, one with a 2 weight and one with a 5 weight, then option one has probability 2/7, and option two has probability 5/7. The probability of each option is calculated as the weight of the given option divided by the sum of all weights. |
 
 ## Tiles, Rooms & Zones
 The connectors at the edge of a geomorph can be clicked by the user to create a new tile for the expedition. This prompts the user to select a geomorph to place, alongside a rotation and altitude.
@@ -73,7 +74,9 @@ TODO
 
 # Alarms & Enemy Waves
 ## Alarms & Scans
-Alarms / scans can be attached to any type of security door to require the players to complete scan(s) before unlocking the door. They are both implemented through teh Alarms tab, and are differentiated by the `Spawns Enemies` checkbox.
+Alarms / scans can be attached to any type of security door to require the players to complete scan(s) before unlocking the door. They are both implemented through the Alarms tab, and are differentiated by the `Spawns Enemies` checkbox.
+
+After an alarm has been implemented, users can add alarms to a security door by clicking on it and setting the `Alarm` dropdown value in the Door settings popup.
 
 To create an alarm, the Alarms tab can be opened and a new alarm can be created by clicking the `+ Create New Alarm` button. This opens three options:
 
@@ -117,17 +120,21 @@ All events can be made to spawn enemies through the `SpawnEnemyWaves` or the `Sp
 ## Blood Doors
 TODO
 
-## Event Alarms
-TODO
-
-# Loot & Items
+# Resources & Items
 ## Resource Packs
-TODO
+Resource packs can be distributed throughout a zone using the Zone Config panel. This can be accessed by clicking on any room in a zone and then swapping to the 'Zone' tab. From here, it can be found under the 'Resource Kit Uses' section.
+
+The first row of the matrix is the resource kit type - Medikit, Ammo, Tool, and Disinfect Packs. The values that you input in this row are the number of uses that will be placed in the zone (i.e., 4 means there will be 4 uses, or 80% total).
+
+The next three rows of the matrix are the weighted placements for the start, middle, and end of the zone, which determine where in the zone you would like the resources to spawn. Leaving them all at 0 means random placement.
 
 ## Consumables
 TODO
 
 ## Big Pickup Items
+TODO
+
+## Artifacts
 TODO
 
 # Environment

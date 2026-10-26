@@ -431,12 +431,24 @@ public class ZoneSettingsData
     [JsonPropertyName("excludeList")] public List<EnemyExcludeItem> ExcludeList { get; set; } = new();
 
     [JsonPropertyName("medKitUses")] public int MedKitUses { get; set; }
+    [JsonPropertyName("medKitPlacementStart")] public double MedKitPlacementStart { get; set; }
+    [JsonPropertyName("medKitPlacementMiddle")] public double MedKitPlacementMiddle { get; set; }
+    [JsonPropertyName("medKitPlacementEnd")] public double MedKitPlacementEnd { get; set; }
 
     [JsonPropertyName("ammoKitUses")] public int AmmoKitUses { get; set; }
+    [JsonPropertyName("ammoKitPlacementStart")] public double AmmoKitPlacementStart { get; set; }
+    [JsonPropertyName("ammoKitPlacementMiddle")] public double AmmoKitPlacementMiddle { get; set; }
+    [JsonPropertyName("ammoKitPlacementEnd")] public double AmmoKitPlacementEnd { get; set; }
 
     [JsonPropertyName("toolKitUses")] public int ToolKitUses { get; set; }
+    [JsonPropertyName("toolKitPlacementStart")] public double ToolKitPlacementStart { get; set; }
+    [JsonPropertyName("toolKitPlacementMiddle")] public double ToolKitPlacementMiddle { get; set; }
+    [JsonPropertyName("toolKitPlacementEnd")] public double ToolKitPlacementEnd { get; set; }
 
     [JsonPropertyName("disinfectKitUses")] public int DisinfectKitUses { get; set; }
+    [JsonPropertyName("disinfectKitPlacementStart")] public double DisinfectKitPlacementStart { get; set; }
+    [JsonPropertyName("disinfectKitPlacementMiddle")] public double DisinfectKitPlacementMiddle { get; set; }
+    [JsonPropertyName("disinfectKitPlacementEnd")] public double DisinfectKitPlacementEnd { get; set; }
 
     [JsonPropertyName("containsDC")] public bool ContainsDC { get; set; }
 

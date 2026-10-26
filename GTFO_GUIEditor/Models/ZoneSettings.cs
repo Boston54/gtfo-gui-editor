@@ -14,9 +14,24 @@ public class ZoneSettings : INotifyPropertyChanged
     private uint _lighting;
     private uint _consumableDistributionInZone;
     private int _medKitUses;
+    private double _medKitPlacementStart;
+    private double _medKitPlacementMiddle;
+    private double _medKitPlacementEnd;
+
     private int _ammoKitUses;
+    private double _ammoKitPlacementStart;
+    private double _ammoKitPlacementMiddle;
+    private double _ammoKitPlacementEnd;
+
     private int _toolKitUses;
+    private double _toolKitPlacementStart;
+    private double _toolKitPlacementMiddle;
+    private double _toolKitPlacementEnd;
+
     private int _disinfectKitUses;
+    private double _disinfectKitPlacementStart;
+    private double _disinfectKitPlacementMiddle;
+    private double _disinfectKitPlacementEnd;
     private bool _containsDC;
     private bool _dcOpensSecondary;
     private bool _dcOpensOverload;
@@ -208,10 +223,46 @@ public class ZoneSettings : INotifyPropertyChanged
         set => SetField(ref _medKitUses, Math.Max(0, value));
     }
 
+    public double MedKitPlacementStart
+    {
+        get => _medKitPlacementStart;
+        set => SetField(ref _medKitPlacementStart, value);
+    }
+
+    public double MedKitPlacementMiddle
+    {
+        get => _medKitPlacementMiddle;
+        set => SetField(ref _medKitPlacementMiddle, value);
+    }
+
+    public double MedKitPlacementEnd
+    {
+        get => _medKitPlacementEnd;
+        set => SetField(ref _medKitPlacementEnd, value);
+    }
+
     public int AmmoKitUses
     {
         get => _ammoKitUses;
         set => SetField(ref _ammoKitUses, Math.Max(0, value));
+    }
+
+    public double AmmoKitPlacementStart
+    {
+        get => _ammoKitPlacementStart;
+        set => SetField(ref _ammoKitPlacementStart, value);
+    }
+
+    public double AmmoKitPlacementMiddle
+    {
+        get => _ammoKitPlacementMiddle;
+        set => SetField(ref _ammoKitPlacementMiddle, value);
+    }
+
+    public double AmmoKitPlacementEnd
+    {
+        get => _ammoKitPlacementEnd;
+        set => SetField(ref _ammoKitPlacementEnd, value);
     }
 
     public int ToolKitUses
@@ -220,10 +271,46 @@ public class ZoneSettings : INotifyPropertyChanged
         set => SetField(ref _toolKitUses, Math.Max(0, value));
     }
 
+    public double ToolKitPlacementStart
+    {
+        get => _toolKitPlacementStart;
+        set => SetField(ref _toolKitPlacementStart, value);
+    }
+
+    public double ToolKitPlacementMiddle
+    {
+        get => _toolKitPlacementMiddle;
+        set => SetField(ref _toolKitPlacementMiddle, value);
+    }
+
+    public double ToolKitPlacementEnd
+    {
+        get => _toolKitPlacementEnd;
+        set => SetField(ref _toolKitPlacementEnd, value);
+    }
+
     public int DisinfectKitUses
     {
         get => _disinfectKitUses;
         set => SetField(ref _disinfectKitUses, Math.Max(0, value));
+    }
+
+    public double DisinfectKitPlacementStart
+    {
+        get => _disinfectKitPlacementStart;
+        set => SetField(ref _disinfectKitPlacementStart, value);
+    }
+
+    public double DisinfectKitPlacementMiddle
+    {
+        get => _disinfectKitPlacementMiddle;
+        set => SetField(ref _disinfectKitPlacementMiddle, value);
+    }
+
+    public double DisinfectKitPlacementEnd
+    {
+        get => _disinfectKitPlacementEnd;
+        set => SetField(ref _disinfectKitPlacementEnd, value);
     }
 
     public bool ContainsDC

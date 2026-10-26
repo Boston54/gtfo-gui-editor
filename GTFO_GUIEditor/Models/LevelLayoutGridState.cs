@@ -2264,9 +2264,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 CountMultiplier = zs.CountMultiplier,
                 ExcludeList = zs.ExcludeList.Select(e => e.Clone()).ToList(),
                 MedKitUses = zs.MedKitUses,
+                MedKitPlacementStart = zs.MedKitPlacementStart,
+                MedKitPlacementMiddle = zs.MedKitPlacementMiddle,
+                MedKitPlacementEnd = zs.MedKitPlacementEnd,
                 AmmoKitUses = zs.AmmoKitUses,
+                AmmoKitPlacementStart = zs.AmmoKitPlacementStart,
+                AmmoKitPlacementMiddle = zs.AmmoKitPlacementMiddle,
+                AmmoKitPlacementEnd = zs.AmmoKitPlacementEnd,
                 ToolKitUses = zs.ToolKitUses,
+                ToolKitPlacementStart = zs.ToolKitPlacementStart,
+                ToolKitPlacementMiddle = zs.ToolKitPlacementMiddle,
+                ToolKitPlacementEnd = zs.ToolKitPlacementEnd,
                 DisinfectKitUses = zs.DisinfectKitUses,
+                DisinfectKitPlacementStart = zs.DisinfectKitPlacementStart,
+                DisinfectKitPlacementMiddle = zs.DisinfectKitPlacementMiddle,
+                DisinfectKitPlacementEnd = zs.DisinfectKitPlacementEnd,
                 ContainsDC = zs.ContainsDC,
                 ContainsGenCluster = zs.ContainsGenCluster,
                 PowerCells = zs.PowerCells,
@@ -2334,9 +2346,21 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 }
 
                 zs.MedKitUses = zsData.MedKitUses;
+                zs.MedKitPlacementStart = zsData.MedKitPlacementStart;
+                zs.MedKitPlacementMiddle = zsData.MedKitPlacementMiddle;
+                zs.MedKitPlacementEnd = zsData.MedKitPlacementEnd;
                 zs.AmmoKitUses = zsData.AmmoKitUses;
+                zs.AmmoKitPlacementStart = zsData.AmmoKitPlacementStart;
+                zs.AmmoKitPlacementMiddle = zsData.AmmoKitPlacementMiddle;
+                zs.AmmoKitPlacementEnd = zsData.AmmoKitPlacementEnd;
                 zs.ToolKitUses = zsData.ToolKitUses;
+                zs.ToolKitPlacementStart = zsData.ToolKitPlacementStart;
+                zs.ToolKitPlacementMiddle = zsData.ToolKitPlacementMiddle;
+                zs.ToolKitPlacementEnd = zsData.ToolKitPlacementEnd;
                 zs.DisinfectKitUses = zsData.DisinfectKitUses;
+                zs.DisinfectKitPlacementStart = zsData.DisinfectKitPlacementStart;
+                zs.DisinfectKitPlacementMiddle = zsData.DisinfectKitPlacementMiddle;
+                zs.DisinfectKitPlacementEnd = zsData.DisinfectKitPlacementEnd;
                 zs.ContainsDC = zsData.ContainsDC;
                 zs.ContainsGenCluster = zsData.ContainsGenCluster;
                 zs.PowerCells = zsData.PowerCells;
