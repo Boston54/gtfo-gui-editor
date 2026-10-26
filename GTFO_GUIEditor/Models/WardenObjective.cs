@@ -134,6 +134,7 @@ public class WardenObjective : INotifyPropertyChanged
     private WaveOnGotoWinTrigger _waveOnGotoWinTrigger = WaveOnGotoWinTrigger.OnObjectiveCompleted;
     private bool _stopAllWavesBeforeGotoWin;
     private GenericWaveSettings _wavesOnElevatorLand = new();
+    private GenericWaveSettings _wavesOnActivate = new();
     private uint _fogTransitionDataOnGotoWin;
     private double _fogTransitionDataOnGotoWinDuration;
 
@@ -779,6 +780,12 @@ public class WardenObjective : INotifyPropertyChanged
         set => SetField(ref _wavesOnElevatorLand, value ?? new GenericWaveSettings());
     }
 
+    public GenericWaveSettings WavesOnActivate
+    {
+        get => _wavesOnActivate;
+        set => SetField(ref _wavesOnActivate, value ?? new GenericWaveSettings());
+    }
+
     public uint FogTransitionDataOnGotoWin
     {
         get => _fogTransitionDataOnGotoWin;
@@ -907,6 +914,7 @@ public class WardenObjective : INotifyPropertyChanged
             StopAllWavesBeforeGotoWin = StopAllWavesBeforeGotoWin,
             WavesOnGotoWin = WavesOnGotoWin.Clone(),
             WavesOnElevatorLand = WavesOnElevatorLand.Clone(),
+            WavesOnActivate = WavesOnActivate.Clone(),
             FogTransitionDataOnGotoWin = FogTransitionDataOnGotoWin,
             FogTransitionDataOnGotoWinDuration = FogTransitionDataOnGotoWinDuration,
             UplinkNumberOfVerificationRounds = UplinkNumberOfVerificationRounds,

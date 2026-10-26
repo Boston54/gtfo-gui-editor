@@ -9,42 +9,42 @@ namespace GTFO_GUIEditor.Models;
 public class GenericWaveSettings : INotifyPropertyChanged
 {
     // Wave Roles (Enemy References)
-    private uint _waveRoleWeakling = 0;
-    private uint _waveRoleStandard = 0;
-    private uint _waveRoleSpecial = 0;
-    private uint _waveRoleMiniBoss = 0;
-    private uint _waveRoleBoss = 0;
+    private uint _waveRoleWeakling = 21;
+    private uint _waveRoleStandard = 13;
+    private uint _waveRoleSpecial = 11;
+    private uint _waveRoleMiniBoss = 16;
+    private uint _waveRoleBoss = 18;
 
     // Wave Timing & Pauses
-    private double _pauseBeforeStart = 0;
-    private double _pauseBetweenGroups = 0;
-    private double _wavePauseMin_atCost = 0;
-    private double _wavePauseMax_atCost = 0;
-    private double _wavePauseMin = 0;
-    private double _wavePauseMax = 0;
+    private double _pauseBeforeStart = 3.0;
+    private double _pauseBetweenGroups = 5.0;
+    private double _wavePauseMin_atCost = 3.0;
+    private double _wavePauseMax_atCost = 10.0;
+    private double _wavePauseMin = 3.0;
+    private double _wavePauseMax = 30.0;
 
     // Population Filters
     private WaveFilterType _filterType = WaveFilterType.Exclude;
-    private bool _filterWeakling;
-    private bool _filterStandard;
-    private bool _filterSpecial;
-    private bool _filterMiniBoss;
-    private bool _filterBoss;
+    private bool _filterWeakling = true;
+    private bool _filterStandard = false;
+    private bool _filterSpecial = false;
+    private bool _filterMiniBoss = false;
+    private bool _filterBoss = false;
 
     // Spawn Direction & Spawn Type
-    private double _chanceToRandomizeSpawnDirectionPerWave = 0;
-    private double _chanceToRandomizeSpawnDirectionPerGroup = 0;
-    private bool _overrideWaveSpawnType;
+    private double _chanceToRandomizeSpawnDirectionPerWave = 1.0;
+    private double _chanceToRandomizeSpawnDirectionPerGroup = 0.1;
+    private bool _overrideWaveSpawnType = false;
     private SurvivalWaveSpawnType _survivalWaveSpawnType = SurvivalWaveSpawnType.InRelationToClosestAlivePlayer;
 
     // Population Points & Ramp
-    private double _populationPointsTotal = 0;
-    private double _populationPointsPerWaveStart = 0;
-    private double _populationPointsPerWaveEnd = 0;
-    private double _populationPointsMinPerGroup = 0;
-    private double _populationPointsPerGroupStart = 0;
-    private double _populationPointsPerGroupEnd = 0;
-    private double _populationRampOverTime = 0;
+    private double _populationPointsTotal = -1;
+    private double _populationPointsPerWaveStart = 17.0;
+    private double _populationPointsPerWaveEnd = 25.0;
+    private double _populationPointsMinPerGroup = 5.0;
+    private double _populationPointsPerGroupStart = 5.0;
+    private double _populationPointsPerGroupEnd = 10.0;
+    private double _populationRampOverTime = 200.0;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -302,6 +302,18 @@ public class GenericWaveSettings : INotifyPropertyChanged
     {
         get => _populationRampOverTime;
         set => SetField(ref _populationRampOverTime, value);
+    }
+
+    public bool HasWaveData()
+    {
+        return WaveRoleWeakling > 0 ||
+               WaveRoleStandard > 0 ||
+               WaveRoleSpecial > 0 ||
+               WaveRoleMiniBoss > 0 ||
+               WaveRoleBoss > 0 ||
+               PopulationPointsTotal > 0 ||
+               PopulationPointsPerWaveStart > 0 ||
+               PopulationPointsPerWaveEnd > 0;
     }
 
     public GenericWaveSettings Clone()

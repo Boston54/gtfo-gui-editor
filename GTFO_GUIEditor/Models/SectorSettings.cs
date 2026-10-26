@@ -769,6 +769,13 @@ public class SectorSettings : INotifyPropertyChanged
         set => PrimaryObjective.WavesOnElevatorLand = value;
     }
 
+    [JsonPropertyName("WavesOnActivate")]
+    public GenericWaveSettings WavesOnActivate
+    {
+        get => PrimaryObjective.WavesOnActivate;
+        set => PrimaryObjective.WavesOnActivate = value;
+    }
+
     [JsonPropertyName("FogTransitionDataOnGotoWin")]
     public uint FogTransitionDataOnGotoWin
     {

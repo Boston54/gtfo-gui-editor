@@ -1,0 +1,423 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             xmlns:dialogs="clr-namespace:GTFO_GUIEditor.Views.Dialogs;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.LevelLayoutView"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Grid RowDefinitions="Auto,Auto,Auto,Auto,*" Margin="0">
+        <TextBlock Grid.Row="0" Text="Level Layout" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+        
+        <!-- Top Bar 1: Level Selection, Level Name, Level Add/Delete -->
+        <Border Grid.Row="1" Background="#252526" Padding="10" Margin="0,0,0,6" CornerRadius="4">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,12,2">
+                    <TextBlock Text="Level:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                    <ComboBox ItemsSource="{Binding Levels}"
+                              SelectedItem="{Binding SelectedLevel, Mode=TwoWay}"
+                              MinWidth="160"
+                              VerticalAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:LevelLayoutBlock">
+                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,12,2">
+                    <TextBlock Text="Level Name:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                    <TextBox Text="{Binding SelectedLevel.Name, Mode=TwoWay}"
+                             IsEnabled="{Binding HasSelectedLevel}"
+                             Width="160"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Content="+ Add Level"
+                        Command="{Binding OpenCreateLevelDialog}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="Edit Level"
+                        Command="{Binding OpenEditLevelDialog}"
+                        IsEnabled="{Binding HasSelectedLevel}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="- Delete Level"
+                        Command="{Binding RequestDeleteSelectedLevel}"
+                        IsEnabled="{Binding HasSelectedLevel}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Top Bar 2: Dimension Selection, Dimension Name, Dimension Add/Edit/Delete -->
+        <Border Grid.Row="2" Background="#252526" Padding="10" Margin="0,0,0,6" CornerRadius="4">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,12,2">
+                    <TextBlock Text="Dimension:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                    <ComboBox ItemsSource="{Binding AvailableDimensions}"
+                              SelectedItem="{Binding SelectedDimension, Mode=TwoWay}"
+                              IsEnabled="{Binding HasSelectedLevel}"
+                              MinWidth="160"
+                              VerticalAlignment="Center">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:DimensionOption">
+                                <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,12,2">
+                    <TextBlock Text="Dimension Name:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                    <TextBox Text="{Binding ActiveDimensionName, Mode=TwoWay}"
+                             IsEnabled="{Binding CanEditActiveDimensionName}"
+                             Width="160"
+                             VerticalAlignment="Center"/>
+                </StackPanel>
+
+                <Button Content="+ Add Dimension"
+                        Command="{Binding OpenAddDimensionDialog}"
+                        IsEnabled="{Binding CanAddDimension}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="Edit Dimension"
+                        Command="{Binding RequestEditActiveDimension}"
+                        IsEnabled="{Binding CanEditActiveDimension}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="- Delete Dimension"
+                        Command="{Binding RequestDeleteActiveDimension}"
+                        IsEnabled="{Binding CanDeleteActiveDimension}"
+                        Margin="0,2,6,2"
+                        Padding="10,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Top Bar 3: Sector Selection -->
+        <Border Grid.Row="3" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBlock Text="Sectors:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,2,12,2" Foreground="#E0E0E0"/>
+
+                <Button Content="Main"
+                        Command="{Binding OpenMainSectorSettings}"
+                        IsEnabled="{Binding HasMainSector}"
+                        ToolTip.Tip="Configure settings for the Main Sector."
+                        Margin="0,2,8,2"
+                        Padding="16,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="Secondary"
+                        Command="{Binding OpenSecondarySectorSettings}"
+                        IsEnabled="{Binding HasSecondarySector}"
+                        ToolTip.Tip="Configure settings for the Secondary Sector (requires Secondary Door in the level)."
+                        Margin="0,2,8,2"
+                        Padding="16,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Content="Overload"
+                        Command="{Binding OpenOverloadSectorSettings}"
+                        IsEnabled="{Binding HasOverloadSector}"
+                        ToolTip.Tip="Configure settings for the Overload Sector (requires Overload Door in the level)."
+                        Margin="0,2,8,2"
+                        Padding="16,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Main Level Layout View Content Area -->
+        <Grid Grid.Row="4">
+            <!-- When a level is selected -->
+            <Grid IsVisible="{Binding HasSelectedLevel}" RowDefinitions="Auto,*">
+                <!-- Warnings StackPanel -->
+                <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,10">
+                    <!-- Duplicate ID Warning Banner (if any) -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasDuplicatePersistentId}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                       Foreground="#FF6B6B"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Grid Size Warning Banner (if layout exceeds grid size) -->
+                    <Border Background="#3A281C"
+                            BorderBrush="#FFA726"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasGridSizeWarning}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FFA726" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding GridSizeWarningMessage}"
+                                       Foreground="#FFA726"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- Level Layout Canvas / Visual View Panel -->
+                <Border Grid.Row="1" Background="#141414" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+                    <Grid RowDefinitions="Auto,*">
+                        <!-- Canvas Toolbar -->
+                        <Border Grid.Row="0" Background="#1F1F1F" BorderBrush="#2D2D2D" BorderThickness="0,0,0,1" Padding="10,6">
+                            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,16,2">
+                                    <Button Content="+" Command="{Binding ZoomIn}" ToolTip.Tip="Zoom In" Width="30" Height="28" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                    <Button Content="−" Command="{Binding ZoomOut}" ToolTip.Tip="Zoom Out" Width="30" Height="28" Margin="0,0,8,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                    <TextBlock Text="{Binding GridState.ZoomPercentage}" VerticalAlignment="Center" Foreground="#B0BEC5" Margin="0,0,12,0" FontWeight="SemiBold" FontSize="12"/>
+                                    <Button Content="Reset View" Click="OnResetViewClicked" ToolTip.Tip="Center view on Starting Elevator" Padding="8,4" FontSize="11" VerticalAlignment="Center"/>
+                                </StackPanel>
+
+                                <!-- Legend / Status info -->
+                                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasUnexpandedDoors}">
+                                        <Border Width="10" Height="5" Background="#FFFF00" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Unexpanded" FontSize="11" Foreground="#FFFF00" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasConnectedDoors}">
+                                        <Border Width="10" Height="5" Background="#9D00FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Connected" FontSize="11" Foreground="#9D00FF" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecurityDoors}">
+                                        <Border Width="10" Height="5" Background="#FF0000" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Security Door" FontSize="11" Foreground="#FF0000" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasMainDoors}">
+                                        <Border Width="10" Height="5" Background="#CCCCCC" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Main Door" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecondaryDoors}">
+                                        <Border Width="10" Height="5" Background="#FFA200" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Secondary Door" FontSize="11" Foreground="#FFA200" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasOverloadDoors}">
+                                        <Border Width="10" Height="5" Background="#00F2FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Overload Door" FontSize="11" Foreground="#00F2FF" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasBlockedDoors}">
+                                        <Border Width="10" Height="5" Background="#757575" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Blocked" FontSize="11" Foreground="#9E9E9E" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </WrapPanel>
+                            </WrapPanel>
+                        </Border>
+
+                        <!-- Interactive Pannable & Zoomable Canvas Area -->
+                        <Border x:Name="LevelLayoutCanvasBorder"
+                                Grid.Row="1"
+                                Background="#121212"
+                                ClipToBounds="True"
+                                PointerPressed="OnLevelLayoutPointerPressed"
+                                PointerMoved="OnLevelLayoutPointerMoved"
+                                PointerReleased="OnLevelLayoutPointerReleased"
+                                PointerCaptureLost="OnLevelLayoutPointerCaptureLost"
+                                PointerExited="OnLevelLayoutPointerExited"
+                                PointerWheelChanged="OnLevelLayoutPointerWheelChanged">
+                            <Canvas Background="#121212"
+                                    HorizontalAlignment="Left" VerticalAlignment="Top"
+                                    RenderTransformOrigin="0,0"
+                                    ClipToBounds="False">
+                                <Canvas.RenderTransform>
+                                    <TransformGroup>
+                                        <ScaleTransform ScaleX="{Binding GridState.Zoom}" ScaleY="{Binding GridState.Zoom}"/>
+                                        <TranslateTransform X="{Binding GridState.PanX}" Y="{Binding GridState.PanY}"/>
+                                    </TransformGroup>
+                                </Canvas.RenderTransform>
+
+                                <!-- Dynamic Grid Background -->
+                                <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                           Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}">
+                                    <Rectangle.Fill>
+                                        <VisualBrush DestinationRect="0,0,64,64" TileMode="Tile" SourceRect="0,0,64,64">
+                                            <VisualBrush.Visual>
+                                                <Border Width="64" Height="64" BorderBrush="#252525" BorderThickness="0,0,1,1" Background="#141414"/>
+                                            </VisualBrush.Visual>
+                                        </VisualBrush>
+                                    </Rectangle.Fill>
+                                </Rectangle>
+
+                                <!-- Grid Outer Boundary -->
+                                <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                           Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}"
+                                           Stroke="#37474F" StrokeThickness="2" Fill="Transparent"/>
+
+                                <!-- Placed Rooms / Geomorph Meshes -->
+                                <ItemsControl ItemsSource="{Binding GridState.PlacedRooms}"
+                                              Canvas.Left="0" Canvas.Top="0"
+                                              ClipToBounds="False">
+                                    <ItemsControl.Template>
+                                        <ControlTemplate>
+                                            <ItemsPresenter Name="PART_ItemsPresenter"
+                                                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                            ClipToBounds="False"/>
+                                        </ControlTemplate>
+                                    </ItemsControl.Template>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="False"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerTheme>
+                                        <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                            <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
+                                            <Setter Property="ClipToBounds" Value="False"/>
+                                        </ControlTheme>
+                                    </ItemsControl.ItemContainerTheme>
+                                    <ItemsControl.Styles>
+                                        <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                            <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
+                                            <Setter Property="ClipToBounds" Value="False"/>
+                                        </Style>
+                                    </ItemsControl.Styles>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:PlacedRoomNode">
+                                            <Path Data="{Binding Geometry}"
+                                                  Fill="{Binding FillBrush}"
+                                                  Stroke="{Binding StrokeBrush}"
+                                                  StrokeThickness="{Binding StrokeThickness}"
+                                                  IsVisible="{Binding HasGeometry}"
+                                                  ToolTip.Tip="{Binding DisplayName}"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+
+                                <!-- Placed Doors / Connectors -->
+                                <ItemsControl ItemsSource="{Binding GridState.PlacedDoors}"
+                                              Canvas.Left="0" Canvas.Top="0"
+                                              ClipToBounds="False">
+                                    <ItemsControl.Template>
+                                        <ControlTemplate>
+                                            <ItemsPresenter Name="PART_ItemsPresenter"
+                                                            ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                            ClipToBounds="False"/>
+                                        </ControlTemplate>
+                                    </ItemsControl.Template>
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <Canvas ClipToBounds="False"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemContainerTheme>
+                                        <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                            <Setter Property="Canvas.ZIndex" Value="10"/>
+                                            <Setter Property="ClipToBounds" Value="False"/>
+                                        </ControlTheme>
+                                    </ItemsControl.ItemContainerTheme>
+                                    <ItemsControl.Styles>
+                                        <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                            <Setter Property="Canvas.ZIndex" Value="10"/>
+                                            <Setter Property="ClipToBounds" Value="False"/>
+                                        </Style>
+                                    </ItemsControl.Styles>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate x:DataType="models:PlacedDoorNode">
+                                            <Button Width="{Binding DoorWidth}"
+                                                    Height="{Binding DoorHeight}"
+                                                    Background="{Binding DoorBrush}"
+                                                    BorderBrush="#FFFFFF"
+                                                    BorderThickness="0.5"
+                                                    CornerRadius="0.5"
+                                                    Padding="0"
+                                                    Margin="0"
+                                                    Cursor="Hand"
+                                                    RenderTransformOrigin="50%,50%"
+                                                    ToolTip.Tip="{Binding TooltipText}"
+                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LevelLayout.OnDoorClicked}"
+                                                    CommandParameter="{Binding}"
+                                                    PointerPressed="OnDoorPointerPressed">
+                                                <Button.RenderTransform>
+                                                    <RotateTransform Angle="{Binding RotationAngle}"/>
+                                                </Button.RenderTransform>
+                                            </Button>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Canvas>
+                        </Border>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- When no level is selected -->
+            <Panel IsVisible="{Binding !HasSelectedLevel}" Background="#1E1E1E">
+                <TextBlock Text="No level selected. Create a new level to begin."
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Foreground="Gray"/>
+            </Panel>
+        </Grid>
+
+        <!-- Create / Edit Level Modal Overlay -->
+        <dialogs:LevelConfigDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsCreatingLevel}"/>
+
+        <!-- Delete Level Confirmation Modal Overlay -->
+        <dialogs:DeleteLevelConfirmationDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsConfirmingDelete}"/>
+
+        <!-- Delete Dimension Confirmation Modal Overlay -->
+        <dialogs:DeleteDimensionConfirmationDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsConfirmingDeleteDimension}"/>
+
+        <!-- Configure / Prompt Dimension Modal Overlay -->
+        <dialogs:DimensionConfigDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsConfiguringDimension}"/>
+
+        <!-- Pick Geomorph for Door Expansion Modal Overlay -->
+        <dialogs:PickGeomorphDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsPickingGeomorphForDoor}"/>
+
+        <!-- Expand Room in Geomorph Modal Overlay -->
+        <dialogs:ExpandRoomDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsExpandingRoom}"/>
+
+        <!-- Edit Room Modal Overlay -->
+        <dialogs:EditRoomDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsEditingRoom}"/>
+
+        <!-- Edit Door Modal Overlay -->
+        <dialogs:EditDoorDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsEditingDoor}"/>
+
+        <!-- Layout Deletion Confirmation Modal Overlay -->
+        <dialogs:LayoutDeletionConfirmationDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsConfirmingLayoutDeletion}"/>
+
+        <!-- Edit Sector Modal Overlay -->
+        <dialogs:EditSectorDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsEditingSector}"/>
+    </Grid>
+</UserControl>

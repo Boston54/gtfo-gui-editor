@@ -265,6 +265,47 @@ public static class EditorDefaultsService
         objective.FogTransitionDataOnGotoWinDuration = d.FogTransitionDataOnGotoWinDuration;
         objective.StopAllWavesBeforeGotoWin = d.StopAllWavesBeforeGotoWin;
         objective.WaveOnGotoWinTrigger = d.WaveOnGotoWinTrigger;
+
+        ApplyGenericWaveDefaults(objective.WavesOnGotoWin);
+        ApplyGenericWaveDefaults(objective.WavesOnElevatorLand);
+        ApplyGenericWaveDefaults(objective.WavesOnActivate);
+    }
+
+    public static void ApplyGenericWaveDefaults(GenericWaveSettings wave)
+    {
+        var dAlarms = GetDefaults().AlarmsWindow;
+        var dRoles = dAlarms.WaveRoles;
+        var dFilters = dAlarms.PopulationFilters;
+        var dTiming = dAlarms.WaveSettingsAndTiming;
+
+        wave.WaveRoleWeakling = dRoles.WaveRoleWeakling;
+        wave.WaveRoleStandard = dRoles.WaveRoleStandard;
+        wave.WaveRoleSpecial = dRoles.WaveRoleSpecial;
+        wave.WaveRoleMiniBoss = dRoles.WaveRoleMiniBoss;
+        wave.WaveRoleBoss = dRoles.WaveRoleBoss;
+        wave.FilterWeakling = dFilters.FilterWeakling;
+        wave.FilterStandard = dFilters.FilterStandard;
+        wave.FilterSpecial = dFilters.FilterSpecial;
+        wave.FilterMiniBoss = dFilters.FilterMiniBoss;
+        wave.FilterBoss = dFilters.FilterBoss;
+        wave.FilterType = dFilters.FilterType;
+        wave.PauseBeforeStart = dTiming.PauseBeforeStart;
+        wave.PauseBetweenGroups = dTiming.PauseBetweenGroups;
+        wave.WavePauseMin_AtCost = dTiming.WavePauseMin_AtCost;
+        wave.WavePauseMax_AtCost = dTiming.WavePauseMax_AtCost;
+        wave.WavePauseMin = dTiming.WavePauseMin;
+        wave.WavePauseMax = dTiming.WavePauseMax;
+        wave.ChanceToRandomizeSpawnDirectionPerWave = dTiming.ChanceToRandomizeSpawnDirectionPerWave;
+        wave.ChanceToRandomizeSpawnDirectionPerGroup = dTiming.ChanceToRandomizeSpawnDirectionPerGroup;
+        wave.OverrideWaveSpawnType = dTiming.OverrideWaveSpawnType;
+        wave.SurvivalWaveSpawnType = dTiming.SurvivalWaveSpawnType;
+        wave.PopulationPointsTotal = dTiming.PopulationPointsTotal;
+        wave.PopulationPointsPerWaveStart = dTiming.PopulationPointsPerWaveStart;
+        wave.PopulationPointsPerWaveEnd = dTiming.PopulationPointsPerWaveEnd;
+        wave.PopulationPointsMinPerGroup = dTiming.PopulationPointsMinPerGroup;
+        wave.PopulationPointsPerGroupStart = dTiming.PopulationPointsPerGroupStart;
+        wave.PopulationPointsPerGroupEnd = dTiming.PopulationPointsPerGroupEnd;
+        wave.PopulationRampOverTime = dTiming.PopulationRampOverTime;
     }
 
     // --- Alarms Defaults ---

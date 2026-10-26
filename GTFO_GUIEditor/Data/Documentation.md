@@ -36,10 +36,11 @@ This section is divided into four sections:
 | Datablocks | Datablocks are `json` files used by the game to define almost everything. Entire rundowns are defined purely through extremely complicated datablocks. The purpose of this editor is to generate these datablocks automatically to alleviate the massive learning curve that comes with rundown development for this game.|
 | Geomorph | Geomorphs, also known as geos or tiles, are the preset area layouts that the game uses. Most geomorphs are limited to one space in the level layout grid, although some geos can be 1x2 or 2x2. |
 | Tileset | Tilesets define a collection of geomorphs that are available for use in a level. The game is split into three tilesets: Mining, Tech, and Service. Each of these have sub-categories, although geos from any subcategory can be used when the parent tileset is selected. |
-| Dimensions | A level can consist of multiple dimensions. These effectively act as their own level layouts that players can be transported to/from via `Warp` events. |
+| Dimensions | A level can consist of multiple dimensions. These effectively act as their own level layouts that players can be transported to/from via `Warp Events`. |
 | Snatcher Boxes | The most common use for additional dimensions in an expedition is Snatcher Boxes. These are boxes that are generated as a separate dimension, where players get transported to when taken by a Snatcher. Without Snatcher Boxes being added to an expedition, snatchers do not work as intended. |
 | Markers | Geomorphs define the overall layout and shape of a tile, while markers fill in the blanks. Bridges, objects, boxes, terminals, etc, are all placed via Markers. In some tiles, markers can completely change the flow of a tile. These are randomly generated based on the Marker seed offset. |
 | Plugs | Plugs define the asset that is placed at the edge of a geomorph to connect with other geomorphs. These can include simple doors with surrounding structure, staircases between altitudes, and open room dividers with no doors. |
+| Boss Aligns | Some geomorphs contain a Boss Align point which defines static points where 'boss' enemeis (such as Tanks or Mothers) will spawn if they are spawned in this tile.|
 
 ## Tiles, Rooms & Zones
 The connectors at the edge of a geomorph can be clicked by the user to create a new tile for the expedition. This prompts the user to select a geomorph to place, alongside a rotation and altitude.
@@ -68,21 +69,68 @@ To place bulkhead keys, candidate zones for each key can be created by opening t
 # Objectives
 Objectives are per-sector components that define what the players must do to beat each sector in an expedition.
 
-# Alarms & Enemy Waves
-## Alarms
 TODO
 
-## Enemy Wave Settings
+# Alarms & Enemy Waves
+## Alarms & Scans
+Alarms / scans can be attached to any type of security door to require the players to complete scan(s) before unlocking the door. They are both implemented through teh Alarms tab, and are differentiated by the `Spawns Enemies` checkbox.
+
+To create an alarm, the Alarms tab can be opened and a new alarm can be created by clicking the `+ Create New Alarm` button. This opens three options:
+
+**Create a new fresh (blank) alarm** which creates a new alarm with some preset default values
+
+**Use an existing alarm as a template** which allows users to duplicate an existing alarm
+
+**Import an alarm from vanilla** allows you to select any alarm from any level in the vanilla game to import. Note: this list includes alarms that both do and do not spawn enemies, meaning a lot of them are just enemyless team scans.
+
+The number and frequency of enemy spawns can be configured through the `Population Points & Ramp` section.
+
+Some common types of alarms can be created as follows:
+
+| Alarm Type | Settings |
+| --- | --- |
+| Surge | `Points Per Wave (Start)` and `Points Per Wave (End)` set to a very high value (10000+), and `Population Ramp Over Time (s)` set to 0. |
+| Diminished | `Points Per Wave (Start)` and `Points Per Wave (End)` set to a lower-than-normal value (~15/20) |
+| Error | Check the `Is Error` box in the General settings |
+| Ramping Error | In addition to a standard Error, you need `Points Per Wave (Start)` and `Points Per Wave (End)` set to a very high value (10000+), and `Population Ramp Over Time (s)` set to a high value. Higher ramp time values will cause slower ramping; the R2E1 error alarm uses 1800s. |
+| Single-Enemy or Few-Enemy | `Population Points Total` set to a low non-negative, non-zero value. As the number gets higher, more enemies will be spawned (based on the cost of the enemy) |
+
+`Tip: You can see the meaning of every field by hovering the label.`
+
+## Enemy Waves
+In addition to alarms, enemies can be spawned manually through events.
+
+**Objective-based Enemy Waves**
+
+Objective-based enemy waves can be configured through the objective section of the Sector tab (accessible through the sector buttons in the level layout).
+The following lists can be configured to spawn enemies at certain objective stages:
+* `WavesOnElevatorLand` - When the elevator lands; commonly used for level-wide error alarms.
+* `WavesOnGotoWin` - When the 'goto win' phase begins; commonly used for extraction alarms.
+* `WavesOnActivate` - When the objective is activated (such as a neonate HSU being activated)
+
+**Event-Based Enemy Waves**
+
+All events can be made to spawn enemies through the `SpawnEnemyWaves` or the `SpawnEnemyOnPoint` event types.
+* `SpawnEnemyWaves` - allows users to define an enemy wave to spawn. For help with the different settings this allows, you can either hover the label for a short explanation, or view the `Alarms & Scans` tab.
+* `SpawnEnemyOnPoint` - allows users to spawn an enemy at a specific point in a geomorph, based on a `WorldEventObjectFilter` baked into the geomorph. When the 'count' value is used, all of the enemies on top of one another. This is generally used to spawn Flyers. Due to requiring a `WorldEventObjectFilter` value, it is recommended to only use this if you know what you're doing.
+
+## Blood Doors
 TODO
 
 ## Event Alarms
 TODO
 
-# Loo
-
-# Environment
+# Loot & Items
+## Resource Packs
 TODO
 
+## Consumables
+TODO
+
+## Big Pickup Items
+TODO
+
+# Environment
 ## Lighting
 TODO
 
@@ -96,6 +144,12 @@ TODO
 ## Door Events
 TODO
 
+## Objective Events
+TODO
+
+## Other Events
+TODO
+
 # Sounds
 TODO
 
@@ -104,6 +158,8 @@ TODO
 
 ## Datablocks & Configs
 TODO
+
+## How to Test Your Rundown
 
 ## Publishing a Rundown
 TODO

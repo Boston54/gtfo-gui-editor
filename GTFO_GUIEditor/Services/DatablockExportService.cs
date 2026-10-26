@@ -467,8 +467,8 @@ public static class DatablockExportService
                     ["SurvivalWaveSettings"] = waveSettingsId,
                     ["SurvivalWavePopulation"] = popId,
                     ["SurvivalWaveAreaDistance"] = 2,
-                    ["DisableSurvivalWaveOnComplete"] = true,
-                    ["UseRandomPositions"] = false,
+                    ["DisableSurvivalWaveOnComplete"] = alarm.DisableSurvivalWaveOnComplete,
+                    ["UseRandomPositions"] = alarm.UseRandomPositions,
                     ["WantedDistanceFromStartPos"] = alarm.WantedDistanceFromStartPos,
                     ["WantedDistanceBetweenPuzzleComponents"] = alarm.WantedDistanceBetweenPuzzleComponents,
                     ["ChainedPuzzle"] = puzzleSteps,
@@ -586,14 +586,18 @@ public static class DatablockExportService
                     foreach (var obj in level.MainSector.Objectives)
                     {
                         uint objId = wardenObjectiveAlloc.Allocate();
-                        wardenObjectiveBlocks.Add(CompileWardenObjective(obj, objId, SynthesizeText));
+                        wardenObjectiveBlocks.Add(CompileWardenObjective(obj, objId, SynthesizeText,
+                            survivalWaveSettingsAlloc, survivalWavePopulationAlloc, survivalWaveSettingsBlocks,
+                            survivalWavePopulationBlocks));
                         mainObjIds.Add(objId);
                     }
                 }
                 else
                 {
                     uint objId = wardenObjectiveAlloc.Allocate();
-                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.MainSector?.PrimaryObjective ?? new WardenObjective(), objId, SynthesizeText));
+                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.MainSector?.PrimaryObjective ?? new WardenObjective(), objId, SynthesizeText,
+                        survivalWaveSettingsAlloc, survivalWavePopulationAlloc, survivalWaveSettingsBlocks,
+                        survivalWavePopulationBlocks));
                     mainObjIds.Add(objId);
                 }
 
@@ -603,14 +607,18 @@ public static class DatablockExportService
                 if (level.SecondarySector != null)
                 {
                     uint secObjId = wardenObjectiveAlloc.Allocate();
-                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.SecondarySector.PrimaryObjective, secObjId, SynthesizeText));
+                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.SecondarySector.PrimaryObjective, secObjId, SynthesizeText,
+                        survivalWaveSettingsAlloc, survivalWavePopulationAlloc, survivalWaveSettingsBlocks,
+                        survivalWavePopulationBlocks));
                     levelSecondaryObjectiveId[level.PersistentId] = secObjId;
                 }
 
                 if (level.OverloadSector != null)
                 {
                     uint thirdObjId = wardenObjectiveAlloc.Allocate();
-                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.OverloadSector.PrimaryObjective, thirdObjId, SynthesizeText));
+                    wardenObjectiveBlocks.Add(CompileWardenObjective(level.OverloadSector.PrimaryObjective, thirdObjId, SynthesizeText,
+                        survivalWaveSettingsAlloc, survivalWavePopulationAlloc, survivalWaveSettingsBlocks,
+                        survivalWavePopulationBlocks));
                     levelThirdObjectiveId[level.PersistentId] = thirdObjId;
                 }
 
@@ -1723,19 +1731,104 @@ public static class DatablockExportService
                 ["SustainedEventSlotIndex"] = 0,
                 ["SustainedEventStateCount"] = 0,
                 ["SustainedEventStateDuration"] = 0.0,
-                ["SustainedEventDelay"] = 0.0
+                ["SustainedEventDelay"] = 0.0,
+                ["WorldEventObjectFilter"] = ev.WorldEventObjectFilter ?? string.Empty
             });
         }
 
         return array;
     }
 
+    private static JsonArray SerializeGenericWaveList(
+        GenericWaveSettings? wave,
+        string prefix,
+        PersistentIdAllocator? waveSettingsAlloc,
+        PersistentIdAllocator? wavePopAlloc,
+        List<JsonObject>? waveSettingsBlocks,
+        List<JsonObject>? wavePopBlocks)
+    {
+        var array = new JsonArray();
+        if (wave == null || !wave.HasWaveData() || waveSettingsAlloc == null || wavePopAlloc == null ||
+            waveSettingsBlocks == null || wavePopBlocks == null)
+            return array;
+
+        uint popId = wavePopAlloc.Allocate();
+        var popObj = new JsonObject
+        {
+            ["WaveRoleWeakling"] = wave.WaveRoleWeakling,
+            ["WaveRoleStandard"] = wave.WaveRoleStandard,
+            ["WaveRoleSpecial"] = wave.WaveRoleSpecial,
+            ["WaveRoleMiniBoss"] = wave.WaveRoleMiniBoss,
+            ["WaveRoleBoss"] = wave.WaveRoleBoss,
+            ["name"] = $"{prefix}_Pop_{popId}",
+            ["internalEnabled"] = true,
+            ["persistentID"] = popId
+        };
+        wavePopBlocks.Add(popObj);
+
+        var popFilterArray = new JsonArray();
+        if (wave.FilterWeakling) popFilterArray.Add("Weakling");
+        if (wave.FilterStandard) popFilterArray.Add("Standard");
+        if (wave.FilterSpecial) popFilterArray.Add("Special");
+        if (wave.FilterMiniBoss) popFilterArray.Add("MiniBoss");
+        if (wave.FilterBoss) popFilterArray.Add("Boss");
+
+        uint waveSettingsId = waveSettingsAlloc.Allocate();
+        var waveObj = new JsonObject
+        {
+            ["m_pauseBeforeStart"] = wave.PauseBeforeStart,
+            ["m_pauseBetweenGroups"] = wave.PauseBetweenGroups,
+            ["m_wavePauseMin_atCost"] = wave.WavePauseMin_AtCost,
+            ["m_wavePauseMax_atCost"] = wave.WavePauseMax_AtCost,
+            ["m_wavePauseMin"] = wave.WavePauseMin,
+            ["m_wavePauseMax"] = wave.WavePauseMax,
+            ["m_populationFilter"] = popFilterArray,
+            ["m_filterType"] = wave.FilterType.ToString(),
+            ["m_chanceToRandomizeSpawnDirectionPerWave"] = wave.ChanceToRandomizeSpawnDirectionPerWave,
+            ["m_chanceToRandomizeSpawnDirectionPerGroup"] = wave.ChanceToRandomizeSpawnDirectionPerGroup,
+            ["m_overrideWaveSpawnType"] = wave.OverrideWaveSpawnType,
+            ["m_survivalWaveSpawnType"] = wave.SurvivalWaveSpawnType.ToString(),
+            ["m_populationPointsTotal"] = wave.PopulationPointsTotal,
+            ["m_populationPointsPerWaveStart"] = wave.PopulationPointsPerWaveStart,
+            ["m_populationPointsPerWaveEnd"] = wave.PopulationPointsPerWaveEnd,
+            ["m_populationPointsMinPerGroup"] = wave.PopulationPointsMinPerGroup,
+            ["m_populationPointsPerGroupStart"] = wave.PopulationPointsPerGroupStart,
+            ["m_populationPointsPerGroupEnd"] = wave.PopulationPointsPerGroupEnd,
+            ["m_populationRampOverTime"] = wave.PopulationRampOverTime,
+            ["name"] = $"{prefix}_Settings_{waveSettingsId}",
+            ["internalEnabled"] = true,
+            ["persistentID"] = waveSettingsId
+        };
+        waveSettingsBlocks.Add(waveObj);
+
+        var waveEntry = new JsonObject
+        {
+            ["WaveSettings"] = waveSettingsId,
+            ["WavePopulation"] = popId,
+            ["AreaDistance"] = 2,
+            ["SpawnDelay"] = wave.PauseBeforeStart,
+            ["TriggerAlarm"] = true,
+            ["IntelMessage"] = 0
+        };
+        array.Add(waveEntry);
+        return array;
+    }
+
     private static JsonObject CompileWardenObjective(SectorSettings sector, uint persistentId,
-        Func<string?, string, uint> textSynth) =>
-        CompileWardenObjective(sector.PrimaryObjective, persistentId, textSynth);
+        Func<string?, string, uint> textSynth,
+        PersistentIdAllocator? waveSettingsAlloc = null,
+        PersistentIdAllocator? wavePopAlloc = null,
+        List<JsonObject>? waveSettingsBlocks = null,
+        List<JsonObject>? wavePopBlocks = null) =>
+        CompileWardenObjective(sector.PrimaryObjective, persistentId, textSynth, waveSettingsAlloc, wavePopAlloc,
+            waveSettingsBlocks, wavePopBlocks);
 
     private static JsonObject CompileWardenObjective(WardenObjective sector, uint persistentId,
-        Func<string?, string, uint> textSynth)
+        Func<string?, string, uint> textSynth,
+        PersistentIdAllocator? waveSettingsAlloc = null,
+        PersistentIdAllocator? wavePopAlloc = null,
+        List<JsonObject>? waveSettingsBlocks = null,
+        List<JsonObject>? wavePopBlocks = null)
     {
         var retrieveItemsArray = new JsonArray();
         if (sector.ObjectiveType == ObjectiveType.RetrieveBigItems)
@@ -1820,18 +1913,18 @@ public static class DatablockExportService
             ["GoToWinCondition_ToMainLayer"] = 0,
             ["GoToWinConditionHelp_ToMainLayer"] = 0,
             ["ShowHelpDelay"] = 180.0,
-            ["WavesOnElevatorLand"] = new JsonArray(),
+            ["WavesOnElevatorLand"] = SerializeGenericWaveList(sector.WavesOnElevatorLand, $"Obj_{persistentId}_ElevatorLand", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
             ["EventsOnElevatorLand"] = SerializeWardenEvents(sector.EventsOnElevatorLand, textSynth),
             ["WaveOnElevatorWardenIntel"] = 0,
             ["FogTransitionDataOnElevatorLand"] = 0,
             ["FogTransitionDurationOnElevatorLand"] = 0.0,
             ["OnActivateOnSolveItem"] = false,
-            ["WavesOnActivate"] = new JsonArray(),
+            ["WavesOnActivate"] = SerializeGenericWaveList(sector.WavesOnActivate, $"Obj_{persistentId}_Activate", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
             ["EventsOnActivate"] =
                 SerializeWardenEvents(
                     sector.EventsOnActivate.Count > 0 ? sector.EventsOnActivate : sector.EventsOnActivation, textSynth),
             ["StopAllWavesBeforeGotoWin"] = sector.StopAllWavesBeforeGotoWin,
-            ["WavesOnGotoWin"] = new JsonArray(),
+            ["WavesOnGotoWin"] = SerializeGenericWaveList(sector.WavesOnGotoWin, $"Obj_{persistentId}_GotoWin", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
             ["WaveOnGotoWinTrigger"] = sector.WaveOnGotoWinTrigger.ToString(),
             ["EventsOnGotoWin"] = SerializeWardenEvents(sector.EventsOnGotoWin, textSynth),
             ["EventsOnGotoWinTrigger"] = "OnObjectiveCompleted",

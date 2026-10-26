@@ -1,0 +1,695 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.EditRoomDialog"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+                        <Border Background="#252526"
+                                BorderBrush="#444444"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="20"
+                                Width="720"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                BoxShadow="0 4 20 #80000000">
+                            <StackPanel Spacing="12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="{Binding EditingRoomTitle}"
+                                               FontSize="18"
+                                               FontWeight="Bold"
+                                               Foreground="#FFFFFF"
+                                               TextTrimming="CharacterEllipsis"/>
+                                    <Button Grid.Column="1"
+                                            Content="✕"
+                                            Command="{Binding CloseEditRoomDialog}"
+                                            Padding="8,4"
+                                            Background="Transparent"/>
+                                </Grid>
+
+                                <!-- Three Tabs: Room, Zone, Geomorph -->
+                                <TabControl SelectedIndex="0" Margin="0,2,0,0">
+                                    <!-- TAB 1: Room -->
+                                    <TabItem Header="Room" FontSize="13" FontWeight="SemiBold">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                            <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
+                                                <StackPanel Spacing="12">
+                                                    <TextBlock Text="Room Settings"
+                                                               FontWeight="Bold"
+                                                               FontSize="14"
+                                                               Foreground="#00F2FF"/>
+
+                                                    <!-- Room Info Details -->
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Room:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,10"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding EditingRoomRoomName}" FontWeight="Bold" Foreground="#00F2FF" VerticalAlignment="Center" Margin="0,0,16,10"/>
+
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Area:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,10"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding EditingRoomAreaIndex, StringFormat='Area {0}'}" FontWeight="Bold" Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,16,10"/>
+
+                                                        <TextBlock Grid.Row="0" Grid.Column="4" Text="Zone:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,10"/>
+                                                        <TextBlock Grid.Row="0" Grid.Column="5" Text="{Binding EditingRoomZoneDisplayName}" FontWeight="Bold" Foreground="#00F2FF" VerticalAlignment="Center" Margin="0,0,0,10"/>
+
+                                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Room Size:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding EditingRoomAreaSize, StringFormat='{}{0} m²'}" Foreground="#D0D0D0" VerticalAlignment="Center"/>
+                                                    </Grid>
+
+                                                    <!-- Delete Room Button -->
+                                                    <Button Content="Delete Room"
+                                                            Command="{Binding RequestDeleteRoom}"
+                                                            Background="#D9534F"
+                                                            Foreground="White"
+                                                            FontWeight="SemiBold"
+                                                            HorizontalAlignment="Right"
+                                                            Padding="14,6"
+                                                            Margin="0,6,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </ScrollViewer>
+                                    </TabItem>
+
+                                    <!-- TAB 2: Zone -->
+                                    <TabItem Header="Zone" FontSize="13" FontWeight="SemiBold">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                            <StackPanel Spacing="12">
+                                                <!-- Seeds & Lighting Section -->
+                                                <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="12">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Column="0"
+                                                                       Text="Zone Settings"
+                                                                       FontWeight="Bold"
+                                                                       FontSize="14"
+                                                                       Foreground="#00F2FF"/>
+                                                            <TextBlock Grid.Column="1"
+                                                                       Text="{Binding EditingRoomZoneDisplayName}"
+                                                                       FontWeight="Bold"
+                                                                       Foreground="#FFA200"/>
+                                                        </Grid>
+
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Sub Seed:" ToolTip.Tip="Subseed for the zone." VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.SubSeed, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Marker Sub Seed:" ToolTip.Tip="Subseed for markers. Affects which markers spawn and where (room objects, lockers, terminals, etc)" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.MarkerSubSeed, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Lighting Sub Seed:" ToolTip.Tip="Subseed for the lighting" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.LightingSubSeed, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Lighting:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,8" ToolTip.Tip="Lighting settings for this zone."/>
+                                                            <ComboBox Grid.Row="1" Grid.Column="3"
+                                                                      ItemsSource="{Binding AvailableLightingConfigs}"
+                                                                      SelectedItem="{Binding SelectedZoneLightingOption, Mode=TwoWay}"
+                                                                      HorizontalAlignment="Stretch"
+                                                                      VerticalAlignment="Center"
+                                                                      Margin="0,0,0,8">
+                                                                <ComboBox.ItemTemplate>
+                                                                    <DataTemplate x:DataType="models:LightSettingsBlock">
+                                                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                                    </DataTemplate>
+                                                                </ComboBox.ItemTemplate>
+                                                            </ComboBox>
+
+                                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Consumables:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip.Tip="consumable distribution in this zone."/>
+                                                            <ComboBox Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="3"
+                                                                      ItemsSource="{Binding AvailableConsumableDistributions}"
+                                                                      SelectedItem="{Binding SelectedZoneConsumableDistributionOption, Mode=TwoWay}"
+                                                                      HorizontalAlignment="Stretch"
+                                                                      VerticalAlignment="Center">
+                                                                <ComboBox.ItemTemplate>
+                                                                    <DataTemplate x:DataType="models:ConsumableDistributionBlock">
+                                                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                                    </DataTemplate>
+                                                                </ComboBox.ItemTemplate>
+                                                            </ComboBox>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Enemy Respawning Section -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox Content="Enemy Respawning"
+                                                                  ToolTip.Tip="True if enemies should respawn in this zone (Respawn Zone). Note that if too many respawn sacs exist in the level there can be significant audio issues, so do not overuse this."
+                                                                  IsChecked="{Binding ActiveZoneSettings.EnemyRespawning, Mode=TwoWay}"
+                                                                  FontWeight="SemiBold"
+                                                                  Foreground="#E0E0E0"/>
+
+                                                        <StackPanel Spacing="8" IsVisible="{Binding ActiveZoneSettings.EnemyRespawning}" Margin="20,2,0,0">
+                                                            <CheckBox Content="Require Other Zone"
+                                                                      ToolTip.Tip="True if respawning requires all players to be outside of this zone in addition to the room distance requirement"
+                                                                      IsChecked="{Binding ActiveZoneSettings.RequireOtherZone, Mode=TwoWay}"
+                                                                      Foreground="#CCCCCC"/>
+
+                                                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Room Distance:" ToolTip.Tip="How many rooms away the players must be for the respawn to trigger. Default in vanilla is 2. If set to 0, enemies will just respawn on top of themselves" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.RoomDistance, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Time Interval (s):" ToolTip.Tip="How often the respawn check is run. Note this does NOT simply mean how long the players have left the area for" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.TimeInterval, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Count Multiplier:" ToolTip.Tip="0-1 multiplier for the proportion of enemies that will respawn. When the proportion of enemies falls below this, enemies will respawn back up to this value." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.CountMultiplier, Mode=TwoWay}" Margin="0,0,14,0"/>
+                                                            </Grid>
+
+                                                            <!-- Exclude List -->
+                                                            <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                                <Expander.Header>
+                                                                    <Grid ColumnDefinitions="*,Auto">
+                                                                        <TextBlock Grid.Column="0" Text="Exclude List" ToolTip.Tip="Select enemies to not be respawned. Many levels opt to exclude scouts." FontWeight="SemiBold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                                                        <Button Grid.Column="1" Content="+ Add Excluded Enemy" Command="{Binding AddEnemyExcludeItem}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                                    </Grid>
+                                                                </Expander.Header>
+                                                                <ItemsControl ItemsSource="{Binding ActiveZoneSettings.ExcludeList}" Margin="0,8,0,0">
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate x:DataType="models:EnemyExcludeItem" x:CompileBindings="False">
+                                                                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,2">
+                                                                                <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to NOT respawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <ComboBox Grid.Column="1"
+                                                                                          ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                                                          SelectedValue="{Binding EnemyId, Mode=TwoWay}"
+                                                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                                                          HorizontalAlignment="Stretch"
+                                                                                          Margin="0,0,8,0">
+                                                                                    <ComboBox.ItemTemplate>
+                                                                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                                                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                                                        </DataTemplate>
+                                                                                    </ComboBox.ItemTemplate>
+                                                                                </ComboBox>
+                                                                                <Button Grid.Column="2" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyExcludeItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                            </Grid>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
+                                                            </Expander>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Resource Kit Uses (Med, Ammo, Tool, Disinfect) -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="Resource Kit Uses" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" ToolTip.Tip="Number of resource kit uses in the zone."/>
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Med Uses:" ToolTip.Tip="Number of medical kit uses in this zone." VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.MedKitUses, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Ammo Uses:" ToolTip.Tip="Number of ammo pack uses in this zone." VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.AmmoKitUses, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Tool Uses:" ToolTip.Tip="Number of tool refill uses in this zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.ToolKitUses, Mode=TwoWay}" Margin="0,0,14,0"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Disinfect Uses:" ToolTip.Tip="Number of disinfection pack uses in this zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveZoneSettings.DisinfectKitUses, Mode=TwoWay}"/>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Power Cells, Fog Turbines -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
+                                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
+                                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Power Cells:" ToolTip.Tip="Number of power cells in the zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.PowerCells, Mode=TwoWay}" Margin="0,0,14,0"/>
+
+                                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Fog Turbines:" ToolTip.Tip="Number of fog turbines in the zone." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.FogTurbines, Mode=TwoWay}"/>
+                                                    </Grid>
+                                                </Border>
+
+                                                <!-- Clusters & Spawners Section -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="Clusters &amp; Spawners" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto">
+                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="HSU Clusters:" ToolTip.Tip="Number of HSU clusters in this zone" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveZoneSettings.HSUClusters, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Corpse Clusters:" ToolTip.Tip="Number of corpse clusters in this zone" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveZoneSettings.CorpseClusters, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Container Clusters:" ToolTip.Tip="Number of resource container clusters in this zone. This is not required for resources to spawn" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveZoneSettings.ResourceContainerClusters, Mode=TwoWay}" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Corpses In Zone:" ToolTip.Tip="Number of corpses in this zone" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveZoneSettings.CorpsesInZone, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="Ground Spawners:" ToolTip.Tip="Number of ground spawners in this zone, which are spots for consumables to spawn on the ground, shelves, etc" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <ComboBox Grid.Row="2" Grid.Column="1"
+                                                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableZoneDistributionAmounts}"
+                                                                      SelectedItem="{Binding ActiveZoneSettings.GroundSpawnersInZone, Mode=TwoWay}"
+                                                                      HorizontalAlignment="Stretch" Margin="0,0,14,8"/>
+
+                                                            <TextBlock Grid.Row="2" Grid.Column="2" Text="HSUs In Zone:" ToolTip.Tip="Number of HSUs in this zone" VerticalAlignment="Center" Margin="0,0,8,8" Foreground="#AAAAAA"/>
+                                                            <ComboBox Grid.Row="2" Grid.Column="3"
+                                                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableZoneDistributionAmounts}"
+                                                                      SelectedItem="{Binding ActiveZoneSettings.HSUsInZone, Mode=TwoWay}"
+                                                                      HorizontalAlignment="Stretch" Margin="0,0,0,8"/>
+
+                                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="Decon Units:" ToolTip.Tip="Number of decon units in this zone" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#AAAAAA"/>
+                                                            <ComboBox Grid.Row="3" Grid.Column="1"
+                                                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableZoneDistributionAmounts}"
+                                                                      SelectedItem="{Binding ActiveZoneSettings.DeconUnitsInZone, Mode=TwoWay}"
+                                                                      HorizontalAlignment="Stretch" Margin="0,0,14,0"/>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+
+                                                <!-- Big Pickup Distribution In Zone -->
+                                                <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                    <Expander.Header>
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Big Pickup Distribution" ToolTip.Tip="Add big pickups to this zone (cells, turbines, etc)" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                                            <Button Grid.Column="1" Content="+ Add Big Pickup" Command="{Binding AddBigPickupDistributionItem}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                        </Grid>
+                                                    </Expander.Header>
+                                                    <ItemsControl ItemsSource="{Binding ActiveZoneSettings.BigPickupDistributionInZone}" Margin="0,8,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:BigPickupDistributionItem" x:CompileBindings="False">
+                                                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,2">
+                                                                    <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="Item to place in the zone" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                    <ComboBox Grid.Column="1"
+                                                                              ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
+                                                                              SelectedValue="{Binding ItemType, Mode=TwoWay}"
+                                                                              SelectedValueBinding="{Binding Type}"
+                                                                              HorizontalAlignment="Stretch"
+                                                                              Margin="0,0,8,0">
+                                                                        <ComboBox.ItemTemplate>
+                                                                            <DataTemplate x:DataType="models:RetrieveBigItemOption">
+                                                                                <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                            </DataTemplate>
+                                                                        </ComboBox.ItemTemplate>
+                                                                    </ComboBox>
+                                                                    <Button Grid.Column="2" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveBigPickupDistributionItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                </Grid>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Expander>
+
+                                                <!-- Disinfection Station Placements -->
+                                                <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                    <Expander.Header>
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Disinfection Station Placements" ToolTip.Tip="Placements for disinfection stations" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                                            <Button Grid.Column="1" Content="+ Add Station Placement" Command="{Binding AddDisinfectionStationPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                        </Grid>
+                                                    </Expander.Header>
+                                                    <ItemsControl ItemsSource="{Binding ActiveZoneSettings.DisinfectionStationPlacements}" Margin="0,8,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:DisinfectionStationPlacement" x:CompileBindings="False">
+                                                                <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                                                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto" RowDefinitions="Auto">
+                                                                        <TextBlock Grid.Column="0" Text="Start:" ToolTip.Tip="Weight for the start of the zone." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                        <TextBox Grid.Column="1" Text="{Binding PlacementStartWeight, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                                                        <TextBlock Grid.Column="2" Text="Middle:" ToolTip.Tip="Weight for the middle of the zone." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                        <TextBox Grid.Column="3" Text="{Binding PlacementMiddleWeight, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                                                        <TextBlock Grid.Column="4" Text="End:" ToolTip.Tip="Weight for the end of the zone." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                        <TextBox Grid.Column="5" Text="{Binding PlacementEndWeight, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                                                        <Button Grid.Column="6" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveDisinfectionStationPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                    </Grid>
+                                                                </Border>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Expander>
+
+                                                <!-- Terminal Placements -->
+                                                <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                    <Expander.Header>
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Terminal Placements" ToolTip.Tip="Placements and configs for terminals in the zone" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                                            <Button Grid.Column="1" Content="+ Add Terminal" Command="{Binding AddTerminalPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                        </Grid>
+                                                    </Expander.Header>
+                                                    <ItemsControl ItemsSource="{Binding ActiveZoneSettings.TerminalPlacements}" Margin="0,8,0,0">
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:TerminalPlacement" x:CompileBindings="False">
+                                                                <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch" Margin="0,0,0,10">
+                                                                    <Expander.Header>
+                                                                        <Grid ColumnDefinitions="*,Auto">
+                                                                            <TextBlock Grid.Column="0" Text="Terminal Configuration" ToolTip.Tip="Custom configuration for this terminal" FontWeight="SemiBold" FontSize="12" Foreground="#FFA200" VerticalAlignment="Center"/>
+                                                                            <Button Grid.Column="1" Content="✕ Remove Terminal" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                        </Grid>
+                                                                    </Expander.Header>
+                                                                    <StackPanel Spacing="8" Margin="0,8,0,0">
+                                                                        <!-- Placement Weights & Seed Offsets -->
+                                                                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Start:" ToolTip.Tip="Weight for the start of the zone." VerticalAlignment="Center" Margin="0,0,6,8" Foreground="#AAAAAA"/>
+                                                                            <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PlacementStartWeight, Mode=TwoWay}" Margin="0,0,10,8"/>
+
+                                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="Middle:" ToolTip.Tip="Weight for the middle of the zone." VerticalAlignment="Center" Margin="0,0,6,8" Foreground="#AAAAAA"/>
+                                                                            <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding PlacementMiddleWeight, Mode=TwoWay}" Margin="0,0,10,8"/>
+
+                                                                            <TextBlock Grid.Row="0" Grid.Column="4" Text="End:" ToolTip.Tip="Weight for the end of the zone." VerticalAlignment="Center" Margin="0,0,6,8" Foreground="#AAAAAA"/>
+                                                                            <TextBox Grid.Row="0" Grid.Column="5" Text="{Binding PlacementEndWeight, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="Area Seed:" ToolTip.Tip="Seed offset for where this terminal is placed." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding AreaSeedOffset, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Marker Seed:" ToolTip.Tip="Seed offset for where markers will be placed." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding MarkerSeedOffset, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                                                        </Grid>
+
+                                                                        <!-- Starting State & State Options -->
+                                                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto" RowDefinitions="Auto,Auto">
+                                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="Starting State:" ToolTip.Tip="Initial state of the terminal. Almost every terminal in the base game uses 'Sleeping'." VerticalAlignment="Center" Margin="0,0,6,8" Foreground="#CCCCCC"/>
+                                                                            <ComboBox Grid.Row="0" Grid.Column="1"
+                                                                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTerminalStartingStates}"
+                                                                                      SelectedItem="{Binding StartingState, Mode=TwoWay}"
+                                                                                      HorizontalAlignment="Stretch"
+                                                                                      Margin="0,0,12,8"/>
+
+                                                                            <CheckBox Grid.Row="0" Grid.Column="2"
+                                                                                      Content="Show Log Count"
+                                                                                      ToolTip.Tip="Whether this terminal should display the log count."
+                                                                                      IsChecked="{Binding KeepShowingLocalLogCount, Mode=TwoWay}"
+                                                                                      VerticalAlignment="Center"
+                                                                                      Margin="0,0,12,8"
+                                                                                      Foreground="#CCCCCC"/>
+
+                                                                            <CheckBox Grid.Row="0" Grid.Column="3"
+                                                                                      Content="Use Custom Info Text"
+                                                                                      ToolTip.Tip="Whether this terminal should contain custom Info text."
+                                                                                      IsChecked="{Binding UseCustomInfoText, Mode=TwoWay}"
+                                                                                      VerticalAlignment="Center"
+                                                                                      Margin="0,0,0,8"
+                                                                                      Foreground="#CCCCCC"/>
+
+                                                                            <!-- Custom Info Text [only visible when UseCustomInfoText is true] -->
+                                                                            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4"
+                                                                                  ColumnDefinitions="Auto,*"
+                                                                                  IsVisible="{Binding UseCustomInfoText}"
+                                                                                  Margin="0,0,0,8">
+                                                                                <TextBlock Grid.Column="0" Text="Custom Info Text:" ToolTip.Tip="The custom info text to be displayed" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                <TextBox Grid.Column="1" Text="{Binding CustomInfoText, Mode=TwoWay}"/>
+                                                                            </Grid>
+                                                                        </Grid>
+
+                                                                        <!-- Password Protection -->
+                                                                        <Border Background="#141414" BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="8">
+                                                                            <StackPanel Spacing="8">
+                                                                                <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                                                    <CheckBox Content="Password Protected"
+                                                                                              ToolTip.Tip="True if this terminal should be password protected"
+                                                                                              IsChecked="{Binding PasswordProtected, Mode=TwoWay}"
+                                                                                              VerticalAlignment="Center"
+                                                                                              Margin="0,0,16,0"
+                                                                                              Foreground="#CCCCCC"/>
+
+                                                                                    <CheckBox Content="Generate Password"
+                                                                                              ToolTip.Tip="True if a password should be generated (this is only *not* used on the hidden R8A2 terminal)"
+                                                                                              IsChecked="{Binding GeneratePassword, Mode=TwoWay}"
+                                                                                              IsVisible="{Binding PasswordProtected}"
+                                                                                              VerticalAlignment="Center"
+                                                                                              Margin="0,0,16,0"
+                                                                                              Foreground="#CCCCCC"/>
+
+                                                                                    <CheckBox Content="Show Password Length"
+                                                                                              ToolTip.Tip="True if the password length should be shown to the player"
+                                                                                              IsChecked="{Binding ShowPasswordLength, Mode=TwoWay}"
+                                                                                              IsVisible="{Binding IsPasswordGenerationVisible}"
+                                                                                              VerticalAlignment="Center"
+                                                                                              Margin="0,0,16,0"
+                                                                                              Foreground="#CCCCCC"/>
+
+                                                                                    <CheckBox Content="Show Password Part Positions"
+                                                                                              ToolTip.Tip="True if the parts of the password given to players should include their position"
+                                                                                              IsChecked="{Binding ShowPasswordPartPositions, Mode=TwoWay}"
+                                                                                              IsVisible="{Binding IsPasswordGenerationVisible}"
+                                                                                              VerticalAlignment="Center"
+                                                                                              Foreground="#CCCCCC"/>
+                                                                                </WrapPanel>
+
+                                                                                <!-- Password Hint Text [only visible when PasswordProtected is true] -->
+                                                                                <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding PasswordProtected}">
+                                                                                    <TextBlock Grid.Column="0" Text="Password Hint Text:" ToolTip.Tip="The text shown to players where they need to type the password into" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                    <TextBox Grid.Column="1" Text="{Binding PasswordHintText, Mode=TwoWay}"/>
+                                                                                </Grid>
+
+                                                                                <!-- Password Part Count [only visible when PasswordProtected and GeneratePassword is true] -->
+                                                                                <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsPasswordGenerationVisible}">
+                                                                                    <TextBlock Grid.Column="0" Text="Password Part Count:" ToolTip.Tip="How many logs this password is split between" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                    <TextBox Grid.Column="1" Text="{Binding PasswordPartCount, Mode=TwoWay}"/>
+                                                                                </Grid>
+
+                                                                                <!-- TerminalZoneSelectionDatas [only visible when PasswordProtected and GeneratePassword is true] -->
+                                                                                <Expander Background="#1A1A1A" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch"
+                                                                                          IsVisible="{Binding IsPasswordGenerationVisible}">
+                                                                                    <Expander.Header>
+                                                                                        <Grid ColumnDefinitions="*,Auto">
+                                                                                            <TextBlock Grid.Column="0" Text="Terminal Zone Selection Datas" FontWeight="SemiBold" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                                                                                            <Button Grid.Column="1" Content="+ Add Terminal Zone" Command="{Binding AddTerminalZoneSelectionData}" Background="#2D5A27" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                        </Grid>
+                                                                                    </Expander.Header>
+                                                                                    <ItemsControl ItemsSource="{Binding TerminalZoneSelectionDatas}" Margin="0,6,0,0">
+                                                                                        <ItemsControl.ItemTemplate>
+                                                                                            <DataTemplate x:DataType="models:TerminalZoneSelectionData" x:CompileBindings="False">
+                                                                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto" Margin="0,2,0,4">
+                                                                                                    <TextBlock Grid.Column="0" Text="Zone:" ToolTip.Tip="The zone a password segment can spawn in" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                                                    <ComboBox Grid.Column="1"
+                                                                                                              ItemsSource="{Binding AvailableZones}"
+                                                                                                              SelectedValue="{Binding Zone, Mode=TwoWay}"
+                                                                                                              SelectedValueBinding="{Binding ZoneIndex}"
+                                                                                                              HorizontalAlignment="Stretch"
+                                                                                                              VerticalAlignment="Center"
+                                                                                                              Margin="0,0,12,0">
+                                                                                                        <ComboBox.ItemTemplate>
+                                                                                                            <DataTemplate x:DataType="models:ZoneOption">
+                                                                                                                <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                                                            </DataTemplate>
+                                                                                                        </ComboBox.ItemTemplate>
+                                                                                                    </ComboBox>
+
+                                                                                                    <TextBlock Grid.Column="2" Text="Terminal:" ToolTip.Tip="The terminal within this zone to spawn the password segment on" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                                                    <ComboBox Grid.Column="3"
+                                                                                                              ItemsSource="{Binding AvailableTerminals}"
+                                                                                                              SelectedValue="{Binding Terminal, Mode=TwoWay}"
+                                                                                                              SelectedValueBinding="{Binding TerminalIndex}"
+                                                                                                              HorizontalAlignment="Stretch"
+                                                                                                              VerticalAlignment="Center"
+                                                                                                              Margin="0,0,8,0">
+                                                                                                        <ComboBox.ItemTemplate>
+                                                                                                            <DataTemplate x:DataType="models:TerminalOption">
+                                                                                                                <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                                                            </DataTemplate>
+                                                                                                        </ComboBox.ItemTemplate>
+                                                                                                    </ComboBox>
+
+                                                                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalZoneSelectionDataCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                                                                </Grid>
+                                                                                            </DataTemplate>
+                                                                                        </ItemsControl.ItemTemplate>
+                                                                                    </ItemsControl>
+                                                                                </Expander>
+                                                                            </StackPanel>
+                                                                        </Border>
+
+                                                                        <!-- Unique Commands -->
+                                                                        <Expander Background="#181818" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                                            <Expander.Header>
+                                                                                <Grid ColumnDefinitions="*,Auto">
+                                                                                    <TextBlock Grid.Column="0" Text="Unique Commands" ToolTip.Tip="Custom commands for this terminal" FontWeight="SemiBold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                                                                    <Button Grid.Column="1" Content="+ Add Unique Command" Command="{Binding AddUniqueCommand}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                                                </Grid>
+                                                                            </Expander.Header>
+                                                                            <ItemsControl ItemsSource="{Binding UniqueCommands}" Margin="0,8,0,0">
+                                                                                <ItemsControl.ItemTemplate>
+                                                                                    <DataTemplate x:DataType="models:TerminalUniqueCommand" x:CompileBindings="False">
+                                                                                        <Expander Background="#141414" BorderBrush="#3A3A3C" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch" Margin="0,0,0,8">
+                                                                                            <Expander.Header>
+                                                                                                <Grid ColumnDefinitions="*,Auto">
+                                                                                                    <TextBlock Grid.Column="0" Text="Unique Command Details" FontWeight="SemiBold" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                                                                                                    <Button Grid.Column="1" Content="✕ Remove Command" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalUniqueCommandCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                                                </Grid>
+                                                                                            </Expander.Header>
+                                                                                            <StackPanel Spacing="6" Margin="0,6,0,0">
+                                                                                                <Grid ColumnDefinitions="Auto,*">
+                                                                                                    <TextBlock Grid.Column="0" Text="Command:" ToolTip.Tip="The name of the command. This is what players must type" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                                    <TextBox Grid.Column="1" Text="{Binding Command, Mode=TwoWay}"/>
+                                                                                                </Grid>
+                                                                                                <Grid ColumnDefinitions="Auto,*">
+                                                                                                    <TextBlock Grid.Column="0" Text="Command Description:" ToolTip.Tip="The description of the command. This will be visible via the 'commands' command." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                                    <TextBox Grid.Column="1" Text="{Binding CommandDesc, Mode=TwoWay}"/>
+                                                                                                </Grid>
+
+                                                                                                <!-- Post Command Outputs -->
+                                                                                                <Expander Background="#1E1E1E" BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                                                                    <Expander.Header>
+                                                                                                        <Grid ColumnDefinitions="*,Auto">
+                                                                                                            <TextBlock Grid.Column="0" Text="Post Command Outputs" ToolTip.Tip="The messages that will be displayed in the terminal after the command is run" FontWeight="SemiBold" FontSize="11" Foreground="#AAAAAA" VerticalAlignment="Center"/>
+                                                                                                            <Button Grid.Column="1" Content="+ Add Output" Command="{Binding AddPostCommandOutput}" Background="#2D5A27" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                                        </Grid>
+                                                                                                    </Expander.Header>
+                                                                                                    <ItemsControl ItemsSource="{Binding PostCommandOutputs}" Margin="0,6,0,0">
+                                                                                                        <ItemsControl.ItemTemplate>
+                                                                                                            <DataTemplate x:DataType="models:TerminalPostCommandOutput" x:CompileBindings="False">
+                                                                                                                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto" Margin="0,2,0,2">
+                                                                                                                    <TextBlock Grid.Column="0" Text="Line Type:" ToolTip.Tip="The style of line" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                                                                    <ComboBox Grid.Column="1"
+                                                                                                                              ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTerminalLineTypes}"
+                                                                                                                              SelectedItem="{Binding LineType, Mode=TwoWay}"
+                                                                                                                              Margin="0,0,8,0"/>
+                                                                                                                    <TextBlock Grid.Column="2" Text="Time:" ToolTip.Tip="The delay when outputting this line. 0 for instant" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                                                                    <TextBox Grid.Column="3" Text="{Binding Time, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
+                                                                                                                    <TextBlock Grid.Column="4" Text="Output:" ToolTip.Tip="The text to be output on this line" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
+                                                                                                                    <TextBox Grid.Column="5" Text="{Binding Output, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                                                                                    <Button Grid.Column="6" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalPostCommandOutputCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                                                                                </Grid>
+                                                                                                            </DataTemplate>
+                                                                                                        </ItemsControl.ItemTemplate>
+                                                                                                    </ItemsControl>
+                                                                                                </Expander>
+
+                                                                                                <!-- Command Events -->
+                                                                                                <Expander Background="#1E1E1E" BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                                                                    <Expander.Header>
+                                                                                                        <Grid ColumnDefinitions="*,Auto">
+                                                                                                            <TextBlock Grid.Column="0" Text="Command Events" ToolTip.Tip="Events to trigger when the command is run" FontWeight="SemiBold" FontSize="11" Foreground="#03C700" VerticalAlignment="Center"/>
+                                                                                                            <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddCommandEvent}" Background="#2D5A27" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                                        </Grid>
+                                                                                                    </Expander.Header>
+                                                                                                    <StackPanel Spacing="6" Margin="0,6,0,0">
+                                                                                                        <ItemsControl ItemsSource="{Binding CommandEvents}"
+                                                                                                                      ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                                                                                    </StackPanel>
+                                                                                                </Expander>
+                                                                                            </StackPanel>
+                                                                                        </Expander>
+                                                                                    </DataTemplate>
+                                                                                </ItemsControl.ItemTemplate>
+                                                                            </ItemsControl>
+                                                                        </Expander>
+                                                                    </StackPanel>
+                                                                </Expander>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
+                                                </Expander>
+
+                                                <!-- Generator Cluster (Gen Cluster) Section -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,2,0,0" IsVisible="{Binding ActiveZoneHasGenClusterTile}">
+                                                    <CheckBox Content="Zone Contains Gen Cluster"
+                                                              ToolTip.Tip="Whether this zone contains a generator cluster."
+                                                              IsChecked="{Binding ActiveZoneSettings.ContainsGenCluster, Mode=TwoWay}"
+                                                              FontWeight="SemiBold"
+                                                              Foreground="#E0E0E0"/>
+                                                </Border>
+
+                                                <!-- Door Controller (DC) Section -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,2,0,0">
+                                                    <StackPanel Spacing="8">
+                                                        <CheckBox Content="Zone Contains DC (Door Controller)"
+                                                                  ToolTip.Tip="Whether the zone contains a DC"
+                                                                  IsChecked="{Binding ActiveZoneSettings.ContainsDC, Mode=TwoWay}"
+                                                                  FontWeight="SemiBold"
+                                                                  Foreground="#E0E0E0"/>
+
+                                                        <!-- DC Scan Seed (only visible if DC is in the zone) -->
+                                                        <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding ActiveZoneSettings.ContainsDC}" Margin="20,2,0,0">
+                                                            <TextBlock Grid.Column="0" Text="DC Scan Seed:" ToolTip.Tip="Seed that affects where the scans will go to" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding ActiveZoneSettings.DcScanSeed, Mode=TwoWay}"/>
+                                                        </Grid>
+
+                                                        <!-- List of doors opened by this DC -->
+                                                        <StackPanel Spacing="6" IsVisible="{Binding ActiveZoneSettings.ContainsDC}" Margin="20,2,0,0">
+                                                            <TextBlock Text="Doors Opened by this DC:"
+                                                                       ToolTip.Tip="The list of doors that can be opened via this DC."
+                                                                       FontSize="12"
+                                                                       FontWeight="SemiBold"
+                                                                       Foreground="#FFA200"/>
+
+                                                            <ItemsControl ItemsSource="{Binding DoorsOpenedByThisDc}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate x:DataType="x:String">
+                                                                        <TextBlock Text="{Binding}"
+                                                                                   Margin="0,0,0,2"
+                                                                                   Foreground="#CCCCCC"/>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                            <TextBlock Text="(No doors originating from this zone)"
+                                                                       FontSize="11"
+                                                                       FontStyle="Italic"
+                                                                       Foreground="#666666"
+                                                                       IsVisible="{Binding !HasDoorsOpenedByThisDc}"/>
+                                                        </StackPanel>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </ScrollViewer>
+                                    </TabItem>
+
+                                    <!-- TAB 3: Geomorph -->
+                                    <TabItem Header="Geomorph" FontSize="13" FontWeight="SemiBold">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                            <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
+                                                <StackPanel Spacing="12">
+                                                    <TextBlock Text="Geomorph Settings"
+                                                               FontWeight="Bold"
+                                                               FontSize="14"
+                                                               Foreground="#00F2FF"/>
+
+                                                    <!-- Geomorph Name -->
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <TextBlock Grid.Column="0" Text="Geomorph:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding EditingRoomGeomorphName}" FontWeight="Bold" Foreground="#9D00FF" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                                    </Grid>
+
+                                                    <!-- Altitude Selection -->
+                                                    <Grid ColumnDefinitions="Auto,*">
+                                                        <TextBlock Grid.Column="0" Text="Altitude:" FontWeight="SemiBold" Foreground="#AAAAAA" VerticalAlignment="Center" Margin="0,0,10,0" ToolTip.Tip="Elevation of the geomorph."/>
+                                                        <ComboBox Grid.Column="1"
+                                                                  ItemsSource="{Binding AvailableGeomorphAltitudes}"
+                                                                  SelectedItem="{Binding SelectedGeomorphAltitudeOption, Mode=TwoWay}"
+                                                                  HorizontalAlignment="Stretch"
+                                                                  VerticalAlignment="Center">
+                                                            <ComboBox.ItemTemplate>
+                                                                <DataTemplate x:DataType="models:AltitudeOption">
+                                                                    <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                                </DataTemplate>
+                                                            </ComboBox.ItemTemplate>
+                                                        </ComboBox>
+                                                    </Grid>
+
+                                                    <!-- Delete Geomorph Button -->
+                                                    <Button Content="Delete Geomorph"
+                                                            Command="{Binding RequestDeleteGeomorph}"
+                                                            Background="#D9534F"
+                                                            Foreground="White"
+                                                            FontWeight="SemiBold"
+                                                            HorizontalAlignment="Right"
+                                                            Padding="14,6"
+                                                            Margin="0,6,0,0"/>
+                                                </StackPanel>
+                                            </Border>
+                                        </ScrollViewer>
+                                    </TabItem>
+                                </TabControl>
+
+                                <!-- Action buttons -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                                    <Button Content="Close"
+                                            Command="{Binding CloseEditRoomDialog}"
+                                            Background="#007ACC"
+                                            Foreground="White"
+                                            FontWeight="SemiBold"
+                                            Padding="20,8"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+    </Border>
+</UserControl>

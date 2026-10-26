@@ -154,6 +154,9 @@ public class WardenObjectiveData
     [JsonPropertyName("wavesOnElevatorLand")]
     public GenericWaveSettings? WavesOnElevatorLand { get; set; }
 
+    [JsonPropertyName("wavesOnActivate")]
+    public GenericWaveSettings? WavesOnActivate { get; set; }
+
     [JsonPropertyName("fogTransitionDataOnGotoWin")]
     public uint FogTransitionDataOnGotoWin { get; set; } = 0;
 

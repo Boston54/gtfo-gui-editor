@@ -550,4 +550,161 @@ public class AlarmTests
             }
         }
     }
+    [Fact]
+    public void AlarmBlock_IsErrorAndDisableSurvivalWaveOnComplete_PropertyLinkAndClone()
+    {
+        var alarm = new AlarmBlock();
+        Assert.False(alarm.IsError);
+        Assert.True(alarm.DisableSurvivalWaveOnComplete);
+
+        alarm.IsError = true;
+        Assert.True(alarm.IsError);
+        Assert.False(alarm.DisableSurvivalWaveOnComplete);
+
+        alarm.DisableSurvivalWaveOnComplete = true;
+        Assert.False(alarm.IsError);
+        Assert.True(alarm.DisableSurvivalWaveOnComplete);
+
+        alarm.IsError = true;
+        var clone = alarm.Clone();
+        Assert.True(clone.IsError);
+        Assert.False(clone.DisableSurvivalWaveOnComplete);
+    }
+
+    [Fact]
+    public void AlarmBlock_UseRandomPositionsAndTriggerAlarm_GetSetAndClone()
+    {
+        var alarm = new AlarmBlock();
+        Assert.False(alarm.UseRandomPositions);
+        Assert.True(alarm.SpawnsEnemies);
+        Assert.True(alarm.TriggerAlarmOnActivate);
+
+        alarm.UseRandomPositions = true;
+        alarm.SpawnsEnemies = false;
+        Assert.True(alarm.UseRandomPositions);
+        Assert.False(alarm.SpawnsEnemies);
+        Assert.False(alarm.TriggerAlarmOnActivate);
+
+        alarm.TriggerAlarmOnActivate = true;
+        Assert.True(alarm.SpawnsEnemies);
+        Assert.True(alarm.TriggerAlarmOnActivate);
+
+        var clone = alarm.Clone();
+        Assert.True(clone.UseRandomPositions);
+        Assert.True(clone.SpawnsEnemies);
+        Assert.True(clone.TriggerAlarmOnActivate);
+    }
+
+    [Fact]
+    public void AlarmService_LoadVanillaAlarms_ParsesIsErrorAndUseRandomPositions()
+    {
+        var alarms = AlarmService.LoadVanillaAlarms();
+        Assert.NotNull(alarms);
+
+        // ChainedPuzzle 627: R2E1 ZONE_602 (Main) has DisableSurvivalWaveOnComplete=false -> IsError=true
+        var errorAlarm = alarms.FirstOrDefault(a => a.PersistentId == 627);
+        Assert.NotNull(errorAlarm);
+        Assert.True(errorAlarm.IsError);
+        Assert.False(errorAlarm.DisableSurvivalWaveOnComplete);
+        Assert.True(errorAlarm.SpawnsEnemies);
+
+        // ChainedPuzzle 545: R1C2 ZONE_3 (Main) has UseRandomPositions=true, DisableSurvivalWaveOnComplete=true -> IsError=false
+        var randomPosAlarm = alarms.FirstOrDefault(a => a.PersistentId == 545);
+        Assert.NotNull(randomPosAlarm);
+        Assert.True(randomPosAlarm.UseRandomPositions);
+        Assert.False(randomPosAlarm.IsError);
+        Assert.True(randomPosAlarm.DisableSurvivalWaveOnComplete);
+    }
+
+    [Fact]
+    public void AlarmBlock_NewSettings_ProjectSerializationRoundtrip()
+    {
+        string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_test_{System.Guid.NewGuid():N}.rundown");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var customAlarm = AlarmService.CreateFreshAlarm(8888, "Custom Advanced Alarm");
+            customAlarm.IsError = true;
+            customAlarm.UseRandomPositions = true;
+            customAlarm.SpawnsEnemies = false;
+
+            mainVm.Alarms.Alarms.Add(customAlarm);
+
+            RundownProjectService.SaveProject(mainVm, tempFile);
+
+            var loadedProject = RundownProjectService.LoadProject(tempFile);
+            var loadedVm = new MainWindowViewModel();
+            RundownProjectService.ApplyProject(loadedVm, loadedProject);
+
+            var loadedAlarm = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 8888);
+            Assert.NotNull(loadedAlarm);
+            Assert.Equal("Custom Advanced Alarm", loadedAlarm.Name);
+            Assert.True(loadedAlarm.IsError);
+            Assert.False(loadedAlarm.DisableSurvivalWaveOnComplete);
+            Assert.True(loadedAlarm.UseRandomPositions);
+            Assert.False(loadedAlarm.SpawnsEnemies);
+            Assert.False(loadedAlarm.TriggerAlarmOnActivate);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempFile))
+            {
+                try { System.IO.File.Delete(tempFile); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void DatablockExport_ExportsIsErrorAndUseRandomPositions()
+    {
+        string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_export_{System.Guid.NewGuid():N}");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var errorAlarm = AlarmService.CreateFreshAlarm(70001, "Export Error Alarm");
+            errorAlarm.IsError = true;
+            errorAlarm.UseRandomPositions = true;
+            errorAlarm.SpawnsEnemies = true;
+
+            var normalAlarm = AlarmService.CreateFreshAlarm(70002, "Export Normal Alarm");
+            normalAlarm.IsError = false;
+            normalAlarm.UseRandomPositions = false;
+            normalAlarm.SpawnsEnemies = false;
+
+            mainVm.Alarms.Alarms.Clear();
+            mainVm.Alarms.Alarms.Add(errorAlarm);
+            mainVm.Alarms.Alarms.Add(normalAlarm);
+
+            var result = DatablockExportService.ExportAll(mainVm, tempDir);
+            Assert.True(result.Success, result.Message);
+
+            string chainedPuzzlePath = System.IO.Path.Combine(tempDir, "GameData_ChainedPuzzleDataBlock_bin.json");
+            Assert.True(System.IO.File.Exists(chainedPuzzlePath));
+
+            var jsonDoc = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(chainedPuzzlePath))?.AsObject();
+            Assert.NotNull(jsonDoc);
+
+            var blocks = jsonDoc["Blocks"]?.AsArray();
+            Assert.NotNull(blocks);
+
+            var expErrorBlock = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 70001)?.AsObject();
+            Assert.NotNull(expErrorBlock);
+            Assert.False(expErrorBlock["DisableSurvivalWaveOnComplete"]?.GetValue<bool>());
+            Assert.True(expErrorBlock["UseRandomPositions"]?.GetValue<bool>());
+            Assert.True(expErrorBlock["TriggerAlarmOnActivate"]?.GetValue<bool>());
+
+            var expNormalBlock = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 70002)?.AsObject();
+            Assert.NotNull(expNormalBlock);
+            Assert.True(expNormalBlock["DisableSurvivalWaveOnComplete"]?.GetValue<bool>());
+            Assert.False(expNormalBlock["UseRandomPositions"]?.GetValue<bool>());
+            Assert.False(expNormalBlock["TriggerAlarmOnActivate"]?.GetValue<bool>());
+        }
+        finally
+        {
+            if (System.IO.Directory.Exists(tempDir))
+            {
+                try { System.IO.Directory.Delete(tempDir, true); } catch { }
+            }
+        }
+    }
 }

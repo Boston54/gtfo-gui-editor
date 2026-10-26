@@ -17,6 +17,8 @@ public class AlarmBlock : INotifyPropertyChanged
     private string _publicAlarmName = "";
     private bool _internalEnabled = true;
     private bool _spawnsEnemies = true;
+    private bool _isError = false;
+    private bool _useRandomPositions = false;
     private double _wantedDistanceFromStartPos = 0;
     private double _wantedDistanceBetweenPuzzleComponents = 0;
     private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
@@ -109,7 +111,47 @@ public class AlarmBlock : INotifyPropertyChanged
     public bool SpawnsEnemies
     {
         get => _spawnsEnemies;
-        set => SetField(ref _spawnsEnemies, value);
+        set
+        {
+            if (SetField(ref _spawnsEnemies, value))
+            {
+                OnPropertyChanged(nameof(TriggerAlarmOnActivate));
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public bool TriggerAlarmOnActivate
+    {
+        get => SpawnsEnemies;
+        set => SpawnsEnemies = value;
+    }
+
+    [JsonPropertyName("IsError")]
+    public bool IsError
+    {
+        get => _isError;
+        set
+        {
+            if (SetField(ref _isError, value))
+            {
+                OnPropertyChanged(nameof(DisableSurvivalWaveOnComplete));
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public bool DisableSurvivalWaveOnComplete
+    {
+        get => !_isError;
+        set => IsError = !value;
+    }
+
+    [JsonPropertyName("UseRandomPositions")]
+    public bool UseRandomPositions
+    {
+        get => _useRandomPositions;
+        set => SetField(ref _useRandomPositions, value);
     }
 
     [JsonPropertyName("WantedDistanceFromStartPos")]
@@ -404,6 +446,8 @@ public class AlarmBlock : INotifyPropertyChanged
             PublicAlarmName = PublicAlarmName,
             InternalEnabled = InternalEnabled,
             SpawnsEnemies = SpawnsEnemies,
+            IsError = IsError,
+            UseRandomPositions = UseRandomPositions,
             WantedDistanceFromStartPos = WantedDistanceFromStartPos,
             WantedDistanceBetweenPuzzleComponents = WantedDistanceBetweenPuzzleComponents,
             ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(ChainedPuzzle.Select(c => c.Clone())),

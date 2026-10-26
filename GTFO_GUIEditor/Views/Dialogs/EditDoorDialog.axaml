@@ -1,0 +1,545 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.EditDoorDialog"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="24"
+                Width="920"
+                MaxHeight="800"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 20 #80000000">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <StackPanel Spacing="16">
+                    <TextBlock Text="{Binding EditingDoorTitle}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"/>
+
+                    <!-- Door Settings Section -->
+                    <Border Background="#1E1E1E"
+                            BorderBrush="#3E3E42"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="14">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Security Door Configuration"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"/>
+
+                            <!-- Alarm / Chained Puzzle Selection -->
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="Alarm:"
+                                           ToolTip.Tip="The alarm attached to this door."
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           Foreground="#CCCCCC"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableAlarms}"
+                                          SelectedItem="{Binding SelectedDoorAlarmOption, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Alias Override (int) -->
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="Alias Override:"
+                                           ToolTip.Tip="Override for this zone's number. -1 for no override (will use default value based on the zone index)"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           Foreground="#CCCCCC"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding EditingDoorAliasOverride, Mode=TwoWay}"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Alias Prefix Short Override (string) -->
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto">
+                                <TextBlock Grid.Column="0"
+                                           Text="Alias Prefix Short Override:"
+                                           ToolTip.Tip="The prefix before the zone number. A common use case is to name this something like &quot;Resource Room, ZONE&quot;."
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           Foreground="#CCCCCC"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding EditingDoorAliasPrefixShortOverride, Mode=TwoWay}"
+                                         VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- TurnOffAlarmOnTerminal (bool) -->
+                            <CheckBox Content="Turn Off Alarm On Terminal"
+                                      IsChecked="{Binding EditingDoor.TurnOffAlarmOnTerminal, Mode=TwoWay}"
+                                      ToolTip.Tip="True if this door's alarm (typically, an error) should be stopped via a terminal"
+                                      Foreground="#CCCCCC"/>
+
+                            <!-- TerminalZone & Terminal [only visible if TurnOffAlarmOnTerminal is true] -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto"
+                                  IsVisible="{Binding EditingDoor.TurnOffAlarmOnTerminal}"
+                                  Margin="0,2,0,0">
+                                <TextBlock Grid.Column="0"
+                                           Text="Terminal Zone:"
+                                           ToolTip.Tip="The zone that contains the terminal used to deactivate alarms"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           Foreground="#CCCCCC"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableDoorTerminalZones}"
+                                          SelectedItem="{Binding SelectedDoorTerminalZoneOption, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"
+                                          Margin="0,0,12,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ZoneOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2"
+                                           Text="Terminal:"
+                                           ToolTip.Tip="The specific terminal that should be used for the deactivation"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,12,0"
+                                           Foreground="#CCCCCC"/>
+                                <ComboBox Grid.Column="3"
+                                          ItemsSource="{Binding AvailableDoorTerminals}"
+                                          SelectedItem="{Binding SelectedDoorTerminalOption, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:TerminalOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Apex Door (bool) [only visible if EditingDoor.IsSecurityDoor is true] -->
+                            <CheckBox Content="Apex Door"
+                                      IsChecked="{Binding EditingDoor.IsApexDoor, Mode=TwoWay}"
+                                      IsVisible="{Binding EditingDoor.IsSecurityDoor}"
+                                      ToolTip.Tip="Whether this security door is an apex door"
+                                      Foreground="#CCCCCC"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Blood Doors Section -->
+                    <Border Background="#1E1E1E"
+                            BorderBrush="#3E3E42"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="14">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Blood Doors"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"/>
+
+                            <!-- Blood Door Toggle -->
+                            <CheckBox Content="Blood Door"
+                                      ToolTip.Tip="True if this door is a blood door"
+                                      IsChecked="{Binding EditingDoor.HasBloodDoor, Mode=TwoWay}"
+                                      Foreground="#CCCCCC"/>
+
+                            <!-- Blood Door Settings (Visible when Blood Door toggle is enabled) -->
+                            <StackPanel Spacing="12" IsVisible="{Binding EditingDoor.HasBloodDoor}">
+                                <!-- EnemyGroupInArea -->
+                                <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                    <Expander.Header>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0" Text="EnemyGroupInArea" ToolTip.Tip="The enemy group that will spawn in the room behind the door when it is opened." FontWeight="SemiBold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Content="+ Add Enemy" Command="{Binding AddEnemyGroupInAreaItem}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                        </Grid>
+                                    </Expander.Header>
+                                    <ItemsControl ItemsSource="{Binding EditingDoor.EnemyGroupInArea}" Margin="0,8,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyGroupItem" x:CompileBindings="False">
+                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,2,0,2">
+                                                    <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              SelectedValue="{Binding EnemyId, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding PersistentId}"
+                                                              HorizontalAlignment="Stretch"
+                                                              Margin="0,0,8,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
+                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyGroupInAreaItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+
+                                <!-- EnemyGroupInFrontOfDoor -->
+                                <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                    <Expander.Header>
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0" Text="EnemyGroupInFrontOfDoor" ToolTip.Tip="The enemy group that will spawn directly behind the door when it is opened." FontWeight="SemiBold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1" Content="+ Add Enemy" Command="{Binding AddEnemyGroupInFrontOfDoorItem}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                        </Grid>
+                                    </Expander.Header>
+                                    <ItemsControl ItemsSource="{Binding EditingDoor.EnemyGroupInFrontOfDoor}" Margin="0,8,0,0">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyGroupItem" x:CompileBindings="False">
+                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,2,0,2">
+                                                    <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                    <ComboBox Grid.Column="1"
+                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              SelectedValue="{Binding EnemyId, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding PersistentId}"
+                                                              HorizontalAlignment="Stretch"
+                                                              Margin="0,0,8,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
+                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyGroupInFrontOfDoorItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </Expander>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Locked Door Section -->
+                    <Border Background="#1E1E1E"
+                            BorderBrush="#3E3E42"
+                            BorderThickness="1"
+                            CornerRadius="6"
+                            Padding="14">
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Locked Door"
+                                       FontSize="14"
+                                       FontWeight="Bold"
+                                       Foreground="#FFFFFF"/>
+
+                            <!-- Locked Door / Progression Puzzle Type -->
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0"
+                                           Text="Locked Door:"
+                                           ToolTip.Tip="The type of lock that should be applied to this door. 'None' for unlocked."
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"
+                                           Foreground="#CCCCCC"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableProgressionPuzzleTypes}"
+                                          SelectedItem="{Binding EditingDoor.ProgressionPuzzleToEnter, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <!-- Custom Text (string) -->
+                            <Grid ColumnDefinitions="Auto,*">
+                                <TextBlock Grid.Column="0"
+                                           Text="Custom Text:"
+                                           ToolTip.Tip="The custom text that should be visible on this door while it is locked."
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"
+                                           Foreground="#CCCCCC"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding EditingDoor.ProgressionPuzzleCustomText, Mode=TwoWay}"
+                                         HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <!-- PowerGenerator_And_PowerCell Count -->
+                            <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding EditingDoor.IsGeneratorPuzzle}">
+                                <TextBlock Grid.Column="0"
+                                           Text="Count:"
+                                           ToolTip.Tip="How many power cells to spawn"
+                                           VerticalAlignment="Center"
+                                           Margin="0,0,8,0"
+                                           Foreground="#CCCCCC"/>
+                                <TextBox Grid.Column="1"
+                                         Text="{Binding EditingDoor.ProgressionPuzzlePlacementCount, Mode=TwoWay}"
+                                         HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <!-- Candidate Zones for Keycard_SecurityBox or PowerGenerator_And_PowerCell -->
+                            <StackPanel Spacing="10" IsVisible="{Binding EditingDoor.IsKeycardOrGeneratorPuzzle}">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Candidate Zones"
+                                               ToolTip.Tip="Candidate zones for this power cell"
+                                               FontWeight="SemiBold"
+                                               FontSize="12"
+                                               Foreground="#FFFFFF"
+                                               VerticalAlignment="Center"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                        <Button Content="+ Add Candidate Zone"
+                                                Command="{Binding AddDoorCandidateZone}"
+                                                Background="#3E3E42"
+                                                Foreground="White"
+                                                Padding="6,3"
+                                                FontSize="11"/>
+                                        <Button Content="- Remove Zone"
+                                                Command="{Binding RemoveDoorCandidateZoneCommand}"
+                                                CommandParameter="{Binding SelectedDoorCandidateZonePlacement}"
+                                                IsEnabled="{Binding HasSelectedDoorCandidateZonePlacement}"
+                                                Background="#3E3E42"
+                                                Foreground="White"
+                                                Padding="6,3"
+                                                FontSize="11"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Candidate Zones List -->
+                                <ListBox ItemsSource="{Binding EditingDoor.ProgressionPuzzleCandidateZones}"
+                                         SelectedItem="{Binding SelectedDoorCandidateZonePlacement, Mode=TwoWay}"
+                                         Height="75"
+                                         Background="#141414"
+                                         BorderBrush="#2A2A2A"
+                                         BorderThickness="1"
+                                         CornerRadius="4">
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:CandidateZonePlacement">
+                                            <TextBlock Text="{Binding DisplayTitle}"
+                                                       Foreground="#E0E0E0"
+                                                       VerticalAlignment="Center"
+                                                       FontSize="12"/>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                </ListBox>
+
+                                <!-- Selected Candidate Zone Details -->
+                                <StackPanel Spacing="8" IsVisible="{Binding HasSelectedDoorCandidateZonePlacement}">
+                                    <!-- Dimension & Zone Selection -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Dimension:"
+                                                   ToolTip.Tip="The dimension of this candidate zone"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"
+                                                   Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding AvailableDimensions}"
+                                                  SelectedItem="{Binding SelectedDoorCandidateDimensionOption, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center"
+                                                  Margin="0,0,14,0">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:DimensionOption">
+                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="Zone:"
+                                                   ToolTip.Tip="The candidate zone"
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,8,0"
+                                                   Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Column="3"
+                                                  ItemsSource="{Binding AvailableDoorCandidateZones}"
+                                                  SelectedItem="{Binding SelectedDoorCandidateZoneOption, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"
+                                                  VerticalAlignment="Center">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:ZoneOption">
+                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+
+                                    <!-- Placement Weights -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto">
+                                        <TextBlock Grid.Column="0"
+                                                   Text="Start:"
+                                                   ToolTip.Tip="Weight for the start of the zone."
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,6,0"
+                                                   Foreground="#AAAAAA"/>
+                                        <TextBox Grid.Column="1"
+                                                 Text="{Binding SelectedDoorCandidateZonePlacement.PlacementStartWeight, Mode=TwoWay}"
+                                                 Margin="0,0,10,0"/>
+
+                                        <TextBlock Grid.Column="2"
+                                                   Text="Middle:"
+                                                   ToolTip.Tip="Weight for the middle of the zone."
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,6,0"
+                                                   Foreground="#AAAAAA"/>
+                                        <TextBox Grid.Column="3"
+                                                 Text="{Binding SelectedDoorCandidateZonePlacement.PlacementMiddleWeight, Mode=TwoWay}"
+                                                 Margin="0,0,10,0"/>
+
+                                        <TextBlock Grid.Column="4"
+                                                   Text="End:"
+                                                   ToolTip.Tip="Weight for the end of the zone."
+                                                   VerticalAlignment="Center"
+                                                   Margin="0,0,6,0"
+                                                   Foreground="#AAAAAA"/>
+                                        <TextBox Grid.Column="5"
+                                                 Text="{Binding SelectedDoorCandidateZonePlacement.PlacementEndWeight, Mode=TwoWay}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Events Section Header -->
+                    <TextBlock Text="Door Events"
+                               FontSize="15"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"
+                               Margin="0,4,0,0"/>
+
+                    <!-- EventsOnPortalWarp -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Portal Warp" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the portal scan is completed (this is for source zone, not destination zone). Hardcoded to be used with the portal geomorph (R6B1 and R6D1)" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnPortalWarp}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnPortalWarp}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnApproachDoor -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Approach Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when a player gets close to the door" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnApproachDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnApproachDoor}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnUnlockDoor -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Unlock Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the door is unlocked" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnUnlockDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnUnlockDoor}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnOpenDoor -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Open Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when this door is opened" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnOpenDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnOpenDoor}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnDoorScanStart -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Door Scan Start" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the scan for this door starts" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnDoorScanStart}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnDoorScanStart}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnDoorScanDone -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Door Scan Done" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the scan of this zone is finished" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnDoorScanDone}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnDoorScanDone}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnBossDeath -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Boss Death" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when an enemy considered to be a 'boss' dies. In vanilla, this is specific to the R6D1 kraken, making it unusable" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnBossDeath}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnBossDeath}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- EventsOnTrigger -->
+                    <Expander Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Events On Trigger" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Used to trigger events when a player approaches an object using the triggers that are defined in the prefabs" Foreground="#03C700" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnTrigger}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                            </Grid>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnTrigger}"
+                                          ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                        <Button Content="Close"
+                                Command="{Binding CloseEditDoorDialog}"
+                                Background="#007ACC"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                Padding="20,8"/>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+    </Border>
+</UserControl>

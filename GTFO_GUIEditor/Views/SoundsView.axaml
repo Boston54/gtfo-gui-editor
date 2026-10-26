@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.SoundsView"
+             x:DataType="vm:SoundsViewModel">
+    <Grid RowDefinitions="Auto,Auto,Auto,*" Margin="10">
+        <TextBlock Grid.Row="0" Text="Sounds" FontWeight="Bold" FontSize="16" Margin="0,0,0,6"/>
+        <TextBlock Grid.Row="1" Text="Search the list of all sounds in GTFO. Click an ID to copy it to clipboard." TextWrapping="Wrap" Margin="0,0,0,10"/>
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+            <TextBlock Grid.Column="0" Text="Search:" VerticalAlignment="Center" Margin="0,0,8,0" FontWeight="SemiBold"/>
+            <TextBox Grid.Column="1" 
+                     Text="{Binding SearchText, Mode=TwoWay}" 
+                     Watermark="Search by ID, name, path, or keyword..."
+                     VerticalAlignment="Center"/>
+            <TextBlock Grid.Column="2" 
+                       Text="{Binding StatusText}" 
+                       VerticalAlignment="Center" 
+                       Margin="10,0,0,0" 
+                       Foreground="Gray" 
+                       FontSize="12"/>
+        </Grid>
+
+        <Border Grid.Row="3" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+            <DataGrid x:Name="SoundsDataGrid"
+                      ItemsSource="{Binding FilteredSounds}"
+                      SelectedItem="{Binding SelectedSound, Mode=TwoWay}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      GridLinesVisibility="All"
+                      CanUserResizeColumns="True"
+                      CanUserReorderColumns="True"
+                      CanUserSortColumns="True"
+                      CellPointerPressed="SoundsDataGrid_CellPointerPressed">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="120"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*"/>
+                    <DataGridTextColumn Header="Wwise Object Path" Binding="{Binding WwisePath}" Width="3*"/>
+                </DataGrid.Columns>
+            </DataGrid>
+        </Border>
+    </Grid>
+</UserControl>

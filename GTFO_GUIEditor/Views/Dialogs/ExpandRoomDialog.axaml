@@ -1,0 +1,114 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.ExpandRoomDialog"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="24"
+                Width="480"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 20 #80000000">
+            <StackPanel Spacing="14">
+                <TextBlock Text="Expand Room in Geomorph"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#FFFFFF"/>
+
+                <!-- Room Expansion Target Info Card -->
+                <Border Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="12">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="{Binding RoomExpansionGeomorphName}" FontWeight="Bold" Foreground="#9D00FF" FontSize="13" TextTrimming="CharacterEllipsis"/>
+                        <Grid ColumnDefinitions="Auto,*,Auto,*" Margin="0,4,0,0">
+                            <TextBlock Grid.Column="0" Text="From Room:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="1" Text="{Binding RoomExpansionFromArea, StringFormat='Area {0}'}" FontWeight="Bold" Foreground="#E0E0E0" Margin="0,0,16,0"/>
+
+                            <TextBlock Grid.Column="2" Text="Generating:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                            <TextBlock Grid.Column="3" Text="{Binding RoomExpansionTargetArea, StringFormat='Area {0}'}" FontWeight="Bold" Foreground="#FFA200"/>
+                        </Grid>
+                    </StackPanel>
+                </Border>
+
+                <TextBlock Text="Choose the connection type for this doorway. Once generated, this door type is permanent."
+                           Foreground="#AAAAAA"
+                           FontSize="12"
+                           TextWrapping="Wrap"/>
+
+                <!-- Door Type Option -->
+                <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="Door Type:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                        <StackPanel Spacing="6" Margin="4,0,0,0">
+                            <RadioButton Content="Room Door"
+                                         GroupName="RoomExpansionDoorTypeGroup"
+                                         IsChecked="{Binding IsRoomExpansionRoomDoor, Mode=TwoWay}"
+                                         Foreground="#9D00FF"/>
+                            <RadioButton Content="Security Door"
+                                         GroupName="RoomExpansionDoorTypeGroup"
+                                         IsChecked="{Binding IsRoomExpansionSecurityDoor, Mode=TwoWay}"
+                                         Foreground="#FF0000"/>
+                            <RadioButton Content="Main Door"
+                                         GroupName="RoomExpansionDoorTypeGroup"
+                                         IsChecked="{Binding IsRoomExpansionMainDoor, Mode=TwoWay}"
+                                         Foreground="#CCCCCC"/>
+                            <RadioButton Content="Secondary Door"
+                                         GroupName="RoomExpansionDoorTypeGroup"
+                                         IsChecked="{Binding IsRoomExpansionSecondaryDoor, Mode=TwoWay}"
+                                         IsEnabled="{Binding CanAddSecondaryDoor}"
+                                         Foreground="#FFA200"/>
+                            <RadioButton Content="Overload Door"
+                                         GroupName="RoomExpansionDoorTypeGroup"
+                                         IsChecked="{Binding IsRoomExpansionOverloadDoor, Mode=TwoWay}"
+                                         IsEnabled="{Binding CanAddOverloadDoor}"
+                                         Foreground="#00F2FF"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Zone Lighting Selector (only when expanding to a new zone with a zone door) -->
+                <StackPanel Spacing="6" IsVisible="{Binding IsRoomExpansionToNewZone}">
+                    <TextBlock Text="Zone Lighting:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding AvailableLightingConfigs}"
+                              SelectedItem="{Binding SelectedRoomExpansionLighting, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:LightSettingsBlock">
+                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Error message if any -->
+                <TextBlock Text="{Binding RoomExpansionErrorMessage}"
+                           Foreground="#FF6B6B"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding HasRoomExpansionErrorMessage}"/>
+
+                <!-- Action buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                    <Button Content="Cancel"
+                            Command="{Binding CancelRoomExpansion}"
+                            Padding="16,8"/>
+                    <Button Content="Generate Room"
+                            Command="{Binding ConfirmRoomExpansion}"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="16,8"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Border>
+</UserControl>

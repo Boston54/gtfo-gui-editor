@@ -1,0 +1,374 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.LightingView"
+             x:DataType="vm:LightingViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Top Bar: Config Selection and Creation -->
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="Lighting:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Blocks}"
+                          SelectedItem="{Binding SelectedBlock, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:LightSettingsBlock">
+                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <Button Grid.Column="2"
+                        Content="+ Create New Config"
+                        Command="{Binding OpenCreateBlockDialog}"
+                        Margin="10,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Grid.Column="3"
+                        Content="- Delete Config"
+                        Command="{Binding RequestDeleteSelectedBlock}"
+                        IsEnabled="{Binding HasSelectedBlock}"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+                        
+                <TextBlock Grid.Column="4"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"
+                           Foreground="#AAAAAA"
+                           FontSize="12"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Editor Area (when a config is selected) -->
+        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedBlock}">
+            <ScrollViewer Margin="0">
+                <StackPanel Spacing="14">
+                    <!-- Duplicate ID Warning Banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasDuplicatePersistentId}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                       Foreground="#FF6B6B"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Missing Categories Warning Banner -->
+                    <Border Background="#3A281C"
+                            BorderBrush="#FFA726"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasMissingCategories}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FFA726" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding MissingCategoriesWarning}"
+                                       Foreground="#FFA726"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 1: General Identification -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the lighting setting. This is not visible to the player, but is used for identifying the lighting setting within the editor." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.Name, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this lighting setting. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.PersistentId, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 2: Light Category Settings (Options) -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="12">
+                            <!-- Category Selector & Add Option -->
+                            <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,4">
+                                <TextBlock Grid.Column="0" Text="Category:" ToolTip.Tip="The category to edit config settings for." VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding Categories}"
+                                          SelectedItem="{Binding SelectedCategory, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          VerticalAlignment="Center"/>
+                                <Button Grid.Column="2"
+                                        Content="+ Add Option"
+                                        Command="{Binding AddOption}"
+                                        Margin="10,0,0,0"
+                                        Padding="12,6"
+                                        FontWeight="SemiBold"
+                                        VerticalAlignment="Center"/>
+                            </Grid>
+
+                            <!-- Options List for Selected Category -->
+                            <ItemsControl ItemsSource="{Binding CurrentCategorySettings}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:LightCategorySettingItem" x:CompileBindings="False">
+                                        <Border BorderBrush="#333333"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="12"
+                                                Margin="0,0,0,10">
+                                            <StackPanel Spacing="10">
+                                                <!-- Option Header Row -->
+                                                <Grid ColumnDefinitions="*,Auto">
+                                                    <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                        <TextBlock Text="Lighting Option" FontWeight="Bold" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                                        <TextBlock Text="{Binding Category, StringFormat='({0})'}" FontWeight="SemiBold" Foreground="#4EC9B0" VerticalAlignment="Center"/>
+                                                    </StackPanel>
+                                                    <Button Grid.Column="1"
+                                                            Content="- Remove Option"
+                                                            Command="{Binding $parent[Window].DataContext.Lighting.RemoveOption}"
+                                                            CommandParameter="{Binding}"
+                                                            Background="#3A1C1C"
+                                                            Foreground="#FF6B6B"
+                                                            Padding="8,4"
+                                                            FontSize="12"
+                                                            FontWeight="SemiBold"/>
+                                                </Grid>
+
+                                                <!-- Option Settings Grid -->
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                                                    <!-- Row 0: On, Intensity Mul, Weight -->
+                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="On:" ToolTip.Tip="Whether the lights in this setting are on." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <CheckBox Grid.Row="0" Grid.Column="1" IsChecked="{Binding On, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Intensity Multiplier:" ToolTip.Tip="Multiplier for the lighting intensity." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding IntensityMul, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                                    <TextBlock Grid.Row="0" Grid.Column="4" Text="Weight:" ToolTip.Tip="Probability weight of this setting being chosen for this category." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                                    <TextBox Grid.Row="0" Grid.Column="5" Text="{Binding Weight, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                                    <!-- Row 1: Chance, Chance Broken -->
+                                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Chance:" ToolTip.Tip="The 0-1 chance of each light being on. 1 for always on." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Chance, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Chance Broken:" ToolTip.Tip="The 0-1 chance of this light being broken. 0 for never broken." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ChanceBroken, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                                </Grid>
+
+                                                <!-- Color Section (RGBA Sliders and Hex) -->
+                                                <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,4,0,0">
+                                                    <StackPanel Spacing="8">
+                                                        <TextBlock Text="Color (RGBA)" ToolTip.Tip="Color of the lights in this category." FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+
+                                                        <!-- Swatch and Hex -->
+                                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                                            <Border Grid.Column="0"
+                                                                    Background="{Binding Color.HexColor}"
+                                                                    Width="50"
+                                                                    Height="28"
+                                                                    CornerRadius="3"
+                                                                    BorderBrush="#555555"
+                                                                    BorderThickness="1"
+                                                                    Margin="0,0,10,0"/>
+                                                            <TextBox Grid.Column="1"
+                                                                     Text="{Binding Color.HexCode, Mode=TwoWay}"
+                                                                     Watermark="#AARRGGBB"
+                                                                     VerticalAlignment="Center"
+                                                                     Margin="0,0,8,0"/>
+                                                        </Grid>
+
+                                                        <!-- RGBA Sliders -->
+                                                        <Grid ColumnDefinitions="30,*,50" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,2,0,0">
+                                                            <!-- Red -->
+                                                            <TextBlock Grid.Row="0" Grid.Column="0" Text="R:" ToolTip.Tip="The red lighting colour for this category." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                            <Slider Grid.Row="0" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding Color.R, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                            <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Color.R, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                            <!-- Green -->
+                                                            <TextBlock Grid.Row="1" Grid.Column="0" Text="G:" ToolTip.Tip="The green lighting colour for this category." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                            <Slider Grid.Row="1" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding Color.G, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                            <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding Color.G, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                                            <!-- Blue -->
+                                                            <TextBlock Grid.Row="2" Grid.Column="0" Text="B:" ToolTip.Tip="The blue lighting colour for this category." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                            <Slider Grid.Row="2" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding Color.B, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                            <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding Color.B, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                                            
+                                                            <!-- Alpha -->
+                                                            <TextBlock Grid.Row="3" Grid.Column="0" Text="A:" ToolTip.Tip="The alpha lighting colour for this category." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                                            <Slider Grid.Row="3" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding Color.A, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                                            <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding Color.A, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+
+                            <!-- When no options defined for this category -->
+                            <Border IsVisible="{Binding !HasCurrentCategorySettings}"
+                                    BorderBrush="#333333"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    Padding="16"
+                                    HorizontalAlignment="Stretch">
+                                <TextBlock Text="No lighting settings defined for this category. Click '+ Add Option' to add one."
+                                           Foreground="Gray"
+                                           FontStyle="Italic"
+                                           HorizontalAlignment="Center"/>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- When no config is selected -->
+        <Panel Grid.Row="1" IsVisible="{Binding !HasSelectedBlock}" Background="#1E1E1E">
+            <TextBlock Text="No lighting config selected. Create a new config to begin."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"/>
+        </Panel>
+
+        <!-- Create Config Modal Dialog Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsCreatingBlock}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Create New Lighting Config"
+                               FontWeight="Bold"
+                               FontSize="16"/>
+
+                    <TextBlock Text="Choose how you want to create the new lighting config:"
+                               Foreground="LightGray"
+                               FontSize="12"/>
+
+                    <!-- Option: Blank or Template -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                        <StackPanel Spacing="10">
+                            <RadioButton Content="Create a new fresh (default) config" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                            <RadioButton Content="Use an existing config as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+
+                            <!-- Template Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Config Template:" FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:LightSettingsBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Name and PersistentID -->
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Error Message Banner -->
+                    <TextBlock Text="{Binding CreationErrorMessage}"
+                               Foreground="#FF6B6B"
+                               IsVisible="{Binding HasCreationErrorMessage}"
+                               FontSize="12"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelCreateBlock}"
+                                Padding="14,6"/>
+                        <Button Content="Create Config"
+                                Command="{Binding ConfirmCreateBlock}"
+                                Classes="accent"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Delete Config Modal Confirmation Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsConfirmingDelete}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Confirm Delete Lighting Config"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#FF6B6B"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                               TextWrapping="Wrap"
+                               FontSize="13"/>
+
+                    <TextBlock Text="This action will remove the lighting config from the configuration. This cannot be undone."
+                               Foreground="Gray"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelDeleteBlock}"
+                                Padding="14,6"/>
+                        <Button Content="Delete"
+                                Command="{Binding ConfirmDeleteBlock}"
+                                Background="#D32F2F"
+                                Foreground="White"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

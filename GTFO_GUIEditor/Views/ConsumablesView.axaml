@@ -1,0 +1,310 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.ConsumablesView"
+             x:Name="ConsumablesTabRoot"
+             x:DataType="vm:ConsumablesViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Top Bar: Distribution Selection and Creation -->
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="Distribution:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Blocks}"
+                          SelectedItem="{Binding SelectedBlock, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:ConsumableDistributionBlock">
+                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <Button Grid.Column="2"
+                        Content="+ Create New Distribution"
+                        Command="{Binding OpenCreateBlockDialog}"
+                        Margin="10,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Grid.Column="3"
+                        Content="- Delete Distribution"
+                        Command="{Binding RequestDeleteSelectedBlock}"
+                        IsEnabled="{Binding HasSelectedBlock}"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+                        
+                <TextBlock Grid.Column="4"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"
+                           Foreground="#AAAAAA"
+                           FontSize="12"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Editor Area (when a distribution is selected) -->
+        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedBlock}">
+            <ScrollViewer Margin="0">
+                <StackPanel Spacing="14">
+                    <!-- Duplicate ID Warning Banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasDuplicatePersistentId}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                       Foreground="#FF6B6B"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 1: General Identification -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the consumable distribution. This is not visible to the player, but is used for identifying the distribution within the editor." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.Name, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this consumable distribution. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.PersistentId, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 2: Distribution Settings -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Distribution Settings" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Spawns Per Zone:" ToolTip.Tip="The number of items to spawn in total from the pool of items." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.SpawnsPerZone, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Chance To Spawn In Resource Container:" ToolTip.Tip="The chance for the item to spawn inside a resource container." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.ChanceToSpawnInResourceContainer, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 3: Consumable Items & Weights -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Consumable Items &amp; Weights" FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1"
+                                        Content="+ Add Item"
+                                        Command="{Binding AddSpawnDataItemCommand}"
+                                        Background="#2D5A27"
+                                        Foreground="White"
+                                        Padding="10,4"
+                                        FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding SelectedBlock.SpawnData}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:ConsumableDistributionItem" x:CompileBindings="False">
+                                        <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto">
+                                                <TextBlock Grid.Column="0"
+                                                           Text="Item:"
+                                                           ToolTip.Tip="The item to be spawned"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,8,0"
+                                                           Foreground="#CCCCCC"/>
+                                                <ComboBox Grid.Column="1"
+                                                          ItemsSource="{x:Static vm:ConsumablesViewModel.AvailableConsumables}"
+                                                          SelectedItem="{Binding Item, Mode=TwoWay}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,16,0"/>
+
+                                                <TextBlock Grid.Column="2"
+                                                           Text="Weight:"
+                                                           ToolTip.Tip="The weighted probability of this item being chosen"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,8,0"
+                                                           Foreground="#CCCCCC"/>
+                                                <TextBox Grid.Column="3"
+                                                         Text="{Binding Weight, Mode=TwoWay}"
+                                                         HorizontalAlignment="Stretch"
+                                                         Margin="0,0,16,0"/>
+
+                                                <Button Grid.Column="4"
+                                                        Content="- Remove"
+                                                        Command="{Binding #ConsumablesTabRoot.DataContext.RemoveSpawnDataItemCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#4A1C1C"
+                                                        Foreground="#FF6B6B"
+                                                        Padding="10,4"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- When no distribution is selected -->
+        <Panel Grid.Row="1" IsVisible="{Binding !HasSelectedBlock}" Background="#1E1E1E">
+            <TextBlock Text="No consumable distribution selected. Create a new distribution to begin."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"/>
+        </Panel>
+
+        <!-- Create Distribution Modal Dialog Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsCreatingBlock}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Create New Consumable Distribution"
+                               FontWeight="Bold"
+                               FontSize="16"/>
+
+                    <TextBlock Text="Choose how you want to create the new distribution:"
+                               Foreground="LightGray"
+                               FontSize="12"/>
+
+                    <!-- Option: Blank or Template -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                        <StackPanel Spacing="10">
+                            <RadioButton Content="Create a new fresh distribution" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                            <RadioButton Content="Use an existing distribution as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+
+                            <!-- Template Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Distribution Template:" FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ConsumableDistributionBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Name and PersistentID -->
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the consumable distribution. This is not visible to the player, but is used for identifying the distribution within the editor." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this consumable distribution. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Error message banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasCreationErrorMessage}">
+                        <TextBlock Text="{Binding CreationErrorMessage}"
+                                   Foreground="#FF6B6B"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+
+                    <!-- Action Buttons -->
+                    <Grid ColumnDefinitions="*,8,*">
+                        <Button Grid.Column="0"
+                                Content="Cancel"
+                                Command="{Binding CancelCreateBlock}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Padding="0,8"/>
+                        <Button Grid.Column="2"
+                                Content="Create"
+                                Command="{Binding ConfirmCreateBlock}"
+                                Background="#2D5A27"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Padding="0,8"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Delete Distribution Confirmation Modal Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsConfirmingDelete}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Delete Consumable Distribution"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#FF6B6B"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                               Foreground="LightGray"
+                               FontSize="13"
+                               TextWrapping="Wrap"/>
+
+                    <!-- Action Buttons -->
+                    <Grid ColumnDefinitions="*,8,*">
+                        <Button Grid.Column="0"
+                                Content="Cancel"
+                                Command="{Binding CancelDeleteBlock}"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Padding="0,8"/>
+                        <Button Grid.Column="2"
+                                Content="Delete"
+                                Command="{Binding ConfirmDeleteBlock}"
+                                Background="#5A1C1C"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Stretch"
+                                HorizontalContentAlignment="Center"
+                                Padding="0,8"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

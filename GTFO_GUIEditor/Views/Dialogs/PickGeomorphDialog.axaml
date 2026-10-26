@@ -1,0 +1,254 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.PickGeomorphDialog"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Width="840"
+                MaxHeight="720"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 20 #80000000">
+            <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+                <TextBlock Grid.Row="0"
+                           Text="Expand Level - Pick Geomorph"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#FFFFFF"
+                           Margin="0,0,0,12"/>
+
+                <!-- Expansion Target Info Card -->
+                <Border Grid.Row="1" Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,12">
+                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Direction:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding ExpansionDirectionText}" FontWeight="Bold" Foreground="#9D00FF" Margin="0,0,16,4"/>
+
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Target Cell:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,4"/>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding ExpansionTargetCellText}" FontWeight="Bold" Foreground="#E0E0E0" Margin="0,0,0,4"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="From Geo:" FontWeight="SemiBold" Foreground="#AAAAAA" Margin="0,0,8,0"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="3" Text="{Binding ExpansionSourceGeoText}" Foreground="#D0D0D0" TextTrimming="CharacterEllipsis"/>
+                    </Grid>
+                </Border>
+
+                <!-- Main 2-Column Content Area -->
+                <Grid Grid.Row="2" ColumnDefinitions="*,290">
+                    <!-- Left Column: Geomorph Grid Selector -->
+                    <Grid Grid.Column="0" RowDefinitions="Auto,Auto,*">
+                        <TextBlock Grid.Row="0" Text="Select Geomorph:" FontSize="13" Foreground="LightGray" FontWeight="SemiBold" Margin="0,0,0,4"/>
+                        <TextBox Grid.Row="1" Text="{Binding GeomorphFilterText, Mode=TwoWay}" Watermark="Filter geomorphs by name..." Margin="0,0,0,6"/>
+                        <Border Grid.Row="2" Background="#1A1A1C" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
+                            <ListBox ItemsSource="{Binding FilteredExpansionGeomorphs}"
+                                     SelectedItem="{Binding SelectedExpansionGeomorph, Mode=TwoWay}"
+                                     Background="Transparent"
+                                     ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                     ScrollViewer.VerticalScrollBarVisibility="Auto"
+                                     Height="340">
+                                <ListBox.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ListBox.ItemsPanel>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:GeomorphOption">
+                                        <Border Width="110" Height="115"
+                                                Background="#252528"
+                                                BorderBrush="#3C3C40"
+                                                BorderThickness="1"
+                                                CornerRadius="4"
+                                                Padding="4"
+                                                Margin="2">
+                                            <ToolTip.Tip>
+                                                <Border Background="#1E1E1E" BorderBrush="#555555" BorderThickness="1" CornerRadius="4" Padding="6">
+                                                    <StackPanel Spacing="6">
+                                                        <TextBlock Text="{Binding DisplayName}" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                                        <TextBlock Text="{Binding Category}" Foreground="#AAAAAA" FontSize="11"/>
+                                                        <Panel Width="320" Height="180" IsVisible="{Binding HasImage}">
+                                                            <Image Source="{Binding ImageBitmap}" Stretch="Uniform" IsVisible="{Binding HasImageBitmap}"/>
+                                                            <TextBlock Text="Image preview not found on disk" Foreground="#888888" FontStyle="Italic" FontSize="11" HorizontalAlignment="Center" VerticalAlignment="Center" IsVisible="{Binding !HasImageBitmap}"/>
+                                                        </Panel>
+                                                        <TextBlock Text="No screenshot available" Foreground="#777777" FontStyle="Italic" FontSize="11" IsVisible="{Binding !HasImage}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </ToolTip.Tip>
+                                            <Grid RowDefinitions="*,Auto">
+                                                <Panel Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                                    <Viewbox Width="75" Height="75" IsVisible="{Binding HasSvgGeometry}">
+                                                        <Path Data="{Binding SvgGeometry}"
+                                                              Fill="#3A80D2"
+                                                              Stroke="Transparent"
+                                                              StrokeThickness="0"
+                                                              Stretch="Uniform"/>
+                                                    </Viewbox>
+                                                    <TextBlock Text="No Image"
+                                                               Foreground="#666666"
+                                                               FontSize="11"
+                                                               FontStyle="Italic"
+                                                               HorizontalAlignment="Center"
+                                                               VerticalAlignment="Center"
+                                                               IsVisible="{Binding !HasSvgGeometry}"/>
+                                                </Panel>
+                                                <TextBlock Grid.Row="1"
+                                                           Text="{Binding DisplayName}"
+                                                           FontSize="10"
+                                                           Foreground="#CCCCCC"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           HorizontalAlignment="Center"
+                                                           TextAlignment="Center"
+                                                           Margin="0,2,0,0"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Border>
+                    </Grid>
+
+                    <!-- Right Column: Selected Preview & Parameters -->
+                    <ScrollViewer Grid.Column="1" Margin="14,0,0,0" VerticalScrollBarVisibility="Auto">
+                        <StackPanel Spacing="10">
+                            <!-- Preview Box -->
+                            <Border Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6" HorizontalAlignment="Center">
+                                    <TextBlock Text="Selected Preview:" FontSize="12" Foreground="#AAAAAA" FontWeight="SemiBold" HorizontalAlignment="Center"/>
+                                    <Border Background="#101418" BorderBrush="#25303D" BorderThickness="1" CornerRadius="4" Width="170" Height="170">
+                                        <Panel HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Viewbox Width="150" Height="150" IsVisible="{Binding HasSelectedExpansionGeomorphPreview}">
+                                                <Path Data="{Binding SelectedExpansionGeomorphPreviewGeometry}"
+                                                      Fill="#3A80D2"
+                                                      Stroke="Transparent"
+                                                      StrokeThickness="0"
+                                                      Stretch="Uniform"/>
+                                            </Viewbox>
+                                            <TextBlock Text="No preview available"
+                                                       Foreground="#666666"
+                                                       FontSize="11"
+                                                       FontStyle="Italic"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"
+                                                       IsVisible="{Binding !HasSelectedExpansionGeomorphPreview}"/>
+                                        </Panel>
+                                    </Border>
+                                    <TextBlock Text="{Binding SelectedExpansionGeomorph.DisplayName}"
+                                               FontSize="11"
+                                               FontWeight="SemiBold"
+                                               Foreground="#FFFFFF"
+                                               HorizontalAlignment="Center"
+                                               TextAlignment="Center"
+                                               TextTrimming="CharacterEllipsis"
+                                               MaxWidth="240"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Tile Rotation Selector -->
+                            <StackPanel Spacing="4" IsVisible="{Binding HasAvailableRotations}">
+                                <TextBlock Text="Tile Rotation:" FontSize="12" Foreground="LightGray" FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding AvailableExpansionRotations}"
+                                          SelectedItem="{Binding SelectedExpansionRotation, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:RotationOption">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Tile Altitude Selector -->
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="Tile Altitude:" FontSize="12" Foreground="LightGray" FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding AvailableExpansionAltitudes}"
+                                          SelectedItem="{Binding SelectedExpansionAltitude, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AltitudeOption">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Tile Lighting Selector (only when expanding to a new zone) -->
+                            <StackPanel Spacing="4" IsVisible="{Binding IsExpansionToNewZone}">
+                                <TextBlock Text="Zone Lighting:" FontSize="12" Foreground="LightGray" FontWeight="SemiBold"/>
+                                <ComboBox ItemsSource="{Binding AvailableLightingConfigs}"
+                                          SelectedItem="{Binding SelectedExpansionLighting, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:LightSettingsBlock">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <!-- Door Type Option -->
+                            <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Door Type:" FontSize="12" Foreground="LightGray" FontWeight="SemiBold"/>
+                                    <StackPanel Spacing="4" Margin="2,0,0,0">
+                                        <RadioButton Content="Room Door"
+                                                     GroupName="ExpansionDoorTypeGroup"
+                                                     IsChecked="{Binding IsExpansionRoomDoor, Mode=TwoWay}"
+                                                     Foreground="#9D00FF"/>
+                                        <RadioButton Content="Security Door"
+                                                     GroupName="ExpansionDoorTypeGroup"
+                                                     IsChecked="{Binding IsExpansionSecurityDoor, Mode=TwoWay}"
+                                                     Foreground="#FF0000"/>
+                                        <RadioButton Content="Main Door"
+                                                     GroupName="ExpansionDoorTypeGroup"
+                                                     IsChecked="{Binding IsExpansionMainDoor, Mode=TwoWay}"
+                                                     Foreground="#CCCCCC"/>
+                                        <RadioButton Content="Secondary Door"
+                                                     GroupName="ExpansionDoorTypeGroup"
+                                                     IsChecked="{Binding IsExpansionSecondaryDoor, Mode=TwoWay}"
+                                                     IsEnabled="{Binding CanAddSecondaryDoor}"
+                                                     Foreground="#FFA200"/>
+                                        <RadioButton Content="Overload Door"
+                                                     GroupName="ExpansionDoorTypeGroup"
+                                                     IsChecked="{Binding IsExpansionOverloadDoor, Mode=TwoWay}"
+                                                     IsEnabled="{Binding CanAddOverloadDoor}"
+                                                     Foreground="#00F2FF"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+
+                <!-- Error message if any -->
+                <TextBlock Grid.Row="3"
+                           Text="{Binding ExpansionErrorMessage}"
+                           Foreground="#FF6B6B"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           Margin="0,8,0,0"
+                           IsVisible="{Binding HasExpansionErrorMessage}"/>
+
+                <!-- Action buttons -->
+                <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,12,0,0">
+                    <Button Content="Cancel"
+                            Command="{Binding CancelDoorExpansion}"
+                            Padding="16,8"/>
+                    <Button Content="Generate"
+                            Command="{Binding ConfirmDoorExpansion}"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="16,8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Border>
+</UserControl>

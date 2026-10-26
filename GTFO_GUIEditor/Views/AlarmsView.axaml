@@ -1,0 +1,521 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.AlarmsView"
+             x:Name="AlarmsTabRoot"
+             x:DataType="vm:AlarmsViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Top Bar: Alarm Selection and Creation -->
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="Alarm:" ToolTip.Tip="Select the alarm to modify" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Alarms}"
+                          SelectedItem="{Binding SelectedAlarm, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:AlarmBlock">
+                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <Button Grid.Column="2"
+                        Content="+ Create New Alarm"
+                        Command="{Binding OpenCreateAlarmDialog}"
+                        Margin="10,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Grid.Column="3"
+                        Content="- Delete Alarm"
+                        Command="{Binding RequestDeleteSelectedAlarm}"
+                        IsEnabled="{Binding HasSelectedAlarm}"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+                        
+                <TextBlock Grid.Column="4"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"
+                           Foreground="#AAAAAA"
+                           FontSize="12"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Editor Area (when an alarm is selected) -->
+        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedAlarm}">
+            <ScrollViewer Margin="0">
+                <StackPanel Spacing="14">
+                    <!-- Duplicate ID Warning Banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasDuplicatePersistentId}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                       Foreground="#FF6B6B"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 1: General -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="General" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the alarm. This is not visible to the player, but is used for identifying the alarm within the editor." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this alarm. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Public Alarm Name:" ToolTip.Tip="Public name for this alarm. This is what the player will see when they look at a door with this alarm attached." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.PublicAlarmName, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Spawns Enemies:" ToolTip.Tip="True if this alarm should spawn enemies." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding SelectedAlarm.SpawnsEnemies, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,0,8"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Is Error:" ToolTip.Tip="If true, this alarm will not end when the scans are completed. Note this means that all enemy ramping will continue." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding SelectedAlarm.IsError, Mode=TwoWay}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Scan Settings -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Scan Settings" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Wanted Distance From Start Pos:" ToolTip.Tip="The desired distance for the first scan from the door. A value of 0 means the first scan will be in front of the door, a non-zero value means it will move." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.WantedDistanceFromStartPos, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Wanted Distance Between Puzzle Components:" ToolTip.Tip="The desired distance between each of the scans. If this is 0, then every scan will be in the same spot (this is useful for things like the R8E2 exit scan or the R8C2 MRI scan)" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.WantedDistanceBetweenPuzzleComponents, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Use Random Positions:" ToolTip.Tip="If false, the positions of the scans will be semi-consistently in the same positions (think R8E2 first class VI alarm). If true, they will be random every time." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedAlarm.UseRandomPositions, Mode=TwoWay}" VerticalAlignment="Center"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Scans List -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Scans" ToolTip.Tip="A list of the scans this alarm will contain. This is in-order, top-to-bottom." FontWeight="Bold" FontSize="14" VerticalAlignment="Center"/>
+                                <Button Grid.Column="1"
+                                        Content="+ Add Scan"
+                                        Command="{Binding AddChainedPuzzleItemCommand}"
+                                        Background="#2D5A27"
+                                        Foreground="White"
+                                        Padding="10,4"
+                                        FontWeight="SemiBold"/>
+                            </Grid>
+
+                            <ItemsControl ItemsSource="{Binding SelectedAlarm.ChainedPuzzle}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:ChainedPuzzleItem" x:CompileBindings="False">
+                                        <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,0,0,6">
+                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                <TextBlock Grid.Column="0"
+                                                           Text="Scan Type:"
+                                                           ToolTip.Tip="The type of scan to spawn"
+                                                           VerticalAlignment="Center"
+                                                           Margin="0,0,8,0"
+                                                           Foreground="#CCCCCC"/>
+                                                <ComboBox Grid.Column="1"
+                                                          ItemsSource="{Binding #AlarmsTabRoot.DataContext.ChainedPuzzleTypes}"
+                                                          SelectedValue="{Binding PuzzleType, Mode=TwoWay}"
+                                                          SelectedValueBinding="{Binding PersistentId}"
+                                                          HorizontalAlignment="Stretch"
+                                                          Margin="0,0,12,0">
+                                                    <ComboBox.ItemTemplate>
+                                                        <DataTemplate x:DataType="models:ChainedPuzzleTypeEntry">
+                                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                        </DataTemplate>
+                                                    </ComboBox.ItemTemplate>
+                                                </ComboBox>
+                                                <Button Grid.Column="2"
+                                                        Content="✕ Remove"
+                                                        Command="{Binding #AlarmsTabRoot.DataContext.RemoveChainedPuzzleItemCommand}"
+                                                        CommandParameter="{Binding}"
+                                                        Background="#4A1C1C"
+                                                        Foreground="#FF6B6B"
+                                                        Padding="10,4"/>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Enemy Wave Settings (Toggled by Spawns Enemies) -->
+                    <StackPanel Spacing="14" IsVisible="{Binding SelectedAlarm.SpawnsEnemies}">
+                        <!-- Group 2: Wave Roles (Enemy Selection) -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Wave Roles (Enemy Selection)" FontWeight="Bold" FontSize="14"/>
+                                <TextBlock Text="Select which enemies will spawn for each wave role." Foreground="Gray" FontSize="12"/>
+
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                    <!-- Row 0: Weakling & Standard -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" ToolTip.Tip="The 'weakling' type enemy for this alarm. This enemy will cost 0.75 points to spawn, with a total points soft cap of 25. Many vanilla alarms opt to filter this out by excluding it in the population filter, instead using the standard and special slots for their small enemies as they cost 1 point instead of 0.75." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="1"
+                                              ItemsSource="{Binding Enemies}"
+                                              SelectedValue="{Binding SelectedAlarm.WaveRoleWeakling, Mode=TwoWay}"
+                                              SelectedValueBinding="{Binding PersistentId}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,16,8">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                <TextBlock Text="{Binding DisplayText}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" ToolTip.Tip="The 'standard' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <ComboBox Grid.Row="0" Grid.Column="3"
+                                              ItemsSource="{Binding Enemies}"
+                                              SelectedValue="{Binding SelectedAlarm.WaveRoleStandard, Mode=TwoWay}"
+                                              SelectedValueBinding="{Binding PersistentId}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,0,8">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                <TextBlock Text="{Binding DisplayText}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <!-- Row 1: Special & MiniBoss -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" ToolTip.Tip="The 'special' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1"
+                                              ItemsSource="{Binding Enemies}"
+                                              SelectedValue="{Binding SelectedAlarm.WaveRoleSpecial, Mode=TwoWay}"
+                                              SelectedValueBinding="{Binding PersistentId}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,16,8">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                <TextBlock Text="{Binding DisplayText}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="MiniBoss:" ToolTip.Tip="The 'miniboss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="3"
+                                              ItemsSource="{Binding Enemies}"
+                                              SelectedValue="{Binding SelectedAlarm.WaveRoleMiniBoss, Mode=TwoWay}"
+                                              SelectedValueBinding="{Binding PersistentId}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,0,8">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                <TextBlock Text="{Binding DisplayText}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <!-- Row 2: Boss -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" ToolTip.Tip="The 'boss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army. NOTE: THIS ENEMY TYPE IS BROKEN IN VANILLA." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox Grid.Row="2" Grid.Column="1"
+                                              ItemsSource="{Binding Enemies}"
+                                              SelectedValue="{Binding SelectedAlarm.WaveRoleBoss, Mode=TwoWay}"
+                                              SelectedValueBinding="{Binding PersistentId}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,16,0">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                <TextBlock Text="{Binding DisplayText}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Group 3: Survival Wave Settings - Timing & Group Pauses -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Wave Timing &amp; Pauses" FontWeight="Bold" FontSize="14"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
+                                    <!-- Row 0: Pause Before Start & Pause Between Groups -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Pause Before Start (s):" ToolTip.Tip="How many seconds to wait between the alarm starting and the first wave spawning." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PauseBeforeStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Pause Between Groups (s):" ToolTip.Tip="Delay between spawning enemy groups." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PauseBetweenGroups, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 1: Wave Pause Min & Max -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Wave Pause Min (s):" ToolTip.Tip="Delay between waves at or below the minimum score boundary." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Pause Max (s):" ToolTip.Tip="Delay between waves at the maximum score boundary." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 2: Wave Pause Min at Cost & Wave Pause Max at Cost -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Wave Pause Min at Cost:" ToolTip.Tip="Minimum score boundary for pauses between waves. Below this threshold, the timer for a new wave will decrease at its maximum speed." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.WavePauseMin_AtCost, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Wave Pause Max at Cost:" ToolTip.Tip="Maximum score boundary for pauses between waves. Above this threshold, the timer for a new wave does not move. Anywhere in-between min and max, the timer is lerped." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.WavePauseMax_AtCost, Mode=TwoWay}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Group 4: Population Filter -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Population Filter" FontWeight="Bold" FontSize="14"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                    <TextBlock Grid.Column="0" Text="Filter Type:" ToolTip.Tip="The selected types below will be either the only enemies spawned, or will be excluded entirely, based on this value." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{x:Static vm:AlarmsViewModel.AvailableFilterTypes}"
+                                              SelectedItem="{Binding SelectedAlarm.FilterType, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch"
+                                              Margin="0,0,16,0"/>
+                                </Grid>
+
+                                <!-- Filter Modes text directly above its buttons -->
+                                <StackPanel Spacing="6" Margin="0,4,0,0">
+                                    <TextBlock Text="Filter Modes:" ToolTip.Tip="Select the types to include/exclude from spawning." VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" Spacing="16">
+                                        <CheckBox Content="Weakling" ToolTip.Tip="True if the weakling type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterWeakling, Mode=TwoWay}"/>
+                                        <CheckBox Content="Standard" ToolTip.Tip="True if the standard type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterStandard, Mode=TwoWay}"/>
+                                        <CheckBox Content="Special" ToolTip.Tip="True if the special type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterSpecial, Mode=TwoWay}"/>
+                                        <CheckBox Content="MiniBoss" ToolTip.Tip="True if the miniboss type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterMiniBoss, Mode=TwoWay}"/>
+                                        <CheckBox Content="Boss" ToolTip.Tip="True if the boss type should be included in the filter." IsChecked="{Binding SelectedAlarm.FilterBoss, Mode=TwoWay}"/>
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Group 5: Spawn Direction & Spawn Type -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Spawn Direction &amp; Type" FontWeight="Bold" FontSize="14"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                                    <!-- Row 0: Direction Randomization -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Randomize Direction / Wave:" ToolTip.Tip="0-1 chance for the spawn direction to change between waves." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerWave, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Randomize Direction / Group:" ToolTip.Tip="0-1 chance for the spawn direction to change between groups." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.ChanceToRandomizeSpawnDirectionPerGroup, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 1: Override Spawn Type & Survival Wave Spawn Type -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Override Spawn Type:" ToolTip.Tip="True if the spawn type should be overriden. This must be true for the Wave Spawn Type value to be functional." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedAlarm.OverrideWaveSpawnType, Mode=TwoWay}" Margin="0,0,16,0" VerticalAlignment="Center"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Spawn Type:" ToolTip.Tip="Affects how the enemies spawn. Note that FromElevatorDirection only refers to the host in vanilla; use the hostType6SpawnEnemyFix mod to fix it." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="3"
+                                              ItemsSource="{x:Static vm:AlarmsViewModel.AvailableWaveSpawnTypes}"
+                                              SelectedItem="{Binding SelectedAlarm.SurvivalWaveSpawnType, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Group 6: Population Points & Ramp -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Population Points &amp; Ramp" FontWeight="Bold" FontSize="14"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,5,0,0">
+                                    <!-- Row 0: Total Points & Ramp Time -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Population Points Total:" ToolTip.Tip="The total population points for waves. The alarm automatically stops if this runs out. -1 is infinite." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsTotal, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Population Ramp Over Time (s):" ToolTip.Tip="Lerp over time for start-end population point settings." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationRampOverTime, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 1: Wave Points Start & End -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Points Per Wave (Start):" ToolTip.Tip="Population points for a wave at start ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerWaveStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Points Per Wave (End):" ToolTip.Tip="Population points for a wave at end ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerWaveEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 2: Group Points Start & End -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Points Per Group (Start):" ToolTip.Tip="Population points for a group at start ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsPerGroupStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="2" Text="Points Per Group (End):" ToolTip.Tip="Population points for a group at end ramp." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding SelectedAlarm.PopulationPointsPerGroupEnd, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                                    <!-- Row 3: Min Points Per Group -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Min Points Per Group:" ToolTip.Tip="Minimum required cost for a group to spawn. This setting is related to the soft cap of enemies." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding SelectedAlarm.PopulationPointsMinPerGroup, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- When no alarm is selected -->
+        <Panel Grid.Row="1" IsVisible="{Binding !HasSelectedAlarm}" Background="#1E1E1E">
+            <TextBlock Text="No alarm selected. Create a new alarm to begin."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"/>
+        </Panel>
+
+        <!-- Create Alarm Modal Dialog Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsCreatingAlarm}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Create New Alarm"
+                               FontWeight="Bold"
+                               FontSize="16"/>
+
+                    <TextBlock Text="Choose how you want to create the new alarm:"
+                               Foreground="LightGray"
+                               FontSize="12"/>
+
+                    <!-- Option: Blank, Existing Alarm, or Vanilla Import -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                        <StackPanel Spacing="10">
+                            <RadioButton Content="Create a new fresh (blank) alarm" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+
+                            <RadioButton Content="Use an existing alarm as a template" IsChecked="{Binding IsCreatingFromExisting, Mode=TwoWay}" IsEnabled="{Binding HasExistingAlarms}"/>
+
+                            <!-- Existing Alarm Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromExisting}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Existing Alarm:" ToolTip.Tip="Select an existing alarm from this project to copy properties from." FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding Alarms}"
+                                          SelectedItem="{Binding SelectedExistingAlarm, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <RadioButton Content="Import an alarm from vanilla" IsChecked="{Binding IsCreatingFromVanilla, Mode=TwoWay}"/>
+
+                            <!-- Vanilla Template Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromVanilla}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Vanilla Alarm:" ToolTip.Tip="Select a vanilla alarm to import properties from." FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                          SelectedItem="{Binding SelectedVanillaTemplate, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AlarmBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Name, PersistentID, and Public Alarm Name -->
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,4,0,0">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the alarm. This is not visible to the player, but is used for identifying the alarm within the editor." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewAlarmName, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this alarm. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewAlarmPersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
+
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Public Alarm Name:" ToolTip.Tip="Public name for this alarm. This is what the player will see when they look at a door with this alarm attached." VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding NewAlarmPublicAlarmName, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Error Message Banner -->
+                    <TextBlock Text="{Binding CreationErrorMessage}"
+                               Foreground="#FF6B6B"
+                               IsVisible="{Binding HasCreationErrorMessage}"
+                               FontSize="12"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,6,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelCreateAlarm}"
+                                Padding="14,6"/>
+                        <Button Content="Create Alarm"
+                                Command="{Binding ConfirmCreateAlarm}"
+                                Classes="accent"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Delete Alarm Modal Confirmation Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsConfirmingDelete}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Confirm Delete Alarm"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#FF6B6B"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                               TextWrapping="Wrap"
+                               FontSize="13"/>
+
+                    <TextBlock Text="This action will remove the alarm from the configuration. This cannot be undone."
+                               Foreground="Gray"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelDeleteAlarm}"
+                                Padding="14,6"/>
+                        <Button Content="Delete"
+                                Command="{Binding ConfirmDeleteAlarm}"
+                                Background="#D32F2F"
+                                Foreground="White"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

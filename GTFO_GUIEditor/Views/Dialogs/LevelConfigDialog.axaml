@@ -1,0 +1,93 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.LevelConfigDialog"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="24"
+                Width="500"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 20 #80000000">
+            <StackPanel Spacing="14">
+                <TextBlock Text="{Binding LevelDialogTitle}"
+                           FontSize="18"
+                           FontWeight="Bold"
+                           Foreground="#FFFFFF"/>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Level Name:" FontSize="13" Foreground="LightGray"/>
+                    <TextBox Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..."/>
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Persistent ID:" FontSize="13" Foreground="LightGray"/>
+                    <TextBox Text="{Binding NewLevelPersistentId, Mode=TwoWay}" Watermark="Enter persistent ID..."/>
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Tileset:" FontSize="13" Foreground="LightGray"/>
+                    <ComboBox ItemsSource="{Binding AvailableComplexTypes}"
+                              SelectedItem="{Binding SelectedComplexType, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch"/>
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Starting Elevator Tile:" FontSize="13" Foreground="LightGray"/>
+                    <ComboBox ItemsSource="{Binding AvailableElevatorTiles}"
+                              SelectedItem="{Binding SelectedElevatorTile, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:ElevatorTileOption">
+                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <StackPanel Spacing="6">
+                    <TextBlock Text="Fog Setting:" FontSize="13" Foreground="LightGray"/>
+                    <ComboBox ItemsSource="{Binding AvailableFogSettings}"
+                              SelectedItem="{Binding SelectedFogSetting, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate x:DataType="models:FogSettingsBlock">
+                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Error message if any -->
+                <TextBlock Text="{Binding CreationErrorMessage}"
+                           Foreground="#FF6B6B"
+                           FontSize="12"
+                           TextWrapping="Wrap"
+                           IsVisible="{Binding HasCreationErrorMessage}"/>
+
+                <!-- Action buttons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
+                    <Button Content="Cancel"
+                            Command="{Binding CancelCreateLevel}"
+                            Padding="16,8"/>
+                    <Button Content="{Binding LevelDialogConfirmButtonText}"
+                            Command="{Binding ConfirmCreateLevel}"
+                            Background="#007ACC"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="16,8"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Border>
+</UserControl>

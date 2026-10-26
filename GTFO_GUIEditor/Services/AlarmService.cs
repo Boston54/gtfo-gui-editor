@@ -228,6 +228,12 @@ public static class AlarmService
         [JsonPropertyName("SurvivalWavePopulation")]
         public uint SurvivalWavePopulation { get; set; }
 
+        [JsonPropertyName("DisableSurvivalWaveOnComplete")]
+        public bool DisableSurvivalWaveOnComplete { get; set; } = true;
+
+        [JsonPropertyName("UseRandomPositions")]
+        public bool UseRandomPositions { get; set; }
+
         [JsonPropertyName("internalEnabled")]
         public bool InternalEnabled { get; set; } = true;
 
@@ -318,6 +324,8 @@ public static class AlarmService
                         alarm.PublicAlarmName = puzzleBlock.PublicAlarmName ?? string.Empty;
                         alarm.InternalEnabled = puzzleBlock.InternalEnabled;
                         alarm.SpawnsEnemies = puzzleBlock.TriggerAlarmOnActivate;
+                        alarm.DisableSurvivalWaveOnComplete = puzzleBlock.DisableSurvivalWaveOnComplete;
+                        alarm.UseRandomPositions = puzzleBlock.UseRandomPositions;
                         alarm.WantedDistanceFromStartPos = puzzleBlock.WantedDistanceFromStartPos;
                         alarm.WantedDistanceBetweenPuzzleComponents = puzzleBlock.WantedDistanceBetweenPuzzleComponents;
 

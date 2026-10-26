@@ -1,0 +1,335 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.FogSettingsView"
+             x:DataType="vm:FogSettingsViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Top Bar: Config Selection and Creation -->
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto">
+                <TextBlock Grid.Column="0" Text="Fog:" VerticalAlignment="Center" FontWeight="SemiBold" Margin="0,0,8,0" Foreground="#E0E0E0"/>
+                <ComboBox Grid.Column="1"
+                          ItemsSource="{Binding Blocks}"
+                          SelectedItem="{Binding SelectedBlock, Mode=TwoWay}"
+                          HorizontalAlignment="Stretch"
+                          VerticalAlignment="Center">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate x:DataType="models:FogSettingsBlock">
+                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                
+                <Button Grid.Column="2"
+                        Content="+ Create New Config"
+                        Command="{Binding OpenCreateBlockDialog}"
+                        Margin="10,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+
+                <Button Grid.Column="3"
+                        Content="- Delete Config"
+                        Command="{Binding RequestDeleteSelectedBlock}"
+                        IsEnabled="{Binding HasSelectedBlock}"
+                        Margin="8,0,0,0"
+                        Padding="12,6"
+                        FontWeight="SemiBold"
+                        VerticalAlignment="Center"/>
+                        
+                <TextBlock Grid.Column="4"
+                           Text="{Binding StatusText}"
+                           VerticalAlignment="Center"
+                           Margin="12,0,0,0"
+                           Foreground="#AAAAAA"
+                           FontSize="12"/>
+            </Grid>
+        </Border>
+
+        <!-- Main Editor Area (when a config is selected) -->
+        <Grid Grid.Row="1" IsVisible="{Binding HasSelectedBlock}">
+            <ScrollViewer Margin="0">
+                <StackPanel Spacing="14">
+                    <!-- Duplicate ID Warning Banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasDuplicatePersistentId}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
+                                       Foreground="#FF6B6B"
+                                       FontWeight="SemiBold"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 1: General Identification -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the fog setting. This is not visible to the player, but is used for identifying the fog setting within the editor." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.Name, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="#Internal unique identifier for this fog setting. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.PersistentId, Mode=TwoWay}" Margin="0,0,16,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 2: Fog Properties -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Fog Properties" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Fog Density:" ToolTip.Tip="The base fog density in the entire level. To create inversed fog as in R5E1, you have to set FogDensity and DensityHeightMaxBoost such that FogDensity &lt; DensityHeightMaxBoost. This value is normally very low - most vanilla settings have less than 0.001." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.FogDensity, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Infection:" ToolTip.Tip="The maximum value for how fast infection accumulates in fog. For example, 0.1 would make you 10% infected per second. 0.03 is a common value this is set to. Note that the infection speed is based on how deep you are in the fog with linear scaling. The lowest infection gain rate is at DensityHeightAltitude + DensityHeightRange, and the lowest point is at DensityHeightRange." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.Infection, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- Color Section (RGBA Sliders and Hex) -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,4,0,0">
+                                <StackPanel Spacing="8">
+                                    <TextBlock Text="Fog Color (RGBA)" ToolTip.Tip="RGBA colour of the fog. Non-white fog may not block sight very well, and colours may be affected by other factors in the environment." FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0"/>
+
+                                    <!-- Swatch and Hex -->
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <Border Grid.Column="0"
+                                                Background="{Binding SelectedBlock.FogColor.HexColor}"
+                                                Width="50"
+                                                Height="28"
+                                                CornerRadius="3"
+                                                BorderBrush="#555555"
+                                                BorderThickness="1"
+                                                Margin="0,0,10,0"/>
+                                        <TextBox Grid.Column="1"
+                                                 Text="{Binding SelectedBlock.FogColor.HexCode, Mode=TwoWay}"
+                                                 Watermark="#AARRGGBB"
+                                                 VerticalAlignment="Center"
+                                                 Margin="0,0,8,0"/>
+                                    </Grid>
+
+                                    <!-- RGBA Sliders -->
+                                    <Grid ColumnDefinitions="30,*,50" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,2,0,0">
+                                        <!-- Red -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="R:" ToolTip.Tip="Red for the fog color." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <Slider Grid.Row="0" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding SelectedBlock.FogColor.R, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding SelectedBlock.FogColor.R, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                        <!-- Green -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="G:" ToolTip.Tip="Green for the fog color." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <Slider Grid.Row="1" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding SelectedBlock.FogColor.G, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="{Binding SelectedBlock.FogColor.G, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+
+                                        <!-- Blue -->
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="B:" ToolTip.Tip="Blue for the fog color." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <Slider Grid.Row="2" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding SelectedBlock.FogColor.B, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="{Binding SelectedBlock.FogColor.B, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                        
+                                        <!-- Alpha -->
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="A:" ToolTip.Tip="Alpha for the fog color." VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0.0" Maximum="1.0" Value="{Binding SelectedBlock.FogColor.A, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                        <TextBlock Grid.Row="3" Grid.Column="2" Text="{Binding SelectedBlock.FogColor.A, StringFormat='{}{0:F2}'}" VerticalAlignment="Center"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 3: Density Noise Settings -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Noise Settings" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,5,0,0">
+                                <!-- Row 0: Merged Noise Direction (X, Y, Z) -->
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Direction (X, Y, Z):" ToolTip.Tip="Noise are the floating particles right above the fog plane. This field is a vector that controls the floating direction of those particles." VerticalAlignment="Center" Margin="0,0,12,8"/>
+                                <Grid Grid.Row="0" Grid.Column="1" ColumnDefinitions="*,*,*" Margin="0,0,0,8">
+                                    <TextBox Grid.Column="0" Text="{Binding SelectedBlock.DensityNoiseDirection.X, Mode=TwoWay}" Watermark="X" ToolTip.Tip="X direction" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="1" Text="{Binding SelectedBlock.DensityNoiseDirection.Y, Mode=TwoWay}" Watermark="Y" ToolTip.Tip="Y direction" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="2" Text="{Binding SelectedBlock.DensityNoiseDirection.Z, Mode=TwoWay}" Watermark="Z" ToolTip.Tip="Z direction"/>
+                                </Grid>
+
+                                <!-- Row 1: Speed, Scale -->
+                                <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" ColumnDefinitions="Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="Noise Speed:" ToolTip.Tip="Speed of the fog particles" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="1" Text="{Binding SelectedBlock.DensityNoiseSpeed, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                    <TextBlock Grid.Column="2" Text="Noise Scale:" ToolTip.Tip="Size of the noise particles. Most vanilla settings use a value around 0.1." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Column="3" Text="{Binding SelectedBlock.DensityNoiseScale, Mode=TwoWay}"/>
+                                </Grid>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Group 4: Height Gradient Settings -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Density Height Settings" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Column="0" Text="Altitude:" ToolTip.Tip="The lowest point for the fog height. For non-inversed fog (R5E1), everything with altitude lower than this value will be fully submerged by the fog. Normal zone altitudes - Low: -4.0, Mid: 0.0, High: 4.0." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding SelectedBlock.DensityHeightAltitude, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Range:" ToolTip.Tip="Distance above the lowest point for fog height. The surface of the fog is at the Altitude + Range." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding SelectedBlock.DensityHeightRange, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Max Boost:" ToolTip.Tip="Actual field for controlling the density of non-inversed fog (R5E1). The larger, the more occluding. R5D2, a level with very dense fog, uses a value of 0.2." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Column="5" Text="{Binding SelectedBlock.DensityHeightMaxBoost, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- When no config is selected -->
+        <Panel Grid.Row="1" IsVisible="{Binding !HasSelectedBlock}" Background="#1E1E1E">
+            <TextBlock Text="No fog config selected. Create a new config to begin."
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       Foreground="Gray"/>
+        </Panel>
+
+        <!-- Create Config Modal Dialog Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsCreatingBlock}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="480"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Create New Fog Config"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#E0E0E0"/>
+
+                    <!-- Mode: Fresh vs Copy -->
+                    <StackPanel Spacing="6">
+                        <RadioButton Content="Create fresh config (defaults)"
+                                     IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
+                        <RadioButton Content="Copy from existing template"
+                                     IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
+                    </StackPanel>
+
+                    <!-- Template Picker (visible when copying) -->
+                    <StackPanel Spacing="4" IsVisible="{Binding IsCreatingFromTemplate}">
+                        <TextBlock Text="Template:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
+                        <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                  SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:FogSettingsBlock">
+                                    <TextBlock Text="{Binding DisplayText}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <!-- Name Field -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Config Name:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
+                        <TextBox Text="{Binding NewBlockName, Mode=TwoWay}"
+                                 Watermark="Enter config name..."/>
+                    </StackPanel>
+
+                    <!-- Persistent ID Field -->
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="Persistent ID:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
+                        <TextBox Text="{Binding NewBlockPersistentId, Mode=TwoWay}"
+                                 Watermark="Enter integer ID..."/>
+                    </StackPanel>
+
+                    <!-- Error Banner -->
+                    <Border Background="#3A1C1C"
+                            BorderBrush="#FF6B6B"
+                            BorderThickness="1"
+                            CornerRadius="4"
+                            Padding="10,8"
+                            IsVisible="{Binding HasCreationErrorMessage}">
+                        <TextBlock Text="{Binding CreationErrorMessage}"
+                                   Foreground="#FF6B6B"
+                                   FontWeight="SemiBold"
+                                   FontSize="12"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelCreateBlock}"
+                                Padding="14,6"/>
+                        <Button Content="Create Config"
+                                Command="{Binding ConfirmCreateBlock}"
+                                Classes="accent"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+        <!-- Delete Config Modal Confirmation Overlay -->
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="#80000000"
+                IsVisible="{Binding IsConfirmingDelete}"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch">
+            <Border Background="#1E1E1E"
+                    BorderBrush="#444444"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="20"
+                    Width="440"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    BoxShadow="0 4 16 0 #000000">
+                <StackPanel Spacing="14">
+                    <TextBlock Text="Confirm Delete Fog Config"
+                               FontWeight="Bold"
+                               FontSize="16"
+                               Foreground="#FF6B6B"/>
+
+                    <TextBlock Text="{Binding DeleteConfirmationMessage}"
+                               TextWrapping="Wrap"
+                               FontSize="13"/>
+
+                    <TextBlock Text="This action will remove the fog config from the configuration. This cannot be undone."
+                               Foreground="Gray"
+                               TextWrapping="Wrap"
+                               FontSize="12"/>
+
+                    <!-- Action Buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,8,0,0">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelDeleteBlock}"
+                                Padding="14,6"/>
+                        <Button Content="Delete"
+                                Command="{Binding ConfirmDeleteBlock}"
+                                Background="#D32F2F"
+                                Foreground="White"
+                                Padding="14,6"
+                                FontWeight="SemiBold"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

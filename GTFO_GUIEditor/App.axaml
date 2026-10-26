@@ -1,8 +1,426 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              x:Class="GTFO_GUIEditor.App"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+        <DataTemplate x:Key="WardenEventTemplate" x:CompileBindings="False">
+            <Border Background="#1A1A1A"
+                    BorderBrush="#3E3E42"
+                    BorderThickness="1"
+                    CornerRadius="6"
+                    Padding="12"
+                    Margin="0,0,0,10">
+                <StackPanel Spacing="10">
+                    <!-- Top row: Event Type, Trigger, Enabled, Remove Button -->
+                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto">
+                        <TextBlock Grid.Column="0"
+                                   Text="Type:"
+                                   ToolTip.Tip="The type of event."
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"
+                                   Foreground="#CCCCCC"/>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableEventTypes}"
+                                  SelectedItem="{Binding Type, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"/>
+
+                        <TextBlock Grid.Column="2"
+                                   Text="Trigger:"
+                                   ToolTip.Tip="When this event should trigger in relation to the parent event."
+                                   VerticalAlignment="Center"
+                                   Margin="0,0,8,0"
+                                   Foreground="#CCCCCC"/>
+                        <ComboBox Grid.Column="3"
+                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableEventTriggers}"
+                                  SelectedItem="{Binding Trigger, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"/>
+
+                        <CheckBox Grid.Column="4"
+                                  Content="Enabled"
+                                  IsChecked="{Binding Enabled, Mode=TwoWay}"
+                                  ToolTip.Tip="True if this event should actually trigger."
+                                  VerticalAlignment="Center"
+                                  Margin="0,0,12,0"
+                                  Foreground="#CCCCCC"/>
+
+                        <Button Grid.Column="5"
+                                Content="✕ Remove"
+                                Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveWardenEventCommand}"
+                                CommandParameter="{Binding}"
+                                Background="#4A1C1C"
+                                Foreground="#FF6B6B"
+                                Padding="10,4"/>
+                    </Grid>
+
+                    <!-- Common Row 1: Delay, Layer (Sector) -->
+                    <Grid ColumnDefinitions="Auto,*,Auto,*">
+                        <TextBlock Grid.Column="0" Text="Delay (s):" ToolTip.Tip="A delay before the event will be triggered." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                        <TextBox Grid.Column="1" Text="{Binding Delay, Mode=TwoWay}" Margin="0,0,12,0"/>
+
+                        <TextBlock Grid.Column="2" Text="Layer:" ToolTip.Tip="The sector the event should take place in. This value may or may not be relevant based on the event type." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                        <ComboBox Grid.Column="3"
+                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSectors}"
+                                  SelectedItem="{Binding Layer, Mode=TwoWay}"
+                                  HorizontalAlignment="Stretch"/>
+                    </Grid>
+
+                    <!-- Common Row 2: Dimension, Zone -->
+                    <Grid ColumnDefinitions="Auto,*,Auto,*">
+                        <TextBlock Grid.Column="0" Text="Dimension:" ToolTip.Tip="The dimension the event should take place in. This value may or may not be relevant based on the event type." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.AvailableDimensions}"
+                                  SelectedValue="{Binding Dimension, Mode=TwoWay}"
+                                  SelectedValueBinding="{Binding DimensionIndex}"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="0,0,12,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:DimensionOption">
+                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+
+                        <TextBlock Grid.Column="2" Text="Zone:" ToolTip.Tip="The zone the event should take place in. This value may or may not be relevant based on the event type." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                        <ComboBox Grid.Column="3"
+                                  ItemsSource="{Binding AvailableZones}"
+                                  SelectedValue="{Binding Zone, Mode=TwoWay}"
+                                  SelectedValueBinding="{Binding ZoneIndex}"
+                                  HorizontalAlignment="Stretch">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:ZoneOption">
+                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </Grid>
+
+                    <!-- Common Row 3: WardenIntel -->
+                    <Grid ColumnDefinitions="Auto,*">
+                        <TextBlock Grid.Column="0" Text="Warden Intel:" ToolTip.Tip="On-screen text to display" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                        <TextBox Grid.Column="1" Text="{Binding WardenIntel, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                    </Grid>
+
+                    <!-- Common Row 4: SoundID & SoundSubtitle -->
+                    <Grid ColumnDefinitions="Auto,*,Auto,*">
+                        <TextBlock Grid.Column="0" Text="Sound:" ToolTip.Tip="Sound to play. This is a sound ID, use the sounds tab to view a list of all sounds and their IDs" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                        <TextBox Grid.Column="1" Text="{Binding SoundID, Mode=TwoWay}" Margin="0,0,12,0"/>
+
+                        <TextBlock Grid.Column="2" Text="Sound Subtitle:" ToolTip.Tip="Subtitle for the sound" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                        <TextBox Grid.Column="3" Text="{Binding SoundSubtitle, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Conditional: ActivateChainedPuzzle [ChainPuzzle & UseStaticBioscanPoints] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsChainPuzzleVisible}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Alarm:" ToolTip.Tip="Alarm to start when the event is triggered" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.AvailableAlarms}"
+                                      SelectedValue="{Binding ChainPuzzle, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding PersistentId}"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,16,0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:AlarmBlock">
+                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <CheckBox Grid.Column="2"
+                                      Content="Use Static Bioscan Points"
+                                      IsChecked="{Binding UseStaticBioscanPoints, Mode=TwoWay}"
+                                      ToolTip.Tip="Whether externally defined static bioscan points should be used instead of the normal random positions"
+                                      VerticalAlignment="Center"
+                                      Foreground="#CCCCCC"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Conditional: Duration [AddToTimer, DimensionFlashTeam, LightsInZone] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsDurationVisible}">
+                        <TextBlock Grid.Column="0" Text="Duration (s):" ToolTip.Tip="The duration for this event. Does different things based on the event type" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                        <TextBox Grid.Column="1" Text="{Binding Duration, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Conditional: ClearDimension [DimensionWarpTeam] -->
+                    <CheckBox Content="Clear Dimension"
+                              IsChecked="{Binding ClearDimension, Mode=TwoWay}"
+                              IsVisible="{Binding IsClearDimensionVisible}"
+                              ToolTip.Tip="True if the dimension should be cleared on warp."
+                              Foreground="#FFA200"/>
+
+                    <!-- Conditional: CustomSubObjective [UpdateCustomSubObjective] -->
+                    <StackPanel Spacing="6" IsVisible="{Binding IsCustomSubObjectiveVisible}">
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Custom Sub-Objective Header:" ToolTip.Tip="Header of the custom sub-objective" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="1" Text="{Binding CustomSubObjectiveHeader, Mode=TwoWay}"/>
+                        </Grid>
+                        <Grid ColumnDefinitions="Auto,*">
+                            <TextBlock Grid.Column="0" Text="Custom Sub-Objective:" ToolTip.Tip="Description text of the custom sub-objective" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="1" Text="{Binding CustomSubObjective, Mode=TwoWay}"/>
+                        </Grid>
+                    </StackPanel>
+
+                    <!-- Conditional: FogSetting & FogTransitionDuration [SetFogSetting] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsFogSettingVisible}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,*">
+                            <TextBlock Grid.Column="0" Text="Fog Setting:" ToolTip.Tip="The fog setting to switch to" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.AvailableFogSettings}"
+                                      SelectedValue="{Binding FogSetting, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding PersistentId}"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,12,0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:FogSettingsBlock">
+                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Grid.Column="2" Text="Transition Duration (s):" ToolTip.Tip="How long the transition to the new fog should take" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="3" Text="{Binding FogTransitionDuration, Mode=TwoWay}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Conditional: SpawnEnemyOnPoint [EnemyID & Count] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsEnemyIdVisible}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,*">
+                            <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                      SelectedValue="{Binding EnemyID, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding PersistentId}"
+                                      HorizontalAlignment="Stretch"
+                                      Margin="0,0,12,0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:EnemyEntry">
+                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn (these will spawn on top of each other, typically used to spawn groups of flyers)" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Conditional: WorldEventObjectFilter [SpawnEnemyOnPoint, SetNavMarker] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsWorldEventObjectFilterVisible}">
+                        <TextBlock Grid.Column="0" Text="World Event Object Filter:" ToolTip.Tip="String object filter that decides where this event is to be targeted towards. This is an advanced field, it is recommended to only use event types that require this if you know what you're doing." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                        <TextBox Grid.Column="1" Text="{Binding WorldEventObjectFilter, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Conditional: Position (Vector3) [LightsInZone] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsPositionVisible}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                            <TextBlock Grid.Column="0" Text="Position X:" ToolTip.Tip="X position offset" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="1" Text="{Binding Position.X, Mode=TwoWay}" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="Y position offset" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="3" Text="{Binding Position.Y, Mode=TwoWay}" Margin="0,0,10,0"/>
+                            <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="Z position offset" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#FFA200"/>
+                            <TextBox Grid.Column="5" Text="{Binding Position.Z, Mode=TwoWay}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Conditional: EnemyWaveData [SpawnEnemyWave] -->
+                    <Expander IsVisible="{Binding IsEnemyWaveDataVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Enemy Wave Configuration" FontWeight="SemiBold" ToolTip.Tip="Information for the wave to spawn" Foreground="#FFA200"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <!-- Wave Roles -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Wave Roles (Enemy Selection)" FontWeight="Bold" ToolTip.Tip="Select which enemies will spawn for each wave role" Foreground="#FFFFFF" FontSize="12"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" ToolTip.Tip="The 'weakling' type enemy for this alarm. This enemy will cost 0.75 points to spawn, with a total points soft cap of 25. Many vanilla alarms opt to filter this out by excluding it in the population filter, instead using the standard and special slots for their small enemies as they cost 1 point instead of 0.75." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="1"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                  SelectedValue="{Binding EnemyWaveData.WaveRoleWeakling, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding PersistentId}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,10,6">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EnemyEntry">
+                                                    <TextBlock Text="{Binding DisplayText}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" ToolTip.Tip="The 'standard' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="0" Grid.Column="3"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                  SelectedValue="{Binding EnemyWaveData.WaveRoleStandard, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding PersistentId}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,0,6">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EnemyEntry">
+                                                    <TextBlock Text="{Binding DisplayText}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" ToolTip.Tip="The 'special' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="1"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                  SelectedValue="{Binding EnemyWaveData.WaveRoleSpecial, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding PersistentId}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,10,6">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EnemyEntry">
+                                                    <TextBlock Text="{Binding DisplayText}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Mini-Boss:" ToolTip.Tip="The 'miniboss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="3"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                  SelectedValue="{Binding EnemyWaveData.WaveRoleMiniBoss, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding PersistentId}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,0,6">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EnemyEntry">
+                                                    <TextBlock Text="{Binding DisplayText}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" ToolTip.Tip="The 'boss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army. NOTE: THIS ENEMY TYPE IS BROKEN IN VANILLA." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="2" Grid.Column="1"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                  SelectedValue="{Binding EnemyWaveData.WaveRoleBoss, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding PersistentId}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:EnemyEntry">
+                                                    <TextBlock Text="{Binding DisplayText}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Wave Timing & Pauses -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Wave Timing &amp; Pauses" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Pause Before Start (s):" ToolTip.Tip="Pause in seconds before the wave begins." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EnemyWaveData.PauseBeforeStart, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Pause Between Groups (s):" ToolTip.Tip="Pause in seconds between enemy group spawns." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding EnemyWaveData.PauseBetweenGroups, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Wave Pause Min (at Cost):" ToolTip.Tip="Minimum wave pause duration at max cost/ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EnemyWaveData.WavePauseMin_AtCost, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Pause Max (at Cost):" ToolTip.Tip="Maximum wave pause duration at max cost/ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding EnemyWaveData.WavePauseMax_AtCost, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Wave Pause Min (s):" ToolTip.Tip="Minimum duration to pause between waves." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EnemyWaveData.WavePauseMin, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Wave Pause Max (s):" ToolTip.Tip="Maximum duration to pause between waves." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding EnemyWaveData.WavePauseMax, Mode=TwoWay}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Population Filter -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Population Filter" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" Margin="0,2,0,0">
+                                        <TextBlock Grid.Column="0" Text="Filter Type:" ToolTip.Tip="Include: ONLY selected roles spawn. Exclude: Selected roles DO NOT spawn." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableFilterTypes}"
+                                                  SelectedItem="{Binding EnemyWaveData.FilterType, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </Grid>
+
+                                    <TextBlock Text="Filter Roles:" Margin="0,4,0,2" Foreground="#CCCCCC" FontSize="11"/>
+                                    <WrapPanel Orientation="Horizontal" Margin="0,2,0,0">
+                                        <CheckBox Content="Weakling" IsChecked="{Binding EnemyWaveData.FilterWeakling, Mode=TwoWay}" Margin="0,0,10,4"/>
+                                        <CheckBox Content="Standard" IsChecked="{Binding EnemyWaveData.FilterStandard, Mode=TwoWay}" Margin="0,0,10,4"/>
+                                        <CheckBox Content="Special" IsChecked="{Binding EnemyWaveData.FilterSpecial, Mode=TwoWay}" Margin="0,0,10,4"/>
+                                        <CheckBox Content="Mini-Boss" IsChecked="{Binding EnemyWaveData.FilterMiniBoss, Mode=TwoWay}" Margin="0,0,10,4"/>
+                                        <CheckBox Content="Boss" IsChecked="{Binding EnemyWaveData.FilterBoss, Mode=TwoWay}" Margin="0,0,10,4"/>
+                                    </WrapPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Spawn Direction & Type -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Spawn Direction &amp; Type" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto" Margin="0,2,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Randomize Direction / Wave:" ToolTip.Tip="0-1 chance for the spawn direction to change between waves." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EnemyWaveData.ChanceToRandomizeSpawnDirectionPerWave, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Randomize Direction / Group:" ToolTip.Tip="0-1 chance for the spawn direction to change between groups." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding EnemyWaveData.ChanceToRandomizeSpawnDirectionPerGroup, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Override Spawn Type:" ToolTip.Tip="True if the spawn type should be overridden." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding EnemyWaveData.OverrideWaveSpawnType, Mode=TwoWay}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Wave Spawn Type:" ToolTip.Tip="Affects how the enemies spawn. Only does anything if Override Spawn Type is true." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <ComboBox Grid.Row="1" Grid.Column="3"
+                                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableWaveSpawnTypes}"
+                                                  SelectedItem="{Binding EnemyWaveData.SurvivalWaveSpawnType, Mode=TwoWay}"
+                                                  HorizontalAlignment="Stretch"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Population Points & Ramp -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <TextBlock Text="Population Points &amp; Ramp" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto,Auto" Margin="0,2,0,0">
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Population Points Total:" ToolTip.Tip="The total population points for waves. -1 is infinite." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EnemyWaveData.PopulationPointsTotal, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="0" Grid.Column="2" Text="Population Ramp Over Time (s):" ToolTip.Tip="Lerp over time for start-end population point settings." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding EnemyWaveData.PopulationRampOverTime, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Points Per Wave (Start):" ToolTip.Tip="Population points for a wave at start ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EnemyWaveData.PopulationPointsPerWaveStart, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Points Per Wave (End):" ToolTip.Tip="Population points for a wave at end ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding EnemyWaveData.PopulationPointsPerWaveEnd, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Points Per Group (Start):" ToolTip.Tip="Population points for a group at start ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EnemyWaveData.PopulationPointsPerGroupStart, Mode=TwoWay}" Margin="0,0,10,6"/>
+
+                                        <TextBlock Grid.Row="2" Grid.Column="2" Text="Points Per Group (End):" ToolTip.Tip="Population points for a group at end ramp." VerticalAlignment="Center" Margin="0,0,6,6" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="2" Grid.Column="3" Text="{Binding EnemyWaveData.PopulationPointsPerGroupEnd, Mode=TwoWay}" Margin="0,0,0,6"/>
+
+                                        <TextBlock Grid.Row="3" Grid.Column="0" Text="Min Points Per Group:" ToolTip.Tip="Minimum required cost for a group to spawn." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                        <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding EnemyWaveData.PopulationPointsMinPerGroup, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+    </Application.Resources>
 
     <Application.Styles>
         <FluentTheme />

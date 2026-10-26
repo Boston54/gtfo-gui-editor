@@ -67,6 +67,12 @@ public static class WardenEventVisibilityConfig
         EventType.SpawnEnemyOnPoint
     };
 
+    public static readonly HashSet<EventType> WorldEventObjectFilterTypes = new()
+    {
+        EventType.SpawnEnemyOnPoint,
+        EventType.SetNavMarker
+    };
+
     public static bool IsChainPuzzleVisible(EventType type) => ChainPuzzleTypes.Contains(type);
     public static bool IsUseStaticBioscanPointsVisible(EventType type) => UseStaticBioscanPointsTypes.Contains(type);
     public static bool IsDurationVisible(EventType type) => DurationTypes.Contains(type);
@@ -78,6 +84,7 @@ public static class WardenEventVisibilityConfig
     public static bool IsEnemyIdVisible(EventType type) => EnemyIdTypes.Contains(type);
     public static bool IsPositionVisible(EventType type) => PositionTypes.Contains(type);
     public static bool IsCountVisible(EventType type) => CountTypes.Contains(type);
+    public static bool IsWorldEventObjectFilterVisible(EventType type) => WorldEventObjectFilterTypes.Contains(type);
 }
 
 public class WardenEvent : INotifyPropertyChanged
@@ -104,6 +111,7 @@ public class WardenEvent : INotifyPropertyChanged
     private Vector3Data _position = new();
     private int _count = 1;
     private bool _enabled = true;
+    private string _worldEventObjectFilter = string.Empty;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -363,6 +371,13 @@ public class WardenEvent : INotifyPropertyChanged
         set => SetField(ref _enabled, value);
     }
 
+    [JsonPropertyName("WorldEventObjectFilter")]
+    public string WorldEventObjectFilter
+    {
+        get => _worldEventObjectFilter;
+        set => SetField(ref _worldEventObjectFilter, value ?? string.Empty);
+    }
+
     [JsonIgnore]
     public bool IsChainPuzzleVisible => WardenEventVisibilityConfig.IsChainPuzzleVisible(Type);
 
@@ -400,6 +415,9 @@ public class WardenEvent : INotifyPropertyChanged
     public bool IsCountVisible => WardenEventVisibilityConfig.IsCountVisible(Type);
 
     [JsonIgnore]
+    public bool IsWorldEventObjectFilterVisible => WardenEventVisibilityConfig.IsWorldEventObjectFilterVisible(Type);
+
+    [JsonIgnore]
     public string DisplayName => $"Event: {Type}" + (Delay > 0 ? $" (Delay: {Delay}s)" : string.Empty);
 
     public void NotifyVisibilityChanged()
@@ -416,6 +434,7 @@ public class WardenEvent : INotifyPropertyChanged
         OnPropertyChanged(nameof(IsEnemyIdVisible));
         OnPropertyChanged(nameof(IsPositionVisible));
         OnPropertyChanged(nameof(IsCountVisible));
+        OnPropertyChanged(nameof(IsWorldEventObjectFilterVisible));
     }
 
     public WardenEvent Clone()
@@ -443,7 +462,8 @@ public class WardenEvent : INotifyPropertyChanged
             EnemyID = EnemyID,
             Position = Position?.Clone() ?? new Vector3Data(),
             Count = Count,
-            Enabled = Enabled
+            Enabled = Enabled,
+            WorldEventObjectFilter = WorldEventObjectFilter
         };
     }
 

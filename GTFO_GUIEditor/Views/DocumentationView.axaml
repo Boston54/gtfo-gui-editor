@@ -1,0 +1,81 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.DocumentationView"
+             x:DataType="vm:DocumentationViewModel">
+    <Grid>
+        <!-- Top-level TabControl for H1 sections -->
+        <TabControl ItemsSource="{Binding Sections}"
+                    SelectedItem="{Binding SelectedSection, Mode=TwoWay}"
+                    Margin="0">
+            <TabControl.ItemTemplate>
+                <DataTemplate x:DataType="models:DocSection">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <TabControl.ContentTemplate>
+                <DataTemplate x:DataType="models:DocSection">
+                    <Grid Margin="4,8,8,4">
+                        <!-- If this H1 has H2 subtabs -->
+                        <TabControl ItemsSource="{Binding SubSections}"
+                                    SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
+                                    IsVisible="{Binding HasSubSections}"
+                                    Margin="0">
+                            <TabControl.ItemTemplate>
+                                <DataTemplate x:DataType="models:DocSection">
+                                    <TextBlock Text="{Binding Title}" FontSize="13"/>
+                                </DataTemplate>
+                            </TabControl.ItemTemplate>
+                            <TabControl.ContentTemplate>
+                                <DataTemplate x:DataType="models:DocSection">
+                                    <Grid Margin="2,6,4,2">
+                                        <!-- If this H2 has H3 sub-subtabs -->
+                                        <TabControl ItemsSource="{Binding SubSections}"
+                                                    SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
+                                                    IsVisible="{Binding HasSubSections}"
+                                                    Margin="0">
+                                            <TabControl.ItemTemplate>
+                                                <DataTemplate x:DataType="models:DocSection">
+                                                    <TextBlock Text="{Binding Title}" FontSize="12"/>
+                                                </DataTemplate>
+                                            </TabControl.ItemTemplate>
+                                            <TabControl.ContentTemplate>
+                                                <DataTemplate x:DataType="models:DocSection">
+                                                    <ScrollViewer Padding="12,10,12,14"
+                                                                  HorizontalScrollBarVisibility="Disabled"
+                                                                  VerticalScrollBarVisibility="Auto">
+                                                        <ContentControl Content="{Binding RenderedContent}"/>
+                                                    </ScrollViewer>
+                                                </DataTemplate>
+                                            </TabControl.ContentTemplate>
+                                        </TabControl>
+
+                                        <!-- If no H3 subtabs, show H2 content directly -->
+                                        <ScrollViewer Padding="12,10,12,14"
+                                                      HorizontalScrollBarVisibility="Disabled"
+                                                      VerticalScrollBarVisibility="Auto"
+                                                      IsVisible="{Binding !HasSubSections}">
+                                            <ContentControl Content="{Binding RenderedContent}"/>
+                                        </ScrollViewer>
+                                    </Grid>
+                                </DataTemplate>
+                            </TabControl.ContentTemplate>
+                        </TabControl>
+
+                        <!-- If no H2 subtabs, show H1 content directly -->
+                        <ScrollViewer Padding="12,10,24,14"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto"
+                                      IsVisible="{Binding !HasSubSections}">
+                            <ContentControl Content="{Binding RenderedContent}"/>
+                        </ScrollViewer>
+                    </Grid>
+                </DataTemplate>
+            </TabControl.ContentTemplate>
+        </TabControl>
+    </Grid>
+</UserControl>

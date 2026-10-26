@@ -2964,7 +2964,14 @@ public class LevelLayoutTests
         ev.Type = EventType.SpawnEnemyOnPoint;
         Assert.True(ev.IsEnemyIdVisible);
         Assert.True(ev.IsCountVisible);
+        Assert.True(ev.IsWorldEventObjectFilterVisible);
         Assert.False(ev.IsEnemyWaveDataVisible);
+
+        // SetNavMarker
+        ev.Type = EventType.SetNavMarker;
+        Assert.True(ev.IsWorldEventObjectFilterVisible);
+        Assert.False(ev.IsEnemyIdVisible);
+        Assert.False(ev.IsCountVisible);
     }
 
     [Fact]
@@ -2993,6 +3000,7 @@ public class LevelLayoutTests
             Count = 4,
             Enabled = true,
             Position = new Vector3Data(1.0, 2.0, 3.0),
+            WorldEventObjectFilter = "FilterTest_123",
             EnemyWaveData = new GenericWaveSettings
             {
                 WaveRoleStandard = 1001,
@@ -3021,6 +3029,7 @@ public class LevelLayoutTests
         Assert.Equal(original.EnemyID, clone.EnemyID);
         Assert.Equal(original.Count, clone.Count);
         Assert.Equal(original.Enabled, clone.Enabled);
+        Assert.Equal(original.WorldEventObjectFilter, clone.WorldEventObjectFilter);
         Assert.Equal(1.0, clone.Position.X);
         Assert.Equal(2.0, clone.Position.Y);
         Assert.Equal(3.0, clone.Position.Z);
