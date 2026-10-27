@@ -129,10 +129,14 @@ The first row of the matrix is the resource kit type - Medikit, Ammo, Tool, and 
 The next three rows of the matrix are the weighted placements for the start, middle, and end of the zone, which determine where in the zone you would like the resources to spawn. Leaving them all at 0 means random placement.
 
 ## Consumables
-TODO
+Consumables can be added to a level through the Zone Config panel. This can be accessed by clicking on any room in a zone and then swapping to the 'Zone' tab, where the user can select the consumable distribution config that they would like for this zone.
+
+The consumable distribution configs themselves are defined through the Consumables tab, where configs can be created to define settings such as how many consumable items to place, and the weighted probabilities for each item to be selected.
 
 ## Big Pickup Items
-TODO
+Big pickup items (Cells, Turbines, etc) can be added to a zone through the Zone Config panel. This can be accessed by clicking on any room in a zone and then swapping to the 'Zone' tab, where the user can add values to the Big Pickup Distribution list to place.
+
+It is important to note that items that are placed this way are *not* objective items. For example, a Neonate HSU placed through this field will not automatically work for completing an `ActivateSmallHSU` objective.
 
 ## Artifacts
 TODO
