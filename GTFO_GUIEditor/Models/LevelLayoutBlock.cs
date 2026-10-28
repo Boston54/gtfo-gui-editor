@@ -21,6 +21,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private SectorSettings _mainSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 0 };
     private SectorSettings _secondarySector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 100 };
     private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 200 };
+    private ExpeditionBalanceSettings _expeditionBalance = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -124,6 +125,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _overloadSector;
         set => SetField(ref _overloadSector, value ?? new SectorSettings());
+    }
+
+    [JsonPropertyName("ExpeditionBalance")]
+    public ExpeditionBalanceSettings ExpeditionBalance
+    {
+        get => _expeditionBalance;
+        set => SetField(ref _expeditionBalance, value ?? new ExpeditionBalanceSettings());
     }
 
     public SectorSettings GetSectorSettings(SectorType sectorType)
@@ -288,7 +296,8 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             Dimensions = new ObservableCollection<DimensionLayoutBlock>(_dimensions.Select(d => d.Clone())),
             MainSector = MainSector.Clone(),
             SecondarySector = SecondarySector.Clone(),
-            OverloadSector = OverloadSector.Clone()
+            OverloadSector = OverloadSector.Clone(),
+            ExpeditionBalance = ExpeditionBalance.Clone()
         };
         return clone;
     }

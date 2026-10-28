@@ -99,7 +99,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Wave",
+      "name": "Striker (Wave)",
       "internalEnabled": true,
       "persistentID": 13
     },
@@ -186,7 +186,7 @@
           "Cooldown": 9.0
         }
       ],
-      "name": "Striker_Berserk",
+      "name": "Nightmare Striker",
       "internalEnabled": true,
       "persistentID": 53
     },
@@ -267,7 +267,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Patrol",
+      "name": "Striker (Patrol)",
       "internalEnabled": true,
       "persistentID": 32
     },
@@ -348,7 +348,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Wave_Fast",
+      "name": "Striker (Wave, Fast)",
       "internalEnabled": true,
       "persistentID": 31
     },
@@ -429,7 +429,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Hibernate",
+      "name": "Striker (Hibernate)",
       "internalEnabled": true,
       "persistentID": 24
     },
@@ -516,7 +516,7 @@
           "Cooldown": 8.0
         }
       ],
-      "name": "Striker_Bullrush",
+      "name": "Charger",
       "internalEnabled": true,
       "persistentID": 30
     },
@@ -603,7 +603,7 @@
           "Cooldown": 2.0
         }
       ],
-      "name": "Striker_Big_Wave",
+      "name": "Giant (Wave)",
       "internalEnabled": true,
       "persistentID": 16
     },
@@ -690,7 +690,7 @@
           "Cooldown": 4.0
         }
       ],
-      "name": "Striker_Big_nightmare",
+      "name": "Nightmare Giant",
       "internalEnabled": true,
       "persistentID": 62
     },
@@ -777,7 +777,7 @@
           "Cooldown": 0.8
         }
       ],
-      "name": "Striker_Big_Bullrush",
+      "name": "Big Charger",
       "internalEnabled": true,
       "persistentID": 39
     },
@@ -870,7 +870,7 @@
           "Cooldown": 5.0
         }
       ],
-      "name": "Shooter_Spread",
+      "name": "Hybrid",
       "internalEnabled": true,
       "persistentID": 52
     },
@@ -957,7 +957,7 @@
           "Cooldown": 2.0
         }
       ],
-      "name": "Striker_Big_Hibernate",
+      "name": "Giant (Hibernate)",
       "internalEnabled": true,
       "persistentID": 28
     },
@@ -1044,7 +1044,7 @@
           "Cooldown": 2.0
         }
       ],
-      "name": "Striker_Big_Shadow",
+      "name": "Shadow Giant",
       "internalEnabled": true,
       "persistentID": 35
     },
@@ -1125,7 +1125,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Boss",
+      "name": "Striker (Boss)",
       "internalEnabled": true,
       "persistentID": 19
     },
@@ -1206,7 +1206,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Child",
+      "name": "Baby Striker",
       "internalEnabled": true,
       "persistentID": 38
     },
@@ -1287,7 +1287,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Striker_Child_Nightmare",
+      "name": "Nightmare Baby Striker",
       "internalEnabled": true,
       "persistentID": 63
     },
@@ -1374,7 +1374,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Shooter_Hibernate",
+      "name": "Shooter (Hibernate)",
       "internalEnabled": true,
       "persistentID": 26
     },
@@ -1461,7 +1461,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Shooter_Wave",
+      "name": "Shooter (Wave)",
       "internalEnabled": true,
       "persistentID": 11
     },
@@ -1548,7 +1548,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Shooter_Big",
+      "name": "Big Shooter",
       "internalEnabled": true,
       "persistentID": 18
     },
@@ -1641,7 +1641,7 @@
           "Cooldown": 2.0
         }
       ],
-      "name": "Shooter_Big_RapidFire",
+      "name": "Nightmare Shooter",
       "internalEnabled": true,
       "persistentID": 33
     },
@@ -1728,7 +1728,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Shooter_Big_Infection",
+      "name": "Big Shooter (Infection)",
       "internalEnabled": true,
       "persistentID": 34
     },
@@ -1815,7 +1815,7 @@
           "Cooldown": 15.0
         }
       ],
-      "name": "Birther",
+      "name": "Mother",
       "internalEnabled": true,
       "persistentID": 36
     },
@@ -1902,7 +1902,7 @@
           "Cooldown": 15.0
         }
       ],
-      "name": "Birther_Boss",
+      "name": "Big Mother",
       "internalEnabled": true,
       "persistentID": 37
     },
@@ -2001,7 +2001,7 @@
           "Cooldown": 50.0
         }
       ],
-      "name": "MegaMother",
+      "name": "Mega Mother",
       "internalEnabled": true,
       "persistentID": 55
     },
@@ -2175,7 +2175,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Scout_nightmare",
+      "name": "Nightmare Scout",
       "internalEnabled": true,
       "persistentID": 56
     },
@@ -2262,7 +2262,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Scout_zoomer",
+      "name": "Zoomer Scout",
       "internalEnabled": true,
       "persistentID": 54
     },
@@ -2355,7 +2355,7 @@
           "Cooldown": 0.8
         }
       ],
-      "name": "Scout_Bullrush",
+      "name": "Charger Scout",
       "internalEnabled": true,
       "persistentID": 41
     },
@@ -2442,7 +2442,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Scout_Shadow",
+      "name": "Shadow Scout",
       "internalEnabled": true,
       "persistentID": 40
     },
@@ -2765,7 +2765,7 @@
           "Cooldown": 2.0
         }
       ],
-      "name": "Tank_Boss",
+      "name": "Immortal",
       "internalEnabled": true,
       "persistentID": 47
     },
@@ -2939,128 +2939,9 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Flyer_Big",
+      "name": "Big Flyer",
       "internalEnabled": true,
       "persistentID": 45
-    },
-    {
-      "EnemyType": "Boss",
-      "AssetBundle": "Enemies",
-      "BundleShard": "S1",
-      "BasePrefabs": [
-        "Assets/AssetPrefabs/Characters/Enemies/Bases/EnemyBase.prefab",
-        "Assets/AssetPrefabs/Characters/Enemies/Bases/SquidBossBase.prefab"
-      ],
-      "ModelDatas": [
-        {
-          "ModelFile": "Assets/AssetPrefabs/CharacterBuilder/Enemies/Squidward/Squidward_CB.prefab",
-          "ModelCustomization": "Assets/AssetPrefabs/CharacterBuilder/Enemies/Squidward/Customization_Squidward.prefab",
-          "PositionOffset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "RotationOffset": {
-            "x": 0.0,
-            "y": 0.0,
-            "z": 0.0
-          },
-          "NeckScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "HeadScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "ChestScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "ArmScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "LegScale": {
-            "x": 1.0,
-            "y": 1.0,
-            "z": 1.0
-          },
-          "SizeRange": {
-            "x": 0.9,
-            "y": 1.1
-          }
-        }
-      ],
-      "DetectionDataId": 13,
-      "BehaviorDataId": 38,
-      "MovementDataId": 35,
-      "BalancingDataId": 35,
-      "SFXDataId": 36,
-      "ArenaDimensions": [],
-      "LinkedSlaveModels": [],
-      "InternalMaterial": 131072,
-      "isCoccoon": false,
-      "EnemySpottedDialogId": 0,
-      "AI_Abilities": [
-        {
-          "Enabled": true,
-          "AbilityPrefab": "Assets/AssetPrefabs/Characters/Enemies/Abilities/EAB_SquidBossProjectileShooter.prefab",
-          "AbilityType": "Ranged",
-          "Cooldown": 10.0,
-          "AbilityConditions": [
-            "BossPhase0",
-            "BossStateCombat"
-          ]
-        },
-        {
-          "Enabled": true,
-          "AbilityPrefab": "Assets/AssetPrefabs/Characters/Enemies/Abilities/EAB_SquidBossSpawningPhase0.prefab",
-          "AbilityType": "SpawnChildren",
-          "Cooldown": 15.0,
-          "AbilityConditions": [
-            "BossPhase0",
-            "BossStateSpawn"
-          ]
-        },
-        {
-          "Enabled": true,
-          "AbilityPrefab": "Assets/AssetPrefabs/Characters/Enemies/Abilities/EAB_SquidBossProjectileShooterRaging.prefab",
-          "AbilityType": "Ranged",
-          "Cooldown": 10.0,
-          "AbilityConditions": [
-            "BossPhase0",
-            "BossStateRage"
-          ]
-        },
-        {
-          "Enabled": true,
-          "AbilityPrefab": "Assets/AssetPrefabs/Characters/Enemies/Abilities/EAB_SquidBossSpawningRaging.prefab",
-          "AbilityType": "SpawnChildren",
-          "Cooldown": 10.0,
-          "AbilityConditions": [
-            "BossPhase1",
-            "BossStateRage"
-          ]
-        },
-        {
-          "Enabled": true,
-          "AbilityPrefab": "Assets/AssetPrefabs/Characters/Enemies/Abilities/EAB_StrikerBigTentacle.prefab",
-          "AbilityType": "Melee",
-          "Cooldown": 10.0,
-          "AbilityConditions": [
-            "BossPhase0",
-            "BossStateCombat"
-          ]
-        }
-      ],
-      "name": "Squidward",
-      "internalEnabled": true,
-      "persistentID": 43
     },
     {
       "EnemyType": "Boss",
@@ -3502,7 +3383,7 @@
           ]
         }
       ],
-      "name": "SquidBoss_Big",
+      "name": "Kraken (R6D1)",
       "internalEnabled": true,
       "persistentID": 44
     },
@@ -3585,7 +3466,7 @@
           "Cooldown": 1.0
         }
       ],
-      "name": "Pouncer",
+      "name": "Snatcher",
       "internalEnabled": true,
       "persistentID": 46
     },
@@ -4029,7 +3910,7 @@
           ]
         }
       ],
-      "name": "SquidBoss_Big_Complex",
+      "name": "Kraken (R8E2)",
       "internalEnabled": true,
       "persistentID": 58
     },
@@ -4284,7 +4165,7 @@
           ]
         }
       ],
-      "name": "SquidBoss_VS",
+      "name": "Kraken (R8B2)",
       "internalEnabled": true,
       "persistentID": 61
     }

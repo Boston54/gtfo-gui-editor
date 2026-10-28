@@ -82,6 +82,7 @@ public static class RundownProjectService
                 MainSector = ExportSectorSettings(level.MainSector),
                 SecondarySector = ExportSectorSettings(level.SecondarySector),
                 OverloadSector = ExportSectorSettings(level.OverloadSector),
+                ExpeditionBalance = level.ExpeditionBalance.Clone(),
                 GridState = level.GridState.ExportStateData()
             };
             project.Levels.Add(levelData);
@@ -207,7 +208,8 @@ public static class RundownProjectService
                         levelData.Dimensions?.Select(d => d.Clone()) ?? Enumerable.Empty<DimensionLayoutBlock>()),
                     MainSector = ImportSectorSettings(levelData.MainSector),
                     SecondarySector = ImportSectorSettings(levelData.SecondarySector),
-                    OverloadSector = ImportSectorSettings(levelData.OverloadSector)
+                    OverloadSector = ImportSectorSettings(levelData.OverloadSector),
+                    ExpeditionBalance = levelData.ExpeditionBalance?.Clone() ?? new ExpeditionBalanceSettings()
                 };
 
                 if (levelData.GridState != null)

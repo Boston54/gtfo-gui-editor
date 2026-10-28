@@ -12,9 +12,6 @@
   * as has already been done for the alarms tab
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
-* **Expedition Balance**
-  * Add support for the expedition balance settings - allow users to create a new set of settings per-level.
-  * The defaults should not be just the vanilla ones; the editor assumes the resource pack amounts are all 1, so lock those in.
 * **Ability to search the user docs for keywords**
 
 *If we are wanting to add support for modded enemies and weapons, then:*

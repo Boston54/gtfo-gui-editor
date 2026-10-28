@@ -3048,6 +3048,14 @@ public class LevelLayoutViewModel : ViewModelBase
         set => SetField(ref _selectedElevatorTile, value);
     }
 
+    private ExpeditionBalanceSettings _editingExpeditionBalance = new();
+
+    public ExpeditionBalanceSettings EditingExpeditionBalance
+    {
+        get => _editingExpeditionBalance;
+        set => SetField(ref _editingExpeditionBalance, value ?? new ExpeditionBalanceSettings());
+    }
+
     public string CreationErrorMessage
     {
         get => _creationErrorMessage;
@@ -3088,6 +3096,7 @@ public class LevelLayoutViewModel : ViewModelBase
         }
 
         CreationErrorMessage = string.Empty;
+        EditingExpeditionBalance = new ExpeditionBalanceSettings();
         IsCreatingLevel = true;
     }
 
@@ -3112,6 +3121,7 @@ public class LevelLayoutViewModel : ViewModelBase
                                ?? _availableElevatorTiles.FirstOrDefault();
 
         CreationErrorMessage = string.Empty;
+        EditingExpeditionBalance = _selectedLevel.ExpeditionBalance.Clone();
         IsCreatingLevel = true;
     }
 
@@ -3178,6 +3188,7 @@ public class LevelLayoutViewModel : ViewModelBase
                 _selectedLevel.ComplexType = SelectedComplexType;
                 _selectedLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
                 _selectedLevel.ElevatorTile = SelectedElevatorTile.Prefab;
+                _selectedLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
 
                 var reality = _selectedLevel.GetDimension("Reality");
                 if (reality != null)
@@ -3216,6 +3227,7 @@ public class LevelLayoutViewModel : ViewModelBase
             SelectedElevatorTile.Prefab
         );
         newLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
+        newLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
 
         _levels.Add(newLevel);
         SelectedLevel = newLevel;

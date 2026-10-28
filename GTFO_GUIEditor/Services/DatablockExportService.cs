@@ -248,6 +248,7 @@ public static class DatablockExportService
             var lightSettingsAlloc = new PersistentIdAllocator(100000);
             var fogSettingsAlloc = new PersistentIdAllocator(100000);
             var complexResourceAlloc = new PersistentIdAllocator(100000);
+            var expeditionBalanceAlloc = new PersistentIdAllocator(100000);
             var rundownAlloc = new PersistentIdAllocator(100000);
 
             // 1. Load vanilla blocks to preserve/reference
@@ -257,6 +258,7 @@ public static class DatablockExportService
             var vanillaEnemyBlocks = LoadVanillaBlocksArray("EnemyDataBlock.json");
             var vanillaChainedPuzzleTypeBlocks = LoadVanillaBlocksArray("ChainedPuzzleTypeDataBlock.json");
             var vanillaExpeditionBalanceBlocks = LoadVanillaBlocksArray("ExpeditionBalanceDataBlock.json");
+            RegisterExistingIds(vanillaExpeditionBalanceBlocks, expeditionBalanceAlloc);
 
             var vanillaChainedPuzzleBlocks = LoadVanillaBlocksArray("ChainedPuzzleDataBlock.json");
             RegisterExistingIds(vanillaChainedPuzzleBlocks, chainedPuzzleAlloc);
@@ -279,6 +281,7 @@ public static class DatablockExportService
             var wardenObjectiveBlocks = new List<JsonObject>();
             var levelLayoutBlocks = new List<JsonObject>();
             var dimensionBlocks = new List<JsonObject>();
+            var expeditionBalanceBlocks = new List<JsonObject>();
 
             // Enemy info cache for blood door score calculation
             var enemyCosts = LoadEnemyCosts(vanillaEnemyBlocks);
@@ -1197,6 +1200,22 @@ public static class DatablockExportService
                 complexBlocks.Add(mainSetObj);
             }
 
+            // 4.5. Synthesize Expedition Balance Blocks per level
+            var levelExpeditionBalanceId = new Dictionary<uint, uint>();
+
+            foreach (var level in mainVm.LevelLayout.Levels)
+            {
+                uint expBalId = expeditionBalanceAlloc.Allocate();
+                levelExpeditionBalanceId[level.PersistentId] = expBalId;
+
+                var expBalObj = level.ExpeditionBalance.ToExportJsonObject(
+                    expBalId,
+                    $"Generated_ExpeditionBalance_{level.Name}_{expBalId}",
+                    level.InternalEnabled
+                );
+                expeditionBalanceBlocks.Add(expBalObj);
+            }
+
             // Compile Dimensions & Dimension ComplexResourceSets
             foreach (var level in mainVm.LevelLayout.Levels)
             {
@@ -1296,22 +1315,27 @@ public static class DatablockExportService
                     },
                     ["VanityItemLayerDropDataBlock"] = rundown.VanityItemLayerDropDataBlock,
                     ["TierA"] = SerializeTierExpeditions(rundown.TierA, SynthesizeText, levelMainComplexResourceSetId,
+                        levelExpeditionBalanceId,
                         levelMainObjectiveId, levelMainObjectiveIds, levelSecondaryObjectiveId, levelThirdObjectiveId,
                         levelSecondaryLayoutId, levelThirdLayoutId,
                         mainVm.LevelLayout?.Levels),
                     ["TierB"] = SerializeTierExpeditions(rundown.TierB, SynthesizeText, levelMainComplexResourceSetId,
+                        levelExpeditionBalanceId,
                         levelMainObjectiveId, levelMainObjectiveIds, levelSecondaryObjectiveId, levelThirdObjectiveId,
                         levelSecondaryLayoutId, levelThirdLayoutId,
                         mainVm.LevelLayout?.Levels),
                     ["TierC"] = SerializeTierExpeditions(rundown.TierC, SynthesizeText, levelMainComplexResourceSetId,
+                        levelExpeditionBalanceId,
                         levelMainObjectiveId, levelMainObjectiveIds, levelSecondaryObjectiveId, levelThirdObjectiveId,
                         levelSecondaryLayoutId, levelThirdLayoutId,
                         mainVm.LevelLayout?.Levels),
                     ["TierD"] = SerializeTierExpeditions(rundown.TierD, SynthesizeText, levelMainComplexResourceSetId,
+                        levelExpeditionBalanceId,
                         levelMainObjectiveId, levelMainObjectiveIds, levelSecondaryObjectiveId, levelThirdObjectiveId,
                         levelSecondaryLayoutId, levelThirdLayoutId,
                         mainVm.LevelLayout?.Levels),
                     ["TierE"] = SerializeTierExpeditions(rundown.TierE, SynthesizeText, levelMainComplexResourceSetId,
+                        levelExpeditionBalanceId,
                         levelMainObjectiveId, levelMainObjectiveIds, levelSecondaryObjectiveId, levelThirdObjectiveId,
                         levelSecondaryLayoutId, levelThirdLayoutId,
                         mainVm.LevelLayout?.Levels),
@@ -1478,8 +1502,10 @@ public static class DatablockExportService
             WriteDatablockFile(exportRootPath, "GameData_EnemyGroupDataBlock_bin.json",
                 enemyGroupBlocks.Count > 0 ? enemyGroupBlocks : vanillaEnemyGroupBlocks);
             datablocksCount++;
+            var vanillaExpeditionBalanceHeaders = LoadVanillaHeadersArray("ExpeditionBalanceDataBlock.json");
             WriteDatablockFile(exportRootPath, "GameData_ExpeditionBalanceDataBlock_bin.json",
-                vanillaExpeditionBalanceBlocks);
+                expeditionBalanceBlocks.Count > 0 ? expeditionBalanceBlocks : vanillaExpeditionBalanceBlocks,
+                vanillaExpeditionBalanceHeaders);
             datablocksCount++;
             WriteDatablockFile(exportRootPath, "GameData_FogSettingsDataBlock_bin.json", fogBlocks);
             datablocksCount++;
@@ -2118,6 +2144,7 @@ public static class DatablockExportService
         IEnumerable<ExpeditionBlock>? expeditions,
         Func<string?, string, uint> textSynth,
         Dictionary<uint, uint> levelMainComplexResourceSetId,
+        Dictionary<uint, uint> levelExpeditionBalanceId,
         Dictionary<uint, uint> levelMainObjectiveId,
         Dictionary<uint, List<uint>> levelMainObjectiveIds,
         Dictionary<uint, uint> levelSecondaryObjectiveId,
@@ -2155,6 +2182,22 @@ public static class DatablockExportService
             else if (exp.Expedition?.ComplexResourceData > 0)
             {
                 complexSetId = exp.Expedition.ComplexResourceData;
+            }
+
+            uint expBalId = 1;
+            if (expLevelLayoutId > 0 &&
+                levelExpeditionBalanceId.TryGetValue(expLevelLayoutId, out var allocatedBalId))
+            {
+                expBalId = allocatedBalId;
+            }
+            else if (matchingLevel != null &&
+                     levelExpeditionBalanceId.TryGetValue(matchingLevel.PersistentId, out var matchAllocBalId))
+            {
+                expBalId = matchAllocBalId;
+            }
+            else if (exp.Expedition?.ExpeditionBalance > 0)
+            {
+                expBalId = exp.Expedition.ExpeditionBalance;
             }
 
             uint defaultMainObjId = 0;
@@ -2316,7 +2359,7 @@ public static class DatablockExportService
                     ["LightSettings"] = exp.Expedition?.LightSettings ?? 0,
                     ["FogSettings"] = exp.Expedition?.FogSettings ?? 0,
                     ["EnemyPopulation"] = exp.Expedition?.EnemyPopulation ?? 1,
-                    ["ExpeditionBalance"] = exp.Expedition?.ExpeditionBalance ?? 1,
+                    ["ExpeditionBalance"] = expBalId,
                     ["ScoutWaveSettings"] = exp.Expedition?.ScoutWaveSettings ?? 3,
                     ["ScoutWavePopulation"] = exp.Expedition?.ScoutWavePopulation ?? 1,
                     ["EnvironmentWetness"] = exp.Expedition?.EnvironmentWetness ?? 0.0,

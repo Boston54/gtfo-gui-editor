@@ -56,6 +56,8 @@ public class LevelLayoutBlockData
 
     [JsonPropertyName("overloadSector")] public SectorSettingsData OverloadSector { get; set; } = new() { ZoneAliasStart = 200 };
 
+    [JsonPropertyName("expeditionBalance")] public ExpeditionBalanceSettings? ExpeditionBalance { get; set; }
+
     [JsonPropertyName("gridState")] public LevelLayoutGridStateData GridState { get; set; } = new();
 }
 

@@ -42,6 +42,7 @@ This section is divided into four sections:
 | Plugs | Plugs define the asset that is placed at the edge of a geomorph to connect with other geomorphs. These can include simple doors with surrounding structure, staircases between altitudes, and open room dividers with no doors. |
 | Boss Aligns | Some geomorphs contain a Boss Align point which defines static points where 'boss' enemeis (such as Tanks or Mothers) will spawn if they are spawned in this tile.|
 | Weighted Probability | Weighted probability used to determine the probability of something happening relative to other options. For example, if you have two options, one with a 2 weight and one with a 5 weight, then option one has probability 2/7, and option two has probability 5/7. The probability of each option is calculated as the weight of the given option divided by the sum of all weights. |
+| Placement Weights | #TODO |
 
 ## Tiles, Rooms & Zones
 The connectors at the edge of a geomorph can be clicked by the user to create a new tile for the expedition. This prompts the user to select a geomorph to place, alongside a rotation and altitude.
@@ -139,7 +140,11 @@ Big pickup items (Cells, Turbines, etc) can be added to a zone through the Zone 
 It is important to note that items that are placed this way are *not* objective items. For example, a Neonate HSU placed through this field will not automatically work for completing an `ActivateSmallHSU` objective.
 
 ## Artifacts
-TODO
+Artifacts can be confused through multiple different fields across the editor.
+
+The Level Config dialog (accessible via the Level bar at the top of the level view) can be used to set the number of artifacts per segment and sector, as well as the chances of artifacts spawning inside boxes.
+
+The sectors dialog (accessible via the Sectors bar at the top of the level view) can be used to set a multiplier for the number of artifacts to be spawned in this sector. By setting this to 0, no artifacts will be spawned in this sector regardless of what the value is for the level's artifact information, which allows users to spawn artifacts in specific sectors but not others.
 
 # Environment
 ## Lighting

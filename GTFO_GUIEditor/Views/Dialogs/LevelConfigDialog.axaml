@@ -15,79 +15,201 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                Width="500"
+                Width="620"
+                MaxHeight="820"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 BoxShadow="0 4 20 #80000000">
-            <StackPanel Spacing="14">
-                <TextBlock Text="{Binding LevelDialogTitle}"
+            <Grid RowDefinitions="Auto,*,Auto">
+                <!-- Header -->
+                <TextBlock Grid.Row="0"
+                           Text="{Binding LevelDialogTitle}"
                            FontSize="18"
                            FontWeight="Bold"
-                           Foreground="#FFFFFF"/>
+                           Foreground="#FFFFFF"
+                           Margin="0,0,0,14"/>
 
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Level Name:" FontSize="13" Foreground="LightGray"/>
-                    <TextBox Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..."/>
+                <!-- Scrollable Content -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,8,0">
+                    <StackPanel Spacing="16">
+                        <!-- General Level Settings -->
+                        <Border Background="#1E1E1E"
+                                BorderBrush="#3E3E42"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="14">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="General Settings"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                    <!-- Level Name -->
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Level Name:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..." Margin="0,4"/>
+
+                                    <!-- Persistent ID -->
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewLevelPersistentId, Mode=TwoWay}" Watermark="Enter persistent ID..." Margin="0,4"/>
+
+                                    <!-- Tileset -->
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tileset:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="2" Grid.Column="1"
+                                              ItemsSource="{Binding AvailableComplexTypes}"
+                                              SelectedItem="{Binding SelectedComplexType, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch" Margin="0,4"/>
+
+                                    <!-- Starting Elevator Tile -->
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Starting Elevator Tile:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="3" Grid.Column="1"
+                                              ItemsSource="{Binding AvailableElevatorTiles}"
+                                              SelectedItem="{Binding SelectedElevatorTile, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch" Margin="0,4">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:ElevatorTileOption">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+
+                                    <!-- Fog Setting -->
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Fog Setting:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="4" Grid.Column="1"
+                                              ItemsSource="{Binding AvailableFogSettings}"
+                                              SelectedItem="{Binding SelectedFogSetting, Mode=TwoWay}"
+                                              HorizontalAlignment="Stretch" Margin="0,4">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate x:DataType="models:FogSettingsBlock">
+                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Resource Containers Section -->
+                        <Border Background="#1E1E1E"
+                                BorderBrush="#3E3E42"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="14">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Resource Containers"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="0-1 chance to put new loot spawns in existing resource containers instead of making a new one. Higher chances will cause thre to be less boxes/lockers, but each will have more loot on average." Text="Chance To Re-Use Resource Container:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ChanceToReUseResourceContainer, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" ToolTip.Tip="The maximum number of packs that can spawn in a single resource container" Text="Max Packs Per Resource Container:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditingExpeditionBalance.MaxPacksPerResourceContainer, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" ToolTip.Tip="The number of empty weak resource containers to spawn in each zone" Text="Empty Weak Resource Containers Per Zone:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditingExpeditionBalance.EmptyWeakResourceContainersPerZone, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" ToolTip.Tip="The number of empty secure resource containers to spawn in each zone" Text="Empty Secure Resource Containers Per Zone:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding EditingExpeditionBalance.EmptySecureResourceContainersPerZone, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" ToolTip.Tip="0-1 chance that a resource container with a pack inside it will be locked" Text="Weak Resource Container With Pack Chance For Locked:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakResourceContainerWithPackChanceForLocked, Mode=TwoWay}" Margin="0,4"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Weak Doors Section -->
+                        <Border Background="#1E1E1E"
+                                BorderBrush="#3E3E42"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="14">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Room Doors"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="The health of small (4x4) room doors" Text="Small Door Health:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoor4x4Health, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" ToolTip.Tip="The health of large (8x4) room doors" Text="Large Door Health:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoor8x4Health, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" ToolTip.Tip="The probability weight that a room door will have no lock on it" Text="No Lock Weight:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoorChanceLockWeightNoLock, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="3" Grid.Column="0" ToolTip.Tip="The probability weight that a room door will have a melee lock on it" Text="Melee Lock Weight:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoorChanceLockWeightMelee, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="4" Grid.Column="0" ToolTip.Tip="The probability weight that a room door will have a hack lock on it" Text="Hack Lock Weight:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoorChanceLockWeightHackableLock, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="5" Grid.Column="0" ToolTip.Tip="The health of the smack lock on a room door" Text="Room Door Lock Health:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoorLockHealth, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="6" Grid.Column="0" ToolTip.Tip="The conversion factor for the volume of glue to the health of a door. E.g., if this value is 0.5 and there are 10 units of C-Foam on a door, then the door will have 5 extra health" Text="Glue Volume To Door Health Conversion:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding EditingExpeditionBalance.GlueVolumeToDoorHealthConversion, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="7" Grid.Column="0" ToolTip.Tip="The maximum amount of units of glue that a door can have (default is 27)" Text="Glue Volume For Door Glue Max State:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding EditingExpeditionBalance.GlueVolumeForDoorGlueMaxState, Mode=TwoWay}" Margin="0,4"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Artifacts Section -->
+                        <Border Background="#1E1E1E"
+                                BorderBrush="#3E3E42"
+                                BorderThickness="1"
+                                CornerRadius="6"
+                                Padding="14">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Artifacts"
+                                           FontSize="14"
+                                           FontWeight="Bold"
+                                           Foreground="#FFFFFF"/>
+
+                                <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="The number of artifacts to spawn per segment" Text="Artifacts Per Segment:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ArtifactsPerSegment, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0" ToolTip.Tip="The number of artifacts to spawn in each sector (before sector-specific settings are accounted for)" Text="Artifacts Per Sector:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ArtifactsPerLayer, Mode=TwoWay}" Margin="0,4"/>
+
+                                    <TextBlock Grid.Row="2" Grid.Column="0" ToolTip.Tip="The 0-1 chance for an artifact to be spawned in a resource container" Text="Chance To Put Artifact In Resource Container:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ChanceToPutArtifactInResourceContainer, Mode=TwoWay}" Margin="0,4"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Footer with Errors and Action Buttons -->
+                <StackPanel Grid.Row="2" Spacing="10" Margin="0,14,0,0">
+                    <!-- Error message if any -->
+                    <TextBlock Text="{Binding CreationErrorMessage}"
+                               Foreground="#FF6B6B"
+                               FontSize="12"
+                               TextWrapping="Wrap"
+                               IsVisible="{Binding HasCreationErrorMessage}"/>
+
+                    <!-- Action buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10">
+                        <Button Content="Cancel"
+                                Command="{Binding CancelCreateLevel}"
+                                Padding="16,8"/>
+                        <Button Content="{Binding LevelDialogConfirmButtonText}"
+                                Command="{Binding ConfirmCreateLevel}"
+                                Background="#007ACC"
+                                Foreground="White"
+                                FontWeight="SemiBold"
+                                Padding="16,8"/>
+                    </StackPanel>
                 </StackPanel>
-
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Persistent ID:" FontSize="13" Foreground="LightGray"/>
-                    <TextBox Text="{Binding NewLevelPersistentId, Mode=TwoWay}" Watermark="Enter persistent ID..."/>
-                </StackPanel>
-
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Tileset:" FontSize="13" Foreground="LightGray"/>
-                    <ComboBox ItemsSource="{Binding AvailableComplexTypes}"
-                              SelectedItem="{Binding SelectedComplexType, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch"/>
-                </StackPanel>
-
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Starting Elevator Tile:" FontSize="13" Foreground="LightGray"/>
-                    <ComboBox ItemsSource="{Binding AvailableElevatorTiles}"
-                              SelectedItem="{Binding SelectedElevatorTile, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="models:ElevatorTileOption">
-                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </StackPanel>
-
-                <StackPanel Spacing="6">
-                    <TextBlock Text="Fog Setting:" FontSize="13" Foreground="LightGray"/>
-                    <ComboBox ItemsSource="{Binding AvailableFogSettings}"
-                              SelectedItem="{Binding SelectedFogSetting, Mode=TwoWay}"
-                              HorizontalAlignment="Stretch">
-                        <ComboBox.ItemTemplate>
-                            <DataTemplate x:DataType="models:FogSettingsBlock">
-                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
-                            </DataTemplate>
-                        </ComboBox.ItemTemplate>
-                    </ComboBox>
-                </StackPanel>
-
-                <!-- Error message if any -->
-                <TextBlock Text="{Binding CreationErrorMessage}"
-                           Foreground="#FF6B6B"
-                           FontSize="12"
-                           TextWrapping="Wrap"
-                           IsVisible="{Binding HasCreationErrorMessage}"/>
-
-                <!-- Action buttons -->
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,10,0,0">
-                    <Button Content="Cancel"
-                            Command="{Binding CancelCreateLevel}"
-                            Padding="16,8"/>
-                    <Button Content="{Binding LevelDialogConfirmButtonText}"
-                            Command="{Binding ConfirmCreateLevel}"
-                            Background="#007ACC"
-                            Foreground="White"
-                            FontWeight="SemiBold"
-                            Padding="16,8"/>
-                </StackPanel>
-            </StackPanel>
+            </Grid>
         </Border>
     </Border>
 </UserControl>
