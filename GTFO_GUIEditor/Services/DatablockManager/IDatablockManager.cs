@@ -33,6 +33,16 @@ public interface IDatablockManager
     ObservableCollection<T> Get<T>() where T : class;
 
     /// <summary>
+    /// Gets a level layout datablock by persistent ID.
+    /// </summary>
+    LevelLayoutBlock? GetLevelLayout(uint persistentId);
+
+    /// <summary>
+    /// Gets the imported canvas state associated with a level layout ID.
+    /// </summary>
+    LevelLayoutGridState? GetLevelLayoutGridState(uint persistentId);
+
+    /// <summary>
     /// Exports all datablocks and configuration files to the specified output directory synchronously.
     /// </summary>
     ExportResult ExportDatablocks(MainWindowViewModel vm, string outputDirectory);

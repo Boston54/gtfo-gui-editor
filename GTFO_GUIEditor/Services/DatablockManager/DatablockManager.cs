@@ -61,6 +61,18 @@ public class DatablockManager : IDatablockManager
     }
 
     /// <inheritdoc />
+    public LevelLayoutBlock? GetLevelLayout(uint persistentId)
+    {
+        return Get<LevelLayoutBlock>().FirstOrDefault(level => level.PersistentId == persistentId);
+    }
+
+    /// <inheritdoc />
+    public LevelLayoutGridState? GetLevelLayoutGridState(uint persistentId)
+    {
+        return GetLevelLayout(persistentId)?.GridState;
+    }
+
+    /// <inheritdoc />
     public void LoadAll(string folderPath)
     {
         ImportAll(folderPath);
