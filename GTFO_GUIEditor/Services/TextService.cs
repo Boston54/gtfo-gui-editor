@@ -10,66 +10,27 @@ public static class TextService
     private static readonly object _lock = new();
     private static Dictionary<uint, string>? _textCache;
 
-    public static string? FindTextDataBlockFile()
-    {
-        string dir = RundownService.GetDatablocksDirectory();
-        string directPath = Path.Combine(dir, "TextDataBlock.json");
-        if (File.Exists(directPath)) return directPath;
-
-        string altPath = Path.Combine(dir, "GameData_TextDataBlock_bin.json");
-        if (File.Exists(altPath)) return altPath;
-
-        return null;
-    }
-
-    public static void Initialize(string? filePath = null)
+    public static void Initialize()
     {
         lock (_lock)
         {
             if (_textCache != null && _textCache.Count > 0) return;
             _textCache = new Dictionary<uint, string>();
 
-            filePath ??= FindTextDataBlockFile();
-            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath)) return;
-
-            try
+            foreach (var block in DatablockManager.Instance.GetRawBlocks(
+                         "TextDataBlock.json",
+                         "GameData_TextDataBlock_bin.json"))
             {
-                using var fs = File.OpenRead(filePath);
-                using var doc = JsonDocument.Parse(fs);
-                if (doc.RootElement.TryGetProperty("Blocks", out var blocksElement) &&
-                    blocksElement.ValueKind == JsonValueKind.Array)
+                uint id = 0;
+                if (block.TryGetPropertyValue("persistentID", out var idNode))
                 {
-                    foreach (var block in blocksElement.EnumerateArray())
-                    {
-                        uint id = 0;
-                        if (block.TryGetProperty("persistentID", out var idProp) ||
-                            block.TryGetProperty("PersistentID", out idProp) ||
-                            block.TryGetProperty("persistentId", out idProp))
-                        {
-                            if (idProp.ValueKind == JsonValueKind.Number)
-                            {
-                                id = idProp.GetUInt32();
-                            }
-                            else if (idProp.ValueKind == JsonValueKind.String && uint.TryParse(idProp.GetString(), out uint parsedId))
-                            {
-                                id = parsedId;
-                            }
-                        }
-
-                        if (id != 0 && block.TryGetProperty("English", out var engProp))
-                        {
-                            string? eng = engProp.GetString();
-                            if (eng != null)
-                            {
-                                _textCache[id] = eng;
-                            }
-                        }
-                    }
+                    uint.TryParse(idNode?.ToString(), out id);
                 }
-            }
-            catch
-            {
-                // Graceful fallback if text data block cannot be parsed
+                if (id != 0 && block.TryGetPropertyValue("English", out var englishNode))
+                {
+                    var english = englishNode?.GetValue<string>();
+                    if (!string.IsNullOrEmpty(english)) _textCache[id] = english;
+                }
             }
         }
     }

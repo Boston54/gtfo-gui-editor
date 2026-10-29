@@ -12,8 +12,8 @@ public class MainWindowViewModel : ViewModelBase
 {
     private readonly IFileDialogService _fileDialogService;
     private string? _currentFilePath;
-    private string? _lastExportDirectory;
-    private string? _lastImportDirectory;
+    private string? _lastOpenFolderDirectory;
+    private string? _lastSaveFolderDirectory;
     private string _statusMessage = string.Empty;
     private ObservableCollection<RecentFileItem> _recentFiles = new();
 
@@ -48,16 +48,16 @@ public class MainWindowViewModel : ViewModelBase
 
     public bool HasCurrentFilePath => !string.IsNullOrWhiteSpace(CurrentFilePath);
 
-    public string? LastExportDirectory
+    public string? LastSaveFolderDirectory
     {
-        get => _lastExportDirectory;
-        set => SetField(ref _lastExportDirectory, value);
+        get => _lastSaveFolderDirectory;
+        set => SetField(ref _lastSaveFolderDirectory, value);
     }
 
-    public string? LastImportDirectory
+    public string? LastOpenFolderDirectory
     {
-        get => _lastImportDirectory;
-        set => SetField(ref _lastImportDirectory, value);
+        get => _lastOpenFolderDirectory;
+        set => SetField(ref _lastOpenFolderDirectory, value);
     }
 
     public string CurrentFileTitle => string.IsNullOrWhiteSpace(CurrentFilePath)
@@ -71,22 +71,22 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public MainWindowViewModel()
-        : this(new AvaloniaFileDialogService(), autoReopenLastRundown: true)
+        : this(new AvaloniaFileDialogService(), autoOpenLastFolder: true)
     {
     }
 
-    public MainWindowViewModel(bool autoReopenLastRundown)
-        : this(new AvaloniaFileDialogService(), autoReopenLastRundown)
+    public MainWindowViewModel(bool autoOpenLastFolder)
+        : this(new AvaloniaFileDialogService(), autoOpenLastFolder)
     {
     }
 
-    public MainWindowViewModel(IFileDialogService? fileDialogService, bool autoReopenLastRundown = true)
+    public MainWindowViewModel(IFileDialogService? fileDialogService, bool autoOpenLastFolder = true)
     {
         _fileDialogService = fileDialogService ?? new AvaloniaFileDialogService();
 
         try
         {
-            DatablockManager.Instance.LoadAll(LightSettingsService.GetDatablocksDirectory());
+            DatablockManager.Instance.LoadAll(DatablockManager.Instance.GetVanillaDatablocksDirectory());
         }
         catch (Exception ex)
         {
@@ -110,34 +110,83 @@ public class MainWindowViewModel : ViewModelBase
         Rundown = new RundownViewModel(Services.RundownService.CreateFreshBlock(1, "New Rundown"), LevelLayout.Levels);
 
         RefreshRecentFiles();
-
-        if (autoReopenLastRundown)
+        LastOpenFolderDirectory = LoadLastOpenFolder();
+        LastSaveFolderDirectory = LastOpenFolderDirectory;
+        if (autoOpenLastFolder && !string.IsNullOrWhiteSpace(LastOpenFolderDirectory))
         {
-            TryReopenLastRundown();
+            TryOpenLastFolder();
         }
     }
 
-    public bool TryReopenLastRundown()
+    public bool TryOpenLastFolder()
     {
-        var recentFiles = RundownProjectService.LoadRecentFiles();
-        var lastFile = recentFiles.FirstOrDefault(f => !f.IsPlaceholder && !string.IsNullOrWhiteSpace(f.FilePath) && File.Exists(f.FilePath));
-        if (lastFile == null)
+        if (string.IsNullOrWhiteSpace(LastOpenFolderDirectory) || !Directory.Exists(LastOpenFolderDirectory))
         {
             return false;
         }
 
         try
         {
-            var project = RundownProjectService.LoadProject(lastFile.FilePath);
-            RundownProjectService.ApplyProject(this, project, lastFile.FilePath);
-            RefreshRecentFiles();
-            StatusMessage = $"Reopened: {Path.GetFileName(lastFile.FilePath)}";
+            DatablockManager.Instance.ImportAll(LastOpenFolderDirectory);
+            RefreshSelectionsAfterImport();
+            StatusMessage = $"Opened folder: {Path.GetFileName(LastOpenFolderDirectory.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}";
             return true;
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Failed to reopen last rundown: {ex.Message}";
+            StatusMessage = $"Failed to open last folder: {ex.Message}";
             return false;
+        }
+    }
+
+    private static string LastOpenFolderConfigPath
+    {
+        get
+        {
+            string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            if (string.IsNullOrWhiteSpace(appData))
+            {
+                appData = AppDomain.CurrentDomain.BaseDirectory;
+            }
+
+            return Path.Combine(appData, "GTFO_GUIEditor", "last-open-folder.txt");
+        }
+    }
+
+    private static string? LoadLastOpenFolder()
+    {
+        try
+        {
+            string configPath = LastOpenFolderConfigPath;
+            if (!File.Exists(configPath))
+            {
+                return null;
+            }
+
+            string folder = File.ReadAllText(configPath).Trim();
+            return Directory.Exists(folder) ? folder : null;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private static void SaveLastOpenFolder(string folderPath)
+    {
+        try
+        {
+            string configPath = LastOpenFolderConfigPath;
+            string? directory = Path.GetDirectoryName(configPath);
+            if (!string.IsNullOrWhiteSpace(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            File.WriteAllText(configPath, folderPath);
+        }
+        catch
+        {
+            // Ignore failures to persist the last opened folder.
         }
     }
 
@@ -160,7 +209,7 @@ public class MainWindowViewModel : ViewModelBase
     public void NewRundown()
     {
         CurrentFilePath = null;
-        LastExportDirectory = null;
+        LastSaveFolderDirectory = null;
 
         Alarms.Alarms.Clear();
         Alarms.SelectedAlarm = null;
@@ -185,28 +234,7 @@ public class MainWindowViewModel : ViewModelBase
         StatusMessage = "Created new rundown.";
     }
 
-    public async Task SaveRundownAsync()
-    {
-        if (string.IsNullOrWhiteSpace(CurrentFilePath))
-        {
-            await SaveAsRundownAsync();
-            return;
-        }
-
-        try
-        {
-            RundownProjectService.SaveProject(this, CurrentFilePath);
-            RundownProjectService.AddRecentFile(CurrentFilePath);
-            RefreshRecentFiles();
-            StatusMessage = $"Saved: {Path.GetFileName(CurrentFilePath)}";
-        }
-        catch (Exception ex)
-        {
-            StatusMessage = $"Error saving: {ex.Message}";
-        }
-    }
-
-    public async Task SaveAsRundownAsync()
+    public async Task ExportRundownAsync()
     {
         string defaultName = !string.IsNullOrWhiteSpace(Rundown.SelectedRundown?.Name)
             ? $"{Rundown.SelectedRundown.Name}.rundown"
@@ -236,7 +264,7 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    public async Task OpenRundownAsync()
+    public async Task ImportRundownAsync()
     {
         string? selectedPath = await _fileDialogService.ShowOpenFileDialogAsync(
             defaultDirectory: _fileDialogService.DefaultRundownsDirectory,
@@ -273,6 +301,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             var project = RundownProjectService.LoadProject(filePath);
             RundownProjectService.ApplyProject(this, project, filePath);
+            RundownProjectService.AddRecentFile(filePath);
             RefreshRecentFiles();
             StatusMessage = $"Loaded: {Path.GetFileName(filePath)}";
         }
@@ -283,36 +312,36 @@ public class MainWindowViewModel : ViewModelBase
         return Task.CompletedTask;
     }
 
-    public async Task QuickExportDatablocksAsync()
+    public async Task SaveFolderAsync()
     {
-        if (string.IsNullOrWhiteSpace(LastExportDirectory))
+        if (string.IsNullOrWhiteSpace(LastSaveFolderDirectory) || !Directory.Exists(LastSaveFolderDirectory))
         {
-            await ExportDatablocksToAsync();
+            await SaveFolderToAsync();
             return;
         }
 
         try
         {
-            var result = DatablockExportService.ExportAll(this, LastExportDirectory);
+            var result = DatablockExportService.SaveAll(this, LastSaveFolderDirectory);
             if (result.Success)
             {
-                StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(LastExportDirectory)}";
+                StatusMessage = $"Saved folder: {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(LastSaveFolderDirectory)}";
             }
             else
             {
-                StatusMessage = $"Export error: {result.Message}";
+                StatusMessage = $"Save folder error: {result.Message}";
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Export error: {ex.Message}";
+            StatusMessage = $"Save folder error: {ex.Message}";
         }
     }
 
-    public async Task ExportDatablocksToAsync()
+    public async Task SaveFolderToAsync()
     {
-        string initialDir = !string.IsNullOrWhiteSpace(LastExportDirectory) && Directory.Exists(LastExportDirectory)
-            ? LastExportDirectory
+        string initialDir = !string.IsNullOrWhiteSpace(LastSaveFolderDirectory) && Directory.Exists(LastSaveFolderDirectory)
+            ? LastSaveFolderDirectory
             : _fileDialogService.DefaultRundownsDirectory;
 
         string? selectedFolder = await _fileDialogService.ShowOpenFolderDialogAsync(
@@ -326,28 +355,28 @@ public class MainWindowViewModel : ViewModelBase
 
         try
         {
-            LastExportDirectory = selectedFolder;
-            var result = DatablockExportService.ExportAll(this, selectedFolder);
+            LastSaveFolderDirectory = selectedFolder;
+            var result = DatablockExportService.SaveAll(this, selectedFolder);
             if (result.Success)
             {
                 StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(selectedFolder)}";
             }
             else
             {
-                StatusMessage = $"Export error: {result.Message}";
+                StatusMessage = $"Save folder error: {result.Message}";
             }
         }
         catch (Exception ex)
         {
-            StatusMessage = $"Export error: {ex.Message}";
+            StatusMessage = $"Save folder error: {ex.Message}";
         }
     }
 
-    public async Task ImportDatablocksFromAsync()
+    public async Task OpenFolderAsync()
     {
-            string initialDir = !string.IsNullOrWhiteSpace(LastImportDirectory) && Directory.Exists(LastImportDirectory)
-                ? LastImportDirectory
-                : LightSettingsService.GetDatablocksDirectory();
+            string initialDir = !string.IsNullOrWhiteSpace(LastOpenFolderDirectory) && Directory.Exists(LastOpenFolderDirectory)
+                ? LastOpenFolderDirectory
+                : DatablockManager.Instance.GetVanillaDatablocksDirectory();
 
             string? selectedFolder = await _fileDialogService.ShowOpenFolderDialogAsync(
                 defaultDirectory: initialDir,
@@ -360,14 +389,16 @@ public class MainWindowViewModel : ViewModelBase
 
             try
             {
-                LastImportDirectory = selectedFolder;
+                LastOpenFolderDirectory = selectedFolder;
+                LastSaveFolderDirectory = selectedFolder;
+                SaveLastOpenFolder(selectedFolder);
                 DatablockManager.Instance.ImportAll(selectedFolder);
                 RefreshSelectionsAfterImport();
-                StatusMessage = $"Imported datablocks from: {Path.GetFileName(selectedFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}";
+                StatusMessage = $"Opened folder: {Path.GetFileName(selectedFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}";
             }
             catch (Exception ex)
             {
-                StatusMessage = $"Import error: {ex.Message}";
+                StatusMessage = $"Open folder error: {ex.Message}";
             }
     }
 
@@ -380,12 +411,10 @@ public class MainWindowViewModel : ViewModelBase
             LevelLayout.SelectedLevel = LevelLayout.Levels.FirstOrDefault();
     }
 
-    public void SaveRundown() => _ = SaveRundownAsync();
-    public void SaveAsRundown() => _ = SaveAsRundownAsync();
-    public void OpenRundown() => _ = OpenRundownAsync();
     public void OpenRecentFile(string? filePath) => _ = OpenRecentFileAsync(filePath);
-    public void QuickExportDatablocks() => _ = QuickExportDatablocksAsync();
-    public void ExportDatablocksTo() => _ = ExportDatablocksToAsync();
-    public void ExportDatablocks() => _ = QuickExportDatablocksAsync();
-    public void ImportDatablocksFrom() => _ = ImportDatablocksFromAsync();
+    public void OpenFolder() => _ = OpenFolderAsync();
+    public void SaveFolder() => _ = SaveFolderAsync();
+    public void SaveFolderTo() => _ = SaveFolderToAsync();
+    public void ImportRundown() => _ = ImportRundownAsync();
+    public void ExportRundown() => _ = ExportRundownAsync();
 }

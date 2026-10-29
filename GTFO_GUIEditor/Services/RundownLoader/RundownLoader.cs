@@ -69,7 +69,7 @@ public class RundownLoader : IRundownLoader
             FileVersion = 1,
             CreatedAt = DateTime.UtcNow,
             ModifiedAt = DateTime.UtcNow,
-            LastExportDirectory = vm.LastExportDirectory,
+            LastSaveFolderDirectory = vm.LastSaveFolderDirectory,
             Rundown = vm.Rundown.SelectedRundown?.Clone() ?? new RundownBlock(),
             Alarms = vm.Alarms.Alarms.Select(a => a.Clone()).ToList(),
             Lighting = vm.Lighting.Blocks.Select(b => b.Clone()).ToList(),
@@ -158,7 +158,7 @@ public class RundownLoader : IRundownLoader
         ArgumentNullException.ThrowIfNull(project);
 
         vm.CurrentFilePath = filePath;
-        vm.LastExportDirectory = project.LastExportDirectory;
+        vm.LastSaveFolderDirectory = project.LastSaveFolderDirectory;
 
         // Apply Rundown
         vm.Rundown.SelectedRundown = project.Rundown?.Clone() ?? Services.RundownService.CreateFreshBlock(1, "New Rundown");

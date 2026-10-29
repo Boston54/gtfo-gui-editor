@@ -202,54 +202,12 @@ public class ExportContext
 
     public static List<JsonObject> LoadVanillaBlocksArray(string fileName)
     {
-        var list = new List<JsonObject>();
-        string dir = AlarmService.GetDatablocksDirectory();
-        string fullPath = Path.Combine(dir, fileName);
-        if (!File.Exists(fullPath)) return list;
-
-        try
-        {
-            string json = File.ReadAllText(fullPath);
-            using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("Blocks", out var blocksElement) &&
-                blocksElement.ValueKind == JsonValueKind.Array)
-            {
-                foreach (var el in blocksElement.EnumerateArray())
-                {
-                    var node = JsonNode.Parse(el.GetRawText())?.AsObject();
-                    if (node != null) list.Add(node);
-                }
-            }
-        }
-        catch
-        {
-        }
-
-        return list;
+        return DatablockManager.Instance.GetRawBlocks(fileName);
     }
 
     public static JsonArray? LoadVanillaHeadersArray(string fileName)
     {
-        string dir = AlarmService.GetDatablocksDirectory();
-        string fullPath = Path.Combine(dir, fileName);
-        if (!File.Exists(fullPath)) return null;
-
-        try
-        {
-            string json = File.ReadAllText(fullPath);
-            using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("Headers", out var headersEl) &&
-                headersEl.ValueKind == JsonValueKind.Array)
-            {
-                var node = JsonNode.Parse(headersEl.GetRawText())?.AsArray();
-                return node;
-            }
-        }
-        catch
-        {
-        }
-
-        return null;
+        return DatablockManager.Instance.GetRawHeaders(fileName);
     }
 
     public static void RegisterExistingIds(IEnumerable<JsonObject> blocks, PersistentIdAllocator allocator)

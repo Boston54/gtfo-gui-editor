@@ -142,7 +142,7 @@ public class ComplexResourceSetDataBlockExporter : IDatablockExporter
                 complexType == ComplexType.Tech ? "Lab" : "Floodways";
         }
 
-        var templateObj = ComplexResourceSetService.LoadTemplateJsonObject(complexType);
+        var templateObj = DatablockManager.Instance.GetComplexResourceTemplate(complexType);
         JsonObject resultObj;
         if (templateObj != null)
         {

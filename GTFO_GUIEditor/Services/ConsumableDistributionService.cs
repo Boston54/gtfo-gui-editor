@@ -19,61 +19,6 @@ public static class ConsumableDistributionService
         Converters = { new JsonStringEnumConverter() }
     };
 
-    public static string GetDatablocksDirectory()
-    {
-        return LightSettingsService.GetDatablocksDirectory();
-    }
-
-    public static string? FindDataBlockFile()
-    {
-        string dir = GetDatablocksDirectory();
-        string directPath = Path.Combine(dir, "ConsumableDistributionDataBlock.json");
-        if (File.Exists(directPath))
-        {
-            return directPath;
-        }
-
-        string directPath2 = Path.Combine(dir, "ConsumableDistributionDatablock.json");
-        if (File.Exists(directPath2))
-        {
-            return directPath2;
-        }
-
-        string altPath = Path.Combine(dir, "GameData_ConsumableDistributionDataBlock_bin.json");
-        if (File.Exists(altPath))
-        {
-            return altPath;
-        }
-
-        return null;
-    }
-
-    public static ConsumableDistributionDataBlockFile LoadDataBlockFile(string? filePath = null)
-    {
-        filePath ??= FindDataBlockFile();
-
-        if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
-        {
-            return new ConsumableDistributionDataBlockFile();
-        }
-
-        try
-        {
-            string json = File.ReadAllText(filePath);
-            return JsonSerializer.Deserialize<ConsumableDistributionDataBlockFile>(json, JsonOptions) ?? new ConsumableDistributionDataBlockFile();
-        }
-        catch
-        {
-            return new ConsumableDistributionDataBlockFile();
-        }
-    }
-
-    public static List<ConsumableDistributionBlock> LoadVanillaBlocks(string? filePath = null)
-    {
-        var file = LoadDataBlockFile(filePath);
-        return file.Blocks;
-    }
-
     public static ConsumableDistributionBlock CreateFreshBlock(uint id, string name)
     {
         return new ConsumableDistributionBlock

@@ -15,6 +15,10 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         {
             return;
         }
+        if (file.Blocks.Count == 0)
+        {
+            return;
+        }
 
         var target = DatablockManager.Instance.Get<LevelLayoutBlock>();
         target.Clear();

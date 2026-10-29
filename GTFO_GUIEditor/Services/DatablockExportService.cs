@@ -22,6 +22,11 @@ public static class DatablockExportService
         return DatablockManager.Instance.ExportDatablocksAsync(mainVm, exportRootPath);
     }
 
+    public static ExportResult SaveAll(MainWindowViewModel mainVm, string folderPath)
+    {
+        return ExportAll(mainVm, folderPath);
+    }
+
     public static string NormalizeZoneString(string? zone)
     {
         return DoorGraphAnalyzer.NormalizeZoneString(zone);

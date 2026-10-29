@@ -294,11 +294,7 @@ public class LevelLayoutViewModel : ViewModelBase
             _availableSounds = new ObservableCollection<SoundEntry>();
         }
 
-        var loadedLevels = initialLevels?.ToList() ?? LevelLayoutService.GetInitialLevels();
-        if (loadedLevels.Count == 0)
-        {
-            loadedLevels = LevelLayoutService.GetInitialLevels();
-        }
+        var loadedLevels = initialLevels?.ToList() ?? Levels.ToList();
         Levels.Clear();
         foreach (var level in loadedLevels)
         {

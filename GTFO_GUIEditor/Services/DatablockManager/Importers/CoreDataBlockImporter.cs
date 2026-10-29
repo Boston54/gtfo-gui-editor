@@ -39,8 +39,14 @@ public class CoreDataBlockImporter : IDatablockImporter
         var path = context.FindFile(name, alternate);
         if (context.TryDeserializeFile<TFile>(path, out var file) && file != null)
         {
+            var blocks = getBlocks(file);
+            if (blocks.Count == 0)
+            {
+                return;
+            }
+
             target.Clear();
-            foreach (var block in getBlocks(file))
+            foreach (var block in blocks)
             {
                 target.Add(block);
             }
@@ -56,8 +62,14 @@ public class CoreDataBlockImporter : IDatablockImporter
         var path = context.FindFile(name, alternate1, alternate2);
         if (context.TryDeserializeFile<TFile>(path, out var file) && file != null)
         {
+            var blocks = getBlocks(file);
+            if (blocks.Count == 0)
+            {
+                return;
+            }
+
             target.Clear();
-            foreach (var block in getBlocks(file))
+            foreach (var block in blocks)
             {
                 target.Add(block);
             }

@@ -11,10 +11,10 @@
         Title="GTFO Level Editor"
         Icon="/Assets/icon.png">
     <Window.KeyBindings>
-        <KeyBinding Gesture="Ctrl+N" Command="{Binding NewRundown}"/>
-        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveRundown}"/>
-        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenRundown}"/>
-        <KeyBinding Gesture="Ctrl+E" Command="{Binding QuickExportDatablocks}"/>
+        <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveFolder}"/>
+        <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenFolder}"/>
+        <KeyBinding Gesture="Ctrl+I" Command="{Binding ImportRundown}"/>
+        <KeyBinding Gesture="Ctrl+E" Command="{Binding ExportRundown}"/>
     </Window.KeyBindings>
     <Grid RowDefinitions="Auto,*">
         <!-- Top Taskbar / Menu Bar -->
@@ -22,40 +22,15 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <Menu Grid.Column="0" Background="Transparent" Foreground="#E0E0E0">
                     <MenuItem Header="File" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
-                        <MenuItem Header="New"
-                                  Command="{Binding NewRundown}"
-                                  InputGesture="Ctrl+N"/>
-                        <Separator Background="#333333"/>
+                        <MenuItem Header="Open Folder"
+                                  Command="{Binding OpenFolder}"/>
                         <MenuItem Header="Save"
-                                  Command="{Binding SaveRundown}"
-                                  InputGesture="Ctrl+S"/>
-                        <MenuItem Header="Save As..."
-                                  Command="{Binding SaveAsRundown}"/>
-                        <Separator Background="#333333"/>
-                        <MenuItem Header="Open..."
-                                  Command="{Binding OpenRundown}"
-                                  InputGesture="Ctrl+O"/>
-                        <MenuItem Header="Open Recent"
-                                  ItemsSource="{Binding RecentFiles}">
-                            <MenuItem.ItemTemplate>
-                                <DataTemplate x:DataType="models:RecentFileItem">
-                                    <MenuItem Header="{Binding DisplayName}"
-                                              ToolTip.Tip="{Binding FilePath}"
-                                              IsEnabled="{Binding !IsPlaceholder}"
-                                              Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).OpenRecentFile}"
-                                              CommandParameter="{Binding FilePath}"/>
-                                </DataTemplate>
-                            </MenuItem.ItemTemplate>
-                        </MenuItem>
-                    </MenuItem>
-                    <MenuItem Header="Import / Export" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
-                        <MenuItem Header="Import From..."
-                                  Command="{Binding ImportDatablocksFrom}"/>
-                        <MenuItem Header="Quick Export"
-                                  Command="{Binding QuickExportDatablocks}"
-                                  InputGesture="Ctrl+E"/>
-                        <MenuItem Header="Export To..."
-                                  Command="{Binding ExportDatablocksTo}"/>
+                                  Command="{Binding SaveFolder}"/>
+                        <Separator/>
+                        <MenuItem Header="Import..."
+                                  Command="{Binding ImportRundown}"/>
+                        <MenuItem Header="Export..."
+                                  Command="{Binding ExportRundown}"/>
                     </MenuItem>
                 </Menu>
 

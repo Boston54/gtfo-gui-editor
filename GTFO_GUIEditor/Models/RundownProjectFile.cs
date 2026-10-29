@@ -12,7 +12,7 @@ public class RundownProjectFile
 
     [JsonPropertyName("modifiedAt")] public DateTime ModifiedAt { get; set; } = DateTime.UtcNow;
 
-    [JsonPropertyName("lastExportDirectory")] public string? LastExportDirectory { get; set; }
+    [JsonPropertyName("lastSaveFolderDirectory")] public string? LastSaveFolderDirectory { get; set; }
 
     [JsonPropertyName("rundown")] public RundownBlock Rundown { get; set; } = new();
 
