@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.ViewModels;
@@ -11,6 +12,26 @@ namespace GTFO_GUIEditor.Services;
 /// </summary>
 public interface IDatablockManager
 {
+    /// <summary>
+    /// Loads all supported datablocks from a datablocks folder.
+    /// </summary>
+    void LoadAll(string folderPath);
+
+    /// <summary>
+    /// Imports all supported datablock JSON files through the registered importer pipeline.
+    /// </summary>
+    void ImportAll(string folderPath);
+
+    /// <summary>
+    /// Imports all supported datablock JSON files asynchronously.
+    /// </summary>
+    Task ImportAllAsync(string folderPath);
+
+    /// <summary>
+    /// Gets the master collection for a datablock model type.
+    /// </summary>
+    ObservableCollection<T> Get<T>() where T : class;
+
     /// <summary>
     /// Exports all datablocks and configuration files to the specified output directory synchronously.
     /// </summary>

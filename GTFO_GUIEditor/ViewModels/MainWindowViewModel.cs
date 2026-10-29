@@ -13,6 +13,7 @@ public class MainWindowViewModel : ViewModelBase
     private readonly IFileDialogService _fileDialogService;
     private string? _currentFilePath;
     private string? _lastExportDirectory;
+    private string? _lastImportDirectory;
     private string _statusMessage = string.Empty;
     private ObservableCollection<RecentFileItem> _recentFiles = new();
 
@@ -53,6 +54,12 @@ public class MainWindowViewModel : ViewModelBase
         set => SetField(ref _lastExportDirectory, value);
     }
 
+    public string? LastImportDirectory
+    {
+        get => _lastImportDirectory;
+        set => SetField(ref _lastImportDirectory, value);
+    }
+
     public string CurrentFileTitle => string.IsNullOrWhiteSpace(CurrentFilePath)
         ? "Untitled Rundown"
         : Path.GetFileName(CurrentFilePath);
@@ -77,6 +84,15 @@ public class MainWindowViewModel : ViewModelBase
     {
         _fileDialogService = fileDialogService ?? new AvaloniaFileDialogService();
 
+        try
+        {
+            DatablockManager.Instance.LoadAll(LightSettingsService.GetDatablocksDirectory());
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Failed to load datablocks: {ex.Message}";
+        }
+
         Documentation = new DocumentationViewModel();
         Sounds = new SoundsViewModel();
         Geomorphs = new GeomorphsViewModel();
@@ -84,7 +100,13 @@ public class MainWindowViewModel : ViewModelBase
         Consumables = new ConsumablesViewModel();
         Lighting = new LightingViewModel();
         FogSettings = new FogSettingsViewModel();
-        LevelLayout = new LevelLayoutViewModel(null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks, Consumables.Blocks);
+        LevelLayout = new LevelLayoutViewModel(
+            null,
+            DatablockManager.Instance.Get<LevelLayoutBlock>(),
+            Lighting.Blocks,
+            Alarms.Alarms,
+            FogSettings.Blocks,
+            Consumables.Blocks);
         Rundown = new RundownViewModel(Services.RundownService.CreateFreshBlock(1, "New Rundown"), LevelLayout.Levels);
 
         RefreshRecentFiles();
@@ -321,6 +343,43 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    public async Task ImportDatablocksFromAsync()
+    {
+            string initialDir = !string.IsNullOrWhiteSpace(LastImportDirectory) && Directory.Exists(LastImportDirectory)
+                ? LastImportDirectory
+                : LightSettingsService.GetDatablocksDirectory();
+
+            string? selectedFolder = await _fileDialogService.ShowOpenFolderDialogAsync(
+                defaultDirectory: initialDir,
+                title: "Select Datablock Import Folder");
+
+            if (string.IsNullOrWhiteSpace(selectedFolder))
+            {
+                return;
+            }
+
+            try
+            {
+                LastImportDirectory = selectedFolder;
+                DatablockManager.Instance.ImportAll(selectedFolder);
+                RefreshSelectionsAfterImport();
+                StatusMessage = $"Imported datablocks from: {Path.GetFileName(selectedFolder.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar))}";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Import error: {ex.Message}";
+            }
+    }
+
+    private void RefreshSelectionsAfterImport()
+    {
+            Alarms.SelectedAlarm = Alarms.Alarms.FirstOrDefault();
+            Consumables.SelectedBlock = Consumables.Blocks.FirstOrDefault();
+            Lighting.SelectedBlock = Lighting.Blocks.FirstOrDefault();
+            FogSettings.SelectedBlock = FogSettings.Blocks.FirstOrDefault();
+            LevelLayout.SelectedLevel = LevelLayout.Levels.FirstOrDefault();
+    }
+
     public void SaveRundown() => _ = SaveRundownAsync();
     public void SaveAsRundown() => _ = SaveAsRundownAsync();
     public void OpenRundown() => _ = OpenRundownAsync();
@@ -328,4 +387,5 @@ public class MainWindowViewModel : ViewModelBase
     public void QuickExportDatablocks() => _ = QuickExportDatablocksAsync();
     public void ExportDatablocksTo() => _ = ExportDatablocksToAsync();
     public void ExportDatablocks() => _ = QuickExportDatablocksAsync();
+    public void ImportDatablocksFrom() => _ = ImportDatablocksFromAsync();
 }

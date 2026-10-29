@@ -19,7 +19,6 @@ public class RundownViewModel : ViewModelBase
     private ObservableCollection<RundownTierViewModel> _tiers = new();
 
     // Available Level Layouts for Expedition linking
-    private ObservableCollection<LevelLayoutBlock> _availableLevelLayouts = new();
 
     // Active editing tier modal
     private RundownTierViewModel? _activeEditingTier;
@@ -58,9 +57,18 @@ public class RundownViewModel : ViewModelBase
 
         if (levelLayouts != null)
         {
-            _availableLevelLayouts = levelLayouts;
-            _availableLevelLayouts.CollectionChanged += AvailableLevelLayouts_CollectionChanged;
-            foreach (var level in _availableLevelLayouts)
+            var availableLevels = AvailableLevelLayouts;
+            if (!ReferenceEquals(availableLevels, levelLayouts))
+            {
+                var snapshot = levelLayouts.ToList();
+                availableLevels.Clear();
+                foreach (var level in snapshot)
+                {
+                    availableLevels.Add(level);
+                }
+            }
+            availableLevels.CollectionChanged += AvailableLevelLayouts_CollectionChanged;
+            foreach (var level in availableLevels)
             {
                 level.PropertyChanged += Level_PropertyChanged;
             }
@@ -80,20 +88,31 @@ public class RundownViewModel : ViewModelBase
 
     public ObservableCollection<LevelLayoutBlock> AvailableLevelLayouts
     {
-        get => _availableLevelLayouts;
+        get => DatablockManager.Instance.Get<LevelLayoutBlock>();
         set
         {
-            if (_availableLevelLayouts != null)
+            if (value != null)
             {
-                _availableLevelLayouts.CollectionChanged -= AvailableLevelLayouts_CollectionChanged;
-                foreach (var level in _availableLevelLayouts)
+                var availableLevels = DatablockManager.Instance.Get<LevelLayoutBlock>();
+                availableLevels.CollectionChanged -= AvailableLevelLayouts_CollectionChanged;
+                foreach (var level in availableLevels)
                 {
                     level.PropertyChanged -= Level_PropertyChanged;
                 }
+
+                if (!ReferenceEquals(availableLevels, value))
+                {
+                    var snapshot = value.ToList();
+                    availableLevels.Clear();
+                    foreach (var level in snapshot)
+                    {
+                        availableLevels.Add(level);
+                    }
+                }
             }
-            _availableLevelLayouts = value ?? new ObservableCollection<LevelLayoutBlock>();
-            _availableLevelLayouts.CollectionChanged += AvailableLevelLayouts_CollectionChanged;
-            foreach (var level in _availableLevelLayouts)
+            var levels = DatablockManager.Instance.Get<LevelLayoutBlock>();
+            levels.CollectionChanged += AvailableLevelLayouts_CollectionChanged;
+            foreach (var level in levels)
             {
                 level.PropertyChanged += Level_PropertyChanged;
             }
@@ -135,7 +154,7 @@ public class RundownViewModel : ViewModelBase
     public void SyncExpeditionSectorsWithLevel(ExpeditionBlock? expedition)
     {
         if (expedition == null) return;
-        var level = _availableLevelLayouts.FirstOrDefault(l => l.PersistentId == expedition.LevelLayoutData);
+        var level = AvailableLevelLayouts.FirstOrDefault(l => l.PersistentId == expedition.LevelLayoutData);
         if (level != null)
         {
             expedition.SecondaryLayerEnabled = level.HasSecondaryDoor;
@@ -273,7 +292,7 @@ public class RundownViewModel : ViewModelBase
 
     public LevelLayoutBlock? SelectedEditingExpeditionLevel
     {
-        get => _availableLevelLayouts.FirstOrDefault(l => l.PersistentId == ActiveEditingExpedition?.LevelLayoutData);
+        get => AvailableLevelLayouts.FirstOrDefault(l => l.PersistentId == ActiveEditingExpedition?.LevelLayoutData);
         set
         {
             if (ActiveEditingExpedition != null && value != null)

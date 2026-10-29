@@ -12,7 +12,6 @@ namespace GTFO_GUIEditor.ViewModels;
 public class ConsumablesViewModel : ViewModelBase
 {
     private readonly List<ConsumableDistributionBlock> _vanillaTemplates;
-    private ObservableCollection<ConsumableDistributionBlock> _blocks;
     private ConsumableDistributionBlock? _selectedBlock;
     private string _statusText = string.Empty;
 
@@ -36,23 +35,27 @@ public class ConsumablesViewModel : ViewModelBase
 
     public ObservableCollection<ConsumableDistributionBlock> Blocks
     {
-        get => _blocks;
-        private set => SetField(ref _blocks, value);
+        get => DatablockManager.Instance.Get<ConsumableDistributionBlock>();
     }
 
     public ObservableCollection<ConsumableDistributionBlock> AvailableTemplates { get; }
 
     public ConsumablesViewModel()
-        : this(new List<ConsumableDistributionBlock>())
+        : this(DatablockManager.Instance.Get<ConsumableDistributionBlock>())
     {
     }
 
     public ConsumablesViewModel(IEnumerable<ConsumableDistributionBlock> initialBlocks)
     {
         var blockList = initialBlocks.ToList();
-        _vanillaTemplates = ConsumableDistributionService.LoadVanillaBlocks();
-        _blocks = new ObservableCollection<ConsumableDistributionBlock>(blockList);
-        _blocks.CollectionChanged += (s, e) =>
+        _vanillaTemplates = blockList.Select(b => b.Clone()).ToList();
+        var blocks = Blocks;
+        blocks.Clear();
+        foreach (var block in blockList)
+        {
+            blocks.Add(block);
+        }
+        blocks.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
@@ -63,9 +66,9 @@ public class ConsumablesViewModel : ViewModelBase
         AddSpawnDataItemCommand = new RelayCommand(AddSpawnDataItem);
         RemoveSpawnDataItemCommand = new RelayCommand<ConsumableDistributionItem>(RemoveSpawnDataItem);
 
-        if (_blocks.Count > 0)
+        if (blocks.Count > 0)
         {
-            SelectedBlock = _blocks[0];
+            SelectedBlock = blocks[0];
         }
 
         UpdateStatusText();
@@ -120,7 +123,7 @@ public class ConsumablesViewModel : ViewModelBase
         get
         {
             if (SelectedBlock == null) return false;
-            return _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId) > 1;
+            return Blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId) > 1;
         }
     }
 
@@ -129,7 +132,7 @@ public class ConsumablesViewModel : ViewModelBase
         get
         {
             if (SelectedBlock == null) return string.Empty;
-            int count = _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
+            int count = Blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
             if (count > 1)
             {
                 return $"Warning: Persistent ID {SelectedBlock.PersistentId} is shared by {count} consumable distributions. Each distribution should have a unique ID.";
@@ -142,11 +145,11 @@ public class ConsumablesViewModel : ViewModelBase
     {
         if (SelectedBlock != null)
         {
-            StatusText = $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({_blocks.Count} distributions loaded)";
+            StatusText = $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({Blocks.Count} distributions loaded)";
         }
         else
         {
-            StatusText = $"No consumable distribution selected ({_blocks.Count} distributions loaded)";
+            StatusText = $"No consumable distribution selected ({Blocks.Count} distributions loaded)";
         }
     }
 
@@ -230,7 +233,7 @@ public class ConsumablesViewModel : ViewModelBase
 
     public uint GenerateRandomPersistentId()
     {
-        var existingIds = new HashSet<uint>(_blocks.Select(b => b.PersistentId));
+        var existingIds = new HashSet<uint>(Blocks.Select(b => b.PersistentId));
         uint id;
         do
         {
@@ -264,7 +267,7 @@ public class ConsumablesViewModel : ViewModelBase
             return false;
         }
 
-        if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
+        if (Blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
             CreationErrorMessage = $"A distribution with Persistent ID {NewBlockPersistentId} already exists.";
             return false;
@@ -280,7 +283,7 @@ public class ConsumablesViewModel : ViewModelBase
             newBlock = ConsumableDistributionService.CreateFreshBlock(NewBlockPersistentId, NewBlockName.Trim());
         }
 
-        _blocks.Add(newBlock);
+        Blocks.Add(newBlock);
         SelectedBlock = newBlock;
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
@@ -329,15 +332,15 @@ public class ConsumablesViewModel : ViewModelBase
         if (BlockToDelete == null) return;
 
         var blockToRemove = BlockToDelete;
-        int index = _blocks.IndexOf(blockToRemove);
-        _blocks.Remove(blockToRemove);
+        int index = Blocks.IndexOf(blockToRemove);
+        Blocks.Remove(blockToRemove);
 
         if (SelectedBlock == blockToRemove)
         {
-            if (_blocks.Count > 0)
+            if (Blocks.Count > 0)
             {
-                int newIndex = Math.Clamp(index, 0, _blocks.Count - 1);
-                SelectedBlock = _blocks[newIndex];
+                int newIndex = Math.Clamp(index, 0, Blocks.Count - 1);
+                SelectedBlock = Blocks[newIndex];
             }
             else
             {

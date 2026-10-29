@@ -11,7 +11,6 @@ namespace GTFO_GUIEditor.ViewModels;
 public class FogSettingsViewModel : ViewModelBase
 {
     private readonly List<FogSettingsBlock> _vanillaTemplates;
-    private ObservableCollection<FogSettingsBlock> _blocks;
     private FogSettingsBlock? _selectedBlock;
     private string _statusText = string.Empty;
 
@@ -32,23 +31,28 @@ public class FogSettingsViewModel : ViewModelBase
 
     public ObservableCollection<FogSettingsBlock> Blocks
     {
-        get => _blocks;
-        private set => SetField(ref _blocks, value);
+        get => DatablockManager.Instance.Get<FogSettingsBlock>();
     }
 
     public ObservableCollection<FogSettingsBlock> AvailableTemplates { get; }
 
     public FogSettingsViewModel()
-        : this(new List<FogSettingsBlock>())
+        : this(DatablockManager.Instance.Get<FogSettingsBlock>())
     {
     }
 
     public FogSettingsViewModel(IEnumerable<FogSettingsBlock> initialBlocks)
     {
         var blockList = initialBlocks.ToList();
-        _vanillaTemplates = FogSettingsService.LoadVanillaBlocks();
-        _blocks = new ObservableCollection<FogSettingsBlock>(blockList);
-        _blocks.CollectionChanged += (s, e) =>
+        _vanillaTemplates = blockList.Select(b => b.Clone()).ToList();
+        var blocks = Blocks;
+        blocks.Clear();
+        foreach (var block in blockList)
+        {
+            blocks.Add(block);
+        }
+        blocks.CollectionChanged += (s, e) =>
+
         {
             OnPropertyChanged(nameof(HasExistingBlocks));
             OnPropertyChanged(nameof(HasExistingConfigs));
@@ -58,9 +62,9 @@ public class FogSettingsViewModel : ViewModelBase
 
         AvailableTemplates = new ObservableCollection<FogSettingsBlock>(_vanillaTemplates);
 
-        if (_blocks.Count > 0)
+        if (blocks.Count > 0)
         {
-            SelectedBlock = _blocks[0];
+            SelectedBlock = blocks[0];
         }
 
         UpdateStatusText();
@@ -115,7 +119,7 @@ public class FogSettingsViewModel : ViewModelBase
         get
         {
             if (SelectedBlock == null) return false;
-            return _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId) > 1;
+            return Blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId) > 1;
         }
     }
 
@@ -124,7 +128,7 @@ public class FogSettingsViewModel : ViewModelBase
         get
         {
             if (SelectedBlock == null) return string.Empty;
-            int count = _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
+            int count = Blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
             if (count > 1)
             {
                 return
@@ -139,20 +143,19 @@ public class FogSettingsViewModel : ViewModelBase
     {
         if (SelectedBlock != null)
         {
-            StatusText =
-                $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({_blocks.Count} configs loaded)";
+            StatusText = $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({Blocks.Count} configs loaded)";
         }
         else
         {
-            StatusText = $"No fog config selected ({_blocks.Count} configs loaded)";
+            StatusText = $"No fog config selected ({Blocks.Count} configs loaded)";
         }
     }
 
     // Modal Create/Delete properties and methods
 
-    public bool HasExistingBlocks => _blocks.Count > 0;
+    public bool HasExistingBlocks => Blocks.Count > 0;
 
-    public bool HasExistingConfigs => _blocks.Count > 0;
+    public bool HasExistingConfigs => Blocks.Count > 0;
 
     public bool IsCreatingBlock
     {
@@ -318,7 +321,7 @@ public class FogSettingsViewModel : ViewModelBase
 
     public uint GenerateRandomPersistentId()
     {
-        var existingIds = new HashSet<uint>(_blocks.Select(b => b.PersistentId));
+        var existingIds = new HashSet<uint>(Blocks.Select(b => b.PersistentId));
         uint id;
         do
         {
@@ -340,7 +343,7 @@ public class FogSettingsViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCreatingFromVanilla));
         OnPropertyChanged(nameof(IsCreatingFromTemplate));
 
-        SelectedExistingBlock = _selectedBlock ?? _blocks.FirstOrDefault();
+        SelectedExistingBlock = _selectedBlock ?? Blocks.FirstOrDefault();
         SelectedVanillaTemplate = AvailableTemplates.FirstOrDefault();
         CreationErrorMessage = string.Empty;
         IsCreatingBlock = true;
@@ -348,7 +351,7 @@ public class FogSettingsViewModel : ViewModelBase
 
     public void OpenDuplicateBlockDialog(FogSettingsBlock? block = null)
     {
-        var target = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
+        var target = block ?? _selectedBlock ?? Blocks.FirstOrDefault();
         OpenCreateBlockDialog();
         if (target != null)
         {
@@ -371,7 +374,7 @@ public class FogSettingsViewModel : ViewModelBase
             return false;
         }
 
-        if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
+        if (Blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
             CreationErrorMessage = $"A config with Persistent ID {NewBlockPersistentId} already exists.";
             return false;
@@ -405,7 +408,7 @@ public class FogSettingsViewModel : ViewModelBase
             newBlock = FogSettingsService.CreateFreshBlock(NewBlockPersistentId, NewBlockName.Trim());
         }
 
-        _blocks.Add(newBlock);
+        Blocks.Add(newBlock);
         SelectedBlock = newBlock;
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
@@ -454,15 +457,15 @@ public class FogSettingsViewModel : ViewModelBase
         if (BlockToDelete == null) return;
 
         var blockToRemove = BlockToDelete;
-        int index = _blocks.IndexOf(blockToRemove);
-        _blocks.Remove(blockToRemove);
+        int index = Blocks.IndexOf(blockToRemove);
+        Blocks.Remove(blockToRemove);
 
         if (SelectedBlock == blockToRemove)
         {
-            if (_blocks.Count > 0)
+            if (Blocks.Count > 0)
             {
-                int newIndex = Math.Clamp(index, 0, _blocks.Count - 1);
-                SelectedBlock = _blocks[newIndex];
+                int newIndex = Math.Clamp(index, 0, Blocks.Count - 1);
+                SelectedBlock = Blocks[newIndex];
             }
             else
             {

@@ -11,7 +11,6 @@ namespace GTFO_GUIEditor.ViewModels;
 public class LightingViewModel : ViewModelBase
 {
     private readonly List<LightSettingsBlock> _vanillaTemplates;
-    private ObservableCollection<LightSettingsBlock> _blocks;
     private LightSettingsBlock? _selectedBlock;
     private string _statusText = string.Empty;
     private LightCategory _selectedCategory = LightCategory.General;
@@ -38,23 +37,27 @@ public class LightingViewModel : ViewModelBase
 
     public ObservableCollection<LightSettingsBlock> Blocks
     {
-        get => _blocks;
-        private set => SetField(ref _blocks, value);
+        get => DatablockManager.Instance.Get<LightSettingsBlock>();
     }
 
     public ObservableCollection<LightSettingsBlock> AvailableTemplates { get; }
 
     public LightingViewModel()
-        : this(new List<LightSettingsBlock>())
+        : this(DatablockManager.Instance.Get<LightSettingsBlock>())
     {
     }
 
     public LightingViewModel(IEnumerable<LightSettingsBlock> initialBlocks)
     {
         var blockList = initialBlocks.ToList();
-        _vanillaTemplates = LightSettingsService.LoadVanillaBlocks();
-        _blocks = new ObservableCollection<LightSettingsBlock>(blockList);
-        _blocks.CollectionChanged += (s, e) =>
+        _vanillaTemplates = blockList.Select(b => b.Clone()).ToList();
+        var blocks = Blocks;
+        blocks.Clear();
+        foreach (var block in blockList)
+        {
+            blocks.Add(block);
+        }
+        blocks.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(HasExistingBlocks));
             OnPropertyChanged(nameof(HasExistingConfigs));
@@ -64,9 +67,9 @@ public class LightingViewModel : ViewModelBase
 
         AvailableTemplates = new ObservableCollection<LightSettingsBlock>(_vanillaTemplates);
 
-        if (_blocks.Count > 0)
+        if (blocks.Count > 0)
         {
-            SelectedBlock = _blocks[0];
+            SelectedBlock = blocks[0];
         }
 
         UpdateStatusText();
@@ -205,7 +208,7 @@ public class LightingViewModel : ViewModelBase
         get
         {
             if (_selectedBlock == null) return false;
-            return _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId) > 1;
+            return Blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId) > 1;
         }
     }
 
@@ -214,9 +217,9 @@ public class LightingViewModel : ViewModelBase
         get
         {
             if (_selectedBlock == null || !HasDuplicatePersistentId) return string.Empty;
-            int count = _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
-            return
-                $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
+
+            int count = Blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
+            return $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
         }
     }
 
@@ -230,12 +233,11 @@ public class LightingViewModel : ViewModelBase
     {
         if (_selectedBlock != null)
         {
-            StatusText =
-                $"{_blocks.Count} configs loaded. Editing: [{_selectedBlock.PersistentId}] {_selectedBlock.Name}";
+            StatusText = $"{Blocks.Count} configs loaded. Editing: [{_selectedBlock.PersistentId}] {_selectedBlock.Name}";
         }
         else
         {
-            StatusText = $"{_blocks.Count} configs loaded.";
+            StatusText = $"{Blocks.Count} configs loaded.";
         }
     }
 
@@ -275,9 +277,9 @@ public class LightingViewModel : ViewModelBase
     }
 
     // Dialog / Prompt properties
-    public bool HasExistingBlocks => _blocks.Count > 0;
+    public bool HasExistingBlocks => Blocks.Count > 0;
 
-    public bool HasExistingConfigs => _blocks.Count > 0;
+    public bool HasExistingConfigs => Blocks.Count > 0;
 
     public bool IsCreatingBlock
     {
@@ -443,7 +445,7 @@ public class LightingViewModel : ViewModelBase
 
     public uint GenerateRandomPersistentId()
     {
-        var existingIds = new HashSet<uint>(_blocks.Select(b => b.PersistentId));
+        var existingIds = new HashSet<uint>(Blocks.Select(b => b.PersistentId));
         uint id;
         do
         {
@@ -465,7 +467,7 @@ public class LightingViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCreatingFromVanilla));
         OnPropertyChanged(nameof(IsCreatingFromTemplate));
 
-        SelectedExistingBlock = _selectedBlock ?? _blocks.FirstOrDefault();
+        SelectedExistingBlock = _selectedBlock ?? Blocks.FirstOrDefault();
         SelectedVanillaTemplate = AvailableTemplates.FirstOrDefault();
         CreationErrorMessage = string.Empty;
         IsCreatingBlock = true;
@@ -473,7 +475,7 @@ public class LightingViewModel : ViewModelBase
 
     public void OpenDuplicateBlockDialog(LightSettingsBlock? block = null)
     {
-        var target = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
+        var target = block ?? _selectedBlock ?? Blocks.FirstOrDefault();
         OpenCreateBlockDialog();
         if (target != null)
         {
@@ -496,7 +498,7 @@ public class LightingViewModel : ViewModelBase
             return false;
         }
 
-        if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
+        if (Blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
             CreationErrorMessage = $"A config with Persistent ID {NewBlockPersistentId} already exists.";
             return false;
@@ -530,7 +532,7 @@ public class LightingViewModel : ViewModelBase
             newBlock = LightSettingsService.CreateFreshBlock(NewBlockPersistentId, NewBlockName.Trim());
         }
 
-        _blocks.Add(newBlock);
+        Blocks.Add(newBlock);
         SelectedBlock = newBlock;
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
@@ -604,17 +606,17 @@ public class LightingViewModel : ViewModelBase
 
     public bool DeleteBlock(LightSettingsBlock block)
     {
-        int index = _blocks.IndexOf(block);
+        int index = Blocks.IndexOf(block);
         if (index < 0) return false;
 
-        _blocks.RemoveAt(index);
+        Blocks.RemoveAt(index);
 
         if (_selectedBlock == block)
         {
-            if (_blocks.Count > 0)
+            if (Blocks.Count > 0)
             {
-                int newIndex = Math.Min(index, _blocks.Count - 1);
-                SelectedBlock = _blocks[newIndex];
+                int newIndex = Math.Min(index, Blocks.Count - 1);
+                SelectedBlock = Blocks[newIndex];
             }
             else
             {

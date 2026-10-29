@@ -11,10 +11,8 @@ namespace GTFO_GUIEditor.ViewModels;
 public class ComplexResourceSetsViewModel : ViewModelBase
 {
     private readonly List<ComplexResourceSetBlock> _vanillaTemplates;
-    private ObservableCollection<ComplexResourceSetBlock> _blocks;
     private ComplexResourceSetBlock? _selectedBlock;
     private string _statusText = string.Empty;
-    private IEnumerable<LevelLayoutBlock>? _levels;
     private string _gridSizeWarningMessage = string.Empty;
 
     // Category / Prefabs management
@@ -52,7 +50,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
     public ObservableCollection<string> Categories { get; } = new(ComplexResourceSetBlock.CategoryNames);
 
     public ComplexResourceSetsViewModel()
-        : this(ComplexResourceSetService.LoadVanillaBlocks())
+        : this(DatablockManager.Instance.Get<ComplexResourceSetBlock>())
     {
     }
 
@@ -60,17 +58,22 @@ public class ComplexResourceSetsViewModel : ViewModelBase
     {
         var blockList = initialBlocks.ToList();
         _vanillaTemplates = blockList.Select(b => b.Clone()).ToList();
-        _blocks = new ObservableCollection<ComplexResourceSetBlock>(blockList);
-        _blocks.CollectionChanged += (s, e) =>
+        var blocks = Blocks;
+        blocks.Clear();
+        foreach (var block in blockList)
+        {
+            blocks.Add(block);
+        }
+        blocks.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
         };
         AvailableTemplates = new ObservableCollection<ComplexResourceSetBlock>(_vanillaTemplates);
 
-        if (_blocks.Count > 0)
+        if (blocks.Count > 0)
         {
-            SelectedBlock = _blocks[0];
+            SelectedBlock = blocks[0];
         }
 
         UpdateStatusText();
@@ -78,8 +81,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
 
     public ObservableCollection<ComplexResourceSetBlock> Blocks
     {
-        get => _blocks;
-        private set => SetField(ref _blocks, value);
+        get => DatablockManager.Instance.Get<ComplexResourceSetBlock>();
     }
 
     public ObservableCollection<ComplexResourceSetBlock> AvailableTemplates { get; }
@@ -145,10 +147,18 @@ public class ComplexResourceSetsViewModel : ViewModelBase
 
     public IEnumerable<LevelLayoutBlock>? Levels
     {
-        get => _levels;
+        get => DatablockManager.Instance.Get<LevelLayoutBlock>();
         set
         {
-            _levels = value;
+            if (value != null)
+            {
+                var levels = DatablockManager.Instance.Get<LevelLayoutBlock>();
+                levels.Clear();
+                foreach (var level in value)
+                {
+                    levels.Add(level);
+                }
+            }
             CheckGridSizeWarning();
         }
     }
@@ -192,7 +202,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         get
         {
             if (_selectedBlock == null) return false;
-            return _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId) > 1;
+            return Blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId) > 1;
         }
     }
 
@@ -201,7 +211,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         get
         {
             if (_selectedBlock == null || !HasDuplicatePersistentId) return string.Empty;
-            int count = _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
+            int count = Blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
             return $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
         }
     }
@@ -342,7 +352,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
 
     public uint GenerateRandomPersistentId()
     {
-        var existingIds = new HashSet<uint>(_blocks.Select(b => b.PersistentId));
+        var existingIds = new HashSet<uint>(Blocks.Select(b => b.PersistentId));
         uint id;
         do
         {
@@ -376,7 +386,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
             return false;
         }
 
-        if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
+        if (Blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
             CreationErrorMessage = $"A block with Persistent ID {NewBlockPersistentId} already exists.";
             return false;
@@ -392,7 +402,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
             newBlock = ComplexResourceSetService.CreateFreshBlock(NewBlockPersistentId, NewBlockName.Trim());
         }
 
-        _blocks.Add(newBlock);
+        Blocks.Add(newBlock);
         SelectedBlock = newBlock;
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
@@ -473,20 +483,20 @@ public class ComplexResourceSetsViewModel : ViewModelBase
     public bool DeleteBlock(ComplexResourceSetBlock? block)
     {
         if (block == null) return false;
-        int index = _blocks.IndexOf(block);
+        int index = Blocks.IndexOf(block);
         if (index < 0) return false;
 
         string deletedName = block.Name;
         uint deletedId = block.PersistentId;
 
-        _blocks.RemoveAt(index);
+        Blocks.RemoveAt(index);
 
         if (_selectedBlock == block)
         {
-            if (_blocks.Count > 0)
+            if (Blocks.Count > 0)
             {
-                int newIndex = Math.Min(index, _blocks.Count - 1);
-                SelectedBlock = _blocks[newIndex];
+                int newIndex = Math.Min(index, Blocks.Count - 1);
+                SelectedBlock = Blocks[newIndex];
             }
             else
             {
@@ -495,12 +505,12 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         }
 
         UpdateStatusText();
-        StatusText = $"Deleted block [{deletedId}] {deletedName}. {_blocks.Count:N0} blocks remaining.";
+        StatusText = $"Deleted block [{deletedId}] {deletedName}. {Blocks.Count:N0} blocks remaining.";
         return true;
     }
 
     private void UpdateStatusText()
     {
-        StatusText = $"{_blocks.Count:N0} blocks loaded";
+        StatusText = $"{Blocks.Count:N0} blocks loaded";
     }
 }

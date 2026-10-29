@@ -12,7 +12,20 @@ namespace GTFO_GUIEditor.ViewModels;
 
 public class LevelLayoutViewModel : ViewModelBase
 {
-    private ObservableCollection<LevelLayoutBlock> _levels;
+    private static void ReplaceCollection<T>(ObservableCollection<T> target, IEnumerable<T> source) where T : class
+    {
+        if (ReferenceEquals(target, source))
+        {
+            return;
+        }
+
+        var snapshot = source.ToList();
+        target.Clear();
+        foreach (var item in snapshot)
+        {
+            target.Add(item);
+        }
+    }
     private LevelLayoutBlock? _selectedLevel;
     private string _statusText = string.Empty;
 
@@ -115,10 +128,6 @@ public class LevelLayoutViewModel : ViewModelBase
     public ObservableCollection<ZoneOption> AvailableDoorTerminalZones => _availableDoorTerminalZones;
     public ObservableCollection<TerminalOption> AvailableDoorTerminals => _availableDoorTerminals;
 
-    private ObservableCollection<LightSettingsBlock> _availableLightingConfigs = new();
-    private ObservableCollection<AlarmBlock> _availableAlarms = new();
-    private ObservableCollection<FogSettingsBlock> _availableFogSettings = new();
-    private ObservableCollection<ConsumableDistributionBlock> _availableConsumableDistributions = new();
     private ObservableCollection<FogTransitionOption> _availableFogTransitionOptions = new();
     private ObservableCollection<SoundEntry> _availableSounds = new();
 
@@ -136,8 +145,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public ObservableCollection<LevelLayoutBlock> Levels
     {
-        get => _levels;
-        private set => SetField(ref _levels, value);
+        get => DatablockManager.Instance.Get<LevelLayoutBlock>();
     }
 
     public ObservableCollection<ComplexType> AvailableComplexTypes { get; } = new(new[] { ComplexType.Mining, ComplexType.Tech, ComplexType.Service });
@@ -168,46 +176,22 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public ObservableCollection<LightSettingsBlock> AvailableLightingConfigs
     {
-        get => _availableLightingConfigs;
-        private set => SetField(ref _availableLightingConfigs, value);
+        get => DatablockManager.Instance.Get<LightSettingsBlock>();
     }
 
     public ObservableCollection<AlarmBlock> AvailableAlarms
     {
-        get => _availableAlarms;
-        private set => SetField(ref _availableAlarms, value);
+        get => DatablockManager.Instance.Get<AlarmBlock>();
     }
 
     public ObservableCollection<FogSettingsBlock> AvailableFogSettings
     {
-        get => _availableFogSettings;
-        set
-        {
-            if (_availableFogSettings != null)
-            {
-                _availableFogSettings.CollectionChanged -= AvailableFogSettings_CollectionChanged;
-                foreach (var fog in _availableFogSettings)
-                {
-                    fog.PropertyChanged -= FogBlock_PropertyChanged;
-                }
-            }
-
-            _availableFogSettings = value ?? new ObservableCollection<FogSettingsBlock>();
-            _availableFogSettings.CollectionChanged += AvailableFogSettings_CollectionChanged;
-            foreach (var fog in _availableFogSettings)
-            {
-                fog.PropertyChanged += FogBlock_PropertyChanged;
-            }
-
-            OnPropertyChanged();
-            RefreshFogTransitionOptions();
-        }
+        get => DatablockManager.Instance.Get<FogSettingsBlock>();
     }
 
     public ObservableCollection<ConsumableDistributionBlock> AvailableConsumableDistributions
     {
-        get => _availableConsumableDistributions;
-        private set => SetField(ref _availableConsumableDistributions, value);
+        get => DatablockManager.Instance.Get<ConsumableDistributionBlock>();
     }
 
     public ObservableCollection<FogTransitionOption> AvailableFogTransitionOptions => _availableFogTransitionOptions;
@@ -269,49 +253,31 @@ public class LevelLayoutViewModel : ViewModelBase
     {
         Instance = this;
 
+        var manager = DatablockManager.Instance;
         if (lightingConfigs != null)
         {
-            _availableLightingConfigs = lightingConfigs;
+            ReplaceCollection(manager.Get<LightSettingsBlock>(), lightingConfigs);
         }
-        else
-        {
-            _availableLightingConfigs = new ObservableCollection<LightSettingsBlock>();
-        }
-
         if (alarms != null)
         {
-            _availableAlarms = alarms;
+            ReplaceCollection(manager.Get<AlarmBlock>(), alarms);
         }
-        else
-        {
-            _availableAlarms = new ObservableCollection<AlarmBlock>();
-        }
-
         if (fogSettings != null)
         {
-            _availableFogSettings = fogSettings;
+            ReplaceCollection(manager.Get<FogSettingsBlock>(), fogSettings);
         }
-        else
-        {
-            _availableFogSettings = new ObservableCollection<FogSettingsBlock>();
-        }
-
         if (consumableDistributions != null)
         {
-            _availableConsumableDistributions = consumableDistributions;
-        }
-        else
-        {
-            _availableConsumableDistributions = new ObservableCollection<ConsumableDistributionBlock>();
+            ReplaceCollection(manager.Get<ConsumableDistributionBlock>(), consumableDistributions);
         }
 
-        _availableConsumableDistributions.CollectionChanged += (s, e) =>
+        AvailableConsumableDistributions.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(SelectedZoneConsumableDistributionOption));
         };
 
-        _availableFogSettings.CollectionChanged += AvailableFogSettings_CollectionChanged;
-        foreach (var fog in _availableFogSettings)
+        AvailableFogSettings.CollectionChanged += AvailableFogSettings_CollectionChanged;
+        foreach (var fog in AvailableFogSettings)
         {
             fog.PropertyChanged += FogBlock_PropertyChanged;
         }
@@ -328,10 +294,17 @@ public class LevelLayoutViewModel : ViewModelBase
             _availableSounds = new ObservableCollection<SoundEntry>();
         }
 
-        var loadedLevels = initialLevels?.ToList() ??
-                           LevelLayoutService.GetInitialLevels();
-        _levels = new ObservableCollection<LevelLayoutBlock>(loadedLevels);
-        _levels.CollectionChanged += (s, e) =>
+        var loadedLevels = initialLevels?.ToList() ?? LevelLayoutService.GetInitialLevels();
+        if (loadedLevels.Count == 0)
+        {
+            loadedLevels = LevelLayoutService.GetInitialLevels();
+        }
+        Levels.Clear();
+        foreach (var level in loadedLevels)
+        {
+            Levels.Add(level);
+        }
+        Levels.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
@@ -348,9 +321,9 @@ public class LevelLayoutViewModel : ViewModelBase
             }
         };
 
-        if (_levels.Count > 0)
+        if (Levels.Count > 0)
         {
-            SelectedLevel = _levels[0];
+            SelectedLevel = Levels[0];
         }
         else
         {
@@ -429,9 +402,9 @@ public class LevelLayoutViewModel : ViewModelBase
     {
         _availableFogTransitionOptions.Clear();
         _availableFogTransitionOptions.Add(new FogTransitionOption(0, "Do not transition"));
-        if (_availableFogSettings != null)
+        if (AvailableFogSettings != null)
         {
-            foreach (var fog in _availableFogSettings)
+            foreach (var fog in AvailableFogSettings)
             {
                 _availableFogTransitionOptions.Add(new FogTransitionOption(fog.PersistentId, fog.DisplayText));
             }
@@ -517,7 +490,7 @@ public class LevelLayoutViewModel : ViewModelBase
         get
         {
             if (_selectedLevel == null) return false;
-            return _levels.Count(l => l.PersistentId == _selectedLevel.PersistentId) > 1;
+            return Levels.Count(l => l.PersistentId == _selectedLevel.PersistentId) > 1;
         }
     }
 
@@ -526,7 +499,7 @@ public class LevelLayoutViewModel : ViewModelBase
         get
         {
             if (_selectedLevel == null) return string.Empty;
-            int count = _levels.Count(l => l.PersistentId == _selectedLevel.PersistentId);
+            int count = Levels.Count(l => l.PersistentId == _selectedLevel.PersistentId);
             if (count > 1)
             {
                 return
@@ -545,7 +518,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
     private void UpdateStatusText()
     {
-        if (_levels.Count == 0)
+        if (Levels.Count == 0)
         {
             StatusText = "No levels";
         }
@@ -555,11 +528,11 @@ public class LevelLayoutViewModel : ViewModelBase
                 ? "Reality"
                 : (_selectedDimension?.DisplayName ?? _activeDimensionIndex);
             StatusText =
-                $"Selected [{_selectedLevel.PersistentId}] {_selectedLevel.Name} - {dimInfo} ({_levels.Count} total)";
+                $"Selected [{_selectedLevel.PersistentId}] {_selectedLevel.Name} - {dimInfo} ({Levels.Count} total)";
         }
         else
         {
-            StatusText = $"{_levels.Count} level{(_levels.Count == 1 ? "" : "s")}";
+            StatusText = $"{Levels.Count} level{(Levels.Count == 1 ? "" : "s")}";
         }
     }
 
@@ -2798,7 +2771,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (options.Count == 0)
         {
-            var vanillaSets = ComplexResourceSetService.LoadVanillaBlocks();
+            var vanillaSets = DatablockManager.Instance.Get<ComplexResourceSetBlock>().ToList();
             var set = vanillaSets.FirstOrDefault(s => s.ComplexType == complexType) ?? vanillaSets.FirstOrDefault();
             if (set != null)
             {
@@ -3082,8 +3055,8 @@ public class LevelLayoutViewModel : ViewModelBase
         NewLevelName = levelDefaults.Name == "My New Level" ? $"Level_Custom_{randomId}" : levelDefaults.Name;
 
         SelectedComplexType = levelDefaults.ComplexType;
-        SelectedFogSetting = _availableFogSettings.FirstOrDefault(f => f.PersistentId == levelDefaults.FogSettings)
-                             ?? _availableFogSettings.FirstOrDefault();
+        SelectedFogSetting = AvailableFogSettings.FirstOrDefault(f => f.PersistentId == levelDefaults.FogSettings)
+                             ?? AvailableFogSettings.FirstOrDefault();
 
         UpdateElevatorTilesForSelectedSet();
         if (!string.IsNullOrWhiteSpace(levelDefaults.DimensionGeomorph))
@@ -3112,8 +3085,8 @@ public class LevelLayoutViewModel : ViewModelBase
         NewLevelName = _selectedLevel.Name;
         SelectedComplexType = _selectedLevel.ComplexType;
 
-        SelectedFogSetting = _availableFogSettings.FirstOrDefault(f => f.PersistentId == _selectedLevel.FogSettings)
-                             ?? _availableFogSettings.FirstOrDefault();
+        SelectedFogSetting = AvailableFogSettings.FirstOrDefault(f => f.PersistentId == _selectedLevel.FogSettings)
+                             ?? AvailableFogSettings.FirstOrDefault();
 
         UpdateElevatorTilesForSelectedSet();
 
@@ -3144,13 +3117,13 @@ public class LevelLayoutViewModel : ViewModelBase
         for (int i = 0; i < 1000; i++)
         {
             uint candidate = (uint)rng.Next(1000, 999999);
-            if (!_levels.Any(l => l.PersistentId == candidate))
+            if (!Levels.Any(l => l.PersistentId == candidate))
             {
                 return candidate;
             }
         }
 
-        return (uint)(_levels.Count > 0 ? _levels.Max(l => l.PersistentId) + 1 : 1);
+        return (uint)(Levels.Count > 0 ? Levels.Max(l => l.PersistentId) + 1 : 1);
     }
 
     public bool ConfirmCreateLevel()
@@ -3169,7 +3142,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (IsEditingExistingLevel)
         {
-            if (_levels.Any(l => l != _selectedLevel && l.PersistentId == NewLevelPersistentId))
+            if (Levels.Any(l => l != _selectedLevel && l.PersistentId == NewLevelPersistentId))
             {
                 CreationErrorMessage = $"A level with Persistent ID {NewLevelPersistentId} already exists.";
                 return false;
@@ -3208,7 +3181,7 @@ public class LevelLayoutViewModel : ViewModelBase
             return true;
         }
 
-        if (_levels.Any(l => l.PersistentId == NewLevelPersistentId))
+        if (Levels.Any(l => l.PersistentId == NewLevelPersistentId))
         {
             CreationErrorMessage = $"A level with Persistent ID {NewLevelPersistentId} already exists.";
             return false;
@@ -3229,7 +3202,7 @@ public class LevelLayoutViewModel : ViewModelBase
         newLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
         newLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
 
-        _levels.Add(newLevel);
+        Levels.Add(newLevel);
         SelectedLevel = newLevel;
 
         IsCreatingLevel = false;
@@ -3291,13 +3264,13 @@ public class LevelLayoutViewModel : ViewModelBase
             return false;
         }
 
-        int index = _levels.IndexOf(target);
-        _levels.Remove(target);
+        int index = Levels.IndexOf(target);
+        Levels.Remove(target);
 
-        if (_levels.Count > 0)
+        if (Levels.Count > 0)
         {
-            int nextIndex = Math.Clamp(index, 0, _levels.Count - 1);
-            SelectedLevel = _levels[nextIndex];
+            int nextIndex = Math.Clamp(index, 0, Levels.Count - 1);
+            SelectedLevel = Levels[nextIndex];
         }
         else
         {
@@ -3552,7 +3525,10 @@ public class LevelLayoutViewModel : ViewModelBase
     public ObservableCollection<ZoneOption> AvailableMainExitZones { get; } = new();
     public ObservableCollection<ZoneOption> AvailableObjectiveZones { get; } = new();
 
-    public ObservableCollection<EnemyEntry> Enemies { get; } = new(AlarmService.LoadEnemies());
+    public ObservableCollection<EnemyEntry> Enemies
+    {
+        get => DatablockManager.Instance.Get<EnemyEntry>();
+    }
     public static SurvivalWaveSpawnType[] AvailableWaveSpawnTypes => Enum.GetValues<SurvivalWaveSpawnType>();
     public static WaveFilterType[] AvailableFilterTypes => Enum.GetValues<WaveFilterType>();
     public static WaveOnGotoWinTrigger[] AvailableWaveOnGotoWinTriggers => Enum.GetValues<WaveOnGotoWinTrigger>();

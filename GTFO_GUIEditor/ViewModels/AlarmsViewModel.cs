@@ -12,7 +12,6 @@ namespace GTFO_GUIEditor.ViewModels;
 public class AlarmsViewModel : ViewModelBase
 {
     private readonly List<AlarmBlock> _vanillaTemplates;
-    private ObservableCollection<AlarmBlock> _alarms;
     private AlarmBlock? _selectedAlarm;
     private string _statusText = string.Empty;
 
@@ -38,30 +37,40 @@ public class AlarmsViewModel : ViewModelBase
     public SurvivalWaveSpawnType[] WaveSpawnTypes => AvailableWaveSpawnTypes;
     public WaveFilterType[] FilterTypes => AvailableFilterTypes;
 
-    public ObservableCollection<EnemyEntry> Enemies { get; }
-    public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes { get; }
+    public ObservableCollection<EnemyEntry> Enemies
+    {
+        get => DatablockManager.Instance.Get<EnemyEntry>();
+    }
+    public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes
+    {
+        get => DatablockManager.Instance.Get<ChainedPuzzleTypeEntry>();
+    }
     public ICommand RemoveChainedPuzzleItemCommand { get; }
     public ICommand AddChainedPuzzleItemCommand { get; }
 
     public ObservableCollection<AlarmBlock> Alarms
     {
-        get => _alarms;
-        private set => SetField(ref _alarms, value);
+        get => DatablockManager.Instance.Get<AlarmBlock>();
     }
 
     public ObservableCollection<AlarmBlock> AvailableTemplates { get; }
 
     public AlarmsViewModel()
-        : this(new List<AlarmBlock>(), AlarmService.LoadEnemies(), AlarmService.LoadChainedPuzzleTypes())
+        : this(DatablockManager.Instance.Get<AlarmBlock>(), DatablockManager.Instance.Get<EnemyEntry>(), DatablockManager.Instance.Get<ChainedPuzzleTypeEntry>())
     {
     }
 
     public AlarmsViewModel(IEnumerable<AlarmBlock> initialAlarms, IEnumerable<EnemyEntry>? enemies = null, IEnumerable<ChainedPuzzleTypeEntry>? chainedPuzzleTypes = null)
     {
         var alarmList = initialAlarms.ToList();
-        _vanillaTemplates = AlarmService.LoadVanillaAlarms();
-        _alarms = new ObservableCollection<AlarmBlock>(alarmList);
-        _alarms.CollectionChanged += (s, e) =>
+        _vanillaTemplates = alarmList.Select(a => a.Clone()).ToList();
+        var alarms = Alarms;
+        alarms.Clear();
+        foreach (var alarm in alarmList)
+        {
+            alarms.Add(alarm);
+        }
+        alarms.CollectionChanged += (s, e) =>
         {
             OnPropertyChanged(nameof(HasExistingAlarms));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
@@ -70,18 +79,26 @@ public class AlarmsViewModel : ViewModelBase
 
         AvailableTemplates = new ObservableCollection<AlarmBlock>(_vanillaTemplates);
 
-        var enemyList = (enemies ?? AlarmService.LoadEnemies()).ToList();
-        Enemies = new ObservableCollection<EnemyEntry>(enemyList);
+        if (enemies != null && !ReferenceEquals(Enemies, enemies))
+        {
+            var enemyList = enemies.ToList();
+            Enemies.Clear();
+            foreach (var enemy in enemyList) Enemies.Add(enemy);
+        }
 
-        var puzzleTypesList = (chainedPuzzleTypes ?? AlarmService.LoadChainedPuzzleTypes()).ToList();
-        ChainedPuzzleTypes = new ObservableCollection<ChainedPuzzleTypeEntry>(puzzleTypesList);
+        if (chainedPuzzleTypes != null && !ReferenceEquals(ChainedPuzzleTypes, chainedPuzzleTypes))
+        {
+            var puzzleTypesList = chainedPuzzleTypes.ToList();
+            ChainedPuzzleTypes.Clear();
+            foreach (var puzzleType in puzzleTypesList) ChainedPuzzleTypes.Add(puzzleType);
+        }
 
         RemoveChainedPuzzleItemCommand = new RelayCommand<ChainedPuzzleItem>(RemoveChainedPuzzleItem);
         AddChainedPuzzleItemCommand = new RelayCommand(AddChainedPuzzleItem);
 
-        if (_alarms.Count > 0)
+        if (alarms.Count > 0)
         {
-            SelectedAlarm = _alarms[0];
+            SelectedAlarm = alarms[0];
         }
 
         UpdateStatusText();
@@ -134,7 +151,7 @@ public class AlarmsViewModel : ViewModelBase
         get
         {
             if (_selectedAlarm == null) return false;
-            return _alarms.Count(a => a.PersistentId == _selectedAlarm.PersistentId) > 1;
+            return Alarms.Count(a => a.PersistentId == _selectedAlarm.PersistentId) > 1;
         }
     }
 
@@ -143,14 +160,14 @@ public class AlarmsViewModel : ViewModelBase
         get
         {
             if (!HasDuplicatePersistentId || _selectedAlarm == null) return string.Empty;
-            int count = _alarms.Count(a => a.PersistentId == _selectedAlarm.PersistentId);
+            int count = Alarms.Count(a => a.PersistentId == _selectedAlarm.PersistentId);
             return $"Warning: Persistent ID {_selectedAlarm.PersistentId} is used by {count} alarms in this project. Persistent IDs should be unique.";
         }
     }
 
     // --- Create Alarm Workflow ---
 
-    public bool HasExistingAlarms => _alarms.Count > 0;
+    public bool HasExistingAlarms => Alarms.Count > 0;
 
     public bool IsCreatingAlarm
     {
@@ -338,7 +355,7 @@ public class AlarmsViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsCreatingFromVanilla));
         OnPropertyChanged(nameof(IsCreatingFromTemplate));
 
-        SelectedExistingAlarm = _selectedAlarm ?? _alarms.FirstOrDefault();
+        SelectedExistingAlarm = _selectedAlarm ?? Alarms.FirstOrDefault();
         SelectedVanillaTemplate = AvailableTemplates.FirstOrDefault();
         CreationErrorMessage = string.Empty;
         IsCreatingAlarm = true;
@@ -346,7 +363,7 @@ public class AlarmsViewModel : ViewModelBase
 
     public void OpenDuplicateAlarmDialog(AlarmBlock? alarm = null)
     {
-        var target = alarm ?? _selectedAlarm ?? _alarms.FirstOrDefault();
+        var target = alarm ?? _selectedAlarm ?? Alarms.FirstOrDefault();
         OpenCreateAlarmDialog();
         if (target != null)
         {
@@ -361,12 +378,12 @@ public class AlarmsViewModel : ViewModelBase
         for (int i = 0; i < 1000; i++)
         {
             uint candidate = (uint)rng.Next(1000, 999999);
-            if (!_alarms.Any(a => a.PersistentId == candidate))
+            if (!Alarms.Any(a => a.PersistentId == candidate))
             {
                 return candidate;
             }
         }
-        return (uint)(_alarms.Count > 0 ? _alarms.Max(a => a.PersistentId) + 1 : 1);
+        return (uint)(Alarms.Count > 0 ? Alarms.Max(a => a.PersistentId) + 1 : 1);
     }
 
     public bool ConfirmCreateAlarm()
@@ -383,7 +400,7 @@ public class AlarmsViewModel : ViewModelBase
             return false;
         }
 
-        if (_alarms.Any(a => a.PersistentId == NewAlarmPersistentId))
+        if (Alarms.Any(a => a.PersistentId == NewAlarmPersistentId))
         {
             CreationErrorMessage = $"An alarm with Persistent ID {NewAlarmPersistentId} already exists.";
             return false;
@@ -415,7 +432,7 @@ public class AlarmsViewModel : ViewModelBase
 
         newAlarm.PublicAlarmName = NewAlarmPublicAlarmName?.Trim() ?? string.Empty;
 
-        _alarms.Add(newAlarm);
+        Alarms.Add(newAlarm);
         SelectedAlarm = newAlarm;
 
         IsCreatingAlarm = false;
@@ -499,20 +516,20 @@ public class AlarmsViewModel : ViewModelBase
     public bool DeleteAlarm(AlarmBlock? alarm)
     {
         if (alarm == null) return false;
-        int index = _alarms.IndexOf(alarm);
+        int index = Alarms.IndexOf(alarm);
         if (index < 0) return false;
 
         string deletedName = alarm.Name;
         uint deletedId = alarm.PersistentId;
 
-        _alarms.RemoveAt(index);
+        Alarms.RemoveAt(index);
 
         if (_selectedAlarm == alarm)
         {
-            if (_alarms.Count > 0)
+            if (Alarms.Count > 0)
             {
-                int newIndex = Math.Min(index, _alarms.Count - 1);
-                SelectedAlarm = _alarms[newIndex];
+                int newIndex = Math.Min(index, Alarms.Count - 1);
+                SelectedAlarm = Alarms[newIndex];
             }
             else
             {
@@ -521,7 +538,7 @@ public class AlarmsViewModel : ViewModelBase
         }
 
         UpdateStatusText();
-        StatusText = $"Deleted alarm [{deletedId}] {deletedName}. {_alarms.Count:N0} alarms remaining.";
+        StatusText = $"Deleted alarm [{deletedId}] {deletedName}. {Alarms.Count:N0} alarms remaining.";
         return true;
     }
 
@@ -544,6 +561,6 @@ public class AlarmsViewModel : ViewModelBase
 
     private void UpdateStatusText()
     {
-        StatusText = $"{_alarms.Count:N0} alarms loaded";
+        StatusText = $"{Alarms.Count:N0} alarms loaded";
     }
 }

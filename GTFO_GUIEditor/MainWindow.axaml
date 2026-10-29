@@ -48,7 +48,9 @@
                             </MenuItem.ItemTemplate>
                         </MenuItem>
                     </MenuItem>
-                    <MenuItem Header="Export" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
+                    <MenuItem Header="Import / Export" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
+                        <MenuItem Header="Import From..."
+                                  Command="{Binding ImportDatablocksFrom}"/>
                         <MenuItem Header="Quick Export"
                                   Command="{Binding QuickExportDatablocks}"
                                   InputGesture="Ctrl+E"/>
