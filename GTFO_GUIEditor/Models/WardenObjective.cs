@@ -96,7 +96,6 @@ public class WardenObjective : INotifyPropertyChanged
     private string _timerToActivateTitle = string.Empty;
 
     // Gather Terminal
-    private int _gatherTerminalSpawnCount = 1;
     private int _gatherTerminalRequiredCount = 1;
     private string _gatherTerminalCommand = string.Empty;
     private string _gatherTerminalCommandHelp = string.Empty;
@@ -114,7 +113,6 @@ public class WardenObjective : INotifyPropertyChanged
     private double _timedTerminalSequenceTimePerRound;
     private double _timedTerminalSequenceTimeForConfirmation;
     private string _timedTerminalSequenceSourceTerminalWorldEventObjectFilter = "MainTerminal";
-    private int _timedTerminalSequenceNumberOfTerminals = 1;
     private ObservableCollection<GatherItemPlacement> _timedTerminalSequencePlacements = new()
     {
         new GatherItemPlacement { ItemNumber = 1, ItemPrefix = "Terminal" }

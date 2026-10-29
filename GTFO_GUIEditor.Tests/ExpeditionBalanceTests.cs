@@ -201,7 +201,8 @@ public class ExpeditionBalanceTests
             RundownProjectService.SaveProject(mainVm, tempFile);
 
             var loadVm = new MainWindowViewModel(autoReopenLastRundown: false);
-            RundownProjectService.LoadProject(loadVm, tempFile);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadVm, project, tempFile);
 
             Assert.Single(loadVm.LevelLayout.Levels);
             var loadedLevel = loadVm.LevelLayout.Levels[0];
@@ -278,17 +279,17 @@ public class ExpeditionBalanceTests
             {
                 PersistentId = 1,
                 Name = "Test Rundown",
-                TierA = new ObservableCollection<ExpeditionBlock>
+                TierA = new List<ExpeditionBlock>
                 {
                     new ExpeditionBlock
                     {
                         LevelLayoutData = 101,
-                        Descriptive = new DescriptiveData { Prefix = "A", Name = "Level 1" }
+                        Descriptive = new ExpeditionDescriptiveData { Prefix = "A", PublicName = "Level 1" }
                     },
                     new ExpeditionBlock
                     {
                         LevelLayoutData = 102,
-                        Descriptive = new DescriptiveData { Prefix = "A", Name = "Level 2" }
+                        Descriptive = new ExpeditionDescriptiveData { Prefix = "A", PublicName = "Level 2" }
                     }
                 }
             };

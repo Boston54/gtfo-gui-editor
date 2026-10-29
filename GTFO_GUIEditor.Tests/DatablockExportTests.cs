@@ -1792,8 +1792,8 @@ public class DatablockExportTests
 
             var exp = EditorDefaultsService.CreateDefaultExpedition("A", 1);
             exp.LevelLayoutData = level.PersistentId;
-            mainVm.Rundown.SelectedRundown.TierA.Clear();
-            mainVm.Rundown.SelectedRundown.TierA.Add(exp);
+            mainVm.Rundown.SelectedRundown!.TierA.Clear();
+            mainVm.Rundown.SelectedRundown!.TierA.Add(exp);
 
             var result = DatablockExportService.ExportAll(mainVm, tempDir);
             Assert.True(result.Success, result.Message);

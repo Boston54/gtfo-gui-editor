@@ -94,11 +94,9 @@ public class SectorSettings : INotifyPropertyChanged
                 nonNull[i].ObjectiveNumber = i + 1;
             }
 
-            SetField(ref _objectives, nonNull);
-            if (_objectives != null)
-            {
-                _objectives.CollectionChanged += Objectives_CollectionChanged;
-            }
+            _objectives = nonNull;
+            _objectives.CollectionChanged += Objectives_CollectionChanged;
+            OnPropertyChanged();
 
             HookPrimaryObjective(PrimaryObjective);
             OnPropertyChanged(nameof(PrimaryObjective));
@@ -133,11 +131,9 @@ public class SectorSettings : INotifyPropertyChanged
                 _bulkheadKeyPlacements.CollectionChanged -= BulkheadKeyPlacements_CollectionChanged;
             }
 
-            SetField(ref _bulkheadKeyPlacements, nonNull);
-            if (_bulkheadKeyPlacements != null)
-            {
-                _bulkheadKeyPlacements.CollectionChanged += BulkheadKeyPlacements_CollectionChanged;
-            }
+            _bulkheadKeyPlacements = nonNull;
+            _bulkheadKeyPlacements.CollectionChanged += BulkheadKeyPlacements_CollectionChanged;
+            OnPropertyChanged();
         }
     }
 

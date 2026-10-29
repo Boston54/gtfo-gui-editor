@@ -18,9 +18,9 @@ public class AlarmTests
 
         var striker = enemies.FirstOrDefault(e => e.PersistentId == 13);
         Assert.NotNull(striker);
-        Assert.Equal("Striker_Wave", striker.Name);
+        Assert.Equal("Striker (Wave)", striker.Name);
         Assert.Equal("Standard", striker.EnemyType);
-        Assert.Contains("[13] Striker_Wave", striker.DisplayText);
+        Assert.Contains("[13] Striker (Wave)", striker.DisplayText);
     }
 
     [Fact]

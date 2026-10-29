@@ -417,7 +417,9 @@ public class RundownFileTests : IDisposable
             for (int i = 0; i < 15; i++)
             {
                 string path = Path.Combine(baseDir, $"rundown_{i}.rundown");
-                var list = RundownProjectService.AddRecentFile(path);
+                File.WriteAllText(path, "{}");
+                RundownProjectService.AddRecentFile(path);
+                var list = RundownProjectService.LoadRecentFiles();
                 Assert.True(list.Count <= 10);
                 Assert.Equal(path, list[0].FilePath);
             }
