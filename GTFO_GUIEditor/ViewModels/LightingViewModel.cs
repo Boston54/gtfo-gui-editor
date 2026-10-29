@@ -21,8 +21,10 @@ public class LightingViewModel : ViewModelBase
     // Create block prompt / modal state
     private bool _isCreatingBlock;
     private bool _isCreatingFresh = true;
-    private bool _isCreatingFromTemplate;
-    private LightSettingsBlock? _selectedTemplate;
+    private bool _isCreatingFromExisting;
+    private bool _isCreatingFromVanilla;
+    private LightSettingsBlock? _selectedExistingBlock;
+    private LightSettingsBlock? _selectedVanillaTemplate;
     private string _newBlockName = string.Empty;
     private uint _newBlockPersistentId;
     private string _creationErrorMessage = string.Empty;
@@ -50,10 +52,12 @@ public class LightingViewModel : ViewModelBase
     public LightingViewModel(IEnumerable<LightSettingsBlock> initialBlocks)
     {
         var blockList = initialBlocks.ToList();
-        _vanillaTemplates = blockList.Select(b => b.Clone()).ToList();
+        _vanillaTemplates = LightSettingsService.LoadVanillaBlocks();
         _blocks = new ObservableCollection<LightSettingsBlock>(blockList);
         _blocks.CollectionChanged += (s, e) =>
         {
+            OnPropertyChanged(nameof(HasExistingBlocks));
+            OnPropertyChanged(nameof(HasExistingConfigs));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
         };
@@ -108,7 +112,8 @@ public class LightingViewModel : ViewModelBase
         }
     }
 
-    private void LightCategorySettings_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+    private void LightCategorySettings_CollectionChanged(object? sender,
+        System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
         RefreshCategorySettings();
         CheckMissingCategoriesWarning();
@@ -177,13 +182,15 @@ public class LightingViewModel : ViewModelBase
             return;
         }
 
-        var definedCategories = new HashSet<LightCategory>(_selectedBlock.LightCategorySettings.Select(s => s.Category));
+        var definedCategories =
+            new HashSet<LightCategory>(_selectedBlock.LightCategorySettings.Select(s => s.Category));
         var missing = AvailableCategories.Where(c => !definedCategories.Contains(c)).ToList();
 
         if (missing.Count > 0)
         {
             string missingNames = string.Join(", ", missing);
-            MissingCategoriesWarning = $"Warning: The following lighting categories have no defined options in this config: {missingNames}";
+            MissingCategoriesWarning =
+                $"Warning: The following lighting categories have no defined options in this config: {missingNames}";
         }
         else
         {
@@ -208,7 +215,8 @@ public class LightingViewModel : ViewModelBase
         {
             if (_selectedBlock == null || !HasDuplicatePersistentId) return string.Empty;
             int count = _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
-            return $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
+            return
+                $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
         }
     }
 
@@ -222,7 +230,8 @@ public class LightingViewModel : ViewModelBase
     {
         if (_selectedBlock != null)
         {
-            StatusText = $"{_blocks.Count} configs loaded. Editing: [{_selectedBlock.PersistentId}] {_selectedBlock.Name}";
+            StatusText =
+                $"{_blocks.Count} configs loaded. Editing: [{_selectedBlock.PersistentId}] {_selectedBlock.Name}";
         }
         else
         {
@@ -252,6 +261,7 @@ public class LightingViewModel : ViewModelBase
             _currentCategorySettings.Add(newItem);
             OnPropertyChanged(nameof(HasCurrentCategorySettings));
         }
+
         CheckMissingCategoriesWarning();
     }
 
@@ -265,6 +275,10 @@ public class LightingViewModel : ViewModelBase
     }
 
     // Dialog / Prompt properties
+    public bool HasExistingBlocks => _blocks.Count > 0;
+
+    public bool HasExistingConfigs => _blocks.Count > 0;
+
     public bool IsCreatingBlock
     {
         get => _isCreatingBlock;
@@ -278,29 +292,127 @@ public class LightingViewModel : ViewModelBase
         {
             if (SetField(ref _isCreatingFresh, value) && value)
             {
-                _isCreatingFromTemplate = false;
+                _isCreatingFromExisting = false;
+                _isCreatingFromVanilla = false;
+                OnPropertyChanged(nameof(IsCreatingFromExisting));
+                OnPropertyChanged(nameof(IsCreatingFromVanilla));
                 OnPropertyChanged(nameof(IsCreatingFromTemplate));
+            }
+        }
+    }
+
+    public bool IsCreatingFromExisting
+    {
+        get => _isCreatingFromExisting;
+        set
+        {
+            if (SetField(ref _isCreatingFromExisting, value) && value)
+            {
+                _isCreatingFresh = false;
+                _isCreatingFromVanilla = false;
+                OnPropertyChanged(nameof(IsCreatingFresh));
+                OnPropertyChanged(nameof(IsCreatingFromVanilla));
+                OnPropertyChanged(nameof(IsCreatingFromTemplate));
+                if (SelectedExistingBlock != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(SelectedExistingBlock.Name))
+                    {
+                        NewBlockName = $"{SelectedExistingBlock.Name}_Copy";
+                    }
+                }
+            }
+        }
+    }
+
+    public bool IsCreatingFromVanilla
+    {
+        get => _isCreatingFromVanilla;
+        set
+        {
+            if (SetField(ref _isCreatingFromVanilla, value) && value)
+            {
+                _isCreatingFresh = false;
+                _isCreatingFromExisting = false;
+                OnPropertyChanged(nameof(IsCreatingFresh));
+                OnPropertyChanged(nameof(IsCreatingFromExisting));
+                OnPropertyChanged(nameof(IsCreatingFromTemplate));
+                if (SelectedVanillaTemplate != null)
+                {
+                    if (!string.IsNullOrWhiteSpace(SelectedVanillaTemplate.Name))
+                    {
+                        NewBlockName = SelectedVanillaTemplate.Name;
+                    }
+                }
             }
         }
     }
 
     public bool IsCreatingFromTemplate
     {
-        get => _isCreatingFromTemplate;
+        get => _isCreatingFromVanilla || _isCreatingFromExisting;
         set
         {
-            if (SetField(ref _isCreatingFromTemplate, value) && value)
+            if (value)
             {
-                _isCreatingFresh = false;
-                OnPropertyChanged(nameof(IsCreatingFresh));
+                IsCreatingFromVanilla = true;
+            }
+            else
+            {
+                IsCreatingFresh = true;
+            }
+        }
+    }
+
+    public LightSettingsBlock? SelectedExistingBlock
+    {
+        get => _selectedExistingBlock;
+        set
+        {
+            if (SetField(ref _selectedExistingBlock, value) && value != null)
+            {
+                if (IsCreatingFromExisting)
+                {
+                    if (!string.IsNullOrWhiteSpace(value.Name))
+                    {
+                        NewBlockName = $"{value.Name}_Copy";
+                    }
+                }
+            }
+        }
+    }
+
+    public LightSettingsBlock? SelectedVanillaTemplate
+    {
+        get => _selectedVanillaTemplate;
+        set
+        {
+            if (SetField(ref _selectedVanillaTemplate, value) && value != null)
+            {
+                if (IsCreatingFromVanilla || IsCreatingFromTemplate)
+                {
+                    if (!string.IsNullOrWhiteSpace(value.Name))
+                    {
+                        NewBlockName = value.Name;
+                    }
+                }
             }
         }
     }
 
     public LightSettingsBlock? SelectedTemplate
     {
-        get => _selectedTemplate;
-        set => SetField(ref _selectedTemplate, value);
+        get => _isCreatingFromExisting ? _selectedExistingBlock : _selectedVanillaTemplate;
+        set
+        {
+            if (_isCreatingFromExisting)
+            {
+                SelectedExistingBlock = value;
+            }
+            else
+            {
+                SelectedVanillaTemplate = value;
+            }
+        }
     }
 
     public string NewBlockName
@@ -337,6 +449,7 @@ public class LightingViewModel : ViewModelBase
         {
             id = (uint)Random.Shared.Next(1000, 100000000);
         } while (existingIds.Contains(id));
+
         return id;
     }
 
@@ -345,10 +458,28 @@ public class LightingViewModel : ViewModelBase
         NewBlockPersistentId = GenerateRandomPersistentId();
         NewBlockName = $"Custom_Lighting_{NewBlockPersistentId}";
         IsCreatingFresh = true;
-        IsCreatingFromTemplate = false;
-        SelectedTemplate = AvailableTemplates.FirstOrDefault();
+        _isCreatingFromExisting = false;
+        _isCreatingFromVanilla = false;
+        OnPropertyChanged(nameof(IsCreatingFresh));
+        OnPropertyChanged(nameof(IsCreatingFromExisting));
+        OnPropertyChanged(nameof(IsCreatingFromVanilla));
+        OnPropertyChanged(nameof(IsCreatingFromTemplate));
+
+        SelectedExistingBlock = _selectedBlock ?? _blocks.FirstOrDefault();
+        SelectedVanillaTemplate = AvailableTemplates.FirstOrDefault();
         CreationErrorMessage = string.Empty;
         IsCreatingBlock = true;
+    }
+
+    public void OpenDuplicateBlockDialog(LightSettingsBlock? block = null)
+    {
+        var target = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
+        OpenCreateBlockDialog();
+        if (target != null)
+        {
+            SelectedExistingBlock = target;
+            IsCreatingFromExisting = true;
+        }
     }
 
     public bool ConfirmCreateBlock()
@@ -372,9 +503,27 @@ public class LightingViewModel : ViewModelBase
         }
 
         LightSettingsBlock newBlock;
-        if (IsCreatingFromTemplate && SelectedTemplate != null)
+        if (IsCreatingFromExisting)
         {
-            newBlock = LightSettingsService.CreateBlockFromTemplate(SelectedTemplate, NewBlockPersistentId, NewBlockName.Trim());
+            if (SelectedExistingBlock == null)
+            {
+                CreationErrorMessage = "Please select an existing config to duplicate.";
+                return false;
+            }
+
+            newBlock = LightSettingsService.CreateBlockFromTemplate(SelectedExistingBlock, NewBlockPersistentId,
+                NewBlockName.Trim());
+        }
+        else if (IsCreatingFromVanilla)
+        {
+            if (SelectedVanillaTemplate == null)
+            {
+                CreationErrorMessage = "Please select a vanilla config to import.";
+                return false;
+            }
+
+            newBlock = LightSettingsService.CreateBlockFromTemplate(SelectedVanillaTemplate, NewBlockPersistentId,
+                NewBlockName.Trim());
         }
         else
         {

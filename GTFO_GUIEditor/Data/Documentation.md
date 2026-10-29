@@ -140,7 +140,7 @@ Big pickup items (Cells, Turbines, etc) can be added to a zone through the Zone 
 It is important to note that items that are placed this way are *not* objective items. For example, a Neonate HSU placed through this field will not automatically work for completing an `ActivateSmallHSU` objective.
 
 ## Artifacts
-Artifacts can be confused through multiple different fields across the editor.
+Artifacts can be configured through multiple different fields across the editor.
 
 The Level Config dialog (accessible via the Level bar at the top of the level view) can be used to set the number of artifacts per segment and sector, as well as the chances of artifacts spawning inside boxes.
 

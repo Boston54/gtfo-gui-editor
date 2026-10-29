@@ -206,4 +206,86 @@ public class FogSettingsTests
         Assert.Equal(4, vm.AvailableFogTransitionOptions.Count);
         Assert.Equal((uint)103, vm.AvailableFogTransitionOptions[3].PersistentId);
     }
+
+    [Fact]
+    public void FogSettingsViewModel_AvailableTemplates_LoadsVanillaBlocks()
+    {
+        var vm = new FogSettingsViewModel();
+        Assert.NotEmpty(vm.AvailableTemplates);
+        Assert.Contains(vm.AvailableTemplates, t => t.PersistentId == 21 && t.Name == "Fog_ELEVATOR");
+    }
+
+    [Fact]
+    public void FogSettingsViewModel_CreateBlock_FromVanilla_ImportsVanillaTemplate()
+    {
+        var vm = new FogSettingsViewModel();
+        vm.OpenCreateBlockDialog();
+
+        vm.IsCreatingFromVanilla = true;
+        Assert.True(vm.IsCreatingFromVanilla);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.False(vm.IsCreatingFromExisting);
+
+        var template = vm.AvailableTemplates.First(t => t.PersistentId == 21);
+        vm.SelectedVanillaTemplate = template;
+        Assert.Equal("Fog_ELEVATOR", vm.NewBlockName);
+
+        vm.NewBlockPersistentId = 987654;
+        vm.NewBlockName = "Imported_Elevator_Fog";
+        Assert.True(vm.ConfirmCreateBlock());
+
+        Assert.NotNull(vm.SelectedBlock);
+        Assert.Equal((uint)987654, vm.SelectedBlock.PersistentId);
+        Assert.Equal("Imported_Elevator_Fog", vm.SelectedBlock.Name);
+        Assert.Equal(template.FogDensity, vm.SelectedBlock.FogDensity);
+        Assert.Equal(template.Infection, vm.SelectedBlock.Infection);
+        Assert.Equal(template.FogColor.R, vm.SelectedBlock.FogColor.R);
+    }
+
+    [Fact]
+    public void FogSettingsViewModel_CreateBlock_FromExisting_DuplicatesExistingBlock()
+    {
+        var existing = FogSettingsService.CreateFreshBlock(112233, "MyCustomFog");
+        existing.FogDensity = 0.055;
+        existing.Infection = 0.25;
+
+        var vm = new FogSettingsViewModel(new[] { existing });
+        Assert.True(vm.HasExistingConfigs);
+        Assert.True(vm.HasExistingBlocks);
+
+        vm.OpenDuplicateBlockDialog(existing);
+        Assert.True(vm.IsCreatingFromExisting);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.False(vm.IsCreatingFromVanilla);
+        Assert.Equal(existing, vm.SelectedExistingBlock);
+        Assert.Equal("MyCustomFog_Copy", vm.NewBlockName);
+
+        vm.NewBlockPersistentId = 445566;
+        Assert.True(vm.ConfirmCreateBlock());
+
+        Assert.NotNull(vm.SelectedBlock);
+        Assert.Equal((uint)445566, vm.SelectedBlock.PersistentId);
+        Assert.Equal("MyCustomFog_Copy", vm.SelectedBlock.Name);
+        Assert.Equal(0.055, vm.SelectedBlock.FogDensity);
+        Assert.Equal(0.25, vm.SelectedBlock.Infection);
+    }
+
+    [Fact]
+    public void FogSettingsViewModel_CreateBlock_ValidationErrors_WhenNoTemplateSelected()
+    {
+        var vm = new FogSettingsViewModel();
+        vm.OpenCreateBlockDialog();
+        vm.IsCreatingFromExisting = true;
+        vm.SelectedExistingBlock = null;
+        vm.NewBlockPersistentId = 12345;
+        vm.NewBlockName = "Test";
+
+        Assert.False(vm.ConfirmCreateBlock());
+        Assert.Equal("Please select an existing config to duplicate.", vm.CreationErrorMessage);
+
+        vm.IsCreatingFromVanilla = true;
+        vm.SelectedVanillaTemplate = null;
+        Assert.False(vm.ConfirmCreateBlock());
+        Assert.Equal("Please select a vanilla config to import.", vm.CreationErrorMessage);
+    }
 }

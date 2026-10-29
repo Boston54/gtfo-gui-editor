@@ -8,11 +8,21 @@
   * Three options for this: Manual addition in the Level Config dialog, automatic addition if snatchers are anywhere in the level, or just add to all levels.
 * `LockedNoKey` doors should default the custom text to the vanilla "lockdown" text (TextID 972)
 * **Tampered Data Cube events**
-* **'Import from vanilla' for fog and lighting settings**
-  * as has already been done for the alarms tab
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
-* **Ability to search the user docs for keywords**
+* **Legacy Geomorphs tab**
+  * At least rework this tab so the users can still browse the screenshots and read the tips, or possibly even just remove the tab all together. This was designed for the legacy system of inputting a geomorph's file path manually but is no longer needed.
+* **Missing fields in Alarms config**
+  * AlarmSoundStart (SoundID, give it a default), AlarmSoundStop (SoundID, give it a default), OnlyShowHUDWhenPlayerIsClose (bool)
+* **Dimension config missing almost every field in DimensionDataBlock**
+* **Missing fields in Zone config**
+  * PlayScannerVoiceAudio, SkipAutomaticProgressionObjective, EventsOnTerminalDeactivateAlarm (should only be visible if TurnOffAlarmOnTerminal is true), log files on terminals, StaticSpawnDataContainers (whatever these are)
+  * AllowSmallPickupsAllocation and ForceBigPickupsAllocation may or may not be set? these can probably be auto-set based on other configs instead of getting the user to manually set them.
+* **Missing fields from Level config (from Rundown datablock)**
+  * MLSLevelKit (wtf is this), EnemyPopulation (idk), ScoutWaveSettings, ScoutWavePopulation, VanityItemsDropData, the whole GearPicker system
+  * EnvironmentWetness and DustColor as well, but maybe put these in the Dimension config under Reality to keep consistency between dimensions
+* **Missing fields from Level config (from ExpeditionBalance datablock)**
+  * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
 
 *If we are wanting to add support for modded enemies and weapons, then:*
 

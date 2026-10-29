@@ -13,8 +13,9 @@ public static class DocumentationService
     public static string? FindDocumentationFile()
     {
         string dataDir = EditorDefaultsService.GetDataDirectory();
-        
-        string[] candidates = { "Documentation.md", "UserDocumentation.md", "Home.md", "documentation.md", "userdocumentation.md" };
+
+        string[] candidates =
+            { "Documentation.md", "UserDocumentation.md", "Home.md", "documentation.md", "userdocumentation.md" };
         foreach (var name in candidates)
         {
             string p = Path.Combine(dataDir, name);
@@ -49,7 +50,7 @@ public static class DocumentationService
         }
 
         string[] lines = markdown.Replace("\r\n", "\n").Replace('\r', '\n').Split('\n');
-        
+
         // We will build a tree of parsed sections:
         // Level 1: H1
         // Level 2: H2
@@ -91,6 +92,7 @@ public static class DocumentationService
                         currentH1 = new RawSection { Level = 1, Title = "Documentation" };
                         rawH1List.Add(currentH1);
                     }
+
                     string title = trimmed.Substring(3).Trim();
                     currentH2 = new RawSection { Level = 2, Title = title };
                     currentH1.Children.Add(currentH2);
@@ -105,11 +107,13 @@ public static class DocumentationService
                         currentH1 = new RawSection { Level = 1, Title = "Documentation" };
                         rawH1List.Add(currentH1);
                     }
+
                     if (currentH2 == null)
                     {
                         currentH2 = new RawSection { Level = 2, Title = "Overview" };
                         currentH1.Children.Add(currentH2);
                     }
+
                     string title = trimmed.Substring(4).Trim();
                     currentH3 = new RawSection { Level = 3, Title = title };
                     currentH2.Children.Add(currentH3);
@@ -205,6 +209,155 @@ public static class DocumentationService
         public string Title { get; set; } = string.Empty;
         public StringBuilder ContentBuilder { get; } = new();
         public List<RawSection> Children { get; } = new();
+    }
+
+    public static List<string> ExtractParagraphs(string content)
+    {
+        var list = new List<string>();
+        if (string.IsNullOrWhiteSpace(content))
+        {
+            return list;
+        }
+
+        string normalized = content.Replace("\r\n", "\n").Replace('\r', '\n');
+        string[] blocks = System.Text.RegularExpressions.Regex.Split(normalized, @"\n\s*\n+");
+
+        foreach (var b in blocks)
+        {
+            string trimmed = b.Trim();
+            if (!string.IsNullOrWhiteSpace(trimmed))
+            {
+                list.Add(trimmed);
+            }
+        }
+
+        return list;
+    }
+
+    public static List<DocSearchResult> Search(
+        IEnumerable<DocSection>? sections,
+        string query,
+        Action<DocSearchResult>? onNavigate = null)
+    {
+        var results = new List<DocSearchResult>();
+        if (sections == null || string.IsNullOrWhiteSpace(query))
+        {
+            return results;
+        }
+
+        string trimmedQuery = query.Trim();
+        string[] keywords = trimmedQuery.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+        if (keywords.Length == 0)
+        {
+            return results;
+        }
+
+        foreach (var h1 in sections)
+        {
+            if (h1.IsSearchTab) continue;
+
+            if (!h1.HasSubSections)
+            {
+                CheckAndAddResult(results, h1, null, null, h1, h1.Title, trimmedQuery, keywords, onNavigate);
+            }
+            else
+            {
+                foreach (var h2 in h1.SubSections)
+                {
+                    if (!h2.HasSubSections)
+                    {
+                        string breadcrumb = $"{h1.Title} > {h2.Title}";
+                        CheckAndAddResult(results, h1, h2, null, h2, breadcrumb, trimmedQuery, keywords, onNavigate);
+                    }
+                    else
+                    {
+                        foreach (var h3 in h2.SubSections)
+                        {
+                            string breadcrumb = $"{h1.Title} > {h2.Title} > {h3.Title}";
+                            CheckAndAddResult(results, h1, h2, h3, h3, breadcrumb, trimmedQuery, keywords, onNavigate);
+                        }
+                    }
+                }
+            }
+        }
+
+        return results;
+    }
+
+    private static void CheckAndAddResult(
+        List<DocSearchResult> results,
+        DocSection h1,
+        DocSection? h2,
+        DocSection? h3,
+        DocSection target,
+        string breadcrumb,
+        string fullQuery,
+        string[] keywords,
+        Action<DocSearchResult>? onNavigate)
+    {
+        string content = target.Content ?? string.Empty;
+        var paragraphs = ExtractParagraphs(content);
+
+        var matchingParagraphs = new List<string>();
+
+        bool titleMatches = target.Title.IndexOf(fullQuery, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            breadcrumb.IndexOf(fullQuery, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                            keywords.All(k => target.Title.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                              breadcrumb.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0);
+
+        foreach (var p in paragraphs)
+        {
+            bool paragraphMatches = p.IndexOf(fullQuery, StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                    keywords.All(k => p.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0);
+
+            if (paragraphMatches)
+            {
+                matchingParagraphs.Add(p);
+            }
+        }
+
+        if (matchingParagraphs.Count > 0)
+        {
+            var result = new DocSearchResult(onNavigate)
+            {
+                Title = target.Title,
+                Breadcrumb = breadcrumb,
+                SearchQuery = fullQuery,
+                H1Section = h1,
+                H2Section = h2,
+                H3Section = h3,
+                TargetSection = target
+            };
+            foreach (var p in matchingParagraphs)
+            {
+                result.MatchingParagraphs.Add(new DocSearchParagraph
+                {
+                    Text = p,
+                    HighlightQuery = fullQuery
+                });
+            }
+
+            results.Add(result);
+        }
+        else if (titleMatches && paragraphs.Count > 0)
+        {
+            var result = new DocSearchResult(onNavigate)
+            {
+                Title = target.Title,
+                Breadcrumb = breadcrumb,
+                SearchQuery = fullQuery,
+                H1Section = h1,
+                H2Section = h2,
+                H3Section = h3,
+                TargetSection = target
+            };
+            result.MatchingParagraphs.Add(new DocSearchParagraph
+            {
+                Text = paragraphs[0],
+                HighlightQuery = fullQuery
+            });
+            results.Add(result);
+        }
     }
 
     public static string GetDefaultDocumentationMarkdown()

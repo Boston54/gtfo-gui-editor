@@ -373,4 +373,80 @@ public class LightingTests
         Assert.True(vm.HasMissingCategories);
         Assert.Contains("Special", vm.MissingCategoriesWarning);
     }
+
+    [Fact]
+    public void LightingViewModel_AvailableTemplates_LoadsVanillaBlocks()
+    {
+        var vm = new LightingViewModel();
+        Assert.NotEmpty(vm.AvailableTemplates);
+        Assert.Contains(vm.AvailableTemplates, t => t.PersistentId == 1 && t.Name == "BlueToOrange_1");
+    }
+
+    [Fact]
+    public void LightingViewModel_CreateBlock_FromVanilla_ImportsVanillaTemplate()
+    {
+        var vm = new LightingViewModel();
+        vm.OpenCreateBlockDialog();
+
+        vm.IsCreatingFromVanilla = true;
+        Assert.True(vm.IsCreatingFromVanilla);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.False(vm.IsCreatingFromExisting);
+
+        var template = vm.AvailableTemplates.First(t => t.PersistentId == 1);
+        vm.SelectedVanillaTemplate = template;
+        Assert.Equal("BlueToOrange_1", vm.NewBlockName);
+
+        vm.NewBlockPersistentId = 654321;
+        vm.NewBlockName = "Imported_BlueToOrange";
+        Assert.True(vm.ConfirmCreateBlock());
+
+        Assert.NotNull(vm.SelectedBlock);
+        Assert.Equal((uint)654321, vm.SelectedBlock.PersistentId);
+        Assert.Equal("Imported_BlueToOrange", vm.SelectedBlock.Name);
+        Assert.Equal(template.LightCategorySettings.Count, vm.SelectedBlock.LightCategorySettings.Count);
+    }
+
+    [Fact]
+    public void LightingViewModel_CreateBlock_FromExisting_DuplicatesExistingBlock()
+    {
+        var existing = LightSettingsService.CreateFreshBlock(112233, "MyCustomLighting");
+        var vm = new LightingViewModel(new[] { existing });
+        Assert.True(vm.HasExistingConfigs);
+        Assert.True(vm.HasExistingBlocks);
+
+        vm.OpenDuplicateBlockDialog(existing);
+        Assert.True(vm.IsCreatingFromExisting);
+        Assert.False(vm.IsCreatingFresh);
+        Assert.False(vm.IsCreatingFromVanilla);
+        Assert.Equal(existing, vm.SelectedExistingBlock);
+        Assert.Equal("MyCustomLighting_Copy", vm.NewBlockName);
+
+        vm.NewBlockPersistentId = 445566;
+        Assert.True(vm.ConfirmCreateBlock());
+
+        Assert.NotNull(vm.SelectedBlock);
+        Assert.Equal((uint)445566, vm.SelectedBlock.PersistentId);
+        Assert.Equal("MyCustomLighting_Copy", vm.SelectedBlock.Name);
+        Assert.Equal(existing.LightCategorySettings.Count, vm.SelectedBlock.LightCategorySettings.Count);
+    }
+
+    [Fact]
+    public void LightingViewModel_CreateBlock_ValidationErrors_WhenNoTemplateSelected()
+    {
+        var vm = new LightingViewModel();
+        vm.OpenCreateBlockDialog();
+        vm.IsCreatingFromExisting = true;
+        vm.SelectedExistingBlock = null;
+        vm.NewBlockPersistentId = 12345;
+        vm.NewBlockName = "Test";
+
+        Assert.False(vm.ConfirmCreateBlock());
+        Assert.Equal("Please select an existing config to duplicate.", vm.CreationErrorMessage);
+
+        vm.IsCreatingFromVanilla = true;
+        vm.SelectedVanillaTemplate = null;
+        Assert.False(vm.ConfirmCreateBlock());
+        Assert.Equal("Please select a vanilla config to import.", vm.CreationErrorMessage);
+    }
 }

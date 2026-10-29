@@ -273,17 +273,34 @@
                                Foreground="LightGray"
                                FontSize="12"/>
 
-                    <!-- Option: Blank or Template -->
+                    <!-- Option: Blank, Existing Config, or Vanilla Import -->
                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
                         <StackPanel Spacing="10">
                             <RadioButton Content="Create a new fresh (default) config" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
-                            <RadioButton Content="Use an existing config as a template" IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
 
-                            <!-- Template Selector -->
-                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromTemplate}" Margin="20,4,0,0">
-                                <TextBlock Text="Select Config Template:" FontSize="12" Foreground="LightGray"/>
+                            <RadioButton Content="Use an existing config as a template" IsChecked="{Binding IsCreatingFromExisting, Mode=TwoWay}" IsEnabled="{Binding HasExistingConfigs}"/>
+
+                            <!-- Existing Config Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromExisting}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Existing Config:" ToolTip.Tip="Select an existing lighting config from this project to copy properties from." FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding Blocks}"
+                                          SelectedItem="{Binding SelectedExistingBlock, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:LightSettingsBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <RadioButton Content="Import a config from vanilla" IsChecked="{Binding IsCreatingFromVanilla, Mode=TwoWay}"/>
+
+                            <!-- Vanilla Template Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromVanilla}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Vanilla Config:" ToolTip.Tip="Select a vanilla lighting config to import properties from." FontSize="12" Foreground="LightGray"/>
                                 <ComboBox ItemsSource="{Binding AvailableTemplates}"
-                                          SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
+                                          SelectedItem="{Binding SelectedVanillaTemplate, Mode=TwoWay}"
                                           HorizontalAlignment="Stretch">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate x:DataType="models:LightSettingsBlock">
@@ -297,11 +314,11 @@
 
                     <!-- Name and PersistentID -->
                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" VerticalAlignment="Center" Margin="0,0,10,8"/>
-                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8"/>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the lighting setting." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8" Watermark="Enter config name..."/>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" VerticalAlignment="Center" Margin="0,0,10,0"/>
-                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this lighting setting." VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}" Watermark="Enter integer ID..."/>
                     </Grid>
 
                     <!-- Error Message Banner -->

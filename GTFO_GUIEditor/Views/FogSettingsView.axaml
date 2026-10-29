@@ -221,41 +221,57 @@
                                FontSize="16"
                                Foreground="#E0E0E0"/>
 
-                    <!-- Mode: Fresh vs Copy -->
-                    <StackPanel Spacing="6">
-                        <RadioButton Content="Create fresh config (defaults)"
-                                     IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
-                        <RadioButton Content="Copy from existing template"
-                                     IsChecked="{Binding IsCreatingFromTemplate, Mode=TwoWay}"/>
-                    </StackPanel>
+                    <TextBlock Text="Choose how you want to create the new fog config:"
+                               Foreground="LightGray"
+                               FontSize="12"/>
 
-                    <!-- Template Picker (visible when copying) -->
-                    <StackPanel Spacing="4" IsVisible="{Binding IsCreatingFromTemplate}">
-                        <TextBlock Text="Template:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
-                        <ComboBox ItemsSource="{Binding AvailableTemplates}"
-                                  SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"
-                                  HorizontalAlignment="Stretch">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate x:DataType="models:FogSettingsBlock">
-                                    <TextBlock Text="{Binding DisplayText}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
+                    <!-- Option: Blank, Existing Config, or Vanilla Import -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="10">
+                        <StackPanel Spacing="10">
+                            <RadioButton Content="Create a new fresh (default) config" IsChecked="{Binding IsCreatingFresh, Mode=TwoWay}"/>
 
-                    <!-- Name Field -->
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Config Name:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
-                        <TextBox Text="{Binding NewBlockName, Mode=TwoWay}"
-                                 Watermark="Enter config name..."/>
-                    </StackPanel>
+                            <RadioButton Content="Use an existing config as a template" IsChecked="{Binding IsCreatingFromExisting, Mode=TwoWay}" IsEnabled="{Binding HasExistingConfigs}"/>
 
-                    <!-- Persistent ID Field -->
-                    <StackPanel Spacing="4">
-                        <TextBlock Text="Persistent ID:" FontWeight="SemiBold" FontSize="12" Foreground="#AAAAAA"/>
-                        <TextBox Text="{Binding NewBlockPersistentId, Mode=TwoWay}"
-                                 Watermark="Enter integer ID..."/>
-                    </StackPanel>
+                            <!-- Existing Config Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromExisting}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Existing Config:" ToolTip.Tip="Select an existing fog config from this project to copy properties from." FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding Blocks}"
+                                          SelectedItem="{Binding SelectedExistingBlock, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:FogSettingsBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+
+                            <RadioButton Content="Import a config from vanilla" IsChecked="{Binding IsCreatingFromVanilla, Mode=TwoWay}"/>
+
+                            <!-- Vanilla Template Selector -->
+                            <StackPanel Spacing="6" IsVisible="{Binding IsCreatingFromVanilla}" Margin="20,4,0,0">
+                                <TextBlock Text="Select Vanilla Config:" ToolTip.Tip="Select a vanilla fog config to import properties from." FontSize="12" Foreground="LightGray"/>
+                                <ComboBox ItemsSource="{Binding AvailableTemplates}"
+                                          SelectedItem="{Binding SelectedVanillaTemplate, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:FogSettingsBlock">
+                                            <TextBlock Text="{Binding DisplayText}"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Name and PersistentID -->
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Config Name:" ToolTip.Tip="Internal name for the fog setting." VerticalAlignment="Center" Margin="0,0,10,8"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8" Watermark="Enter config name..."/>
+
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this fog setting." VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}" Watermark="Enter integer ID..."/>
+                    </Grid>
 
                     <!-- Error Banner -->
                     <Border Background="#3A1C1C"

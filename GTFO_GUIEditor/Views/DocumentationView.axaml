@@ -3,76 +3,218 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:views="clr-namespace:GTFO_GUIEditor.Views;assembly=GTFO_GUIEditor"
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
              x:Class="GTFO_GUIEditor.Views.DocumentationView"
              x:DataType="vm:DocumentationViewModel">
     <Grid>
-        <!-- Top-level TabControl for H1 sections -->
-        <TabControl ItemsSource="{Binding Sections}"
+        <!-- Top-level TabControl for Search + H1 sections -->
+        <TabControl ItemsSource="{Binding DisplayTabs}"
                     SelectedItem="{Binding SelectedSection, Mode=TwoWay}"
                     Margin="0">
             <TabControl.ItemTemplate>
                 <DataTemplate x:DataType="models:DocSection">
-                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14"/>
+                    <Panel>
+                        <!-- Distinct Search Button Tab Styling -->
+                        <Border IsVisible="{Binding IsSearchTab}"
+                                Background="#1D385A"
+                                BorderBrush="#3B73A8"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                Padding="10,3"
+                                Margin="2,1">
+                            <TextBlock Text="Search"
+                                       FontWeight="Bold"
+                                       FontSize="13"
+                                       Foreground="#8EC5FC"
+                                       VerticalAlignment="Center"/>
+                        </Border>
+
+                        <!-- Standard Doc Section Tab Header -->
+                        <TextBlock IsVisible="{Binding !IsSearchTab}"
+                                   Text="{Binding Title}"
+                                   FontWeight="SemiBold"
+                                   FontSize="14"
+                                   VerticalAlignment="Center"
+                                   Margin="2,0"/>
+                    </Panel>
                 </DataTemplate>
             </TabControl.ItemTemplate>
             <TabControl.ContentTemplate>
                 <DataTemplate x:DataType="models:DocSection">
                     <Grid Margin="4,8,8,4">
-                        <!-- If this H1 has H2 subtabs -->
-                        <TabControl ItemsSource="{Binding SubSections}"
-                                    SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
-                                    IsVisible="{Binding HasSubSections}"
-                                    Margin="0">
-                            <TabControl.ItemTemplate>
-                                <DataTemplate x:DataType="models:DocSection">
-                                    <TextBlock Text="{Binding Title}" FontSize="13"/>
-                                </DataTemplate>
-                            </TabControl.ItemTemplate>
-                            <TabControl.ContentTemplate>
-                                <DataTemplate x:DataType="models:DocSection">
-                                    <Grid Margin="2,6,4,2">
-                                        <!-- If this H2 has H3 sub-subtabs -->
-                                        <TabControl ItemsSource="{Binding SubSections}"
-                                                    SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
-                                                    IsVisible="{Binding HasSubSections}"
-                                                    Margin="0">
-                                            <TabControl.ItemTemplate>
-                                                <DataTemplate x:DataType="models:DocSection">
-                                                    <TextBlock Text="{Binding Title}" FontSize="12"/>
-                                                </DataTemplate>
-                                            </TabControl.ItemTemplate>
-                                            <TabControl.ContentTemplate>
-                                                <DataTemplate x:DataType="models:DocSection">
-                                                    <ScrollViewer Padding="12,10,12,14"
-                                                                  HorizontalScrollBarVisibility="Disabled"
-                                                                  VerticalScrollBarVisibility="Auto">
-                                                        <ContentControl Content="{Binding RenderedContent}"/>
-                                                    </ScrollViewer>
-                                                </DataTemplate>
-                                            </TabControl.ContentTemplate>
-                                        </TabControl>
+                        <!-- Search Tab Content -->
+                        <Panel IsVisible="{Binding IsSearchTab}">
+                            <Grid DataContext="{Binding $parent[views:DocumentationView].DataContext}"
+                                  x:DataType="vm:DocumentationViewModel"
+                                  RowDefinitions="Auto,Auto,*"
+                                  Margin="8,4,8,8">
+                                <!-- Search Input Row -->
+                                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,10">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding SearchQuery, Mode=TwoWay}"
+                                             Watermark="Search documentation for keyword(s)..."
+                                             FontSize="13"
+                                             Padding="10,7"
+                                             VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Content="Search"
+                                            Command="{Binding SearchCommand}"
+                                            Margin="8,0,0,0"
+                                            Padding="14,7"
+                                            FontWeight="SemiBold"
+                                            Background="#2D5A88"
+                                            Foreground="White"
+                                            VerticalAlignment="Center"/>
+                                    <Button Grid.Column="2"
+                                            Content="Clear"
+                                            Command="{Binding ClearSearchCommand}"
+                                            Margin="6,0,0,0"
+                                            Padding="10,7"
+                                            Background="#333333"
+                                            Foreground="#CCCCCC"
+                                            VerticalAlignment="Center"
+                                            IsVisible="{Binding HasSearchQuery}"/>
+                                </Grid>
 
-                                        <!-- If no H3 subtabs, show H2 content directly -->
-                                        <ScrollViewer Padding="12,10,12,14"
-                                                      HorizontalScrollBarVisibility="Disabled"
-                                                      VerticalScrollBarVisibility="Auto"
-                                                      IsVisible="{Binding !HasSubSections}">
-                                            <ContentControl Content="{Binding RenderedContent}"/>
-                                        </ScrollViewer>
-                                    </Grid>
-                                </DataTemplate>
-                            </TabControl.ContentTemplate>
-                        </TabControl>
+                                <!-- Status Message -->
+                                <TextBlock Grid.Row="1"
+                                           Text="{Binding SearchStatusMessage}"
+                                           Foreground="#AAAAAA"
+                                           FontSize="12"
+                                           Margin="2,0,0,10"
+                                           IsVisible="{Binding HasSearchStatus}"/>
 
-                        <!-- If no H2 subtabs, show H1 content directly -->
-                        <ScrollViewer Padding="12,10,24,14"
-                                      HorizontalScrollBarVisibility="Disabled"
-                                      VerticalScrollBarVisibility="Auto"
-                                      IsVisible="{Binding !HasSubSections}">
-                            <ContentControl Content="{Binding RenderedContent}"/>
-                        </ScrollViewer>
+                                <!-- Search Results List -->
+                                <ScrollViewer Grid.Row="2"
+                                              HorizontalScrollBarVisibility="Disabled"
+                                              VerticalScrollBarVisibility="Auto">
+                                    <StackPanel Spacing="12">
+                                        <!-- Initial Search Prompt -->
+                                        <Border IsVisible="{Binding ShowSearchPrompt}"
+                                                Background="#181818"
+                                                BorderBrush="#2A2A2A"
+                                                BorderThickness="1"
+                                                CornerRadius="6"
+                                                Padding="24,32"
+                                                HorizontalAlignment="Stretch">
+                                            <StackPanel HorizontalAlignment="Center" Spacing="8">
+                                                <TextBlock Text="Search User Documentation"
+                                                           FontSize="15"
+                                                           FontWeight="SemiBold"
+                                                           Foreground="#E0E0E0"
+                                                           HorizontalAlignment="Center"/>
+                                                <TextBlock Text="Enter keywords above to search all pages, guides, tables, and shortcuts."
+                                                           Foreground="#888888"
+                                                           FontSize="12"
+                                                           HorizontalAlignment="Center"/>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Result Cards -->
+                                        <ItemsControl ItemsSource="{Binding SearchResults}"
+                                                      IsVisible="{Binding HasSearchResults}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="models:DocSearchResult">
+                                                    <Border Background="#1C1E22"
+                                                            BorderBrush="#2D323B"
+                                                            BorderThickness="1"
+                                                            CornerRadius="6"
+                                                            Padding="14,10"
+                                                            Margin="0,0,0,10">
+                                                        <StackPanel Spacing="6">
+                                                            <!-- Clickable Page Title Button -->
+                                                            <Button Command="{Binding NavigateCommand}"
+                                                                    Background="Transparent"
+                                                                    BorderThickness="0"
+                                                                    Padding="0"
+                                                                    Cursor="Hand"
+                                                                    HorizontalAlignment="Left">
+                                                                <ContentControl Content="{Binding RenderedTitle}"/>
+                                                            </Button>
+
+                                                            <!-- Matching Paragraphs in this Page -->
+                                                            <ItemsControl ItemsSource="{Binding MatchingParagraphs}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate x:DataType="models:DocSearchParagraph">
+                                                                        <Border Background="#141619"
+                                                                                BorderBrush="#262A30"
+                                                                                BorderThickness="1"
+                                                                                CornerRadius="4"
+                                                                                Padding="10,8"
+                                                                                Margin="0,2,0,4">
+                                                                            <ContentControl Content="{Binding RenderedContent}"/>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </StackPanel>
+                                                    </Border>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </ScrollViewer>
+                            </Grid>
+                        </Panel>
+
+                        <!-- Regular Documentation Section Tabs & Content -->
+                        <Panel IsVisible="{Binding !IsSearchTab}">
+                            <!-- If this H1 has H2 subtabs -->
+                            <TabControl ItemsSource="{Binding SubSections}"
+                                        SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
+                                        IsVisible="{Binding HasSubSections}"
+                                        Margin="0">
+                                <TabControl.ItemTemplate>
+                                    <DataTemplate x:DataType="models:DocSection">
+                                        <TextBlock Text="{Binding Title}" FontSize="13"/>
+                                    </DataTemplate>
+                                </TabControl.ItemTemplate>
+                                <TabControl.ContentTemplate>
+                                    <DataTemplate x:DataType="models:DocSection">
+                                        <Grid Margin="2,6,4,2">
+                                            <!-- If this H2 has H3 sub-subtabs -->
+                                            <TabControl ItemsSource="{Binding SubSections}"
+                                                        SelectedItem="{Binding SelectedSubSection, Mode=TwoWay}"
+                                                        IsVisible="{Binding HasSubSections}"
+                                                        Margin="0">
+                                                <TabControl.ItemTemplate>
+                                                    <DataTemplate x:DataType="models:DocSection">
+                                                        <TextBlock Text="{Binding Title}" FontSize="12"/>
+                                                    </DataTemplate>
+                                                </TabControl.ItemTemplate>
+                                                <TabControl.ContentTemplate>
+                                                    <DataTemplate x:DataType="models:DocSection">
+                                                        <ScrollViewer Padding="12,10,12,14"
+                                                                      HorizontalScrollBarVisibility="Disabled"
+                                                                      VerticalScrollBarVisibility="Auto">
+                                                            <ContentControl Content="{Binding RenderedContent}"/>
+                                                        </ScrollViewer>
+                                                    </DataTemplate>
+                                                </TabControl.ContentTemplate>
+                                            </TabControl>
+
+                                            <!-- If no H3 subtabs, show H2 content directly -->
+                                            <ScrollViewer Padding="12,10,12,14"
+                                                          HorizontalScrollBarVisibility="Disabled"
+                                                          VerticalScrollBarVisibility="Auto"
+                                                          IsVisible="{Binding !HasSubSections}">
+                                                <ContentControl Content="{Binding RenderedContent}"/>
+                                            </ScrollViewer>
+                                        </Grid>
+                                    </DataTemplate>
+                                </TabControl.ContentTemplate>
+                            </TabControl>
+
+                            <!-- If no H2 subtabs, show H1 content directly -->
+                            <ScrollViewer Padding="12,10,24,14"
+                                          HorizontalScrollBarVisibility="Disabled"
+                                          VerticalScrollBarVisibility="Auto"
+                                          IsVisible="{Binding !HasSubSections}">
+                                <ContentControl Content="{Binding RenderedContent}"/>
+                            </ScrollViewer>
+                        </Panel>
                     </Grid>
                 </DataTemplate>
             </TabControl.ContentTemplate>
