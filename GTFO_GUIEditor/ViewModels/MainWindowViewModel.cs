@@ -15,6 +15,10 @@ public class MainWindowViewModel : ViewModelBase
     private string? _lastExportDirectory;
     private string _statusMessage = string.Empty;
     private ObservableCollection<RecentFileItem> _recentFiles = new();
+    private bool _isShowingImportNotification;
+    private string _importNotificationTitle = string.Empty;
+    private string _importNotificationMessage = string.Empty;
+    private ObservableCollection<LevelImportFailure> _importFailedLevels = new();
 
     public DocumentationViewModel Documentation { get; }
     public SoundsViewModel Sounds { get; }
@@ -30,6 +34,30 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _recentFiles;
         private set => SetField(ref _recentFiles, value);
+    }
+
+    public bool IsShowingImportNotification
+    {
+        get => _isShowingImportNotification;
+        set => SetField(ref _isShowingImportNotification, value);
+    }
+
+    public string ImportNotificationTitle
+    {
+        get => _importNotificationTitle;
+        set => SetField(ref _importNotificationTitle, value);
+    }
+
+    public string ImportNotificationMessage
+    {
+        get => _importNotificationMessage;
+        set => SetField(ref _importNotificationMessage, value);
+    }
+
+    public ObservableCollection<LevelImportFailure> ImportFailedLevels
+    {
+        get => _importFailedLevels;
+        set => SetField(ref _importFailedLevels, value);
     }
 
     public string? CurrentFilePath
@@ -321,6 +349,76 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
+    public async Task ImportDatablocksFromAsync()
+    {
+        string initialDir = !string.IsNullOrWhiteSpace(LastExportDirectory) && Directory.Exists(LastExportDirectory)
+            ? LastExportDirectory
+            : _fileDialogService.DefaultRundownsDirectory;
+
+        string? selectedFolder = await _fileDialogService.ShowOpenFolderDialogAsync(
+            defaultDirectory: initialDir,
+            title: "Select Directory to Import Datablocks From");
+
+        if (string.IsNullOrWhiteSpace(selectedFolder))
+        {
+            return;
+        }
+
+        try
+        {
+            var result = DatablockManager.Instance.ImportDatablocks(this, selectedFolder);
+            HandleImportResult(result);
+        }
+        catch (Exception ex)
+        {
+            StatusMessage = $"Import error: {ex.Message}";
+        }
+    }
+
+    public void HandleImportResult(ImportResult result)
+    {
+        if (result.FailedLevels.Count > 0)
+        {
+            ImportFailedLevels.Clear();
+            foreach (var failure in result.FailedLevels)
+            {
+                ImportFailedLevels.Add(failure);
+            }
+
+            ImportNotificationTitle = "Level Import Failure";
+            ImportNotificationMessage = $"{result.FailedLevels.Count} level(s) failed to load due to missing LGTunerAdvanced configuration file(s).";
+            IsShowingImportNotification = true;
+        }
+
+        if (result.Success)
+        {
+            StatusMessage = result.Message;
+        }
+        else
+        {
+            StatusMessage = $"Import error: {result.Message}";
+        }
+    }
+
+    public void CloseImportNotification()
+    {
+        IsShowingImportNotification = false;
+    }
+
+    public ImportResult ImportDatablocks(string inputDirectory)
+    {
+        var result = DatablockManager.Instance.ImportDatablocks(this, inputDirectory);
+        HandleImportResult(result);
+        return result;
+    }
+
+    public async Task<ImportResult> ImportDatablocksAsync(string inputDirectory)
+    {
+        var result = await DatablockManager.Instance.ImportDatablocksAsync(this, inputDirectory);
+        HandleImportResult(result);
+        return result;
+    }
+
     public void SaveRundown() => _ = SaveRundownAsync();
     public void SaveAsRundown() => _ = SaveAsRundownAsync();
     public void OpenRundown() => _ = OpenRundownAsync();
@@ -328,4 +426,6 @@ public class MainWindowViewModel : ViewModelBase
     public void QuickExportDatablocks() => _ = QuickExportDatablocksAsync();
     public void ExportDatablocksTo() => _ = ExportDatablocksToAsync();
     public void ExportDatablocks() => _ = QuickExportDatablocksAsync();
+    public void ImportDatablocksFrom() => _ = ImportDatablocksFromAsync();
+    public void ImportProject() => _ = ImportDatablocksFromAsync();
 }

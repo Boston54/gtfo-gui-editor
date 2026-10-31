@@ -51,18 +51,12 @@ public class SectorSettings : INotifyPropertyChanged
 
     private void Objectives_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (_objectives.Count == 0)
-        {
-            var fallback = new WardenObjective { ObjectiveNumber = 1 };
-            _objectives.Add(fallback);
-        }
-
         for (int i = 0; i < _objectives.Count; i++)
         {
             _objectives[i].ObjectiveNumber = i + 1;
         }
 
-        HookPrimaryObjective(PrimaryObjective);
+        HookPrimaryObjective(_objectives.Count > 0 ? _objectives[0] : null);
         OnPropertyChanged(nameof(Objectives));
         OnPropertyChanged(nameof(PrimaryObjective));
     }

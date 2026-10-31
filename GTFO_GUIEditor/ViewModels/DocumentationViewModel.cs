@@ -159,13 +159,6 @@ public class DocumentationViewModel : ViewModelBase
                 Sections = DocumentationService.ParseDocument(markdown);
                 SelectedSection = GetDefaultSection();
             }
-            else
-            {
-                SourceFilePath = "Built-in Defaults";
-                string fallback = DocumentationService.GetDefaultDocumentationMarkdown();
-                Sections = DocumentationService.ParseDocument(fallback);
-                SelectedSection = GetDefaultSection();
-            }
         }
         catch (Exception ex)
         {

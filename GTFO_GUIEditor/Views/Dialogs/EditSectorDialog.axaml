@@ -333,10 +333,18 @@
                                       HorizontalContentAlignment="Stretch"
                                       IsVisible="{Binding IsMainSector}">
                                 <Expander.Header>
-                                    <TextBlock Text="Waves on Elevator Land"
-                                               FontWeight="SemiBold"
-                                               FontSize="13"
-                                               Foreground="#FFA200"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Waves on Elevator Land"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#FFA200"
+                                                   VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Column="1"
+                                                  IsChecked="{Binding ActiveEditingObjective.WavesOnElevatorLand.Enabled, Mode=TwoWay}"
+                                                  Content="Enabled"
+                                                  Foreground="#FFA200"
+                                                  Margin="0,0,10,0"/>
+                                    </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="10" Margin="0,10,0,0">
                                     <!-- Wave Roles (Enemy Selection) -->
@@ -550,11 +558,19 @@
                                       HorizontalAlignment="Stretch"
                                       HorizontalContentAlignment="Stretch">
                                 <Expander.Header>
-                                    <TextBlock Text="Waves on Activate"
-                                               ToolTip.Tip="Waves to spawn when the objective is 'activated'"
-                                               FontWeight="SemiBold"
-                                               FontSize="13"
-                                               Foreground="#FFA200"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Waves on Activate"
+                                                   ToolTip.Tip="Waves to spawn when the objective is 'activated'"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#FFA200"
+                                                   VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Column="1"
+                                                  IsChecked="{Binding ActiveEditingObjective.WavesOnActivate.Enabled, Mode=TwoWay}"
+                                                  Content="Enabled"
+                                                  Foreground="#FFA200"
+                                                  Margin="0,0,10,0"/>
+                                    </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="10" Margin="0,10,0,0">
                                     <!-- Wave Roles (Enemy Selection) -->
@@ -823,10 +839,18 @@
                                       HorizontalAlignment="Stretch"
                                       HorizontalContentAlignment="Stretch">
                                 <Expander.Header>
-                                    <TextBlock Text="Waves on Go To Win"
-                                               FontWeight="SemiBold"
-                                               FontSize="13"
-                                               Foreground="#FFA200"/>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Waves on Go To Win"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#FFA200"
+                                                   VerticalAlignment="Center"/>
+                                        <CheckBox Grid.Column="1"
+                                                  IsChecked="{Binding ActiveEditingObjective.WavesOnGotoWin.Enabled, Mode=TwoWay}"
+                                                  Content="Enabled"
+                                                  Foreground="#FFA200"
+                                                  Margin="0,0,10,0"/>
+                                    </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="10" Margin="0,10,0,0">
                                     <!-- Wave Roles (Enemy Selection) -->

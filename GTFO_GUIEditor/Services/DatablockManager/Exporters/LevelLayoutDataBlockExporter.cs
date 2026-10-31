@@ -169,81 +169,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             var gridState = level.GridState ?? new LevelLayoutGridState();
 
             // Build tree of room connections via BFS starting from root geomorph
-            var roomParentInfo = new Dictionary<(string geoId, int areaIdx), (int prevX, int prevZ, int prevArea, int expanderId)>();
-            if (gridState.PlacedGeomorphs.Count > 0)
-            {
-                var rootGeo = gridState.PlacedGeomorphs.FirstOrDefault(g => g.GridX == 0 && g.GridY == 0) ??
-                              gridState.PlacedGeomorphs[0];
-                var visitedRooms = new HashSet<(string geoId, int areaIdx)>();
-                var queue = new Queue<(PlacedGeomorphNode geo, int areaIdx)>();
-
-                var rootKey = (rootGeo.Id, 0);
-                visitedRooms.Add(rootKey);
-                roomParentInfo[rootKey] = (rootGeo.GridX, -rootGeo.GridY, 0, 0);
-                queue.Enqueue((rootGeo, 0));
-
-                while (queue.Count > 0)
-                {
-                    var (currGeo, currArea) = queue.Dequeue();
-
-                    // Internal doors in same geomorph
-                    foreach (var d in gridState.PlacedDoors.Where(d =>
-                                 d.IsInternal && d.Geomorph == currGeo && (d.IsConnected || d.IsZoneBoundary)))
-                    {
-                        int neighborArea = -1;
-                        if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
-                        else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
-
-                        if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
-                        {
-                            var neighborKey = (currGeo.Id, neighborArea);
-                            if (!visitedRooms.Contains(neighborKey))
-                            {
-                                visitedRooms.Add(neighborKey);
-
-                                int expanderId = -1;
-                                if (currGeo.Metadata?.AreaDatas != null && currArea >= 0 &&
-                                    currArea < currGeo.Metadata.AreaDatas.Count)
-                                {
-                                    var expanders = currGeo.Metadata.AreaDatas[currArea].ExpanderDatas;
-                                    if (expanders != null)
-                                    {
-                                        expanderId = expanders.FindIndex(e => e.AreaTo == neighborArea);
-                                    }
-                                }
-
-                                if (expanderId < 0)
-                                {
-                                    expanderId = d.ExpanderIndex;
-                                }
-
-                                roomParentInfo[neighborKey] = (currGeo.GridX, -currGeo.GridY, currArea, expanderId);
-                                queue.Enqueue((currGeo, neighborArea));
-                            }
-                        }
-                    }
-
-                    // External doors to adjacent geomorphs
-                    foreach (var d in gridState.PlacedDoors.Where(d =>
-                                 !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea &&
-                                 d.ConnectedDoor != null &&
-                                 (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary)))
-                    {
-                        var otherDoor = d.ConnectedDoor!;
-                        var otherGeo = otherDoor.Geomorph;
-                        if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
-                        {
-                            var neighborKey = (otherGeo.Id, otherDoor.AreaFrom);
-                            if (!visitedRooms.Contains(neighborKey))
-                            {
-                                visitedRooms.Add(neighborKey);
-                                roomParentInfo[neighborKey] = (currGeo.GridX, -currGeo.GridY, d.AreaFrom, d.ExpanderIndex);
-                                queue.Enqueue((otherGeo, otherDoor.AreaFrom));
-                            }
-                        }
-                    }
-                }
-            }
+            var roomParentInfo = BuildRoomProgressionParentMap(gridState);
 
             // Determine sectors to export for this level
             var sectorConfigs = new List<(SectorType Sector, uint LayoutId, string Name, SectorSettings? Settings, List<int> Zones, bool IsMain)>();
@@ -290,11 +216,110 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     int zoneNumber = sectorZones[zIdx];
                     var zoneSettings = gridState.GetOrCreateZoneSettings(sectorCfg.Sector, zoneNumber);
 
-                    // Find entering door for blood door / security settings
-                    var enteringDoor = gridState.PlacedDoors.FirstOrDefault(d =>
-                        d.Geomorph != null &&
-                        d.Geomorph.GeneratedRooms.Any(a => d.Geomorph.GetRoomSector(a) == sectorCfg.Sector && d.Geomorph.GetRoomZone(a) == zoneNumber) &&
-                        d.IsConnected);
+                    // Find candidate entering doors
+                    var candidateDoors = new List<PlacedDoorNode>();
+
+                    foreach (var d in gridState.PlacedDoors)
+                    {
+                        if (d.IsInternal || d.ConnectedDoor == null || d.Geomorph == null || d.ConnectedDoor.Geomorph == null) continue;
+                        if (!d.Geomorph.IsRoomGenerated(d.AreaFrom) || !d.ConnectedDoor.Geomorph.IsRoomGenerated(d.ConnectedDoor.AreaFrom)) continue;
+
+                        var s1 = d.Geomorph.GetRoomSector(d.AreaFrom);
+                        int z1 = d.Geomorph.GetRoomZone(d.AreaFrom);
+
+                        var s2 = d.ConnectedDoor.Geomorph.GetRoomSector(d.ConnectedDoor.AreaFrom);
+                        int z2 = d.ConnectedDoor.Geomorph.GetRoomZone(d.ConnectedDoor.AreaFrom);
+
+                        if (s1 == sectorCfg.Sector && z1 == zoneNumber)
+                        {
+                            if (s2 == sectorCfg.Sector && z2 < zoneNumber)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                            else if (sectorCfg.Sector != SectorType.Main && zoneNumber == 0 && s2 == SectorType.Main)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                        }
+                    }
+
+                    foreach (var d in gridState.PlacedDoors)
+                    {
+                        if (!d.IsInternal || d.Geomorph == null) continue;
+                        if (!d.Geomorph.IsRoomGenerated(d.AreaFrom) || !d.Geomorph.IsRoomGenerated(d.AreaTo)) continue;
+
+                        var sFrom = d.Geomorph.GetRoomSector(d.AreaFrom);
+                        int zFrom = d.Geomorph.GetRoomZone(d.AreaFrom);
+
+                        var sTo = d.Geomorph.GetRoomSector(d.AreaTo);
+                        int zTo = d.Geomorph.GetRoomZone(d.AreaTo);
+
+                        if (sFrom == sectorCfg.Sector && zFrom == zoneNumber)
+                        {
+                            if (sTo == sectorCfg.Sector && zTo < zoneNumber)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                            else if (sectorCfg.Sector != SectorType.Main && zoneNumber == 0 && sTo == SectorType.Main)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                        }
+                        else if (sTo == sectorCfg.Sector && zTo == zoneNumber)
+                        {
+                            if (sFrom == sectorCfg.Sector && zFrom < zoneNumber)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                            else if (sectorCfg.Sector != SectorType.Main && zoneNumber == 0 && sFrom == SectorType.Main)
+                            {
+                                candidateDoors.Add(d);
+                            }
+                        }
+                    }
+
+                    // Prioritize doors that have security / blood / puzzle configured
+                    PlacedDoorNode? enteringDoor = candidateDoors.FirstOrDefault(d =>
+                        d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None ||
+                        (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)));
+
+                    if (enteringDoor == null && candidateDoors.Count > 0)
+                    {
+                        // Check if any candidate door matches the entrance in roomParentInfo
+                        foreach (var d in candidateDoors)
+                        {
+                            var geo = d.Geomorph;
+                            if (geo != null && roomParentInfo.TryGetValue((geo.Id, d.AreaFrom), out var pInfo))
+                            {
+                                if (d.IsInternal && pInfo.prevArea == d.AreaTo && pInfo.prevX == geo.GridX && pInfo.prevZ == -geo.GridY)
+                                {
+                                    enteringDoor = d;
+                                    break;
+                                }
+                                if (!d.IsInternal && d.ConnectedDoor?.Geomorph != null &&
+                                    pInfo.prevX == d.ConnectedDoor.Geomorph.GridX &&
+                                    pInfo.prevZ == -d.ConnectedDoor.Geomorph.GridY &&
+                                    pInfo.prevArea == d.ConnectedDoor.AreaFrom)
+                                {
+                                    enteringDoor = d;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (enteringDoor == null)
+                        {
+                            enteringDoor = candidateDoors[0];
+                        }
+                    }
+
+                    if (enteringDoor == null)
+                    {
+                        enteringDoor = gridState.PlacedDoors.FirstOrDefault(d =>
+                            d.Geomorph != null &&
+                            d.Geomorph.GeneratedRooms.Any(a => d.Geomorph.GetRoomSector(a) == sectorCfg.Sector && d.Geomorph.GetRoomZone(a) == zoneNumber) &&
+                            (d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None));
+                    }
 
                     var activeEnemyWaveObj = new JsonObject
                     {
@@ -317,6 +342,9 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
 
                     if (enteringDoor != null)
                     {
+                        securityGateToEnter = enteringDoor.IsApexDoor ? "Apex" : "Security";
+                        chainedPuzzleToEnter = enteringDoor.ChainedPuzzleToSolve;
+
                         if (enteringDoor.HasBloodDoor)
                         {
                             uint frontId = context.SynthesizeEnemyGroup(enteringDoor.EnemyGroupInFrontOfDoor,
@@ -356,12 +384,6 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                                 });
                             }
                             progPuzzleObj["ZonePlacementData"] = puzzlePlacementsArray;
-                        }
-
-                        if (enteringDoor.IsSecurityDoor || enteringDoor.IsApexDoor || enteringDoor.ChainedPuzzleToSolve > 0)
-                        {
-                            securityGateToEnter = enteringDoor.IsApexDoor ? "Apex" : "Security";
-                            chainedPuzzleToEnter = enteringDoor.ChainedPuzzleToSolve;
                         }
                     }
 
@@ -615,6 +637,25 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     var areaOverridesArray = new JsonArray();
                     var roomsInZone = gridState.PlacedRooms.Where(r => r.Sector == sectorCfg.Sector && r.Zone == zoneNumber).ToList();
 
+                    // Sort rooms so zone entrance room (connecting from another sector/zone) comes first
+                    roomsInZone = roomsInZone.OrderBy(r =>
+                    {
+                        if (r.Geomorph != null && roomParentInfo.TryGetValue((r.Geomorph.Id, r.AreaIndex), out var pInfo))
+                        {
+                            var pGeo = gridState.PlacedGeomorphs.FirstOrDefault(g => g.GridX == pInfo.prevX && g.GridY == -pInfo.prevZ);
+                            if (pGeo != null)
+                            {
+                                var pSec = pGeo.GetRoomSector(pInfo.prevArea);
+                                int pZone = pGeo.GetRoomZone(pInfo.prevArea);
+                                if (pSec != sectorCfg.Sector || pZone != zoneNumber)
+                                {
+                                    return 0;
+                                }
+                            }
+                        }
+                        return 1;
+                    }).ToList();
+
                     foreach (var room in roomsInZone)
                     {
                         var geo = room.Geomorph;
@@ -777,6 +818,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             foreach (var dim in level.Dimensions)
             {
                 uint dimId = context.DimensionAlloc.Allocate();
+                context.DimensionIds[dim] = dimId;
 
                 var dimGeos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 if (!string.IsNullOrWhiteSpace(dim.DimensionGeomorph))
@@ -786,18 +828,34 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
 
                 uint dimSetId = context.ComplexResourceAlloc.Allocate();
 
+                uint dimLayoutId = dim.LevelLayoutData;
+                if (dim.GridState != null && dim.GridState.PlacedGeomorphs.Count > 0)
+                {
+                    if (dimLayoutId == 0)
+                    {
+                        dimLayoutId = context.LevelLayoutAlloc.Allocate();
+                        dim.LevelLayoutData = dimLayoutId;
+                    }
+
+                    ExportDimensionLayout(dim, dimLayoutId, levelLayoutBlocks, context);
+                }
+                else if (dimLayoutId == 0)
+                {
+                    dimLayoutId = mainLayoutId;
+                }
+
                 var dimObj = new JsonObject
                 {
                     ["DimensionData"] = new JsonObject
                     {
-                        ["LevelLayoutData"] = dim.LevelLayoutData > 0 ? dim.LevelLayoutData : mainLayoutId,
+                        ["LevelLayoutData"] = dimLayoutId,
                         ["DimensionGeomorph"] = dim.DimensionGeomorph,
                         ["DimensionResourceSetID"] = dimSetId,
                         ["DimensionFogData"] = 0,
                         ["IsStaticDimension"] = false
                     },
                     ["name"] = dim.Name,
-                    ["internalEnabled"] = true,
+                    ["internalEnabled"] = dim.InternalEnabled,
                     ["persistentID"] = dimId
                 };
                 dimensionBlocks.Add(dimObj);
@@ -827,6 +885,288 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             "GameData_DimensionDataBlock_bin.json",
             context.DimensionBlocks);
         context.DatablocksExportedCount++;
+    }
+
+    private static void ExportDimensionLayout(
+        DimensionLayoutBlock dim,
+        uint layoutId,
+        List<JsonObject> levelLayoutBlocks,
+        ExportContext context)
+    {
+        var gridState = dim.GridState;
+        var zonesArray = new JsonArray();
+        var zoneOverridesList = new List<JsonObject>();
+
+        var distinctZones = gridState.PlacedGeomorphs
+            .SelectMany(g => g.GeneratedRooms.Select(a => g.GetRoomZone(a)))
+            .Concat(gridState.PlacedRooms.Select(r => r.Zone))
+            .Concat(gridState.ZoneSettingsMap.Keys.Select(k => k.ZoneIndex))
+            .Distinct()
+            .OrderBy(z => z)
+            .ToList();
+
+        if (distinctZones.Count == 0)
+        {
+            distinctZones.Add(0);
+        }
+
+        var roomParentInfo = BuildRoomProgressionParentMap(gridState);
+
+        foreach (int zoneNumber in distinctZones)
+        {
+            var zoneSettings = gridState.GetOrCreateZoneSettings(SectorType.Main, zoneNumber);
+            uint lightingId = zoneSettings.Lighting > 0
+                ? zoneSettings.Lighting
+                : (context.MainVm.Lighting.Blocks.FirstOrDefault()?.PersistentId ?? 1);
+
+            var zoneObj = new JsonObject
+            {
+                ["LocalIndex"] = $"Zone_{zoneNumber}",
+                ["SubSeed"] = zoneSettings.SubSeed,
+                ["MarkerSubSeed"] = zoneSettings.MarkerSubSeed,
+                ["LightsSubSeed"] = zoneSettings.LightingSubSeed,
+                ["LightSettings"] = lightingId,
+                ["ConsumableDistributionInZone"] = zoneSettings.ConsumableDistributionInZone,
+                ["StaticSpawnDataContainers"] = new JsonArray()
+            };
+
+            zonesArray.Add(zoneObj);
+
+            var areaOverridesArray = new JsonArray();
+            var roomsInZone = gridState.PlacedRooms.Where(r => r.Zone == zoneNumber).ToList();
+
+            // Sort rooms so zone entrance room (connecting from another zone) comes first
+            roomsInZone = roomsInZone.OrderBy(r =>
+            {
+                if (r.Geomorph != null && roomParentInfo.TryGetValue((r.Geomorph.Id, r.AreaIndex), out var pInfo))
+                {
+                    var pGeo = gridState.PlacedGeomorphs.FirstOrDefault(g => g.GridX == pInfo.prevX && g.GridY == -pInfo.prevZ);
+                    if (pGeo != null)
+                    {
+                        int pZone = pGeo.GetRoomZone(pInfo.prevArea);
+                        if (pZone != zoneNumber)
+                        {
+                            return 0;
+                        }
+                    }
+                }
+                return 1;
+            }).ToList();
+
+            foreach (var room in roomsInZone)
+            {
+                var geo = room.Geomorph;
+                if (geo == null) continue;
+
+                if (roomParentInfo.TryGetValue((geo.Id, room.AreaIndex), out var parentInfo))
+                {
+                    areaOverridesArray.Add(new JsonObject
+                    {
+                        ["PreviousCellPosition"] = new JsonObject
+                        {
+                            ["x"] = parentInfo.prevX,
+                            ["z"] = parentInfo.prevZ
+                        },
+                        ["PreviousCellInternalAreaID"] = parentInfo.prevArea,
+                        ["LG_ExpanderID"] = parentInfo.expanderId
+                    });
+                }
+                else
+                {
+                    areaOverridesArray.Add(new JsonObject
+                    {
+                        ["PreviousCellPosition"] = new JsonObject
+                        {
+                            ["x"] = geo.GridX,
+                            ["z"] = -geo.GridY
+                        },
+                        ["PreviousCellInternalAreaID"] = room.AreaIndex,
+                        ["LG_ExpanderID"] = 0
+                    });
+                }
+            }
+
+            if (areaOverridesArray.Count == 0)
+            {
+                areaOverridesArray.Add(new JsonObject
+                {
+                    ["PreviousCellPosition"] = new JsonObject { ["x"] = 0, ["z"] = 0 },
+                    ["PreviousCellInternalAreaID"] = 0,
+                    ["LG_ExpanderID"] = 0
+                });
+            }
+
+            zoneOverridesList.Add(new JsonObject
+            {
+                ["AreaOverrides"] = areaOverridesArray
+            });
+        }
+
+        var layoutObj = new JsonObject
+        {
+            ["ZoneAliasStart"] = 0,
+            ["Zones"] = zonesArray,
+            ["name"] = dim.Name,
+            ["internalEnabled"] = dim.InternalEnabled,
+            ["persistentID"] = layoutId
+        };
+        levelLayoutBlocks.Add(layoutObj);
+
+        var geoOverridesArray = new JsonArray();
+        var usedComplexes = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var geoNode in gridState.PlacedGeomorphs)
+        {
+            if (geoNode == null) continue;
+
+            string compName = ExtractComplexName(geoNode.PrefabPath, dim.ComplexType);
+            if (!string.IsNullOrWhiteSpace(compName) && !string.Equals(compName, dim.ComplexType.ToString(), StringComparison.OrdinalIgnoreCase))
+            {
+                usedComplexes.Add(compName);
+            }
+
+            if (geoNode.GridX == 0 && geoNode.GridY == 0)
+            {
+                continue;
+            }
+
+            int altVal = geoNode.Altitude switch
+            {
+                GeomorphAltitude.High => 1,
+                GeomorphAltitude.Low => -1,
+                _ => 0
+            };
+
+            int rotVal = (int)Math.Round((((geoNode.RotationAngle % 360) + 360) % 360) / 90.0) % 4;
+
+            geoOverridesArray.Add(new JsonObject
+            {
+                ["Position"] = new JsonObject
+                {
+                    ["x"] = geoNode.GridX,
+                    ["z"] = -geoNode.GridY
+                },
+                ["Rotation"] = rotVal,
+                ["Geomorph"] = geoNode.PrefabPath,
+                ["Altitude"] = altVal
+            });
+        }
+
+        var extraComplexArray = new JsonArray();
+        foreach (var comp in usedComplexes.OrderBy(c => c))
+        {
+            extraComplexArray.Add(comp);
+        }
+
+        var zoneOverridesArray = new JsonArray();
+        foreach (var zo in zoneOverridesList)
+        {
+            zoneOverridesArray.Add(zo);
+        }
+
+        var levelGenOverrideObj = new JsonObject
+        {
+            ["$schema"] = "../../.schemas/LGTunerAdvanced.json",
+            ["LevelLayoutID"] = layoutId,
+            ["ZoneOverrides"] = zoneOverridesArray,
+            ["GeoOverrides"] = geoOverridesArray,
+            ["ExtraComplexResourceToLoad"] = extraComplexArray
+        };
+
+        string levelGenFileName = $"LevelGen_{layoutId}.json";
+        File.WriteAllText(Path.Combine(context.LgTunerDirectory, levelGenFileName),
+            levelGenOverrideObj.ToJsonString(ExportContext.JsonOptions));
+        context.LevelGenFilesExportedCount++;
+    }
+
+    private static Dictionary<(string geoId, int areaIdx), (int prevX, int prevZ, int prevArea, int expanderId)> BuildRoomProgressionParentMap(LevelLayoutGridState gridState)
+    {
+        var roomParentInfo = new Dictionary<(string geoId, int areaIdx), (int prevX, int prevZ, int prevArea, int expanderId)>();
+        if (gridState.PlacedGeomorphs.Count > 0)
+        {
+            var rootGeo = gridState.PlacedGeomorphs.FirstOrDefault(g => g.GridX == 0 && g.GridY == 0) ??
+                          gridState.PlacedGeomorphs[0];
+            var visitedRooms = new HashSet<(string geoId, int areaIdx)>();
+            var queue = new Queue<(PlacedGeomorphNode geo, int areaIdx)>();
+
+            var rootKey = (rootGeo.Id, 0);
+            visitedRooms.Add(rootKey);
+            roomParentInfo[rootKey] = (rootGeo.GridX, -rootGeo.GridY, 0, 0);
+            queue.Enqueue((rootGeo, 0));
+
+            while (queue.Count > 0)
+            {
+                var (currGeo, currArea) = queue.Dequeue();
+
+                // Internal doors in same geomorph - prioritize security doors first
+                var internalDoors = gridState.PlacedDoors
+                    .Where(d => d.IsInternal && d.Geomorph == currGeo && (d.IsConnected || d.IsZoneBoundary))
+                    .OrderByDescending(d => d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.IsSecondaryDoor || d.IsOverloadDoor)
+                    .ToList();
+
+                foreach (var d in internalDoors)
+                {
+                    int neighborArea = -1;
+                    if (d.AreaFrom == currArea) neighborArea = d.AreaTo;
+                    else if (d.AreaTo == currArea) neighborArea = d.AreaFrom;
+
+                    if (neighborArea >= 0 && currGeo.IsRoomGenerated(neighborArea))
+                    {
+                        var neighborKey = (currGeo.Id, neighborArea);
+                        if (!visitedRooms.Contains(neighborKey))
+                        {
+                            visitedRooms.Add(neighborKey);
+
+                            int expanderId = -1;
+                            if (currGeo.Metadata?.AreaDatas != null && currArea >= 0 &&
+                                currArea < currGeo.Metadata.AreaDatas.Count)
+                            {
+                                var expanders = currGeo.Metadata.AreaDatas[currArea].ExpanderDatas;
+                                if (expanders != null)
+                                {
+                                    expanderId = expanders.FindIndex(e => e.AreaTo == neighborArea);
+                                }
+                            }
+
+                            if (expanderId < 0)
+                            {
+                                expanderId = d.ExpanderIndex;
+                            }
+
+                            roomParentInfo[neighborKey] = (currGeo.GridX, -currGeo.GridY, currArea, expanderId);
+                            queue.Enqueue((currGeo, neighborArea));
+                        }
+                    }
+                }
+
+                // External doors to adjacent geomorphs - prioritize security doors first
+                var externalDoors = gridState.PlacedDoors
+                    .Where(d => !d.IsInternal && d.Geomorph == currGeo && d.AreaFrom == currArea &&
+                                d.ConnectedDoor != null &&
+                                (d.IsConnected || d.IsZoneBoundary || d.ConnectedDoor.IsZoneBoundary))
+                    .OrderByDescending(d => d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.IsSecondaryDoor || d.IsOverloadDoor ||
+                                            (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.ConnectedDoor.IsSecondaryDoor || d.ConnectedDoor.IsOverloadDoor)))
+                    .ToList();
+
+                foreach (var d in externalDoors)
+                {
+                    var otherDoor = d.ConnectedDoor!;
+                    var otherGeo = otherDoor.Geomorph;
+                    if (otherGeo != null && otherGeo.IsRoomGenerated(otherDoor.AreaFrom))
+                    {
+                        var neighborKey = (otherGeo.Id, otherDoor.AreaFrom);
+                        if (!visitedRooms.Contains(neighborKey))
+                        {
+                            visitedRooms.Add(neighborKey);
+                            roomParentInfo[neighborKey] = (currGeo.GridX, -currGeo.GridY, d.AreaFrom, d.ExpanderIndex);
+                            queue.Enqueue((otherGeo, otherDoor.AreaFrom));
+                        }
+                    }
+                }
+            }
+        }
+
+        return roomParentInfo;
     }
 
     private static string ExtractComplexName(string prefabPath, ComplexType fallback)

@@ -214,6 +214,22 @@ public class LevelLayoutBlock : INotifyPropertyChanged
         ? $"Level {PersistentId}"
         : Name;
 
+    public LevelLayoutGridState GetGridState(string? dimensionIndex = null)
+    {
+        if (string.IsNullOrWhiteSpace(dimensionIndex) || string.Equals(dimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase))
+        {
+            return GridState;
+        }
+
+        var dim = _dimensions.FirstOrDefault(d => string.Equals(d.DimensionIndex, dimensionIndex, StringComparison.OrdinalIgnoreCase));
+        if (dim != null)
+        {
+            return dim.GridState;
+        }
+
+        return GridState;
+    }
+
     public bool HasDimension(string dimensionIndex)
     {
         if (string.IsNullOrWhiteSpace(dimensionIndex) || string.Equals(dimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase))
@@ -299,6 +315,10 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             OverloadSector = OverloadSector.Clone(),
             ExpeditionBalance = ExpeditionBalance.Clone()
         };
+        if (_gridState != null)
+        {
+            clone.GridState = _gridState.Clone();
+        }
         return clone;
     }
 

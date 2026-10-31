@@ -43,6 +43,9 @@
 * Room expansion from the elevator tile should not be able to be a security door
 * The `ActivateHSU` objective in the test level just shits itself when you finish the interaction on it, its likely that just about every objective is cooked but they are untested
 * The Rundown tier `Scale` value does not look the same in-game as it does in the editor when there is only one level in the tier - the editor has it look centered even when a non-zero value is entered, but in-game, it is offset by that value.
+* Zones are being assigned the wrong index when created
+  * Zones should be assigned the index in order of creation, not based on where they are in the level.
+* The margins in the user docs are slightly too far out and text can get cut off. Both vertical and horizontal
 
 ## Modded Support
 Support for mods should be implemented as its own tab with toggles for each mod. If a mod is enabled, it can only be disabled if the things that are dependent on it are never used. The fields added by a mod in the editor should be coloured differently to make it obvious that it is a mod requirement (different colour for each mod)

@@ -274,13 +274,16 @@ public class ObjectiveHeaderAndWavesTests
             Assert.NotNull(level);
 
             var mainSector = level.GetSectorSettings(SectorType.Main);
+            mainSector.WavesOnGotoWin.Enabled = true;
             mainSector.WavesOnGotoWin.WaveRoleStandard = 10;
             mainSector.WavesOnGotoWin.PopulationPointsTotal = 100.0;
             mainSector.WavesOnGotoWin.PauseBeforeStart = 4.0;
 
+            mainSector.WavesOnActivate.Enabled = true;
             mainSector.WavesOnActivate.WaveRoleWeakling = 20;
             mainSector.WavesOnActivate.PopulationPointsTotal = 50.0;
 
+            mainSector.WavesOnElevatorLand.Enabled = true;
             mainSector.WavesOnElevatorLand.WaveRoleMiniBoss = 30;
             mainSector.WavesOnElevatorLand.PopulationPointsTotal = 25.0;
 

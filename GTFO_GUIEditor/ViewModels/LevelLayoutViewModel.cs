@@ -132,7 +132,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public ObservableCollection<EventTrigger> InstanceAvailableEventTriggers { get; } = new(Enum.GetValues<EventTrigger>());
     public ObservableCollection<SectorType> InstanceAvailableSectors { get; } = new(Enum.GetValues<SectorType>());
 
-    public LevelLayoutGridState GridState => _selectedLevel?.GridState ?? _gridState;
+    public LevelLayoutGridState GridState => _selectedLevel?.GetGridState(_activeDimensionIndex) ?? _gridState;
 
     public ObservableCollection<LevelLayoutBlock> Levels
     {
@@ -773,8 +773,8 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public ComplexResourceSetBlock? GetActiveComplexResourceSet() => null;
 
-    public bool HasGridSizeWarning => _gridState.HasGridSizeWarning;
-    public string GridSizeWarningMessage => _gridState.GridSizeWarningMessage;
+    public bool HasGridSizeWarning => GridState.HasGridSizeWarning;
+    public string GridSizeWarningMessage => GridState.GridSizeWarningMessage;
 
     private void UpdateGridStateTile()
     {
@@ -2550,7 +2550,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public void ToggleSecurityDoor(PlacedDoorNode? door)
     {
         if (door == null) return;
-        _gridState.ToggleSecurityDoor(door);
+        GridState.ToggleSecurityDoor(door);
     }
 
     public void RequestEditActiveDimension()
@@ -2955,15 +2955,32 @@ public class LevelLayoutViewModel : ViewModelBase
                 ? _promptingDimensionOption.DimensionIndex
                 : DimensionCustomName.Trim();
 
-            var dimBlock = new DimensionLayoutBlock
+            var existingDim = _selectedLevel.GetDimension(_promptingDimensionOption.DimensionIndex);
+            DimensionLayoutBlock dimBlock;
+            if (existingDim != null)
             {
-                DimensionIndex = _promptingDimensionOption.DimensionIndex,
-                Name = dimName,
-                ComplexType = DimensionSelectedComplexType,
-                DimensionGeomorph = SelectedDimensionTile.Prefab,
-                TileCategory = tileCategory,
-                InternalEnabled = true
-            };
+                dimBlock = existingDim;
+                dimBlock.Name = dimName;
+                dimBlock.ComplexType = DimensionSelectedComplexType;
+                dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
+                dimBlock.TileCategory = tileCategory;
+                if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
+                {
+                    dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
+                }
+            }
+            else
+            {
+                dimBlock = new DimensionLayoutBlock
+                {
+                    DimensionIndex = _promptingDimensionOption.DimensionIndex,
+                    Name = dimName,
+                    ComplexType = DimensionSelectedComplexType,
+                    DimensionGeomorph = SelectedDimensionTile.Prefab,
+                    TileCategory = tileCategory,
+                    InternalEnabled = true
+                };
+            }
 
             _selectedLevel.SetDimension(dimBlock);
             _activeDimensionIndex = _promptingDimensionOption.DimensionIndex;

@@ -257,7 +257,11 @@ public class RundownDataBlockExporter : IDatablockExporter
             {
                 expSettingsObj["ComplexResourceData"] = complexSetId;
                 expSettingsObj["ExpeditionBalance"] = expBalId;
-                expSettingsObj["LevelLayoutData"] = expLevelLayoutId;
+            }
+
+            if (expLevelLayoutId > 0)
+            {
+                expObj["LevelLayoutData"] = expLevelLayoutId;
             }
 
             if (expObj.TryGetPropertyValue("Descriptive", out var descNode) && descNode is JsonObject descObj)
@@ -306,6 +310,32 @@ public class RundownDataBlockExporter : IDatablockExporter
                 ["LayerType"] = thirdLayerType,
                 ["Zone"] = thirdZone
             };
+
+            if (matchingLevel != null && matchingLevel.Dimensions.Count > 0)
+            {
+                var dimDatasArray = new JsonArray();
+                foreach (var dim in matchingLevel.Dimensions)
+                {
+                    uint dimPersistentId = context.DimensionIds.TryGetValue(dim, out uint pid) ? pid : 0;
+                    if (dimPersistentId > 0)
+                    {
+                        dimDatasArray.Add(new JsonObject
+                        {
+                            ["DimensionIndex"] = dim.DimensionIndex,
+                            ["DimensionData"] = dimPersistentId,
+                            ["Enabled"] = dim.InternalEnabled
+                        });
+                    }
+                }
+                if (dimDatasArray.Count > 0)
+                {
+                    expObj["DimensionDatas"] = dimDatasArray;
+                }
+            }
+            else if (exp.DimensionDatas.HasValue)
+            {
+                expObj["DimensionDatas"] = ConvertToJsonArrayOrEmpty(exp.DimensionDatas);
+            }
 
             array.Add(expObj);
         }

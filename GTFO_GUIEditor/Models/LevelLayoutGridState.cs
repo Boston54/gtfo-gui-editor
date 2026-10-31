@@ -2163,6 +2163,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         return (allRoomsToDelete, deletedGeomorphs);
     }
 
+    public LevelLayoutGridState Clone()
+    {
+        var clone = new LevelLayoutGridState();
+        var data = ExportStateData();
+        clone.ImportStateData(data);
+        return clone;
+    }
+
     public LevelLayoutGridStateData ExportStateData()
     {
         var data = new LevelLayoutGridStateData

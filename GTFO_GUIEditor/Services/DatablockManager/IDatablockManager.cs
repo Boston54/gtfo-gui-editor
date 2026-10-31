@@ -22,6 +22,16 @@ public interface IDatablockManager
     Task<ExportResult> ExportDatablocksAsync(MainWindowViewModel vm, string outputDirectory);
 
     /// <summary>
+    /// Imports datablocks and configuration files from the specified input directory into the editor viewmodels.
+    /// </summary>
+    ImportResult ImportDatablocks(MainWindowViewModel vm, string inputDirectory);
+
+    /// <summary>
+    /// Imports datablocks and configuration files from the specified input directory into the editor viewmodels asynchronously.
+    /// </summary>
+    Task<ImportResult> ImportDatablocksAsync(MainWindowViewModel vm, string inputDirectory);
+
+    /// <summary>
     /// Resolves the source layer and zone for bulkhead door connections.
     /// </summary>
     (string LayerType, string Zone)? ResolveBuildFrom(LevelLayoutGridState? gridState, DoorType targetDoorType);

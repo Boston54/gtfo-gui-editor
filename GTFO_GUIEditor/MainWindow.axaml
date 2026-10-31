@@ -5,6 +5,7 @@
         xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
         xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
         xmlns:views="clr-namespace:GTFO_GUIEditor.Views;assembly=GTFO_GUIEditor"
+        xmlns:dialogs="clr-namespace:GTFO_GUIEditor.Views.Dialogs;assembly=GTFO_GUIEditor"
         mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="600"
         x:Class="GTFO_GUIEditor.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -14,6 +15,7 @@
         <KeyBinding Gesture="Ctrl+N" Command="{Binding NewRundown}"/>
         <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveRundown}"/>
         <KeyBinding Gesture="Ctrl+O" Command="{Binding OpenRundown}"/>
+        <KeyBinding Gesture="Ctrl+I" Command="{Binding ImportDatablocksFrom}"/>
         <KeyBinding Gesture="Ctrl+E" Command="{Binding QuickExportDatablocks}"/>
     </Window.KeyBindings>
     <Grid RowDefinitions="Auto,*">
@@ -47,6 +49,10 @@
                                 </DataTemplate>
                             </MenuItem.ItemTemplate>
                         </MenuItem>
+                        <Separator Background="#333333"/>
+                        <MenuItem Header="Import Project..."
+                                  Command="{Binding ImportDatablocksFrom}"
+                                  InputGesture="Ctrl+I"/>
                     </MenuItem>
                     <MenuItem Header="Export" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
                         <MenuItem Header="Quick Export"
@@ -112,5 +118,10 @@
                 </TabItem>
             </TabControl>
         </Grid>
+
+        <!-- Pop-up Notification for Import Failures -->
+        <dialogs:ImportNotificationDialog Grid.Row="0"
+                                          Grid.RowSpan="2"
+                                          IsVisible="{Binding IsShowingImportNotification}"/>
     </Grid>
 </Window>

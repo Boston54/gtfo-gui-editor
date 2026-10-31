@@ -78,6 +78,7 @@ public class ExportContext
     public Dictionary<LevelLayoutBlock, uint> LevelCrsIds { get; } = new();
     public Dictionary<LevelLayoutBlock, uint> LevelExpeditionBalanceIds { get; } = new();
     public Dictionary<LevelLayoutBlock, (uint Main, uint Secondary, uint Overload, List<uint> Chained)> ObjectiveIds { get; } = new();
+    public Dictionary<DimensionLayoutBlock, uint> DimensionIds { get; } = new();
     public Dictionary<uint, double> EnemyCosts { get; private set; } = new();
 
     private readonly Dictionary<string, uint> _bloodGroupCache = new();

@@ -8,6 +8,8 @@ namespace GTFO_GUIEditor.Models;
 
 public class GenericWaveSettings : INotifyPropertyChanged
 {
+    private bool _enabled = false;
+
     // Wave Roles (Enemy References)
     private uint _waveRoleWeakling = 21;
     private uint _waveRoleStandard = 13;
@@ -47,6 +49,13 @@ public class GenericWaveSettings : INotifyPropertyChanged
     private double _populationRampOverTime = 200.0;
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    [JsonPropertyName("Enabled")]
+    public bool Enabled
+    {
+        get => _enabled;
+        set => SetField(ref _enabled, value);
+    }
 
     // Wave Roles
     [JsonPropertyName("WaveRoleWeakling")]
@@ -306,20 +315,14 @@ public class GenericWaveSettings : INotifyPropertyChanged
 
     public bool HasWaveData()
     {
-        return WaveRoleWeakling > 0 ||
-               WaveRoleStandard > 0 ||
-               WaveRoleSpecial > 0 ||
-               WaveRoleMiniBoss > 0 ||
-               WaveRoleBoss > 0 ||
-               PopulationPointsTotal > 0 ||
-               PopulationPointsPerWaveStart > 0 ||
-               PopulationPointsPerWaveEnd > 0;
+        return Enabled;
     }
 
     public GenericWaveSettings Clone()
     {
         return new GenericWaveSettings
         {
+            Enabled = Enabled,
             WaveRoleWeakling = WaveRoleWeakling,
             WaveRoleStandard = WaveRoleStandard,
             WaveRoleSpecial = WaveRoleSpecial,

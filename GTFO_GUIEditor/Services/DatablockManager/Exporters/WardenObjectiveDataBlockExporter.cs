@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Nodes;
 using GTFO_GUIEditor.Models;
 
@@ -46,8 +47,12 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 }
             }
 
+            var secZones = level.GridState?.GetZonesForSector(SectorType.Secondary) ?? new List<int>();
+            bool secExists = secZones.Count > 0 || level.HasSecondaryDoor || (level.GridState?.HasSecondaryDoor == true) ||
+                             (context.MainVm.Rundown.SelectedRundown?.Expeditions.Any(e => e.LevelLayoutData == level.PersistentId && e.SecondaryLayerEnabled) == true);
+
             uint secObjId = 0;
-            if (level.SecondarySector?.PrimaryObjective != null)
+            if (secExists && level.SecondarySector?.PrimaryObjective != null)
             {
                 secObjId = context.WardenObjectiveAlloc.Allocate();
                 var secObj = CompileWardenObjective(
@@ -59,10 +64,31 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     context.SurvivalWaveSettingsBlocks,
                     context.SurvivalWavePopulationBlocks);
                 wardenObjectiveBlocks.Add(secObj);
+
+                if (level.SecondarySector.Objectives.Count > 1)
+                {
+                    for (int i = 1; i < level.SecondarySector.Objectives.Count; i++)
+                    {
+                        uint chainedId = context.WardenObjectiveAlloc.Allocate();
+                        var chainedObj = CompileWardenObjective(
+                            level.SecondarySector.Objectives[i],
+                            chainedId,
+                            context.SynthesizeText,
+                            context.SurvivalWaveSettingsAlloc,
+                            context.SurvivalWavePopulationAlloc,
+                            context.SurvivalWaveSettingsBlocks,
+                            context.SurvivalWavePopulationBlocks);
+                        wardenObjectiveBlocks.Add(chainedObj);
+                    }
+                }
             }
 
+            var thirdZones = level.GridState?.GetZonesForSector(SectorType.Overload) ?? new List<int>();
+            bool thirdExists = thirdZones.Count > 0 || level.HasOverloadDoor || (level.GridState?.HasOverloadDoor == true) ||
+                               (context.MainVm.Rundown.SelectedRundown?.Expeditions.Any(e => e.LevelLayoutData == level.PersistentId && e.ThirdLayerEnabled) == true);
+
             uint thirdObjId = 0;
-            if (level.OverloadSector?.PrimaryObjective != null)
+            if (thirdExists && level.OverloadSector?.PrimaryObjective != null)
             {
                 thirdObjId = context.WardenObjectiveAlloc.Allocate();
                 var thirdObj = CompileWardenObjective(
@@ -74,6 +100,23 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     context.SurvivalWaveSettingsBlocks,
                     context.SurvivalWavePopulationBlocks);
                 wardenObjectiveBlocks.Add(thirdObj);
+
+                if (level.OverloadSector.Objectives.Count > 1)
+                {
+                    for (int i = 1; i < level.OverloadSector.Objectives.Count; i++)
+                    {
+                        uint chainedId = context.WardenObjectiveAlloc.Allocate();
+                        var chainedObj = CompileWardenObjective(
+                            level.OverloadSector.Objectives[i],
+                            chainedId,
+                            context.SynthesizeText,
+                            context.SurvivalWaveSettingsAlloc,
+                            context.SurvivalWavePopulationAlloc,
+                            context.SurvivalWaveSettingsBlocks,
+                            context.SurvivalWavePopulationBlocks);
+                        wardenObjectiveBlocks.Add(chainedObj);
+                    }
+                }
             }
 
             context.ObjectiveIds[level] = (mainObjId, secObjId, thirdObjId, mainChainedIds);

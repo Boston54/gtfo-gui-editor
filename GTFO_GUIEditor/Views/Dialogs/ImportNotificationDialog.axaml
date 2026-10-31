@@ -1,0 +1,103 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.ImportNotificationDialog"
+             x:DataType="vm:MainWindowViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#E5A93C"
+                BorderThickness="1.5"
+                CornerRadius="8"
+                Padding="24"
+                Width="560"
+                MaxHeight="650"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 6 24 #80000000">
+            <Grid RowDefinitions="Auto,Auto,*,Auto">
+                <!-- Header -->
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                    <StackPanel Grid.Column="0" Spacing="4">
+                        <TextBlock Text="{Binding ImportNotificationTitle}"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="#E5A93C"/>
+                        <TextBlock Text="{Binding ImportNotificationMessage}"
+                                   FontSize="12"
+                                   Foreground="#AAAAAA"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <Button Grid.Column="1"
+                            Content="✕"
+                            Command="{Binding CloseImportNotification}"
+                            Padding="8,4"
+                            Background="Transparent"
+                            Foreground="#888888"
+                            VerticalAlignment="Top"/>
+                </Grid>
+
+                <Separator Grid.Row="1" Background="#3A3A3C" Margin="0,0,0,12"/>
+
+                <!-- Failed Levels List -->
+                <ScrollViewer Grid.Row="2" MaxHeight="400" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ImportFailedLevels}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="models:LevelImportFailure">
+                                <Border Background="#1E1E1E"
+                                        BorderBrush="#444444"
+                                        BorderThickness="1"
+                                        CornerRadius="6"
+                                        Padding="12"
+                                        Margin="0,0,0,10">
+                                    <StackPanel Spacing="6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="{Binding DisplayName}"
+                                                       FontWeight="Bold"
+                                                       FontSize="14"
+                                                       Foreground="#FFFFFF"/>
+                                            <TextBlock Grid.Column="1"
+                                                       Text="{Binding MainLayoutId, StringFormat='Layout ID: {0}'}"
+                                                       FontSize="12"
+                                                       Foreground="#888888"/>
+                                        </Grid>
+                                        <TextBlock Text="Missing configuration files for:"
+                                                   FontSize="12"
+                                                   Foreground="#FF6B6B"
+                                                   FontWeight="SemiBold"/>
+                                        <ItemsControl ItemsSource="{Binding MissingConfigs}" Margin="8,0,0,0">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="x:String">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,2">
+                                                        <TextBlock Text="•" Foreground="#FF8888" FontSize="12"/>
+                                                        <TextBlock Text="{Binding}" Foreground="#E0E0E0" FontSize="12"/>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+
+                <!-- Actions -->
+                <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="10" Margin="0,16,0,0">
+                    <Button Content="OK"
+                            Command="{Binding CloseImportNotification}"
+                            Background="#E5A93C"
+                            Foreground="#000000"
+                            FontWeight="Bold"
+                            Padding="24,8"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Border>
+</UserControl>

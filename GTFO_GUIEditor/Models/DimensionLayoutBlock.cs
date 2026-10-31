@@ -14,6 +14,7 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
     private string _dimensionGeomorph = string.Empty;
     private uint _levelLayoutData;
     private string _tileCategory = "Dimension Geomorph";
+    private LevelLayoutGridState? _gridState;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -104,6 +105,37 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
         set => SetField(ref _tileCategory, value);
     }
 
+    [JsonPropertyName("gridState")]
+    public LevelLayoutGridStateData? GridStateData
+    {
+        get => _gridState?.ExportStateData();
+        set
+        {
+            if (value != null)
+            {
+                GridState.ImportStateData(value);
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public LevelLayoutGridState GridState
+    {
+        get
+        {
+            if (_gridState == null)
+            {
+                _gridState = new LevelLayoutGridState();
+                if (!string.IsNullOrWhiteSpace(DimensionGeomorph))
+                {
+                    _gridState.InitializeStartingTile(DimensionGeomorph, 0, 0);
+                }
+            }
+            return _gridState;
+        }
+        set => SetField(ref _gridState, value);
+    }
+
     [JsonIgnore]
     public string DisplayText => string.IsNullOrWhiteSpace(Name)
         ? DimensionIndex
@@ -111,7 +143,7 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
 
     public DimensionLayoutBlock Clone()
     {
-        return new DimensionLayoutBlock
+        var clone = new DimensionLayoutBlock
         {
             DimensionIndex = DimensionIndex,
             Name = Name,
@@ -122,6 +154,11 @@ public class DimensionLayoutBlock : INotifyPropertyChanged
             LevelLayoutData = LevelLayoutData,
             TileCategory = TileCategory
         };
+        if (_gridState != null)
+        {
+            clone.GridState = _gridState.Clone();
+        }
+        return clone;
     }
 
     protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)

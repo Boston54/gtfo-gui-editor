@@ -11,6 +11,7 @@ This page serves as a user documentation guide. Assistance for how to use the ap
 | `Ctrl+S` | Save Rundown | Saves the current rundown project to disk. |
 | `Ctrl+O` | Open Rundown | Opens an existing `.rundown` project file. |
 | `Ctrl+E` | Quick Export | Exports all datablocks directly to the last export directory. |
+| `Ctrl+I` | Import Rundown | Imports a rundown from datablocks |
 
 The label of almost every field in the editor can be hovered to show a short description of what the field does, and when relevant, also states common default values.
 
@@ -180,3 +181,53 @@ TODO
 
 ## Publishing a Rundown
 TODO
+
+# Importing
+Rundowns can be imported directly into the editor via the `File -> Import` option, or by pressing `CTRL+I`.
+
+It is important to note that due to how the editor works, a rundown that has levels that were not made using LGTunerAdvanced for the level layout, are not possible to fully import into the editor.
+When importing a level without a config, users will be presented with an error dialog telling them which Levels could not be loaded.
+
+The import dialog expects the folder that your datablocks are in, with a subfolder called `Custom` for your mod configs.
+```
+My Rundown
+|- GameData_ChainedPuzzleDataBlock_bin.json
+|- GameData_ChainedPuzzleTypeDataBlock_bin.json
+|- GameData_ComplexResourceSetDataBlock_bin.json
+|- ...
+|- Custom
+  |- LGTunerAdvanced
+    |- <LGTA config files>
+  |- <other mod config folder name>
+    |- ...
+  |- ...
+```
+
+
+TODO THESE LIKELY NEED CHANGING:
+
+
+The following datablocks are fully compatible with the import system:
+* `ChainedPuzzleDataBlock`
+* `ConsumableDistributionDataBlock`
+* `DimensionDataBlock`
+* `EnemyGroupDataBlock`
+* `ExpeditionBalanceDataBlock`
+* `FogSettingsDataBlock`
+* `LightSettingsDataBlock`
+* `RundownDataBlock`
+* `SurvivalWavePopulationDataBlock`
+* `SurvivalWaveSettingsDataBlock`
+* `TextDataBlock`
+* `WardenObjectiveDataBlock`
+
+The following files have caveats with their importing behaviour:
+* `LevelLayoutDataBlock`
+  * As mentioned, the level layouts the editor uses rely entirely on LGTunerAdvanced config files. While this datablock *is* still needed for a rundown, it also needs these configs.
+
+The following files will be *exported* by the program, but will have no impact when imported.
+* `ChainedPuzzleTypeDataBlock`
+* `ComplexResourceSetDataBlock`
+  * These are generated automatically by the export system for each level based on which tiles the user places, meaning that importing them has no effect.
+* `EnemyDataBlock`
+* `GameSetupDataBlock`

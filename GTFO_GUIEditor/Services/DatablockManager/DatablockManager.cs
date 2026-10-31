@@ -23,6 +23,19 @@ public class DatablockManager : IDatablockManager
         RegisterDefaultExporters();
     }
 
+    /// <inheritdoc />
+    public ImportResult ImportDatablocks(MainWindowViewModel vm, string inputDirectory)
+    {
+        var importer = new DatablockImportService();
+        return importer.Import(vm, inputDirectory);
+    }
+
+    /// <inheritdoc />
+    public Task<ImportResult> ImportDatablocksAsync(MainWindowViewModel vm, string inputDirectory)
+    {
+        return Task.Run(() => ImportDatablocks(vm, inputDirectory));
+    }
+
     private void RegisterDefaultExporters()
     {
         // Register exporters in dependency order
