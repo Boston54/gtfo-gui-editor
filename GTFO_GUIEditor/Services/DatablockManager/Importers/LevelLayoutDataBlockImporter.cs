@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
@@ -1299,6 +1300,10 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             bool hasBloodDoor = activeWaveObj?["HasActiveEnemyWave"]?.GetValue<bool>() ?? false;
             uint frontGroup = activeWaveObj?["EnemyGroupInfrontOfDoor"]?.GetValue<uint>() ?? 0;
             uint areaGroup = activeWaveObj?["EnemyGroupInArea"]?.GetValue<uint>() ?? 0;
+            if (frontGroup > 0 || areaGroup > 0)
+            {
+                hasBloodDoor = true;
+            }
 
             var progPuzzleObj = zoneObj["ProgressionPuzzleToEnter"] as JsonObject;
             string progType = progPuzzleObj?["PuzzleType"]?.ToString() ?? "None";
@@ -1488,16 +1493,193 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
 
     private void PopulateEnemyGroupItems(JsonObject groupObj, ObservableCollection<EnemyGroupItem> target)
     {
-        if (groupObj["Groups"] is JsonArray gArr)
+        double maxScore = 10.0;
+        if (groupObj.TryGetPropertyValue("MaxScore", out var msNode) && msNode != null)
         {
-            foreach (var gNode in gArr)
+            if (double.TryParse(msNode.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double ms) && ms > 0)
             {
-                if (gNode is not JsonObject gItem) continue;
-                uint enemyId = gItem["GroupType"]?.GetValue<uint>() ?? 0;
-                int count = (int)Math.Max(1, Math.Round(gItem["DistributionValue"]?.GetValue<double>() ?? 1.0));
-                target.Add(new EnemyGroupItem { EnemyId = enemyId, Count = count });
+                maxScore = ms;
             }
         }
+
+        if (groupObj["Roles"] is not JsonArray rolesArray || rolesArray.Count == 0)
+        {
+            if (groupObj["Groups"] is JsonArray gArr && gArr.Count > 0)
+            {
+                foreach (var gNode in gArr)
+                {
+                    if (gNode is not JsonObject gItem) continue;
+                    uint enemyId = gItem["GroupType"]?.GetValue<uint>() ?? gItem["Enemy"]?.GetValue<uint>() ?? 0;
+                    if (enemyId == 0) enemyId = 24;
+                    int count = (int)Math.Max(1, Math.Round(gItem["DistributionValue"]?.GetValue<double>() ?? 1.0));
+                    target.Add(new EnemyGroupItem { EnemyId = enemyId, Count = count });
+                }
+            }
+            return;
+        }
+
+        var parsedRoles = new List<(uint EnemyId, double Cost, bool IsForceOne, double? ExplicitDistVal, double ParsedWeight)>();
+
+        foreach (var rNode in rolesArray)
+        {
+            if (rNode is not JsonObject rObj) continue;
+
+            uint enemyId = 0;
+            if (rObj.TryGetPropertyValue("Enemy", out var enemyNode) && enemyNode != null)
+            {
+                uint.TryParse(enemyNode.ToString(), out enemyId);
+            }
+
+            if (enemyId == 0)
+            {
+                string roleStr = rObj["Role"]?.ToString() ?? "Melee";
+                enemyId = ResolveEnemyIdFromRole(roleStr);
+            }
+
+            double cost = GetEnemyCost(enemyId);
+
+            double? explicitDistVal = null;
+            if (rObj.TryGetPropertyValue("DistributionValue", out var dvNode) && dvNode != null)
+            {
+                if (double.TryParse(dvNode.ToString(), NumberStyles.Any, CultureInfo.InvariantCulture, out double dv) && dv > 0)
+                {
+                    explicitDistVal = dv;
+                }
+            }
+
+            string distStr = rObj["Distribution"]?.ToString() ?? "Rel_100";
+            bool isForceOne = distStr.Equals("Force_One", StringComparison.OrdinalIgnoreCase);
+
+            double parsedWeight = 1.0;
+            if (distStr.Equals("Rel_100", StringComparison.OrdinalIgnoreCase)) parsedWeight = 1.0;
+            else if (distStr.Equals("Rel_75", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.75;
+            else if (distStr.Equals("Rel_50", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.50;
+            else if (distStr.Equals("Rel_25", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.25;
+            else if (distStr.Equals("Rel_15", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.15;
+            else if (distStr.Equals("Rel_10", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.10;
+            else if (distStr.Equals("Rel_05", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.05;
+            else if (distStr.Equals("Rel_0", StringComparison.OrdinalIgnoreCase)) parsedWeight = 0.0;
+            else if (double.TryParse(distStr, NumberStyles.Any, CultureInfo.InvariantCulture, out double dw) && dw > 0) parsedWeight = dw;
+
+            parsedRoles.Add((enemyId, cost, isForceOne, explicitDistVal, parsedWeight));
+        }
+
+        if (parsedRoles.Count == 0) return;
+
+        double forceOneCost = parsedRoles.Where(r => r.IsForceOne).Sum(r => r.Cost);
+        double remainingScore = Math.Max(0, maxScore - forceOneCost);
+
+        var relativeRoles = parsedRoles.Where(r => !r.IsForceOne).ToList();
+        double sumWeights = relativeRoles.Sum(r => r.ExplicitDistVal ?? r.ParsedWeight);
+
+        var counts = new Dictionary<uint, int>();
+
+        foreach (var r in parsedRoles)
+        {
+            if (r.IsForceOne)
+            {
+                counts[r.EnemyId] = counts.GetValueOrDefault(r.EnemyId, 0) + 1;
+            }
+            else
+            {
+                double proportion;
+                if (r.ExplicitDistVal.HasValue)
+                {
+                    proportion = r.ExplicitDistVal.Value;
+                }
+                else
+                {
+                    proportion = sumWeights > 0 ? (r.ParsedWeight / sumWeights) : (1.0 / relativeRoles.Count);
+                }
+
+                double points = proportion * (forceOneCost > 0 ? remainingScore : maxScore);
+                int count = (int)Math.Max(1, Math.Round(points / r.Cost, MidpointRounding.AwayFromZero));
+                counts[r.EnemyId] = counts.GetValueOrDefault(r.EnemyId, 0) + count;
+            }
+        }
+
+        foreach (var kvp in counts)
+        {
+            target.Add(new EnemyGroupItem
+            {
+                EnemyId = kvp.Key,
+                Count = kvp.Value
+            });
+        }
+    }
+
+    private static uint ResolveEnemyIdFromRole(string role)
+    {
+        if (string.IsNullOrWhiteSpace(role)) return 24;
+        string r = role.Trim();
+        if (r.Equals("Melee", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Standard", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Striker", StringComparison.OrdinalIgnoreCase))
+            return 24;
+        if (r.Equals("Ranged", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Shooter", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Weakling", StringComparison.OrdinalIgnoreCase))
+            return 26;
+        if (r.Equals("MeleeLarge", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("LargeMelee", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("BigMelee", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("BigStriker", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Hunter", StringComparison.OrdinalIgnoreCase))
+            return 35;
+        if (r.Equals("RangedLarge", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("LargeRanged", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("BigRanged", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("BigShooter", StringComparison.OrdinalIgnoreCase))
+            return 36;
+        if (r.Equals("Boss", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Tank", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("MegaBoss", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Mother", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Birther", StringComparison.OrdinalIgnoreCase))
+            return 40;
+        if (r.Equals("MiniBoss", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Scout", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("Detect", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("BirtherBoss", StringComparison.OrdinalIgnoreCase))
+            return 38;
+        if (r.Equals("Shadow", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("ShadowMelee", StringComparison.OrdinalIgnoreCase))
+            return 41;
+        if (r.Equals("ShadowLarge", StringComparison.OrdinalIgnoreCase) ||
+            r.Equals("ShadowMeleeLarge", StringComparison.OrdinalIgnoreCase))
+            return 42;
+        if (r.Equals("ShadowRanged", StringComparison.OrdinalIgnoreCase))
+            return 43;
+
+        if (uint.TryParse(r, out uint parsedId) && parsedId > 0)
+            return parsedId;
+
+        return 24;
+    }
+
+    private static double GetEnemyCost(uint enemyId)
+    {
+        return enemyId switch
+        {
+            13 => 1.0, // Striker_Wave
+            21 => 1.0, // Shooter_Wave
+            11 => 1.0, // Shooter_Wave_Spread
+            16 => 4.0, // Striker_Big_Wave
+            18 => 10.0, // Tank
+            24 => 1.0, // Striker
+            26 => 1.0, // Shooter
+            35 => 4.0, // Big Striker
+            36 => 4.0, // Big Shooter
+            38 => 5.0, // Scout
+            40 => 10.0, // Mother / Tank
+            41 => 1.0, // Shadow
+            42 => 4.0, // Big Shadow
+            43 => 1.0, // Shadow Shooter
+            44 => 4.0, // Big Shadow Shooter
+            47 => 10.0, // Birther
+            51 => 1.0, // Flyer
+            _ => 1.0
+        };
     }
 
     private void ConnectAdjacentDoors(LevelLayoutGridState gridState)

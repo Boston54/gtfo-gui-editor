@@ -707,4 +707,117 @@ public class AlarmTests
             }
         }
     }
+
+    [Fact]
+    public void AlarmBlock_AudioAndHUDProperties_HaveCorrectDefaultsAndClone()
+    {
+        var alarm = new AlarmBlock();
+        Assert.Equal((uint)3339129407, alarm.AlarmSoundStart);
+        Assert.Equal((uint)42633153, alarm.AlarmSoundStop);
+        Assert.False(alarm.OnlyShowHUDWhenPlayerIsClose);
+
+        alarm.AlarmSoundStart = 12345678;
+        alarm.AlarmSoundStop = 87654321;
+        alarm.OnlyShowHUDWhenPlayerIsClose = true;
+
+        var clone = alarm.Clone();
+        Assert.Equal((uint)12345678, clone.AlarmSoundStart);
+        Assert.Equal((uint)87654321, clone.AlarmSoundStop);
+        Assert.True(clone.OnlyShowHUDWhenPlayerIsClose);
+
+        var templateCloned = AlarmService.CreateAlarmFromTemplate(alarm, 9001, "ClonedAudioAlarm");
+        Assert.Equal((uint)12345678, templateCloned.AlarmSoundStart);
+        Assert.Equal((uint)87654321, templateCloned.AlarmSoundStop);
+        Assert.True(templateCloned.OnlyShowHUDWhenPlayerIsClose);
+    }
+
+    [Fact]
+    public void AlarmBlock_AudioAndHUDProperties_ProjectSerializationRoundtrip()
+    {
+        string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_audio_test_{System.Guid.NewGuid():N}.rundown");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var customAlarm = AlarmService.CreateFreshAlarm(9999, "Custom Audio Alarm");
+            customAlarm.AlarmSoundStart = 11223344;
+            customAlarm.AlarmSoundStop = 55667788;
+            customAlarm.OnlyShowHUDWhenPlayerIsClose = true;
+
+            mainVm.Alarms.Alarms.Add(customAlarm);
+
+            RundownProjectService.SaveProject(mainVm, tempFile);
+
+            var loadedProject = RundownProjectService.LoadProject(tempFile);
+            var loadedVm = new MainWindowViewModel();
+            RundownProjectService.ApplyProject(loadedVm, loadedProject);
+
+            var loadedAlarm = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 9999);
+            Assert.NotNull(loadedAlarm);
+            Assert.Equal("Custom Audio Alarm", loadedAlarm.Name);
+            Assert.Equal((uint)11223344, loadedAlarm.AlarmSoundStart);
+            Assert.Equal((uint)55667788, loadedAlarm.AlarmSoundStop);
+            Assert.True(loadedAlarm.OnlyShowHUDWhenPlayerIsClose);
+        }
+        finally
+        {
+            if (System.IO.File.Exists(tempFile))
+            {
+                try { System.IO.File.Delete(tempFile); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void DatablockExportAndImport_PreservesAudioAndHUDProperties()
+    {
+        string tempDir = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"gtfo_alarm_audio_export_{System.Guid.NewGuid():N}");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var audioAlarm = AlarmService.CreateFreshAlarm(80001, "Export Audio Alarm");
+            audioAlarm.AlarmSoundStart = 11112222;
+            audioAlarm.AlarmSoundStop = 33334444;
+            audioAlarm.OnlyShowHUDWhenPlayerIsClose = true;
+
+            mainVm.Alarms.Alarms.Clear();
+            mainVm.Alarms.Alarms.Add(audioAlarm);
+
+            var exportResult = DatablockExportService.ExportAll(mainVm, tempDir);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            string chainedPuzzlePath = System.IO.Path.Combine(tempDir, "GameData_ChainedPuzzleDataBlock_bin.json");
+            Assert.True(System.IO.File.Exists(chainedPuzzlePath));
+
+            var jsonDoc = System.Text.Json.Nodes.JsonNode.Parse(System.IO.File.ReadAllText(chainedPuzzlePath))?.AsObject();
+            Assert.NotNull(jsonDoc);
+
+            var blocks = jsonDoc["Blocks"]?.AsArray();
+            Assert.NotNull(blocks);
+
+            var expAudioBlock = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 80001)?.AsObject();
+            Assert.NotNull(expAudioBlock);
+            Assert.Equal((uint)11112222, expAudioBlock["AlarmSoundStart"]?.GetValue<uint>());
+            Assert.Equal((uint)33334444, expAudioBlock["AlarmSoundStop"]?.GetValue<uint>());
+            Assert.True(expAudioBlock["OnlyShowHUDWhenPlayerIsClose"]?.GetValue<bool>());
+
+            // Test Import
+            var importVm = new MainWindowViewModel();
+            var importResult = DatablockManager.Instance.ImportDatablocks(importVm, tempDir);
+            Assert.True(importResult.Success, importResult.Message);
+
+            var importedAlarm = importVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 80001);
+            Assert.NotNull(importedAlarm);
+            Assert.Equal("Export Audio Alarm", importedAlarm.Name);
+            Assert.Equal((uint)11112222, importedAlarm.AlarmSoundStart);
+            Assert.Equal((uint)33334444, importedAlarm.AlarmSoundStop);
+            Assert.True(importedAlarm.OnlyShowHUDWhenPlayerIsClose);
+        }
+        finally
+        {
+            if (System.IO.Directory.Exists(tempDir))
+            {
+                try { System.IO.Directory.Delete(tempDir, true); } catch { }
+            }
+        }
+    }
 }

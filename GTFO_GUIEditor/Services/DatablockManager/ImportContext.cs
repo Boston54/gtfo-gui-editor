@@ -79,6 +79,15 @@ public class ImportContext
         if (isCustom)
         {
             DatablocksImportedCount++;
+            var vanillaBlocks = ExportContext.LoadVanillaBlocksArray(vanillaFileName);
+            foreach (var block in vanillaBlocks)
+            {
+                if (block.TryGetPropertyValue("persistentID", out var pidNode) && pidNode != null &&
+                    uint.TryParse(pidNode.ToString(), out uint pid) && !targetDict.ContainsKey(pid))
+                {
+                    targetDict[pid] = block;
+                }
+            }
         }
 
         foreach (var block in blocks)

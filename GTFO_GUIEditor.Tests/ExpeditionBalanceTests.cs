@@ -305,7 +305,11 @@ public class ExpeditionBalanceTests
             using var expBalDoc = JsonDocument.Parse(expBalJson);
             var blocks = expBalDoc.RootElement.GetProperty("Blocks").EnumerateArray().ToList();
 
-            Assert.Equal(2, blocks.Count);
+            Assert.Equal(3, blocks.Count);
+
+            var vanillaBlock1 = blocks.FirstOrDefault(b => b.GetProperty("persistentID").GetUInt32() == 1);
+            Assert.True(vanillaBlock1.ValueKind != JsonValueKind.Undefined, "Vanilla block with persistentID 1 not found");
+            Assert.Equal("Normal", vanillaBlock1.GetProperty("name").GetString());
 
             var block1 = blocks.FirstOrDefault(b => b.GetProperty("WeakDoor4x4Health").GetDouble() == 9.5);
             Assert.True(block1.ValueKind != JsonValueKind.Undefined, "Block for LevelAlpha not found");
@@ -344,6 +348,39 @@ public class ExpeditionBalanceTests
 
             Assert.Equal(block1Id, exp1BalId);
             Assert.Equal(block2Id, exp2BalId);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                try { Directory.Delete(tempDir, true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void DatablockExportService_AlwaysIncludesVanillaExpeditionBalanceBlockId1()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"GTFO_ExpBalId1_Test_{Guid.NewGuid():N}");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            vm.LevelLayout.Levels.Clear();
+
+            var exportResult = DatablockExportService.ExportAll(vm, tempDir);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            string expBalPath = Path.Combine(tempDir, "GameData_ExpeditionBalanceDataBlock_bin.json");
+            Assert.True(File.Exists(expBalPath));
+
+            string expBalJson = File.ReadAllText(expBalPath);
+            using var expBalDoc = JsonDocument.Parse(expBalJson);
+            var blocks = expBalDoc.RootElement.GetProperty("Blocks").EnumerateArray().ToList();
+
+            var block1 = blocks.FirstOrDefault(b => b.GetProperty("persistentID").GetUInt32() == 1);
+            Assert.True(block1.ValueKind != JsonValueKind.Undefined, "Expected vanilla ExpeditionBalance block with persistentID 1");
+            Assert.Equal("Normal", block1.GetProperty("name").GetString());
+            Assert.Equal(1.0, block1.GetProperty("HealthPerZone").GetDouble());
         }
         finally
         {

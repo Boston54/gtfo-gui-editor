@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Nodes;
 
 namespace GTFO_GUIEditor.Services;
@@ -8,6 +9,35 @@ public class ExpeditionBalanceDataBlockExporter : IDatablockExporter
     public void Export(ExportContext context)
     {
         var expeditionBalanceBlocks = new List<JsonObject>();
+
+        // Always include the vanilla block with ID 1
+        var vanillaBlock1 = context.VanillaExpeditionBalanceBlocks.FirstOrDefault(b =>
+            b.TryGetPropertyValue("persistentID", out var idNode) &&
+            idNode != null &&
+            uint.TryParse(idNode.ToString(), out uint id) &&
+            id == 1);
+
+        if (vanillaBlock1 != null)
+        {
+            var clone = JsonNode.Parse(vanillaBlock1.ToJsonString())?.AsObject();
+            if (clone != null)
+            {
+                expeditionBalanceBlocks.Add(clone);
+            }
+        }
+        else
+        {
+            var fallbackBlocks = ExportContext.LoadVanillaBlocksArray("ExpeditionBalanceDataBlock.json");
+            var fallback1 = fallbackBlocks.FirstOrDefault(b =>
+                b.TryGetPropertyValue("persistentID", out var idNode) &&
+                idNode != null &&
+                uint.TryParse(idNode.ToString(), out uint id) &&
+                id == 1);
+            if (fallback1 != null)
+            {
+                expeditionBalanceBlocks.Add(fallback1);
+            }
+        }
 
         foreach (var level in context.MainVm.LevelLayout.Levels)
         {
@@ -32,7 +62,7 @@ public class ExpeditionBalanceDataBlockExporter : IDatablockExporter
         ExportContext.WriteDatablockFile(
             context.ExportRootPath,
             "GameData_ExpeditionBalanceDataBlock_bin.json",
-            context.ExpeditionBalanceBlocks.Count > 0 ? context.ExpeditionBalanceBlocks : context.VanillaExpeditionBalanceBlocks,
+            context.ExpeditionBalanceBlocks,
             vanillaExpeditionBalanceHeaders);
 
         context.DatablocksExportedCount++;

@@ -1713,10 +1713,10 @@ public class LevelLayoutViewModel : ViewModelBase
     public void AddEventOnTrigger() => EditingDoor?.EventsOnTrigger.Add(new WardenEvent());
     public void RemoveEventOnTrigger(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnTrigger.Remove(ev); }
 
-    public void AddEnemyGroupInAreaItem() => EditingDoor?.EnemyGroupInArea.Add(new EnemyGroupItem());
+    public void AddEnemyGroupInAreaItem() => EditingDoor?.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 24, Count = 1 });
     public void RemoveEnemyGroupInAreaItem(EnemyGroupItem? item) { if (item != null) EditingDoor?.EnemyGroupInArea.Remove(item); }
 
-    public void AddEnemyGroupInFrontOfDoorItem() => EditingDoor?.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem());
+    public void AddEnemyGroupInFrontOfDoorItem() => EditingDoor?.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem { EnemyId = 24, Count = 1 });
     public void RemoveEnemyGroupInFrontOfDoorItem(EnemyGroupItem? item) { if (item != null) EditingDoor?.EnemyGroupInFrontOfDoor.Remove(item); }
 
     public void AddEventOnActivation() => CurrentObjective?.EventsOnActivation.Add(new WardenEvent());
@@ -1776,7 +1776,7 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
-    public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem());
+    public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
     public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }
 
     public void AddBigPickupDistributionItem() => ActiveZoneSettings?.BigPickupDistributionInZone.Add(new BigPickupDistributionItem());

@@ -136,6 +136,7 @@ public static class AlarmService
         filePath ??= FindEnemyDataBlockFile();
 
         var enemies = new List<EnemyEntry>();
+        enemies.Add(new EnemyEntry { PersistentId = 0, Name = "None", EnemyType = "" });
 
         if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
         {
@@ -145,7 +146,7 @@ public static class AlarmService
                 var data = JsonSerializer.Deserialize<EnemyDataBlockFile>(json, JsonOptions);
                 if (data?.Blocks != null && data.Blocks.Count > 0)
                 {
-                    enemies.AddRange(data.Blocks);
+                    enemies.AddRange(data.Blocks.Where(b => b.PersistentId != 0));
                 }
             }
             catch
@@ -154,7 +155,7 @@ public static class AlarmService
             }
         }
 
-        if (enemies.Count == 0)
+        if (enemies.Count <= 1)
         {
             enemies.Add(new EnemyEntry { PersistentId = 13, Name = "Striker_Wave", EnemyType = "Standard" });
             enemies.Add(new EnemyEntry { PersistentId = 21, Name = "Shooter_Wave", EnemyType = "Weakling" });
@@ -243,6 +244,15 @@ public static class AlarmService
         [JsonPropertyName("WantedDistanceBetweenPuzzleComponents")]
         public double WantedDistanceBetweenPuzzleComponents { get; set; }
 
+        [JsonPropertyName("OnlyShowHUDWhenPlayerIsClose")]
+        public bool OnlyShowHUDWhenPlayerIsClose { get; set; }
+
+        [JsonPropertyName("AlarmSoundStart")]
+        public uint AlarmSoundStart { get; set; } = 3339129407;
+
+        [JsonPropertyName("AlarmSoundStop")]
+        public uint AlarmSoundStop { get; set; } = 42633153;
+
         [JsonPropertyName("ChainedPuzzle")]
         public List<ChainedPuzzleItem>? ChainedPuzzle { get; set; }
     }
@@ -328,6 +338,9 @@ public static class AlarmService
                         alarm.UseRandomPositions = puzzleBlock.UseRandomPositions;
                         alarm.WantedDistanceFromStartPos = puzzleBlock.WantedDistanceFromStartPos;
                         alarm.WantedDistanceBetweenPuzzleComponents = puzzleBlock.WantedDistanceBetweenPuzzleComponents;
+                        alarm.OnlyShowHUDWhenPlayerIsClose = puzzleBlock.OnlyShowHUDWhenPlayerIsClose;
+                        alarm.AlarmSoundStart = puzzleBlock.AlarmSoundStart;
+                        alarm.AlarmSoundStop = puzzleBlock.AlarmSoundStop;
 
                         if (puzzleBlock.ChainedPuzzle != null && puzzleBlock.ChainedPuzzle.Count > 0)
                         {

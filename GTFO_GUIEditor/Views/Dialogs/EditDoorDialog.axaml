@@ -6,6 +6,7 @@
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
              x:Class="GTFO_GUIEditor.Views.Dialogs.EditDoorDialog"
+             x:Name="EditDoorDialogRoot"
              x:DataType="vm:LevelLayoutViewModel">
     <Border Background="#80000000"
             HorizontalAlignment="Stretch"
@@ -177,7 +178,7 @@
                                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,2,0,2">
                                                     <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                     <ComboBox Grid.Column="1"
-                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              ItemsSource="{Binding #EditDoorDialogRoot.DataContext.Enemies}"
                                                               SelectedValue="{Binding EnemyId, Mode=TwoWay}"
                                                               SelectedValueBinding="{Binding PersistentId}"
                                                               HorizontalAlignment="Stretch"
@@ -190,7 +191,7 @@
                                                     </ComboBox>
                                                     <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                     <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
-                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyGroupInAreaItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                    <Button Grid.Column="4" Content="✕" Command="{Binding #EditDoorDialogRoot.DataContext.RemoveEnemyGroupInAreaItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
@@ -211,7 +212,7 @@
                                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,2,0,2">
                                                     <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                     <ComboBox Grid.Column="1"
-                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              ItemsSource="{Binding #EditDoorDialogRoot.DataContext.Enemies}"
                                                               SelectedValue="{Binding EnemyId, Mode=TwoWay}"
                                                               SelectedValueBinding="{Binding PersistentId}"
                                                               HorizontalAlignment="Stretch"
@@ -224,7 +225,7 @@
                                                     </ComboBox>
                                                     <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                     <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
-                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyGroupInFrontOfDoorItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                    <Button Grid.Column="4" Content="✕" Command="{Binding #EditDoorDialogRoot.DataContext.RemoveEnemyGroupInFrontOfDoorItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

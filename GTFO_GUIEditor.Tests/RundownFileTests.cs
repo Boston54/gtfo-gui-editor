@@ -670,4 +670,75 @@ public class RundownFileTests : IDisposable
             }
         }
     }
+
+    [Fact]
+    public void SaveAndLoad_Roundtrip_PreservesBloodDoorEnemiesAndEnemiesListHasEntries()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"test_blood_door_enemies_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var fakeDialog = new FakeFileDialogService();
+            var vm = new MainWindowViewModel(fakeDialog);
+
+            Assert.NotEmpty(vm.LevelLayout.Enemies);
+            Assert.Contains(vm.LevelLayout.Enemies, e => e.PersistentId == 24); // Striker
+            Assert.Contains(vm.LevelLayout.Enemies, e => e.PersistentId == 26); // Shooter
+            Assert.Contains(vm.LevelLayout.Enemies, e => e.PersistentId == 35); // Big Striker
+
+            var customLevel = new LevelLayoutBlock
+            {
+                Name = "Blood Door Enemy Test Level",
+                PersistentId = 444333,
+                ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/geo_32x32_elevator_shaft_dig_site_01.prefab"
+            };
+
+            var grid = customLevel.GridState;
+            var geo = grid.CreateGeomorphNode(customLevel.ElevatorTile, 0, 0);
+            grid.PlacedGeomorphs.Add(geo);
+            foreach (var d in geo.Doors) grid.PlacedDoors.Add(d);
+
+            var door = geo.Doors.First();
+            door.IsSecurityDoor = true;
+            door.HasBloodDoor = true;
+            door.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 24, Count = 5 });
+            door.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 35, Count = 2 });
+            door.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem { EnemyId = 26, Count = 3 });
+
+            vm.LevelLayout.Levels.Add(customLevel);
+
+            RundownProjectService.SaveProject(vm, tempFile);
+
+            var loadedVm = new MainWindowViewModel(fakeDialog);
+            var project = RundownProjectService.LoadProject(tempFile);
+            RundownProjectService.ApplyProject(loadedVm, project, tempFile);
+
+            var loadedLevel = loadedVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == 444333);
+            Assert.NotNull(loadedLevel);
+
+            var loadedDoor = loadedLevel.GridState.PlacedDoors.FirstOrDefault(d => d.IsSecurityDoor);
+            Assert.NotNull(loadedDoor);
+            Assert.True(loadedDoor.HasBloodDoor);
+            Assert.Equal(2, loadedDoor.EnemyGroupInArea.Count);
+            Assert.Equal((uint)24, loadedDoor.EnemyGroupInArea[0].EnemyId);
+            Assert.Equal(5, loadedDoor.EnemyGroupInArea[0].Count);
+            Assert.Equal((uint)35, loadedDoor.EnemyGroupInArea[1].EnemyId);
+            Assert.Equal(2, loadedDoor.EnemyGroupInArea[1].Count);
+
+            Assert.Single(loadedDoor.EnemyGroupInFrontOfDoor);
+            Assert.Equal((uint)26, loadedDoor.EnemyGroupInFrontOfDoor[0].EnemyId);
+            Assert.Equal(3, loadedDoor.EnemyGroupInFrontOfDoor[0].Count);
+
+            // Confirm that the loaded EnemyId values map to valid items in loadedVm.LevelLayout.Enemies
+            var enemyEntry24 = loadedVm.LevelLayout.Enemies.FirstOrDefault(e => e.PersistentId == loadedDoor.EnemyGroupInArea[0].EnemyId);
+            Assert.NotNull(enemyEntry24);
+            Assert.False(string.IsNullOrWhiteSpace(enemyEntry24.DisplayText));
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
 }

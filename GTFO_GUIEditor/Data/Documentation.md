@@ -7,11 +7,11 @@ This page serves as a user documentation guide. Assistance for how to use the ap
 
 | Shortcut | Action | Description |
 | --- | --- | --- |
-| `Ctrl+N` | New Rundown | Creates a fresh rundown project with default templates. |
+| `Ctrl+N` | New Rundown | Creates a fresh rundown project. |
 | `Ctrl+S` | Save Rundown | Saves the current rundown project to disk. |
 | `Ctrl+O` | Open Rundown | Opens an existing `.rundown` project file. |
 | `Ctrl+E` | Quick Export | Exports all datablocks directly to the last export directory. |
-| `Ctrl+I` | Import Rundown | Imports a rundown from datablocks |
+| `Ctrl+I` | Import Rundown | Imports a rundown from datablocks. |
 
 The label of almost every field in the editor can be hovered to show a short description of what the field does, and when relevant, also states common default values.
 
@@ -231,3 +231,18 @@ The following files will be *exported* by the program, but will have no impact w
   * These are generated automatically by the export system for each level based on which tiles the user places, meaning that importing them has no effect.
 * `EnemyDataBlock`
 * `GameSetupDataBlock`
+
+# Credits
+**Boston54** - Developer and UI Designer
+
+**Tgb03** - Plugin Developer (LGTunerAdvanced) and Game Data Extraction
+
+**MasterBuilderMAC** - Developer
+
+```
+This application is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) license.
+
+You are free to share and adapt this work, provided that appropriate credit is given, it is not used for commercial purposes, and any derivative works are distributed under the same license.
+
+Full license: https://creativecommons.org/licenses/by-nc-sa/4.0/
+```

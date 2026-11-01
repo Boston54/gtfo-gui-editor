@@ -357,9 +357,9 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 else if (ChainedPuzzleToSolve == 0 && value.ChainedPuzzleToSolve != 0)
                     ChainedPuzzleToSolve = value.ChainedPuzzleToSolve;
 
-                if (value.AliasOverride == 0 && AliasOverride != 0)
+                if (value.AliasOverride == -1 && AliasOverride != -1)
                     value.AliasOverride = AliasOverride;
-                else if (AliasOverride == 0 && value.AliasOverride != 0)
+                else if (AliasOverride == -1 && value.AliasOverride != -1)
                     AliasOverride = value.AliasOverride;
 
                 if (string.IsNullOrEmpty(value.AliasPrefixShortOverride) && !string.IsNullOrEmpty(AliasPrefixShortOverride))
@@ -367,29 +367,48 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 else if (string.IsNullOrEmpty(AliasPrefixShortOverride) && !string.IsNullOrEmpty(value.AliasPrefixShortOverride))
                     AliasPrefixShortOverride = value.AliasPrefixShortOverride;
 
-                if (value.TurnOffAlarmOnTerminal != TurnOffAlarmOnTerminal)
-                    value.TurnOffAlarmOnTerminal = TurnOffAlarmOnTerminal;
+                if (value.TurnOffAlarmOnTerminal || TurnOffAlarmOnTerminal)
+                {
+                    value.TurnOffAlarmOnTerminal = true;
+                    TurnOffAlarmOnTerminal = true;
+                }
 
-                if (value.TerminalZone != TerminalZone)
+                if (value.TerminalZone == 0 && TerminalZone != 0)
                     value.TerminalZone = TerminalZone;
+                else if (TerminalZone == 0 && value.TerminalZone != 0)
+                    TerminalZone = value.TerminalZone;
 
-                if (value.TerminalIndex != TerminalIndex)
+                if (value.TerminalIndex == 0 && TerminalIndex != 0)
                     value.TerminalIndex = TerminalIndex;
+                else if (TerminalIndex == 0 && value.TerminalIndex != 0)
+                    TerminalIndex = value.TerminalIndex;
 
-                if (value.IsApexDoor != IsApexDoor)
-                    value.IsApexDoor = IsApexDoor;
+                if (value.IsApexDoor || IsApexDoor)
+                {
+                    value.IsApexDoor = true;
+                    IsApexDoor = true;
+                }
 
-                if (value.HasBloodDoor != HasBloodDoor)
-                    value.HasBloodDoor = HasBloodDoor;
+                if (value.HasBloodDoor || HasBloodDoor)
+                {
+                    value.HasBloodDoor = true;
+                    HasBloodDoor = true;
+                }
 
-                if (value.ProgressionPuzzleToEnter != ProgressionPuzzleToEnter)
+                if (value.ProgressionPuzzleToEnter == ProgressionPuzzleType.None && ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
                     value.ProgressionPuzzleToEnter = ProgressionPuzzleToEnter;
+                else if (ProgressionPuzzleToEnter == ProgressionPuzzleType.None && value.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
+                    ProgressionPuzzleToEnter = value.ProgressionPuzzleToEnter;
 
-                if (value.ProgressionPuzzleCustomText != ProgressionPuzzleCustomText)
+                if (string.IsNullOrEmpty(value.ProgressionPuzzleCustomText) && !string.IsNullOrEmpty(ProgressionPuzzleCustomText))
                     value.ProgressionPuzzleCustomText = ProgressionPuzzleCustomText;
+                else if (string.IsNullOrEmpty(ProgressionPuzzleCustomText) && !string.IsNullOrEmpty(value.ProgressionPuzzleCustomText))
+                    ProgressionPuzzleCustomText = value.ProgressionPuzzleCustomText;
 
-                if (value.ProgressionPuzzlePlacementCount != ProgressionPuzzlePlacementCount)
+                if (value.ProgressionPuzzlePlacementCount <= 1 && ProgressionPuzzlePlacementCount > 1)
                     value.ProgressionPuzzlePlacementCount = ProgressionPuzzlePlacementCount;
+                else if (ProgressionPuzzlePlacementCount <= 1 && value.ProgressionPuzzlePlacementCount > 1)
+                    ProgressionPuzzlePlacementCount = value.ProgressionPuzzlePlacementCount;
 
                 SyncEventCollections(this, value);
             }

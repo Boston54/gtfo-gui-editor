@@ -96,6 +96,20 @@
                         </StackPanel>
                     </Border>
 
+                    <!-- Audio -->
+                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                        <StackPanel Spacing="10">
+                            <TextBlock Text="Audio" FontWeight="Bold" FontSize="14"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Alarm Sound Start:" ToolTip.Tip="The sound to play when the alarm starts. This is an ID of a sound effect, view the Sounds tab to see a list." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.AlarmSoundStart, Mode=TwoWay}" Margin="0,0,16,0"/>
+
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Alarm Sound Stop:" ToolTip.Tip="The sound to play when the alarm stops. This is an ID of a sound effect, view the Sounds tab to see a list." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.AlarmSoundStop, Mode=TwoWay}" Margin="0,0,0,0"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Scan Settings -->
                     <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
                         <StackPanel Spacing="10">
@@ -109,6 +123,9 @@
 
                                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Use Random Positions:" ToolTip.Tip="If false, the positions of the scans will be semi-consistently in the same positions (think R8E2 first class VI alarm). If true, they will be random every time." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                 <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedAlarm.UseRandomPositions, Mode=TwoWay}" VerticalAlignment="Center"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="2" Text="Only Show HUD When Player Is Close:" ToolTip.Tip="If true, the 'enter scan' HUD popup will only be visible to players who are close to the scans." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <CheckBox Grid.Row="1" Grid.Column="3" IsChecked="{Binding SelectedAlarm.OnlyShowHUDWhenPlayerIsClose, Mode=TwoWay}" VerticalAlignment="Center"/>
                             </Grid>
                         </StackPanel>
                     </Border>

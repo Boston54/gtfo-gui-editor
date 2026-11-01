@@ -6,6 +6,7 @@
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
              x:Class="GTFO_GUIEditor.Views.Dialogs.EditRoomDialog"
+             x:Name="EditRoomDialogRoot"
              x:DataType="vm:LevelLayoutViewModel">
     <Border Background="#80000000"
             HorizontalAlignment="Stretch"
@@ -174,7 +175,7 @@
                                                                             <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,2">
                                                                                 <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to NOT respawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                                 <ComboBox Grid.Column="1"
-                                                                                          ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                                                          ItemsSource="{Binding #EditRoomDialogRoot.DataContext.Enemies}"
                                                                                           SelectedValue="{Binding EnemyId, Mode=TwoWay}"
                                                                                           SelectedValueBinding="{Binding PersistentId}"
                                                                                           HorizontalAlignment="Stretch"
@@ -185,7 +186,7 @@
                                                                                         </DataTemplate>
                                                                                     </ComboBox.ItemTemplate>
                                                                                 </ComboBox>
-                                                                                <Button Grid.Column="2" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveEnemyExcludeItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                                <Button Grid.Column="2" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveEnemyExcludeItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                                             </Grid>
                                                                         </DataTemplate>
                                                                     </ItemsControl.ItemTemplate>
@@ -312,7 +313,7 @@
                                                                             </DataTemplate>
                                                                         </ComboBox.ItemTemplate>
                                                                     </ComboBox>
-                                                                    <Button Grid.Column="2" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveBigPickupDistributionItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                    <Button Grid.Column="2" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveBigPickupDistributionItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                                 </Grid>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
@@ -341,7 +342,7 @@
                                                                         <TextBlock Grid.Column="4" Text="End:" ToolTip.Tip="Weight for the end of the zone." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
                                                                         <TextBox Grid.Column="5" Text="{Binding PlacementEndWeight, Mode=TwoWay}" Margin="0,0,10,0"/>
 
-                                                                        <Button Grid.Column="6" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveDisinfectionStationPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                        <Button Grid.Column="6" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveDisinfectionStationPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                                     </Grid>
                                                                 </Border>
                                                             </DataTemplate>
@@ -364,7 +365,7 @@
                                                                     <Expander.Header>
                                                                         <Grid ColumnDefinitions="*,Auto">
                                                                             <TextBlock Grid.Column="0" Text="Terminal Configuration" ToolTip.Tip="Custom configuration for this terminal" FontWeight="SemiBold" FontSize="12" Foreground="#FFA200" VerticalAlignment="Center"/>
-                                                                            <Button Grid.Column="1" Content="✕ Remove Terminal" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                            <Button Grid.Column="1" Content="✕ Remove Terminal" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                                         </Grid>
                                                                     </Expander.Header>
                                                                     <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -511,7 +512,7 @@
                                                                                                         </ComboBox.ItemTemplate>
                                                                                                     </ComboBox>
 
-                                                                                                    <Button Grid.Column="4" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalZoneSelectionDataCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                                                                    <Button Grid.Column="4" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalZoneSelectionDataCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
                                                                                                 </Grid>
                                                                                             </DataTemplate>
                                                                                         </ItemsControl.ItemTemplate>
@@ -535,7 +536,7 @@
                                                                                             <Expander.Header>
                                                                                                 <Grid ColumnDefinitions="*,Auto">
                                                                                                     <TextBlock Grid.Column="0" Text="Unique Command Details" FontWeight="SemiBold" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
-                                                                                                    <Button Grid.Column="1" Content="✕ Remove Command" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalUniqueCommandCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                                                    <Button Grid.Column="1" Content="✕ Remove Command" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalUniqueCommandCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
                                                                                                 </Grid>
                                                                                             </Expander.Header>
                                                                                             <StackPanel Spacing="6" Margin="0,6,0,0">
@@ -569,7 +570,7 @@
                                                                                                                     <TextBox Grid.Column="3" Text="{Binding Time, Mode=TwoWay}" Width="60" Margin="0,0,8,0"/>
                                                                                                                     <TextBlock Grid.Column="4" Text="Output:" ToolTip.Tip="The text to be output on this line" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#AAAAAA"/>
                                                                                                                     <TextBox Grid.Column="5" Text="{Binding Output, Mode=TwoWay}" Margin="0,0,6,0"/>
-                                                                                                                    <Button Grid.Column="6" Content="✕" Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveTerminalPostCommandOutputCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                                                                                    <Button Grid.Column="6" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalPostCommandOutputCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
                                                                                                                 </Grid>
                                                                                                             </DataTemplate>
                                                                                                         </ItemsControl.ItemTemplate>

@@ -20137,7 +20137,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_493 (Main)",
+      "name": "R8E2 ZONE_493 (Main)",
       "internalEnabled": true,
       "persistentID": 494
     },
@@ -20168,7 +20168,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_494 (Main)",
+      "name": "R8E2 ZONE_494 (Main)",
       "internalEnabled": true,
       "persistentID": 495
     },
@@ -20205,7 +20205,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_495 (Main)",
+      "name": "R8E2 ZONE_495 (Main)",
       "internalEnabled": true,
       "persistentID": 496
     },
@@ -20227,7 +20227,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_496 (Main)",
+      "name": "R8E2 ZONE_496 (Main)",
       "internalEnabled": true,
       "persistentID": 497
     },
@@ -20264,7 +20264,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_498 (Main)",
+      "name": "R8E2 ZONE_498 (Main)",
       "internalEnabled": true,
       "persistentID": 498
     },
@@ -20301,7 +20301,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_499 (Main)",
+      "name": "R8E2 ZONE_499 (Main)",
       "internalEnabled": true,
       "persistentID": 499
     },
@@ -20323,7 +20323,7 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 OBJECTIVE_EXIT (Main)",
+      "name": "R8E2 OBJECTIVE_EXIT (Main)",
       "internalEnabled": true,
       "persistentID": 500
     },
@@ -20345,7 +20345,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_618 (Secondary)",
+      "name": "R8E2 ZONE_618 (Secondary)",
       "internalEnabled": true,
       "persistentID": 501
     },
@@ -20367,7 +20367,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_619 (Secondary)",
+      "name": "R8E2 ZONE_619 (Secondary)",
       "internalEnabled": true,
       "persistentID": 502
     },
@@ -20389,7 +20389,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_620 (Secondary)",
+      "name": "R8E2 ZONE_620 (Secondary)",
       "internalEnabled": true,
       "persistentID": 503
     },
@@ -20411,7 +20411,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 ZONE_621 (Secondary)",
+      "name": "R8E2 ZONE_621 (Secondary)",
       "internalEnabled": true,
       "persistentID": 504
     },
@@ -20433,7 +20433,7 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 OBJECTIVE_EXIT (Secondary)",
+      "name": "R8E2 OBJECTIVE_EXIT (Secondary)",
       "internalEnabled": true,
       "persistentID": 506
     },
@@ -20455,219 +20455,9 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R8E23 OBJECTIVE_START (Secondary)",
+      "name": "R8E2 OBJECTIVE_START (Secondary)",
       "internalEnabled": true,
       "persistentID": 505
-    },
-    {
-      "PublicAlarmName": "Scan",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 0,
-      "SurvivalWavePopulation": 0,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 6
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": false,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "T2 ZONE_71 (Main)",
-      "internalEnabled": true,
-      "persistentID": 373
-    },
-    {
-      "PublicAlarmName": "Class II Diminished Alarm",
-      "TriggerAlarmOnActivate": true,
-      "SurvivalWaveSettings": 126,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 7.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 6
-        },
-        {
-          "PuzzleType": 2
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": false,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "T2 ZONE_74 (Main)",
-      "internalEnabled": true,
-      "persistentID": 374
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "T2 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 375
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "A1 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 507
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "A2 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 508
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "A3 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 509
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "A5 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 510
-    },
-    {
-      "PublicAlarmName": "Class IV Alarm",
-      "TriggerAlarmOnActivate": true,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": true,
-      "WantedDistanceFromStartPos": 20.0,
-      "WantedDistanceBetweenPuzzleComponents": 10.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 6
-        },
-        {
-          "PuzzleType": 5
-        },
-        {
-          "PuzzleType": 4
-        },
-        {
-          "PuzzleType": 2
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": false,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "B1 ZONE_31 (Main)",
-      "internalEnabled": true,
-      "persistentID": 511
-    },
-    {
-      "PublicAlarmName": "Alarm",
-      "TriggerAlarmOnActivate": false,
-      "SurvivalWaveSettings": 1,
-      "SurvivalWavePopulation": 1,
-      "SurvivalWaveAreaDistance": 2,
-      "DisableSurvivalWaveOnComplete": true,
-      "UseRandomPositions": false,
-      "WantedDistanceFromStartPos": 0.0,
-      "WantedDistanceBetweenPuzzleComponents": 1.0,
-      "ChainedPuzzle": [
-        {
-          "PuzzleType": 7
-        }
-      ],
-      "OnlyShowHUDWhenPlayerIsClose": true,
-      "AlarmSoundStart": 3339129407,
-      "AlarmSoundStop": 42633153,
-      "name": "B1 OBJECTIVE_EXIT (Main)",
-      "internalEnabled": true,
-      "persistentID": 512
     },
     {
       "PublicAlarmName": "Class IV Alarm",
@@ -20696,7 +20486,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_13 (Main)",
+      "name": "R6AX ZONE_13 (Main)",
       "internalEnabled": true,
       "persistentID": 1025
     },
@@ -20718,7 +20508,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_14 (Main)",
+      "name": "R6AX ZONE_14 (Main)",
       "internalEnabled": true,
       "persistentID": 1026
     },
@@ -20749,7 +20539,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_15 (Main)",
+      "name": "R6AX ZONE_15 (Main)",
       "internalEnabled": true,
       "persistentID": 1027
     },
@@ -20771,7 +20561,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_16 (Main)",
+      "name": "R6AX ZONE_16 (Main)",
       "internalEnabled": true,
       "persistentID": 1028
     },
@@ -20793,7 +20583,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_17 (Main)",
+      "name": "R6AX ZONE_17 (Main)",
       "internalEnabled": true,
       "persistentID": 1029
     },
@@ -20815,7 +20605,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 ZONE_19 (Main)",
+      "name": "R6AX ZONE_19 (Main)",
       "internalEnabled": true,
       "persistentID": 1030
     },
@@ -20837,7 +20627,7 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6AX2 OBJECTIVE_EXIT (Main)",
+      "name": "R6AX OBJECTIVE_EXIT (Main)",
       "internalEnabled": true,
       "persistentID": 1031
     },
@@ -20871,7 +20661,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_181 (Main)",
+      "name": "R6BX ZONE_181 (Main)",
       "internalEnabled": true,
       "persistentID": 1050
     },
@@ -20893,7 +20683,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_182 (Main)",
+      "name": "R6BX ZONE_182 (Main)",
       "internalEnabled": true,
       "persistentID": 1051
     },
@@ -20915,7 +20705,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_183 (Main)",
+      "name": "R6BX ZONE_183 (Main)",
       "internalEnabled": true,
       "persistentID": 1052
     },
@@ -20946,7 +20736,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_184 (Main)",
+      "name": "R6BX ZONE_184 (Main)",
       "internalEnabled": true,
       "persistentID": 1053
     },
@@ -20968,7 +20758,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_185 (Main)",
+      "name": "R6BX ZONE_185 (Main)",
       "internalEnabled": true,
       "persistentID": 1054
     },
@@ -20990,7 +20780,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_186 (Main)",
+      "name": "R6BX ZONE_186 (Main)",
       "internalEnabled": true,
       "persistentID": 1055
     },
@@ -21012,7 +20802,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_190 (Main)",
+      "name": "R6BX ZONE_190 (Main)",
       "internalEnabled": true,
       "persistentID": 1056
     },
@@ -21034,7 +20824,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_191 (Main)",
+      "name": "R6BX ZONE_191 (Main)",
       "internalEnabled": true,
       "persistentID": 1057
     },
@@ -21056,7 +20846,7 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 OBJECTIVE_EXIT (Main)",
+      "name": "R6BX OBJECTIVE_EXIT (Main)",
       "internalEnabled": true,
       "persistentID": 1058
     },
@@ -21084,7 +20874,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_250 (Secondary)",
+      "name": "R6BX ZONE_250 (Secondary)",
       "internalEnabled": true,
       "persistentID": 1059
     },
@@ -21106,7 +20896,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_251 (Secondary)",
+      "name": "R6BX ZONE_251 (Secondary)",
       "internalEnabled": true,
       "persistentID": 1060
     },
@@ -21128,7 +20918,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 ZONE_252 (Secondary)",
+      "name": "R6BX ZONE_252 (Secondary)",
       "internalEnabled": true,
       "persistentID": 1061
     },
@@ -21150,7 +20940,7 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6BX4 OBJECTIVE_EXIT (Secondary)",
+      "name": "R6BX OBJECTIVE_EXIT (Secondary)",
       "internalEnabled": true,
       "persistentID": 1062
     },
@@ -21172,7 +20962,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_76 (Main)",
+      "name": "R6CX ZONE_76 (Main)",
       "internalEnabled": true,
       "persistentID": 1100
     },
@@ -21206,7 +20996,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_77 (Main)",
+      "name": "R6CX ZONE_77 (Main)",
       "internalEnabled": true,
       "persistentID": 1101
     },
@@ -21234,7 +21024,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_78 (Main)",
+      "name": "R6CX ZONE_78 (Main)",
       "internalEnabled": true,
       "persistentID": 1102
     },
@@ -21268,7 +21058,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_79 (Main)",
+      "name": "R6CX ZONE_79 (Main)",
       "internalEnabled": true,
       "persistentID": 1103
     },
@@ -21290,7 +21080,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_80 (Main)",
+      "name": "R6CX ZONE_80 (Main)",
       "internalEnabled": true,
       "persistentID": 1104
     },
@@ -21312,7 +21102,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 ZONE_82 (Main)",
+      "name": "R6CX ZONE_82 (Main)",
       "internalEnabled": true,
       "persistentID": 1105
     },
@@ -21334,7 +21124,7 @@
       "OnlyShowHUDWhenPlayerIsClose": false,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 OBJECTIVE_START (Main)",
+      "name": "R6CX OBJECTIVE_START (Main)",
       "internalEnabled": true,
       "persistentID": 1106
     },
@@ -21356,9 +21146,75 @@
       "OnlyShowHUDWhenPlayerIsClose": true,
       "AlarmSoundStart": 3339129407,
       "AlarmSoundStop": 42633153,
-      "name": "R6CX4 OBJECTIVE_EXIT (Main)",
+      "name": "R6CX OBJECTIVE_EXIT (Main)",
       "internalEnabled": true,
       "persistentID": 1107
+    },
+    {
+      "PublicAlarmName": "Alarm",
+      "TriggerAlarmOnActivate": false,
+      "SurvivalWaveSettings": 0,
+      "SurvivalWavePopulation": 0,
+      "SurvivalWaveAreaDistance": 2,
+      "DisableSurvivalWaveOnComplete": true,
+      "UseRandomPositions": true,
+      "WantedDistanceFromStartPos": 0.0,
+      "WantedDistanceBetweenPuzzleComponents": 0.0,
+      "ChainedPuzzle": [
+        {
+          "PuzzleType": 10
+        }
+      ],
+      "OnlyShowHUDWhenPlayerIsClose": false,
+      "AlarmSoundStart": 3339129407,
+      "AlarmSoundStop": 42633153,
+      "name": "Main Bulkhead Scan",
+      "internalEnabled": true,
+      "persistentID": 59
+    },
+    {
+      "PublicAlarmName": "Alarm",
+      "TriggerAlarmOnActivate": false,
+      "SurvivalWaveSettings": 0,
+      "SurvivalWavePopulation": 0,
+      "SurvivalWaveAreaDistance": 2,
+      "DisableSurvivalWaveOnComplete": true,
+      "UseRandomPositions": true,
+      "WantedDistanceFromStartPos": 0.0,
+      "WantedDistanceBetweenPuzzleComponents": 0.0,
+      "ChainedPuzzle": [
+        {
+          "PuzzleType": 11
+        }
+      ],
+      "OnlyShowHUDWhenPlayerIsClose": false,
+      "AlarmSoundStart": 3339129407,
+      "AlarmSoundStop": 42633153,
+      "name": "Secondary Bulkhead Scan",
+      "internalEnabled": true,
+      "persistentID": 60
+    },
+    {
+      "PublicAlarmName": "Alarm",
+      "TriggerAlarmOnActivate": false,
+      "SurvivalWaveSettings": 0,
+      "SurvivalWavePopulation": 0,
+      "SurvivalWaveAreaDistance": 2,
+      "DisableSurvivalWaveOnComplete": true,
+      "UseRandomPositions": true,
+      "WantedDistanceFromStartPos": 0.0,
+      "WantedDistanceBetweenPuzzleComponents": 0.0,
+      "ChainedPuzzle": [
+        {
+          "PuzzleType": 12
+        }
+      ],
+      "OnlyShowHUDWhenPlayerIsClose": false,
+      "AlarmSoundStart": 3339129407,
+      "AlarmSoundStop": 42633153,
+      "name": "Overload Bulkhead Scan",
+      "internalEnabled": true,
+      "persistentID": 61
     }
   ],
   "LastPersistentID": 299

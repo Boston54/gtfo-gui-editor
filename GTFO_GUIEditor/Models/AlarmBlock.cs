@@ -21,6 +21,9 @@ public class AlarmBlock : INotifyPropertyChanged
     private bool _useRandomPositions = false;
     private double _wantedDistanceFromStartPos = 0;
     private double _wantedDistanceBetweenPuzzleComponents = 0;
+    private bool _onlyShowHUDWhenPlayerIsClose = false;
+    private uint _alarmSoundStart = 3339129407;
+    private uint _alarmSoundStop = 42633153;
     private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
 
     // Wave Roles (Enemy References)
@@ -166,6 +169,27 @@ public class AlarmBlock : INotifyPropertyChanged
     {
         get => _wantedDistanceBetweenPuzzleComponents;
         set => SetField(ref _wantedDistanceBetweenPuzzleComponents, value);
+    }
+
+    [JsonPropertyName("OnlyShowHUDWhenPlayerIsClose")]
+    public bool OnlyShowHUDWhenPlayerIsClose
+    {
+        get => _onlyShowHUDWhenPlayerIsClose;
+        set => SetField(ref _onlyShowHUDWhenPlayerIsClose, value);
+    }
+
+    [JsonPropertyName("AlarmSoundStart")]
+    public uint AlarmSoundStart
+    {
+        get => _alarmSoundStart;
+        set => SetField(ref _alarmSoundStart, value);
+    }
+
+    [JsonPropertyName("AlarmSoundStop")]
+    public uint AlarmSoundStop
+    {
+        get => _alarmSoundStop;
+        set => SetField(ref _alarmSoundStop, value);
     }
 
     [JsonPropertyName("ChainedPuzzle")]
@@ -450,6 +474,9 @@ public class AlarmBlock : INotifyPropertyChanged
             UseRandomPositions = UseRandomPositions,
             WantedDistanceFromStartPos = WantedDistanceFromStartPos,
             WantedDistanceBetweenPuzzleComponents = WantedDistanceBetweenPuzzleComponents,
+            OnlyShowHUDWhenPlayerIsClose = OnlyShowHUDWhenPlayerIsClose,
+            AlarmSoundStart = AlarmSoundStart,
+            AlarmSoundStop = AlarmSoundStop,
             ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>(ChainedPuzzle.Select(c => c.Clone())),
 
             WaveRoleWeakling = WaveRoleWeakling,

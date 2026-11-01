@@ -1928,4 +1928,269 @@ public class DatablockImportTests : IDisposable
             Assert.False(impDoor2To3.IsSecurityDoor, "Door from Area 2 to Area 3 should NOT be a Security Door");
         }
     }
+
+    [Fact]
+    public void ExportAndImport_BloodDoor_PreservesEnemyGroupsInFrontAndInArea()
+    {
+        var originalVm = new MainWindowViewModel();
+        var level = originalVm.LevelLayout.Levels[0];
+        level.PersistentId = 2201;
+        level.Name = "Test_BloodDoor_Level";
+        level.ComplexType = ComplexType.Tech;
+        level.ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab";
+
+        var grid = level.GridState;
+        grid.PlacedGeomorphs.Clear();
+        grid.PlacedRooms.Clear();
+        grid.PlacedDoors.Clear();
+
+        var elevGeo = grid.CreateGeomorphNode(level.ElevatorTile, 0, 0);
+        elevGeo.SetRoomZone(0, 0);
+        grid.PlacedGeomorphs.Add(elevGeo);
+
+        var geo1 = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab", 0, -1);
+        grid.PlacedGeomorphs.Add(geo1);
+
+        foreach (var door in elevGeo.Doors)
+        {
+            if (!grid.PlacedDoors.Contains(door)) grid.PlacedDoors.Add(door);
+        }
+        foreach (var door in geo1.Doors)
+        {
+            if (!grid.PlacedDoors.Contains(door)) grid.PlacedDoors.Add(door);
+        }
+
+        var elevDoor = elevGeo.Doors.FirstOrDefault(d => !d.IsInternal);
+        var geo1Door = geo1.Doors.FirstOrDefault(d => !d.IsInternal && d.AreaFrom == 0);
+        Assert.NotNull(elevDoor);
+        Assert.NotNull(geo1Door);
+
+        elevDoor.IsConnected = true;
+        geo1Door.IsConnected = true;
+        elevDoor.ConnectedDoor = geo1Door;
+        geo1Door.ConnectedDoor = elevDoor;
+
+        geo1.GenerateRoom(0);
+        geo1.SetRoomZone(0, 0);
+
+        var door0To5 = geo1.Doors.First(d => d.IsInternal && !d.IsConnected && (d.AreaFrom == 0 && d.AreaTo == 5 || d.AreaFrom == 5 && d.AreaTo == 0));
+        int area5 = grid.GenerateRoomFromDoor(door0To5);
+        geo1.SetRoomZone(area5, 1);
+
+        // Configure door0To5 as a Blood Door into Zone 1
+        door0To5.IsSecurityDoor = true;
+        door0To5.HasBloodDoor = true;
+        door0To5.EnemyGroupInFrontOfDoor.Clear();
+        door0To5.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem { EnemyId = 24, Count = 6 }); // Strikers
+        door0To5.EnemyGroupInFrontOfDoor.Add(new EnemyGroupItem { EnemyId = 35, Count = 1 }); // Big Striker
+
+        door0To5.EnemyGroupInArea.Clear();
+        door0To5.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 26, Count = 4 }); // Shooters
+        door0To5.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 40, Count = 1 }); // Tank
+        grid.RecalculateSecurityDoorConstraints();
+
+        var exp = new ExpeditionBlock
+        {
+            Enabled = true,
+            LevelLayoutData = level.PersistentId,
+            Descriptive = new ExpeditionDescriptiveData { Prefix = "A1", PublicName = level.Name }
+        };
+        originalVm.Rundown.SelectedRundown!.TierA.Clear();
+        originalVm.Rundown.SelectedRundown!.TierA.Add(exp);
+
+        string exportDir = Path.Combine(_tempDir, "ExportBloodDoorTest");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(originalVm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        // Verify EnemyGroupDataBlock was exported
+        string enemyGroupFile = Path.Combine(exportDir, "GameData_EnemyGroupDataBlock_bin.json");
+        Assert.True(File.Exists(enemyGroupFile));
+
+        // Import back
+        var importVm = new MainWindowViewModel();
+        var importResult = DatablockManager.Instance.ImportDatablocks(importVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        var importedLevel = importVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == level.PersistentId || l.Name == level.Name);
+        Assert.NotNull(importedLevel);
+
+        var impGrid = importedLevel.GridState;
+        var impGeo1 = impGrid.PlacedGeomorphs.FirstOrDefault(g => g.GridX == 0 && g.GridY == -1);
+        Assert.NotNull(impGeo1);
+
+        var impDoor0To5 = impGeo1.Doors.FirstOrDefault(d => d.IsInternal &&
+            ((d.AreaFrom == 0 && d.AreaTo == 5) || (d.AreaFrom == 5 && d.AreaTo == 0)) && d.IsSecurityDoor);
+        Assert.NotNull(impDoor0To5);
+        Assert.True(impDoor0To5.HasBloodDoor, "Imported door must have HasBloodDoor = true");
+
+        // Verify EnemyGroupInFrontOfDoor
+        Assert.NotEmpty(impDoor0To5.EnemyGroupInFrontOfDoor);
+        var strikerFront = impDoor0To5.EnemyGroupInFrontOfDoor.FirstOrDefault(e => e.EnemyId == 24);
+        Assert.NotNull(strikerFront);
+        Assert.Equal(6, strikerFront.Count);
+
+        var bigStrikerFront = impDoor0To5.EnemyGroupInFrontOfDoor.FirstOrDefault(e => e.EnemyId == 35);
+        Assert.NotNull(bigStrikerFront);
+        Assert.Equal(1, bigStrikerFront.Count);
+
+        // Verify EnemyGroupInArea
+        Assert.NotEmpty(impDoor0To5.EnemyGroupInArea);
+        var shooterArea = impDoor0To5.EnemyGroupInArea.FirstOrDefault(e => e.EnemyId == 26);
+        Assert.NotNull(shooterArea);
+        Assert.Equal(4, shooterArea.Count);
+
+        var tankArea = impDoor0To5.EnemyGroupInArea.FirstOrDefault(e => e.EnemyId == 40);
+        Assert.NotNull(tankArea);
+        Assert.Equal(1, tankArea.Count);
+    }
+
+    [Fact]
+    public void Import_BloodDoorFromVanillaEnemyGroup_CalculatesEnemyCountsFromRolesAndCost()
+    {
+        var originalVm = new MainWindowViewModel();
+        var level = originalVm.LevelLayout.Levels[0];
+        level.PersistentId = 2202;
+        level.Name = "Test_BloodDoor_Calculated";
+        level.ComplexType = ComplexType.Tech;
+        level.ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_32x32_elevator_shaft_tech_01.prefab";
+
+        var grid = level.GridState;
+        grid.PlacedGeomorphs.Clear();
+        grid.PlacedRooms.Clear();
+        grid.PlacedDoors.Clear();
+
+        var elevGeo = grid.CreateGeomorphNode(level.ElevatorTile, 0, 0);
+        elevGeo.SetRoomZone(0, 0);
+        grid.PlacedGeomorphs.Add(elevGeo);
+
+        var geo1 = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab", 0, -1);
+        grid.PlacedGeomorphs.Add(geo1);
+
+        foreach (var door in elevGeo.Doors)
+        {
+            if (!grid.PlacedDoors.Contains(door)) grid.PlacedDoors.Add(door);
+        }
+        foreach (var door in geo1.Doors)
+        {
+            if (!grid.PlacedDoors.Contains(door)) grid.PlacedDoors.Add(door);
+        }
+
+        var elevDoor = elevGeo.Doors.FirstOrDefault(d => !d.IsInternal);
+        var geo1Door = geo1.Doors.FirstOrDefault(d => !d.IsInternal && d.AreaFrom == 0);
+        Assert.NotNull(elevDoor);
+        Assert.NotNull(geo1Door);
+
+        elevDoor.IsConnected = true;
+        geo1Door.IsConnected = true;
+        elevDoor.ConnectedDoor = geo1Door;
+        geo1Door.ConnectedDoor = elevDoor;
+
+        geo1.GenerateRoom(0);
+        geo1.SetRoomZone(0, 0);
+
+        var door0To5 = geo1.Doors.First(d => d.IsInternal && !d.IsConnected && (d.AreaFrom == 0 && d.AreaTo == 5 || d.AreaFrom == 5 && d.AreaTo == 0));
+        int area5 = grid.GenerateRoomFromDoor(door0To5);
+        geo1.SetRoomZone(area5, 1);
+
+        door0To5.IsSecurityDoor = true;
+        grid.RecalculateSecurityDoorConstraints();
+
+        var exp = new ExpeditionBlock
+        {
+            Enabled = true,
+            LevelLayoutData = level.PersistentId,
+            Descriptive = new ExpeditionDescriptiveData { Prefix = "A1", PublicName = level.Name }
+        };
+        originalVm.Rundown.SelectedRundown!.TierA.Clear();
+        originalVm.Rundown.SelectedRundown!.TierA.Add(exp);
+
+        string exportDir = Path.Combine(_tempDir, "ExportBloodDoorCalcTest");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(originalVm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        // Create a custom EnemyGroup in EnemyGroupDataBlock with MaxScore = 12.0 and roles:
+        // Role 1: "MeleeLarge" (Big Striker, cost 4), Rel_75
+        // Role 2: "Ranged" (Shooter, cost 1), Rel_25
+        // Total relative weight = 1.0. MeleeLarge proportion = 0.75 -> points = 9.0 -> count = Round(9/4) = 2.
+        // Ranged proportion = 0.25 -> points = 3.0 -> count = Round(3/1) = 3.
+        string enemyGroupPath = Path.Combine(exportDir, "GameData_EnemyGroupDataBlock_bin.json");
+        var enemyGroupDoc = JsonNode.Parse(File.ReadAllText(enemyGroupPath))!.AsObject();
+        var blocksArr = enemyGroupDoc["Blocks"]!.AsArray();
+
+        uint testEnemyGroupId = 99999;
+        var customGroup = new JsonObject
+        {
+            ["MaxScore"] = 12.0,
+            ["name"] = "Custom_Calc_Group",
+            ["persistentID"] = testEnemyGroupId,
+            ["internalEnabled"] = true,
+            ["Roles"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["Role"] = "MeleeLarge",
+                    ["Distribution"] = "Rel_75"
+                },
+                new JsonObject
+                {
+                    ["Role"] = "Ranged",
+                    ["Distribution"] = "Rel_25"
+                }
+            }
+        };
+        blocksArr.Add(customGroup);
+        File.WriteAllText(enemyGroupPath, enemyGroupDoc.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+
+        // Modify LevelLayout to reference this enemy group on Zone 1 ActiveEnemyWave
+        string layoutPath = Path.Combine(exportDir, "GameData_LevelLayoutDataBlock_bin.json");
+        var layoutDoc = JsonNode.Parse(File.ReadAllText(layoutPath))!.AsObject();
+        var lBlocks = layoutDoc["Blocks"]!.AsArray();
+        var lBlock = lBlocks.OfType<JsonObject>().First(b => b["persistentID"]?.GetValue<uint>() == level.PersistentId);
+        var z1 = lBlock["Zones"]!.AsArray()[1]!.AsObject();
+        z1["ActiveEnemyWave"] = new JsonObject
+        {
+            ["HasActiveEnemyWave"] = true,
+            ["EnemyGroupInfrontOfDoor"] = testEnemyGroupId,
+            ["EnemyGroupInArea"] = testEnemyGroupId,
+            ["EnemyGroupsInArea"] = 1
+        };
+        File.WriteAllText(layoutPath, layoutDoc.ToJsonString(new JsonSerializerOptions { WriteIndented = true }));
+
+        // Import back
+        var importVm = new MainWindowViewModel();
+        var importResult = DatablockManager.Instance.ImportDatablocks(importVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        var importedLevel = importVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == level.PersistentId);
+        Assert.NotNull(importedLevel);
+
+        var impGrid = importedLevel.GridState;
+        var impGeo1 = impGrid.PlacedGeomorphs.FirstOrDefault(g => g.GridX == 0 && g.GridY == -1);
+        Assert.NotNull(impGeo1);
+
+        var impDoor0To5 = impGeo1.Doors.FirstOrDefault(d => d.IsInternal &&
+            ((d.AreaFrom == 0 && d.AreaTo == 5) || (d.AreaFrom == 5 && d.AreaTo == 0)) && d.IsSecurityDoor);
+        Assert.NotNull(impDoor0To5);
+        Assert.True(impDoor0To5.HasBloodDoor);
+
+        // Verify calculated enemy counts for EnemyGroupInFrontOfDoor
+        Assert.Equal(2, impDoor0To5.EnemyGroupInFrontOfDoor.Count);
+        var bigStriker = impDoor0To5.EnemyGroupInFrontOfDoor.FirstOrDefault(e => e.EnemyId == 35);
+        Assert.NotNull(bigStriker);
+        Assert.Equal(2, bigStriker.Count); // 9 / 4 = 2.25 -> 2
+
+        var shooter = impDoor0To5.EnemyGroupInFrontOfDoor.FirstOrDefault(e => e.EnemyId == 26);
+        Assert.NotNull(shooter);
+        Assert.Equal(3, shooter.Count); // 3 / 1 = 3 -> 3
+
+        // Verify calculated enemy counts for EnemyGroupInArea
+        Assert.Equal(2, impDoor0To5.EnemyGroupInArea.Count);
+        var bigStrikerArea = impDoor0To5.EnemyGroupInArea.FirstOrDefault(e => e.EnemyId == 35);
+        Assert.NotNull(bigStrikerArea);
+        Assert.Equal(2, bigStrikerArea.Count);
+
+        var shooterArea = impDoor0To5.EnemyGroupInArea.FirstOrDefault(e => e.EnemyId == 26);
+        Assert.NotNull(shooterArea);
+        Assert.Equal(3, shooterArea.Count);
+    }
 }

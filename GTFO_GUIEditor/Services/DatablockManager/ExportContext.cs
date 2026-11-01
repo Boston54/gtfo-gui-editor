@@ -114,6 +114,7 @@ public class ExportContext
 
         VanillaEnemyGroupBlocks = LoadVanillaBlocksArray("EnemyGroupDataBlock.json");
         RegisterExistingIds(VanillaEnemyGroupBlocks, EnemyGroupAlloc);
+        EnemyGroupBlocks.AddRange(VanillaEnemyGroupBlocks);
 
         VanillaSurvivalWaveSettingsBlocks = LoadVanillaBlocksArray("SurvivalWaveSettingsDataBlock.json");
         RegisterExistingIds(VanillaSurvivalWaveSettingsBlocks, SurvivalWaveSettingsAlloc);

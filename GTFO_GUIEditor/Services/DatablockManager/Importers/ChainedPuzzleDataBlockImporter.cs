@@ -25,6 +25,9 @@ public class ChainedPuzzleDataBlockImporter : IDatablockImporter
             bool useRandomPositions = puzzleObj["UseRandomPositions"]?.GetValue<bool>() ?? false;
             double wantedDistFromStart = puzzleObj["WantedDistanceFromStartPos"]?.GetValue<double>() ?? 0;
             double wantedDistBetween = puzzleObj["WantedDistanceBetweenPuzzleComponents"]?.GetValue<double>() ?? 0;
+            bool onlyShowHud = puzzleObj["OnlyShowHUDWhenPlayerIsClose"]?.GetValue<bool>() ?? false;
+            uint soundStart = puzzleObj["AlarmSoundStart"]?.GetValue<uint>() ?? 3339129407;
+            uint soundStop = puzzleObj["AlarmSoundStop"]?.GetValue<uint>() ?? 42633153;
 
             uint waveSettingsId = puzzleObj["SurvivalWaveSettings"]?.GetValue<uint>() ?? 0;
             uint popId = puzzleObj["SurvivalWavePopulation"]?.GetValue<uint>() ?? 0;
@@ -40,6 +43,9 @@ public class ChainedPuzzleDataBlockImporter : IDatablockImporter
                 UseRandomPositions = useRandomPositions,
                 WantedDistanceFromStartPos = wantedDistFromStart,
                 WantedDistanceBetweenPuzzleComponents = wantedDistBetween,
+                OnlyShowHUDWhenPlayerIsClose = onlyShowHud,
+                AlarmSoundStart = soundStart,
+                AlarmSoundStop = soundStop,
                 ChainedPuzzle = new ObservableCollection<ChainedPuzzleItem>()
             };
 
