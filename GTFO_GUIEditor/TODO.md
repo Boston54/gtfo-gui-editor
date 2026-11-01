@@ -12,8 +12,6 @@
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
 * **Legacy Geomorphs tab**
   * At least rework this tab so the users can still browse the screenshots and read the tips, or possibly even just remove the tab all together. This was designed for the legacy system of inputting a geomorph's file path manually but is no longer needed.
-* **Missing fields in Alarms config**
-  * AlarmSoundStart (SoundID, give it a default), AlarmSoundStop (SoundID, give it a default), OnlyShowHUDWhenPlayerIsClose (bool)
 * **Dimension config missing almost every field in DimensionDataBlock**
 * **Missing fields in Zone config**
   * PlayScannerVoiceAudio, SkipAutomaticProgressionObjective, EventsOnTerminalDeactivateAlarm (should only be visible if TurnOffAlarmOnTerminal is true), log files on terminals, StaticSpawnDataContainers (whatever these are)
