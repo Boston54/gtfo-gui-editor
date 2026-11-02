@@ -59,13 +59,16 @@ public class EditorSettingsManager
     {
         _settings = LoadSettingsInternal();
         _settings.Appearance.PropertyChanged += OnAppearancePropertyChanged;
+        _settings.General.PropertyChanged += OnAppearancePropertyChanged;
     }
 
     public void ReloadSettings()
     {
         _settings.Appearance.PropertyChanged -= OnAppearancePropertyChanged;
+        _settings.General.PropertyChanged -= OnAppearancePropertyChanged;
         _settings = LoadSettingsInternal();
         _settings.Appearance.PropertyChanged += OnAppearancePropertyChanged;
+        _settings.General.PropertyChanged += OnAppearancePropertyChanged;
     }
 
     private EditorSettings LoadSettingsInternal()

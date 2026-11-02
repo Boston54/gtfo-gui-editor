@@ -23,12 +23,57 @@ public class SettingsTests : IDisposable
     {
         EditorSettingsManager.CustomSettingsConfigPath = null;
         EditorSettingsManager.Instance.Settings.Appearance.ResetToDefaults();
+        EditorSettingsManager.Instance.Settings.General.ResetToDefaults();
         EditorSettingsManager.Instance.ReloadSettings();
         if (File.Exists(_tempSettingsPath))
         {
             try
             {
                 File.Delete(_tempSettingsPath);
+            }
+
+            [Fact]
+            public void GeneralSettings_HasExpectedDefaults()
+            {
+                var settings = new GeneralSettings();
+
+                Assert.Equal(StartupProjectMode.PreviousOpenedProject, settings.StartupProject);
+                Assert.Equal(DataFlowMode.RundownFile, settings.DataFlow);
+                Assert.True(settings.IsPreviousOpenedProjectStartup);
+                Assert.True(settings.IsRundownDataFlow);
+                Assert.Null(settings.StartupProjectPath);
+            }
+
+            [Fact]
+            public void GeneralSettings_DataFlowChangeClearsStartupProjectPath()
+            {
+                var settings = new GeneralSettings
+                {
+                    StartupProject = StartupProjectMode.SetProject,
+                    StartupProjectPath = "/tmp/startup-project"
+                };
+
+                settings.DataFlow = DataFlowMode.Datablocks;
+
+                Assert.Null(settings.StartupProjectPath);
+
+                settings.StartupProjectPath = "/tmp/startup-folder";
+                settings.DataFlow = DataFlowMode.RundownFile;
+
+                Assert.Null(settings.StartupProjectPath);
+            }
+
+            [Fact]
+            public void CloseSettings_FallsBackToPreviousProjectWhenSetProjectHasNoPath()
+            {
+                var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+                vm.Settings.General.StartupProject = StartupProjectMode.SetProject;
+                vm.Settings.General.StartupProjectPath = null;
+
+                vm.CloseSettings();
+
+                Assert.Equal(StartupProjectMode.PreviousOpenedProject, vm.Settings.General.StartupProject);
+                Assert.False(vm.IsShowingSettings);
             }
             catch
             {

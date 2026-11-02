@@ -6,7 +6,7 @@
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              xmlns:controls="clr-namespace:GTFO_GUIEditor.Controls;assembly=GTFO_GUIEditor"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
-             x:Class="GTFO_GUIEditor.Views.Dialogs.SettingsDialog"
+             x:Class="GTFO_GUIEditor.Views.SettingsView"
              x:Name="SettingsDialogRoot"
              x:DataType="vm:MainWindowViewModel">
     <UserControl.Styles>
@@ -26,10 +26,8 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                Width="580"
-                MaxHeight="700"
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"
                 BoxShadow="0 4 20 #80000000">
             <Grid RowDefinitions="Auto,*,Auto">
                 <!-- Header -->
@@ -51,6 +49,46 @@
 
                 <!-- Tabbed Settings Content -->
                 <TabControl Grid.Row="1" Margin="0,0,0,12">
+                    <TabItem Header="General" Foreground="#E0E0E0" FontSize="14" FontWeight="SemiBold">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0" Margin="0,10,0,0">
+                            <StackPanel Spacing="18">
+                                <TextBlock Text="Startup Project" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <StackPanel Spacing="8">
+                                    <RadioButton Content="New project" IsChecked="{Binding Settings.General.IsNewProjectStartup, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <RadioButton Content="Previous opened project" IsChecked="{Binding Settings.General.IsPreviousOpenedProjectStartup, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <RadioButton Content="Set project" IsChecked="{Binding Settings.General.IsSetProjectStartup, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <Border IsVisible="{Binding Settings.General.IsSetProjectStartup}" Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="6" Padding="12">
+                                        <StackPanel Spacing="8">
+                                            <TextBox Text="{Binding Settings.General.StartupProjectPath, Mode=TwoWay}" IsReadOnly="True" Watermark="Choose a file or folder"/>
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <Button Content="Open File..."
+                                                        Command="{Binding ChooseStartupProjectFile}"
+                                                        IsVisible="{Binding Settings.General.IsRundownDataFlow}"
+                                                        Padding="10,5"/>
+                                                <Button Content="Open Folder..."
+                                                        Command="{Binding ChooseStartupProjectFolder}"
+                                                        IsVisible="{Binding Settings.General.IsDatablocksDataFlow}"
+                                                        Padding="10,5"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+                                </StackPanel>
+
+                                <TextBlock Text="Data Flow" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <StackPanel Spacing="8">
+                                    <RadioButton Content=".rundown file" IsChecked="{Binding Settings.General.IsRundownDataFlow, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <RadioButton Content="Datablocks" IsChecked="{Binding Settings.General.IsDatablocksDataFlow, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                </StackPanel>
+
+                                <TextBlock Text="Window Mode" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <StackPanel Spacing="8">
+                                    <RadioButton Content="Windowed" IsChecked="{Binding Settings.General.IsWindowed, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <RadioButton Content="Windowed Fullscreen" IsChecked="{Binding Settings.General.IsWindowedFullscreen, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                    <RadioButton Content="Fullscreen" IsChecked="{Binding Settings.General.IsFullscreen, Mode=TwoWay}" Foreground="#E0E0E0"/>
+                                </StackPanel>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </TabItem>
                     <TabItem Header="Appearance" Foreground="#E0E0E0" FontSize="14" FontWeight="SemiBold">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0" Margin="0,10,0,0">
                             <StackPanel Spacing="16">

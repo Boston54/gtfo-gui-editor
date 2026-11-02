@@ -13,11 +13,166 @@ namespace GTFO_GUIEditor.Models;
 public class EditorSettings : ViewModelBase
 {
     private AppearanceSettings _appearance = new();
+    private GeneralSettings _general = new();
 
     public AppearanceSettings Appearance
     {
         get => _appearance;
         set => SetField(ref _appearance, value ?? new AppearanceSettings());
+    }
+
+    public GeneralSettings General
+    {
+        get => _general;
+        set => SetField(ref _general, value ?? new GeneralSettings());
+    }
+}
+
+public enum StartupProjectMode
+{
+    NewProject,
+    PreviousOpenedProject,
+    SetProject
+}
+
+public enum DataFlowMode
+{
+    RundownFile,
+    Datablocks
+}
+
+public enum WindowDisplayMode
+{
+    Windowed,
+    WindowedFullscreen,
+    Fullscreen
+}
+
+public class GeneralSettings : ViewModelBase
+{
+    private StartupProjectMode _startupProject = StartupProjectMode.PreviousOpenedProject;
+    private string? _startupProjectPath;
+    private DataFlowMode _dataFlow = DataFlowMode.RundownFile;
+    private WindowDisplayMode _windowDisplayMode = WindowDisplayMode.Windowed;
+    private string? _lastOpenedRundownPath;
+    private string? _lastOpenedDatablockPath;
+
+    public StartupProjectMode StartupProject
+    {
+        get => _startupProject;
+        set
+        {
+            if (SetField(ref _startupProject, value))
+            {
+                OnPropertyChanged(nameof(IsNewProjectStartup));
+                OnPropertyChanged(nameof(IsPreviousOpenedProjectStartup));
+                OnPropertyChanged(nameof(IsSetProjectStartup));
+            }
+        }
+    }
+
+    public string? StartupProjectPath
+    {
+        get => _startupProjectPath;
+        set => SetField(ref _startupProjectPath, value);
+    }
+
+    public DataFlowMode DataFlow
+    {
+        get => _dataFlow;
+        set
+        {
+            if (SetField(ref _dataFlow, value))
+            {
+                StartupProjectPath = null;
+                OnPropertyChanged(nameof(IsRundownDataFlow));
+                OnPropertyChanged(nameof(IsDatablocksDataFlow));
+            }
+        }
+    }
+
+    public string? LastOpenedRundownPath
+    {
+        get => _lastOpenedRundownPath;
+        set => SetField(ref _lastOpenedRundownPath, value);
+    }
+
+    public string? LastOpenedDatablockPath
+    {
+        get => _lastOpenedDatablockPath;
+        set => SetField(ref _lastOpenedDatablockPath, value);
+    }
+
+    public WindowDisplayMode WindowDisplayMode
+    {
+        get => _windowDisplayMode;
+        set
+        {
+            if (SetField(ref _windowDisplayMode, value))
+            {
+                OnPropertyChanged(nameof(IsWindowed));
+                OnPropertyChanged(nameof(IsWindowedFullscreen));
+                OnPropertyChanged(nameof(IsFullscreen));
+            }
+        }
+    }
+
+    public bool IsNewProjectStartup
+    {
+        get => StartupProject == StartupProjectMode.NewProject;
+        set { if (value) StartupProject = StartupProjectMode.NewProject; }
+    }
+
+    public bool IsPreviousOpenedProjectStartup
+    {
+        get => StartupProject == StartupProjectMode.PreviousOpenedProject;
+        set { if (value) StartupProject = StartupProjectMode.PreviousOpenedProject; }
+    }
+
+    public bool IsSetProjectStartup
+    {
+        get => StartupProject == StartupProjectMode.SetProject;
+        set { if (value) StartupProject = StartupProjectMode.SetProject; }
+    }
+
+    public bool IsRundownDataFlow
+    {
+        get => DataFlow == DataFlowMode.RundownFile;
+        set { if (value) DataFlow = DataFlowMode.RundownFile; }
+    }
+
+    public bool IsDatablocksDataFlow
+    {
+        get => DataFlow == DataFlowMode.Datablocks;
+        set { if (value) DataFlow = DataFlowMode.Datablocks; }
+    }
+
+    public bool IsWindowed
+    {
+        get => WindowDisplayMode == WindowDisplayMode.Windowed;
+        set { if (value) WindowDisplayMode = WindowDisplayMode.Windowed; }
+    }
+
+    public bool IsWindowedFullscreen
+    {
+        get => WindowDisplayMode == WindowDisplayMode.WindowedFullscreen;
+        set { if (value) WindowDisplayMode = WindowDisplayMode.WindowedFullscreen; }
+    }
+
+    public bool IsFullscreen
+    {
+        get => WindowDisplayMode == WindowDisplayMode.Fullscreen;
+        set { if (value) WindowDisplayMode = WindowDisplayMode.Fullscreen; }
+    }
+
+    public void ResetToDefaults()
+    {
+        StartupProject = StartupProjectMode.PreviousOpenedProject;
+        StartupProjectPath = null;
+        DataFlow = DataFlowMode.RundownFile;
+        LastOpenedRundownPath = null;
+        LastOpenedDatablockPath = null;
+        WindowDisplayMode = WindowDisplayMode.Windowed;
     }
 }
 

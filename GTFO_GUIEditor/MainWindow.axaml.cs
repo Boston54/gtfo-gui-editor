@@ -9,5 +9,9 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         DataContext = new MainWindowViewModel(autoReopenLastRundown: true);
+        if (DataContext is MainWindowViewModel viewModel)
+        {
+            viewModel.ApplyWindowDisplayMode(this);
+        }
     }
 }

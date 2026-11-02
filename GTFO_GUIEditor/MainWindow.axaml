@@ -21,21 +21,21 @@
     <Grid RowDefinitions="Auto,*">
         <!-- Top Taskbar / Menu Bar -->
         <Border Grid.Row="0" Background="#1E1E1E" BorderBrush="#333333" BorderThickness="0,0,0,1" Padding="2,1">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Menu Grid.Column="0" Background="Transparent" Foreground="#E0E0E0">
                     <MenuItem Header="File" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
                         <MenuItem Header="New"
                                   Command="{Binding NewRundown}"
                                   InputGesture="Ctrl+N"/>
                         <Separator Background="#333333"/>
-                        <MenuItem Header="Save"
-                                  Command="{Binding SaveRundown}"
+                        <MenuItem Command="{Binding SaveRundown}"
+                                  Header="{Binding SaveMenuHeader}"
                                   InputGesture="Ctrl+S"/>
-                        <MenuItem Header="Save As..."
+                        <MenuItem Header="{Binding SaveAsMenuHeader}"
                                   Command="{Binding SaveAsRundown}"/>
                         <Separator Background="#333333"/>
-                        <MenuItem Header="Open..."
-                                  Command="{Binding OpenRundown}"
+                        <MenuItem Command="{Binding OpenRundown}"
+                                  Header="{Binding OpenMenuHeader}"
                                   InputGesture="Ctrl+O"/>
                         <MenuItem Header="Open Recent"
                                   ItemsSource="{Binding RecentFiles}">
@@ -48,23 +48,22 @@
                                               CommandParameter="{Binding FilePath}"/>
                                 </DataTemplate>
                             </MenuItem.ItemTemplate>
-                        </MenuItem>
-                        <Separator Background="#333333"/>
-                        <MenuItem Header="Import Project..."
-                                  Command="{Binding ImportDatablocksFrom}"
-                                  InputGesture="Ctrl+I"/>
+                            </MenuItem>
+                            <Separator Background="#333333"/>
+                            <MenuItem Command="{Binding ImportDatablocksFrom}"
+                                      Header="{Binding ImportMenuHeader}"
+                                      InputGesture="Ctrl+I"/>
+                            <MenuItem Command="{Binding QuickExportDatablocks}"
+                                      Header="{Binding QuickExportMenuHeader}"
+                                      InputGesture="Ctrl+E"/>
+                            <MenuItem Command="{Binding ExportDatablocksTo}"
+                                      Header="{Binding ExportToMenuHeader}"/>
                     </MenuItem>
-                    <MenuItem Header="Export" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
-                        <MenuItem Header="Quick Export"
-                                  Command="{Binding QuickExportDatablocks}"
-                                  InputGesture="Ctrl+E"/>
-                        <MenuItem Header="Export To..."
-                                  Command="{Binding ExportDatablocksTo}"/>
-                    </MenuItem>
-                    <MenuItem Header="Settings" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
-                        <MenuItem Header="Appearance"
-                                  Command="{Binding OpenAppearanceSettings}"/>
-                    </MenuItem>
+                    <MenuItem Header="Settings"
+                                  Command="{Binding OpenAppearanceSettings}"
+                                  Foreground="#E0E0E0"
+                                  FontWeight="SemiBold"
+                                  FontSize="13"/>
                 </Menu>
 
                 <TextBlock Grid.Column="1"
@@ -81,6 +80,15 @@
                            FontSize="11"
                            VerticalAlignment="Center"
                            Margin="0,0,12,0"/>
+                <Button Grid.Column="3"
+                        Content="Quit"
+                        Command="{Binding QuitApplication}"
+                        Background="#8B2B2B"
+                        Foreground="White"
+                        FontWeight="SemiBold"
+                        Padding="10,4"
+                        Margin="0,0,4,0"
+                        VerticalAlignment="Center"/>
             </Grid>
         </Border>
 
@@ -129,8 +137,8 @@
                                           IsVisible="{Binding IsShowingImportNotification}"/>
 
         <!-- Settings Modal Overlay -->
-        <dialogs:SettingsDialog Grid.Row="0"
-                                Grid.RowSpan="2"
-                                IsVisible="{Binding IsShowingSettings}"/>
+        <views:SettingsView Grid.Row="0"
+                            Grid.RowSpan="2"
+                            IsVisible="{Binding IsShowingSettings}"/>
     </Grid>
 </Window>
