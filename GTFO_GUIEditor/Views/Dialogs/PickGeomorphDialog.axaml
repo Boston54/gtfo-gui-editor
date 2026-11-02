@@ -201,25 +201,25 @@
                                         <RadioButton Content="Room Door"
                                                      GroupName="ExpansionDoorTypeGroup"
                                                      IsChecked="{Binding IsExpansionRoomDoor, Mode=TwoWay}"
-                                                     Foreground="#9D00FF"/>
+                                                     Foreground="{Binding Appearance.ConnectedDoorColor}"/>
                                         <RadioButton Content="Security Door"
                                                      GroupName="ExpansionDoorTypeGroup"
                                                      IsChecked="{Binding IsExpansionSecurityDoor, Mode=TwoWay}"
-                                                     Foreground="#FF0000"/>
+                                                     Foreground="{Binding Appearance.SecurityDoorColor}"/>
                                         <RadioButton Content="Main Door"
                                                      GroupName="ExpansionDoorTypeGroup"
                                                      IsChecked="{Binding IsExpansionMainDoor, Mode=TwoWay}"
-                                                     Foreground="#CCCCCC"/>
+                                                     Foreground="{Binding Appearance.MainDoorColor}"/>
                                         <RadioButton Content="Secondary Door"
                                                      GroupName="ExpansionDoorTypeGroup"
                                                      IsChecked="{Binding IsExpansionSecondaryDoor, Mode=TwoWay}"
                                                      IsEnabled="{Binding CanAddSecondaryDoor}"
-                                                     Foreground="#FFA200"/>
+                                                     Foreground="{Binding Appearance.SecondaryDoorColor}"/>
                                         <RadioButton Content="Overload Door"
                                                      GroupName="ExpansionDoorTypeGroup"
                                                      IsChecked="{Binding IsExpansionOverloadDoor, Mode=TwoWay}"
                                                      IsEnabled="{Binding CanAddOverloadDoor}"
-                                                     Foreground="#00F2FF"/>
+                                                     Foreground="{Binding Appearance.OverloadDoorColor}"/>
                                     </StackPanel>
                                 </StackPanel>
                             </Border>
