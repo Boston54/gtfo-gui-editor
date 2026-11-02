@@ -90,7 +90,7 @@
                             <!-- TurnOffAlarmOnTerminal (bool) -->
                             <CheckBox Content="Turn Off Alarm On Terminal"
                                       IsChecked="{Binding EditingDoor.TurnOffAlarmOnTerminal, Mode=TwoWay}"
-                                      ToolTip.Tip="True if this door's alarm (typically, an error) should be stopped via a terminal"
+                                      ToolTip.Tip="True if this door's alarm (typically, an error) should be stopped via a terminal. The target terminal will be given the command to deactivate alarms."
                                       Foreground="#CCCCCC"/>
 
                             <!-- TerminalZone & Terminal [only visible if TurnOffAlarmOnTerminal is true] -->
@@ -134,6 +134,21 @@
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
                             </Grid>
+
+                            <!-- EventsOnTerminalDeactivateAlarm [only visible if TurnOffAlarmOnTerminal is true] -->
+                            <Expander Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch"
+                                      IsVisible="{Binding EditingDoor.TurnOffAlarmOnTerminal}">
+                                <Expander.Header>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Terminal Deactivate Alarm" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the alarm is deactivated from the terminal" Foreground="#03C700" VerticalAlignment="Center"/>
+                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnTerminalDeactivateAlarm}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                    </Grid>
+                                </Expander.Header>
+                                <StackPanel Spacing="8" Margin="0,8,0,0">
+                                    <ItemsControl ItemsSource="{Binding EditingDoor.EventsOnTerminalDeactivateAlarm}"
+                                                  ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Expander>
 
                             <!-- Apex Door (bool) [only visible if EditingDoor.IsSecurityDoor is true] -->
                             <CheckBox Content="Apex Door"

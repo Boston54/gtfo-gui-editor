@@ -76,6 +76,7 @@ public class DoorEventsDefaults
     public List<WardenEvent> EventsOnUnlockDoor { get; set; } = new();
     public List<WardenEvent> EventsOnOpenDoor { get; set; } = new();
     public List<WardenEvent> EventsOnPortalWarp { get; set; } = new();
+    public List<WardenEvent> EventsOnTerminalDeactivateAlarm { get; set; } = new();
 }
 
 public class ZoneSettingsDefaults
@@ -109,6 +110,7 @@ public class GeneralAndSeedsDefaults
     public int AliasOverride { get; set; } = -1;
     public bool OverrideAliasPrefix { get; set; } = false;
     public string SubComplex { get; set; } = "Lab";
+    public bool PlayScannerVoiceAudio { get; set; } = true;
 }
 
 public class ExpansionAndAltitudeDefaults
@@ -175,6 +177,7 @@ public class TerminalsDefaults
     public bool ShowPasswordPartPositions { get; set; } = false;
     public string PasswordHintText { get; set; } = string.Empty;
     public int PasswordPartCount { get; set; } = 1;
+    public List<TerminalLocalLogFile> LocalLogFiles { get; set; } = new();
     public List<TerminalZoneSelectionData> TerminalZoneSelectionDatas { get; set; } = new();
     public List<TerminalUniqueCommand> UniqueCommands { get; set; } = new();
 }

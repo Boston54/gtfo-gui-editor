@@ -45,6 +45,7 @@ public class ZoneSettings : INotifyPropertyChanged
     private int _markerSubSeed;
     private int _lightingSubSeed;
     private int _dcScanSeed;
+    private bool _playScannerVoiceAudio = true;
 
     // Enemy Respawning
     private bool _enemyRespawning;
@@ -101,6 +102,12 @@ public class ZoneSettings : INotifyPropertyChanged
     {
         get => _dcScanSeed;
         set => SetField(ref _dcScanSeed, value);
+    }
+
+    public bool PlayScannerVoiceAudio
+    {
+        get => _playScannerVoiceAudio;
+        set => SetField(ref _playScannerVoiceAudio, value);
     }
 
     public bool EnemyRespawning

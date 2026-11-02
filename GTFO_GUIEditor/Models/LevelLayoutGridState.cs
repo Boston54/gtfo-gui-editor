@@ -2265,7 +2265,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 EventsOnDoorScanStart = door.EventsOnDoorScanStart.Select(e => e.Clone()).ToList(),
                 EventsOnDoorScanDone = door.EventsOnDoorScanDone.Select(e => e.Clone()).ToList(),
                 EventsOnBossDeath = door.EventsOnBossDeath.Select(e => e.Clone()).ToList(),
-                EventsOnTrigger = door.EventsOnTrigger.Select(e => e.Clone()).ToList()
+                EventsOnTrigger = door.EventsOnTrigger.Select(e => e.Clone()).ToList(),
+                EventsOnTerminalDeactivateAlarm = door.EventsOnTerminalDeactivateAlarm.Select(e => e.Clone()).ToList()
             });
         }
 
@@ -2282,6 +2283,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 MarkerSubSeed = zs.MarkerSubSeed,
                 LightingSubSeed = zs.LightingSubSeed,
                 DcScanSeed = zs.DcScanSeed,
+                PlayScannerVoiceAudio = zs.PlayScannerVoiceAudio,
                 EnemyRespawning = zs.EnemyRespawning,
                 RequireOtherZone = zs.RequireOtherZone,
                 RoomDistance = zs.RoomDistance,
@@ -2358,6 +2360,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 zs.MarkerSubSeed = zsData.MarkerSubSeed;
                 zs.LightingSubSeed = zsData.LightingSubSeed;
                 zs.DcScanSeed = zsData.DcScanSeed;
+                zs.PlayScannerVoiceAudio = zsData.PlayScannerVoiceAudio;
                 zs.EnemyRespawning = zsData.EnemyRespawning;
                 zs.RequireOtherZone = zsData.RequireOtherZone;
                 zs.RoomDistance = zsData.RoomDistance;
@@ -2584,7 +2587,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                     EventsOnBossDeath = new ObservableCollection<WardenEvent>(
                         dData.EventsOnBossDeath?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
                     EventsOnTrigger = new ObservableCollection<WardenEvent>(
-                        dData.EventsOnTrigger?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>())
+                        dData.EventsOnTrigger?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>()),
+                    EventsOnTerminalDeactivateAlarm = new ObservableCollection<WardenEvent>(
+                        dData.EventsOnTerminalDeactivateAlarm?.Select(e => e.Clone()) ?? Enumerable.Empty<WardenEvent>())
                 };
 
                 geoNode.Doors.Add(doorNode);

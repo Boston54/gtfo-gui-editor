@@ -24,6 +24,7 @@ public class TerminalPlacement : INotifyPropertyChanged
     private int _passwordPartCount = 1;
     private bool _showPasswordLength = true;
     private bool _showPasswordPartPositions;
+    private ObservableCollection<TerminalLocalLogFile> _localLogFiles = new();
     private ObservableCollection<TerminalZoneSelectionData> _terminalZoneSelectionDatas = new();
     private ObservableCollection<TerminalUniqueCommand> _uniqueCommands = new();
 
@@ -132,6 +133,12 @@ public class TerminalPlacement : INotifyPropertyChanged
     [JsonIgnore]
     public bool IsPasswordGenerationVisible => PasswordProtected && GeneratePassword;
 
+    public ObservableCollection<TerminalLocalLogFile> LocalLogFiles
+    {
+        get => _localLogFiles;
+        set => SetField(ref _localLogFiles, value ?? new ObservableCollection<TerminalLocalLogFile>());
+    }
+
     public ObservableCollection<TerminalZoneSelectionData> TerminalZoneSelectionDatas
     {
         get => _terminalZoneSelectionDatas;
@@ -143,6 +150,9 @@ public class TerminalPlacement : INotifyPropertyChanged
         get => _uniqueCommands;
         set => SetField(ref _uniqueCommands, value ?? new ObservableCollection<TerminalUniqueCommand>());
     }
+
+    public void AddLocalLogFile() => LocalLogFiles.Add(new TerminalLocalLogFile());
+    public void RemoveLocalLogFile(TerminalLocalLogFile? file) { if (file != null) LocalLogFiles.Remove(file); }
 
     public void AddTerminalZoneSelectionData()
     {
@@ -182,6 +192,7 @@ public class TerminalPlacement : INotifyPropertyChanged
             PasswordPartCount = PasswordPartCount,
             ShowPasswordLength = ShowPasswordLength,
             ShowPasswordPartPositions = ShowPasswordPartPositions,
+            LocalLogFiles = new ObservableCollection<TerminalLocalLogFile>(LocalLogFiles.Select(l => l.Clone())),
             TerminalZoneSelectionDatas = new ObservableCollection<TerminalZoneSelectionData>(TerminalZoneSelectionDatas.Select(t => t.Clone())),
             UniqueCommands = new ObservableCollection<TerminalUniqueCommand>(UniqueCommands.Select(u => u.Clone()))
         };

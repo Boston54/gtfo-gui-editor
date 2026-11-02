@@ -1,8 +1,9 @@
 ﻿# TODO List:
 ## Features
 * **Adding enemies to a zone (Zone Settings Config)**
+  * Waiting on a custom mod
 * **Spawning enemies in a specific room (Room Settings Config)**
-  * This requires AWO support, it should be implemented behind the scenes through the SpawnHibernateInZone and SpawnScoutInZone events.
+  * Waiting on a custom mod
 * **Checkpoints (Security Door Config)**
 * **Snatcher boxes**
   * Three options for this: Manual addition in the Level Config dialog, automatic addition if snatchers are anywhere in the level, or just add to all levels.
@@ -12,15 +13,13 @@
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
 * **Legacy Geomorphs tab**
   * At least rework this tab so the users can still browse the screenshots and read the tips, or possibly even just remove the tab all together. This was designed for the legacy system of inputting a geomorph's file path manually but is no longer needed.
-* **Dimension config missing almost every field in DimensionDataBlock**
-* **Missing fields in Zone config**
-  * PlayScannerVoiceAudio, SkipAutomaticProgressionObjective, EventsOnTerminalDeactivateAlarm (should only be visible if TurnOffAlarmOnTerminal is true), log files on terminals, StaticSpawnDataContainers (whatever these are)
-  * AllowSmallPickupsAllocation and ForceBigPickupsAllocation may or may not be set? these can probably be auto-set based on other configs instead of getting the user to manually set them.
 * **Missing fields from Level config (from Rundown datablock)**
   * MLSLevelKit (wtf is this), EnemyPopulation (idk), ScoutWaveSettings, ScoutWavePopulation, VanityItemsDropData, the whole GearPicker system
   * EnvironmentWetness and DustColor as well, but maybe put these in the Dimension config under Reality to keep consistency between dimensions
 * **Missing fields from Level config (from ExpeditionBalance datablock)**
   * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
+* **Blood Doors**
+  * Waiting on a custom mod
 
 *If we are wanting to add support for modded enemies and weapons, then:*
 
@@ -31,7 +30,6 @@
 
 ## Testing
 * Like every objective type needs extensive testing
-* Blood doors
 * Dimensions
   * Might also want to test sectors in other dimensions just in case
 * Chained Objectives

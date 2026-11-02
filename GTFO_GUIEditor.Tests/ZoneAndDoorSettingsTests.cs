@@ -1048,4 +1048,266 @@ public class ZoneAndDoorSettingsTests
             }
         }
     }
+
+    [Fact]
+    public void ZoneSettings_PlayScannerVoiceAudio_DefaultsToTrueAndSerializes()
+    {
+        var zs = new ZoneSettings();
+        Assert.True(zs.PlayScannerVoiceAudio);
+
+        zs.PlayScannerVoiceAudio = false;
+        Assert.False(zs.PlayScannerVoiceAudio);
+
+        var grid = new LevelLayoutGridState();
+        var zone = grid.GetOrCreateZoneSettings(SectorType.Main, 2);
+        zone.PlayScannerVoiceAudio = false;
+
+        var stateData = grid.ExportStateData();
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(stateData);
+
+        var importedZone = newGrid.GetOrCreateZoneSettings(SectorType.Main, 2);
+        Assert.False(importedZone.PlayScannerVoiceAudio);
+    }
+
+    [Fact]
+    public void TerminalLocalLogFile_AddRemoveCloneAndSerialize()
+    {
+        var terminal = new TerminalPlacement();
+        Assert.Empty(terminal.LocalLogFiles);
+
+        terminal.AddLocalLogFile();
+        Assert.Single(terminal.LocalLogFiles);
+
+        var log = terminal.LocalLogFiles[0];
+        log.FileName = "LOG_01";
+        log.FileContent = "Restricted data content";
+
+        var cloned = terminal.Clone();
+        Assert.Single(cloned.LocalLogFiles);
+        Assert.Equal("LOG_01", cloned.LocalLogFiles[0].FileName);
+        Assert.Equal("Restricted data content", cloned.LocalLogFiles[0].FileContent);
+
+        terminal.RemoveLocalLogFile(log);
+        Assert.Empty(terminal.LocalLogFiles);
+    }
+
+    [Fact]
+    public void DatablockExportService_ExportsDynamicPickupAllocationAndLogFiles()
+    {
+        var tempExportDir = Path.Combine(Path.GetTempPath(), $"gtfo_export_pickup_logs_{Guid.NewGuid()}");
+        try
+        {
+            var vm = new MainWindowViewModel();
+            var layoutVm = vm.LevelLayout;
+            var level = layoutVm.SelectedLevel;
+            Assert.NotNull(level);
+
+            var zs = level.GridState.GetOrCreateZoneSettings(SectorType.Main, 0);
+            zs.PlayScannerVoiceAudio = false;
+            zs.ConsumableDistributionInZone = 0; // No consumable distribution
+            zs.BigPickupDistributionInZone.Clear();
+
+            // Terminal with local log file
+            var term = new TerminalPlacement();
+            term.LocalLogFiles.Add(new TerminalLocalLogFile
+            {
+                FileName = "FER-WI9-053",
+                FileContent = "Classified research report on specimen."
+            });
+            zs.TerminalPlacements.Add(term);
+
+            var result = DatablockExportService.ExportAll(vm, tempExportDir);
+            Assert.True(result.Success, result.Message);
+
+            string layoutPath = Path.Combine(tempExportDir, "GameData_LevelLayoutDataBlock_bin.json");
+            Assert.True(File.Exists(layoutPath));
+            string json = File.ReadAllText(layoutPath);
+
+            using var doc = JsonDocument.Parse(json);
+            var blocks = doc.RootElement.GetProperty("Blocks");
+            var firstLayout = blocks.EnumerateArray().First();
+            var zones = firstLayout.GetProperty("Zones");
+            var firstZone = zones.EnumerateArray().First();
+
+            Assert.False(firstZone.GetProperty("PlayScannerVoiceAudio").GetBoolean());
+            Assert.False(firstZone.GetProperty("AllowSmallPickupsAllocation").GetBoolean());
+            Assert.False(firstZone.GetProperty("ForceBigPickupsAllocation").GetBoolean());
+
+            var termPlacements = firstZone.GetProperty("TerminalPlacements");
+            var firstTerm = termPlacements.EnumerateArray().First();
+            var logs = firstTerm.GetProperty("LocalLogFiles");
+            var firstLog = logs.EnumerateArray().First();
+
+            Assert.Equal("FER-WI9-053", firstLog.GetProperty("FileName").GetString());
+            Assert.True(firstLog.GetProperty("FileContent").GetUInt32() > 0);
+            Assert.Equal("English", firstLog.GetProperty("FileContentOriginalLanguage").GetString());
+            Assert.Equal(0, firstLog.GetProperty("AttachedAudioFile").GetInt32());
+            Assert.Equal(0, firstLog.GetProperty("AttachedAudioByteSize").GetInt32());
+            Assert.Equal(0, firstLog.GetProperty("PlayerDialogToTriggerAfterAudio").GetInt32());
+
+            // Now test with ConsumableDistribution and BigPickupDistribution populated
+            zs.ConsumableDistributionInZone = 48;
+            zs.BigPickupDistributionInZone.Add(new BigPickupDistributionItem { ItemType = RetrieveBigItemType.CryoHardcase });
+
+            var result2 = DatablockExportService.ExportAll(vm, tempExportDir);
+            Assert.True(result2.Success, result2.Message);
+
+            string json2 = File.ReadAllText(layoutPath);
+            using var doc2 = JsonDocument.Parse(json2);
+            var firstZone2 = doc2.RootElement.GetProperty("Blocks").EnumerateArray().First().GetProperty("Zones").EnumerateArray().First();
+
+            Assert.True(firstZone2.GetProperty("AllowSmallPickupsAllocation").GetBoolean());
+            Assert.True(firstZone2.GetProperty("ForceBigPickupsAllocation").GetBoolean());
+        }
+        finally
+        {
+            if (Directory.Exists(tempExportDir))
+            {
+                Directory.Delete(tempExportDir, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void Door_EventsOnTerminalDeactivateAlarm_AddRemoveSyncAndStatePersistence()
+    {
+        var doorA = new PlacedDoorNode();
+        var ev = new WardenEvent
+        {
+            Type = EventType.StopEnemyWaves,
+            Delay = 2.5
+        };
+        doorA.EventsOnTerminalDeactivateAlarm.Add(ev);
+
+        var doorB = new PlacedDoorNode();
+        doorA.ConnectedDoor = doorB;
+        doorB.ConnectedDoor = doorA;
+
+        Assert.Single(doorA.EventsOnTerminalDeactivateAlarm);
+        Assert.Single(doorB.EventsOnTerminalDeactivateAlarm);
+        Assert.Equal(EventType.StopEnemyWaves, doorB.EventsOnTerminalDeactivateAlarm[0].Type);
+        Assert.Equal(2.5, doorB.EventsOnTerminalDeactivateAlarm[0].Delay);
+
+        doorA.TurnOffAlarmOnTerminal = true;
+        doorA.TerminalZone = 2;
+        doorA.TerminalIndex = 1;
+        Assert.True(doorB.TurnOffAlarmOnTerminal);
+        Assert.Equal(2, doorB.TerminalZone);
+        Assert.Equal(1, doorB.TerminalIndex);
+
+        var grid = new LevelLayoutGridState();
+        var geo = new PlacedGeomorphNode { Id = "geo1", GridX = 0, GridY = 0 };
+        geo.GenerateRoom(0);
+        geo.SetRoomSector(0, SectorType.Main);
+        geo.SetRoomZone(0, 0);
+        doorA.Geomorph = geo;
+        doorA.AreaFrom = 0;
+        grid.PlacedGeomorphs.Add(geo);
+        grid.PlacedDoors.Add(doorA);
+
+        var stateData = grid.ExportStateData();
+        var newGrid = new LevelLayoutGridState();
+        newGrid.ImportStateData(stateData);
+
+        var importedDoor = newGrid.PlacedDoors.FirstOrDefault();
+        Assert.NotNull(importedDoor);
+        Assert.True(importedDoor.TurnOffAlarmOnTerminal);
+        Assert.Equal(2, importedDoor.TerminalZone);
+        Assert.Equal(1, importedDoor.TerminalIndex);
+        Assert.Single(importedDoor.EventsOnTerminalDeactivateAlarm);
+        Assert.Equal(EventType.StopEnemyWaves, importedDoor.EventsOnTerminalDeactivateAlarm[0].Type);
+        Assert.Equal(2.5, importedDoor.EventsOnTerminalDeactivateAlarm[0].Delay);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_EventsOnTerminalDeactivateAlarm_Commands()
+    {
+        var vm = new LevelLayoutViewModel();
+        var door = new PlacedDoorNode { TurnOffAlarmOnTerminal = true };
+        vm.EditingDoor = door;
+
+        Assert.Empty(door.EventsOnTerminalDeactivateAlarm);
+        vm.AddEventOnTerminalDeactivateAlarm();
+        Assert.Single(door.EventsOnTerminalDeactivateAlarm);
+
+        var ev = door.EventsOnTerminalDeactivateAlarm[0];
+        vm.RemoveWardenEvent(ev);
+        Assert.Empty(door.EventsOnTerminalDeactivateAlarm);
+
+        vm.AddEventOnTerminalDeactivateAlarm();
+        Assert.Single(door.EventsOnTerminalDeactivateAlarm);
+        var ev2 = door.EventsOnTerminalDeactivateAlarm[0];
+        vm.RemoveEventOnTerminalDeactivateAlarm(ev2);
+        Assert.Empty(door.EventsOnTerminalDeactivateAlarm);
+    }
+
+    [Fact]
+    public void DatablockExportService_ExportsEventsOnTerminalDeactivateAlarm()
+    {
+        var tempExportDir = Path.Combine(Path.GetTempPath(), $"gtfo_export_door_deact_{Guid.NewGuid()}");
+        try
+        {
+            var vm = new MainWindowViewModel();
+            var layoutVm = vm.LevelLayout;
+            var level = layoutVm.SelectedLevel;
+            Assert.NotNull(level);
+
+            var gridState = level.GridState;
+            var geo = new PlacedGeomorphNode { Id = "geo_door_test", GridX = 0, GridY = 0 };
+            geo.GenerateRoom(0);
+            geo.SetRoomSector(0, SectorType.Main);
+            geo.SetRoomZone(0, 0);
+            gridState.PlacedGeomorphs.Add(geo);
+
+            var door = new PlacedDoorNode
+            {
+                Geomorph = geo,
+                AreaFrom = 0,
+                IsSecurityDoor = true,
+                TurnOffAlarmOnTerminal = true,
+                TerminalZone = 3,
+                TerminalIndex = 1
+            };
+            door.EventsOnTerminalDeactivateAlarm.Add(new WardenEvent
+            {
+                Type = EventType.StopEnemyWaves,
+                Delay = 4.0
+            });
+            gridState.PlacedDoors.Add(door);
+
+            var result = DatablockExportService.ExportAll(vm, tempExportDir);
+            Assert.True(result.Success, result.Message);
+
+            string layoutPath = Path.Combine(tempExportDir, "GameData_LevelLayoutDataBlock_bin.json");
+            Assert.True(File.Exists(layoutPath));
+            string json = File.ReadAllText(layoutPath);
+
+            using var doc = JsonDocument.Parse(json);
+            var blocks = doc.RootElement.GetProperty("Blocks");
+            var firstLayout = blocks.EnumerateArray().First();
+            var zones = firstLayout.GetProperty("Zones");
+            var firstZone = zones.EnumerateArray().First();
+
+            Assert.True(firstZone.GetProperty("TurnOffAlarmOnTerminal").GetBoolean());
+            var puzzleZone = firstZone.GetProperty("TerminalPuzzleZone");
+            Assert.Equal("Zone_3", puzzleZone.GetProperty("LocalIndex").GetString());
+            Assert.Equal(1, puzzleZone.GetProperty("TerminalIndex").GetInt32());
+            Assert.Equal("SessionSeed", puzzleZone.GetProperty("SeedType").GetString());
+            Assert.Equal(0, puzzleZone.GetProperty("StaticSeed").GetInt32());
+
+            var deactEvents = firstZone.GetProperty("EventsOnTerminalDeactivateAlarm");
+            Assert.Equal(1, deactEvents.GetArrayLength());
+            var ev0 = deactEvents.EnumerateArray().First();
+            Assert.Equal(EventType.StopEnemyWaves.ToString(), ev0.GetProperty("Type").GetString());
+            Assert.Equal(4.0, ev0.GetProperty("Delay").GetDouble());
+        }
+        finally
+        {
+            if (Directory.Exists(tempExportDir))
+            {
+                Directory.Delete(tempExportDir, true);
+            }
+        }
+    }
 }

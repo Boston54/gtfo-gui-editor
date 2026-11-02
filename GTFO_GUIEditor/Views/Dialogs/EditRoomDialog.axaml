@@ -132,6 +132,12 @@
                                                                 </ComboBox.ItemTemplate>
                                                             </ComboBox>
                                                         </Grid>
+
+                                                        <CheckBox Content="Player Scanner Voice Audio"
+                                                                  ToolTip.Tip="True if the 'step into the bioscan' voiceline should play when the alarm starts."
+                                                                  IsChecked="{Binding ActiveZoneSettings.PlayScannerVoiceAudio, Mode=TwoWay}"
+                                                                  Foreground="#E0E0E0"
+                                                                  Margin="0,4,0,0"/>
                                                     </StackPanel>
                                                 </Border>
 
@@ -592,6 +598,38 @@
                                                                                                 </Expander>
                                                                                             </StackPanel>
                                                                                         </Expander>
+                                                                                    </DataTemplate>
+                                                                                </ItemsControl.ItemTemplate>
+                                                                            </ItemsControl>
+                                                                        </Expander>
+
+                                                                        <!-- Log Files -->
+                                                                        <Expander Background="#181818" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                                                                            <Expander.Header>
+                                                                                <Grid ColumnDefinitions="*,Auto">
+                                                                                    <TextBlock Grid.Column="0" Text="Log Files" ToolTip.Tip="Additional log files (lore) to be on this terminal. Note that reactor codes, etc, are automatically added to terminals." FontWeight="SemiBold" FontSize="12" Foreground="#FFFFFF" VerticalAlignment="Center"/>
+                                                                                    <Button Grid.Column="1" Content="+ Add Log File" Command="{Binding AddLocalLogFile}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                                                </Grid>
+                                                                            </Expander.Header>
+                                                                            <ItemsControl ItemsSource="{Binding LocalLogFiles}" Margin="0,8,0,0">
+                                                                                <ItemsControl.ItemTemplate>
+                                                                                    <DataTemplate x:DataType="models:TerminalLocalLogFile" x:CompileBindings="False">
+                                                                                        <Border Background="#141414" BorderBrush="#3A3A3C" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                                                            <StackPanel Spacing="6">
+                                                                                                <Grid ColumnDefinitions="*,Auto">
+                                                                                                    <TextBlock Grid.Column="0" Text="Log File Details" FontWeight="SemiBold" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                                                                                                    <Button Grid.Column="1" Content="✕ Remove Log" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalLocalLogFileCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                                                </Grid>
+                                                                                                <Grid ColumnDefinitions="Auto,*">
+                                                                                                    <TextBlock Grid.Column="0" Text="Name:" ToolTip.Tip="The name of the log file. Users will need to use this with the READ command to open the log." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                                    <TextBox Grid.Column="1" Text="{Binding FileName, Mode=TwoWay}"/>
+                                                                                                </Grid>
+                                                                                                <Grid ColumnDefinitions="Auto,*">
+                                                                                                    <TextBlock Grid.Column="0" Text="Content:" ToolTip.Tip="The text to be displayed when the log file is opened." VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#CCCCCC"/>
+                                                                                                    <TextBox Grid.Column="1" Text="{Binding FileContent, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" MaxHeight="100"/>
+                                                                                                </Grid>
+                                                                                            </StackPanel>
+                                                                                        </Border>
                                                                                     </DataTemplate>
                                                                                 </ItemsControl.ItemTemplate>
                                                                             </ItemsControl>

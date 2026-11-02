@@ -683,6 +683,8 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                         TileCategory = tileCat
                     };
 
+                    PopulateDimensionFields(dimLayoutBlock, inner, context);
+
                     BuildDimensionGridState(dimLayoutBlock, context);
                     result.Add(dimLayoutBlock);
                     seenIndexes.Add(dimIndex);
@@ -709,12 +711,229 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                     DimensionGeomorph = dimGeomorph,
                     LevelLayoutData = targetLayoutId
                 };
+                PopulateDimensionFields(dimLayoutBlock, innerData, context);
                 BuildDimensionGridState(dimLayoutBlock, context);
                 result.Add(dimLayoutBlock);
             }
         }
 
         return result;
+    }
+
+    private void PopulateDimensionFields(DimensionLayoutBlock dim, JsonObject? inner, ImportContext context)
+    {
+        if (inner == null) return;
+
+        dim.ForbidWaveSpawning = inner["ForbidWaveSpawning"]?.GetValue<bool>() ?? false;
+
+        string? linkedStr = inner["LinkedToLayer"]?.ToString();
+        if (string.Equals(linkedStr, "SecondaryLayer", StringComparison.OrdinalIgnoreCase) || string.Equals(linkedStr, "Secondary", StringComparison.OrdinalIgnoreCase))
+        {
+            dim.LinkedToLayer = DimensionLinkedToLayer.Secondary;
+        }
+        else if (string.Equals(linkedStr, "ThirdLayer", StringComparison.OrdinalIgnoreCase) || string.Equals(linkedStr, "Overload", StringComparison.OrdinalIgnoreCase))
+        {
+            dim.LinkedToLayer = DimensionLinkedToLayer.Overload;
+        }
+        else
+        {
+            dim.LinkedToLayer = DimensionLinkedToLayer.Main;
+        }
+
+        string? objTypeStr = inner["ObjectiveType"]?.ToString();
+        if (Enum.TryParse<DimensionObjectiveType>(objTypeStr, true, out var parsedObjType))
+        {
+            dim.ObjectiveType = parsedObjType;
+        }
+
+        dim.SoundEventOnWarpTo = inner["SoundEventOnWarpTo"]?.GetValue<uint>() ?? 0;
+        dim.DisableVFXEventOnWarp = inner["DisableVFXEventOnWarp"]?.GetValue<bool>() ?? inner["DisableVFXOnWarp"]?.GetValue<bool>() ?? false;
+        dim.ForbidCarryItemWarps = inner["ForbidCarryItemWarps"]?.GetValue<bool>() ?? false;
+        dim.LeaveDeployablesOnWarp = inner["LeaveDeployablesOnWarp"]?.GetValue<bool>() ?? false;
+
+        dim.DimensionFogData = inner["DimensionFogData"]?.GetValue<uint>() ?? 21;
+        dim.EnvironmentWetness = inner["EnvironmentWetness"]?.GetValue<double>() ?? 0.0;
+        if (inner["DustColor"] is JsonObject dustColorObj)
+        {
+            dim.DustColor.A = dustColorObj["a"]?.GetValue<double>() ?? 0.5686275;
+            dim.DustColor.R = dustColorObj["r"]?.GetValue<double>() ?? 0.496;
+            dim.DustColor.G = dustColorObj["g"]?.GetValue<double>() ?? 0.496;
+            dim.DustColor.B = dustColorObj["b"]?.GetValue<double>() ?? 0.496;
+        }
+        dim.DustAlphaBoost = inner["DustAlphaBoost"]?.GetValue<double>() ?? 0.0;
+        dim.DustTurbulence = inner["DustTurbulence"]?.GetValue<double>() ?? 1.0;
+
+        dim.IsStaticDimension = inner["IsStaticDimension"]?.GetValue<bool>() ?? false;
+        dim.StaticZoneSeed = inner["StaticZoneSeed"]?.GetValue<int>() ?? 0;
+        dim.StaticMarkerSeed = inner["StaticMarkerSeed"]?.GetValue<int>() ?? 0;
+        dim.StaticAliasOverride = inner["StaticAliasOverride"]?.GetValue<int>() ?? -1;
+        dim.StaticConsumableDistributionInZone = inner["StaticConsumableDistributionInZone"]?.GetValue<uint>() ?? 0;
+
+        double healthMulti = inner["StaticHealthMulti"]?.GetValue<double>() ?? 0.0;
+        dim.StaticHealthUses = (int)Math.Round(healthMulti / 0.2);
+
+        double toolMulti = inner["StaticToolAmmoMulti"]?.GetValue<double>() ?? 0.0;
+        dim.StaticToolUses = (int)Math.Round(toolMulti / 0.2);
+
+        double ammoMulti = inner["StaticWeaponAmmoMulti"]?.GetValue<double>() ?? inner["StaticAmmoMulti"]?.GetValue<double>() ?? 0.0;
+        dim.StaticAmmoUses = (int)Math.Round(ammoMulti / 0.2);
+
+        double disinfMulti = inner["StaticDisinfectionMulti"]?.GetValue<double>() ?? 0.0;
+        dim.StaticDisinfectUses = (int)Math.Round(disinfMulti / 0.2);
+
+        if (inner["StaticTerminalPlacements"] is JsonArray terminalsArray)
+        {
+            ImportTerminalPlacements(terminalsArray, dim.StaticTerminalPlacements, context);
+        }
+
+        dim.IsOutside = inner["IsOutside"]?.GetValue<bool>() ?? false;
+        dim.LightAzimuth = inner["LightAzimuth"]?.GetValue<double>() ?? -92.9;
+        dim.LightElevation = inner["LightElevation"]?.GetValue<double>() ?? 30.0;
+        dim.LightIntensity = inner["LightIntensity"]?.GetValue<double>() ?? 1.0;
+        dim.AmbientIntensity = inner["AmbientIntensity"]?.GetValue<double>() ?? 1.0;
+        dim.ReflectionsIntensity = inner["ReflectionsIntensity"]?.GetValue<double>() ?? 1.0;
+        dim.GodrayRange = inner["GodrayRange"]?.GetValue<double>() ?? 8000.0;
+        dim.GodrayExponent = inner["GodrayExponent"]?.GetValue<double>() ?? 1.0;
+        dim.AtmosphereDensity = inner["AtmosphereDensity"]?.GetValue<double>() ?? 1.0;
+        dim.Exposure = inner["Exposure"]?.GetValue<double>() ?? 10.0;
+
+        uint atmoId = inner["AtmosphereData"]?.GetValue<uint>() ?? 0;
+        if (atmoId > 0 && context.AtmosphereBlocks.TryGetValue(atmoId, out var atmoBlock))
+        {
+            if (atmoBlock["LightColor"] is JsonObject lcObj)
+            {
+                dim.AtmosphereLightColor.A = lcObj["a"]?.GetValue<double>() ?? 1.0;
+                dim.AtmosphereLightColor.R = lcObj["r"]?.GetValue<double>() ?? 1.0;
+                dim.AtmosphereLightColor.G = lcObj["g"]?.GetValue<double>() ?? 1.0;
+                dim.AtmosphereLightColor.B = lcObj["b"]?.GetValue<double>() ?? 1.0;
+            }
+            if (atmoBlock["PlanetAlbedo"] is JsonObject paObj)
+            {
+                dim.AtmospherePlanetAlbedo.A = paObj["a"]?.GetValue<double>() ?? 1.0;
+                dim.AtmospherePlanetAlbedo.R = paObj["r"]?.GetValue<double>() ?? 0.2;
+                dim.AtmospherePlanetAlbedo.G = paObj["g"]?.GetValue<double>() ?? 0.0627451;
+                dim.AtmospherePlanetAlbedo.B = paObj["b"]?.GetValue<double>() ?? 0.0;
+            }
+        }
+
+        int cloudsVal = inner["CloudsData"]?.GetValue<int>() ?? 1;
+        dim.CloudsData = (DimensionCloudsType)cloudsVal;
+        dim.CloudsCoverage = inner["CloudsCoverage"]?.GetValue<double>() ?? 0.5;
+        dim.CloudsDensity = inner["CloudsDensity"]?.GetValue<double>() ?? 0.5;
+        dim.CloudsSharpness = inner["CloudsSharpness"]?.GetValue<double>() ?? 0.0;
+        dim.CloudsShadowOpacity = inner["CloudsShadowOpacity"]?.GetValue<double>() ?? 1.0;
+        dim.CloudsTimescale = inner["CloudsTimescale"]?.GetValue<double>() ?? 0.0;
+        dim.CloudsCrawling = inner["CloudsCrawling"]?.GetValue<double>() ?? 0.1;
+        dim.CloudsFade = inner["CloudsFade"]?.GetValue<double>() ?? 0.1;
+        dim.Sandstorm = inner["Sandstorm"]?.GetValue<bool>() ?? false;
+        dim.SandstormEdgeA = inner["SandstormEdgeA"]?.GetValue<double>() ?? 0.4;
+        dim.SandstormEdgeB = inner["SandstormEdgeB"]?.GetValue<double>() ?? 0.6;
+        dim.SandstormMinFog = inner["SandstormMinFog"]?.GetValue<double>() ?? 0.01;
+    }
+
+    public static void ImportTerminalPlacements(JsonArray termArr, ObservableCollection<TerminalPlacement> targetCollection, ImportContext context)
+    {
+        targetCollection.Clear();
+        foreach (var tNode in termArr)
+        {
+            if (tNode is not JsonObject tObj) continue;
+            var termItem = new TerminalPlacement();
+            if (tObj["PlacementWeights"] is JsonObject pwObj)
+            {
+                termItem.PlacementStartWeight = pwObj["Start"]?.GetValue<double>() ?? 0;
+                termItem.PlacementMiddleWeight = pwObj["Middle"]?.GetValue<double>() ?? 0;
+                termItem.PlacementEndWeight = pwObj["End"]?.GetValue<double>() ?? 0;
+            }
+
+            termItem.AreaSeedOffset = tObj["AreaSeedOffset"]?.GetValue<int>() ?? 0;
+            termItem.MarkerSeedOffset = tObj["MarkerSeedOffset"]?.GetValue<int>() ?? 0;
+
+            if (tObj["StartingStateData"] is JsonObject stateObj)
+            {
+                string stateStr = stateObj["StartingState"]?.ToString() ?? "Sleeping";
+                if (Enum.TryParse<TerminalStartingState>(stateStr, true, out var tState))
+                {
+                    termItem.StartingState = tState;
+                }
+                termItem.UseCustomInfoText = stateObj["UseCustomInfoText"]?.GetValue<bool>() ?? false;
+                uint infoTextId = stateObj["CustomInfoText"]?.GetValue<uint>() ?? 0;
+                termItem.CustomInfoText = context.ResolveText(infoTextId);
+                termItem.KeepShowingLocalLogCount = stateObj["KeepShowingLocalLogCount"]?.GetValue<bool>() ?? false;
+                termItem.PasswordProtected = stateObj["PasswordProtected"]?.GetValue<bool>() ?? false;
+                termItem.GeneratePassword = stateObj["GeneratePassword"]?.GetValue<bool>() ?? false;
+                termItem.PasswordHintText = stateObj["PasswordHintText"]?.ToString() ?? string.Empty;
+                termItem.PasswordPartCount = stateObj["PasswordPartCount"]?.GetValue<int>() ?? 1;
+                termItem.ShowPasswordLength = stateObj["ShowPasswordLength"]?.GetValue<bool>() ?? true;
+                termItem.ShowPasswordPartPositions = stateObj["ShowPasswordPartPositions"]?.GetValue<bool>() ?? false;
+
+                if (stateObj["TerminalZoneSelectionDatas"] is JsonArray zoneSelArr)
+                {
+                    termItem.TerminalZoneSelectionDatas.Clear();
+                    foreach (var zsNode in zoneSelArr)
+                    {
+                        if (zsNode is not JsonObject zsObj) continue;
+                        string zStr = zsObj["ZoneIndex"]?.ToString() ?? "Zone_0";
+                        int zIdx = 0;
+                        if (zStr.StartsWith("Zone_", StringComparison.OrdinalIgnoreCase) && int.TryParse(zStr.Substring(5), out int parsedZ))
+                        {
+                            zIdx = parsedZ;
+                        }
+                        int tIdx = zsObj["ItemIndex"]?.GetValue<int>() ?? 0;
+                        termItem.TerminalZoneSelectionDatas.Add(new TerminalZoneSelectionData { Zone = zIdx, Terminal = tIdx });
+                    }
+                }
+            }
+
+            if (tObj["UniqueCommands"] is JsonArray uqArr)
+            {
+                termItem.UniqueCommands.Clear();
+                foreach (var uqNode in uqArr)
+                {
+                    if (uqNode is not JsonObject uqObj) continue;
+                    var cmdItem = new TerminalUniqueCommand
+                    {
+                        Command = uqObj["Command"]?.ToString() ?? string.Empty,
+                        CommandDesc = uqObj["CommandDesc"]?.ToString() ?? string.Empty
+                    };
+                    if (uqObj["PostCommandOutputs"] is JsonArray postArr)
+                    {
+                        foreach (var pNode in postArr)
+                        {
+                            if (pNode is not JsonObject pObj) continue;
+                            string ltStr = pObj["LineType"]?.ToString() ?? "Normal";
+                            Enum.TryParse<TerminalLineType>(ltStr, true, out var parsedLt);
+                            double time = pObj["Time"]?.GetValue<double>() ?? 0.0;
+                            uint outId = pObj["Output"]?.GetValue<uint>() ?? 0;
+                            cmdItem.PostCommandOutputs.Add(new TerminalPostCommandOutput
+                            {
+                                LineType = parsedLt,
+                                Time = time,
+                                Output = context.ResolveText(outId)
+                            });
+                        }
+                    }
+                    termItem.UniqueCommands.Add(cmdItem);
+                }
+            }
+
+            if (tObj["LocalLogFiles"] is JsonArray logsArr)
+            {
+                termItem.LocalLogFiles.Clear();
+                foreach (var lNode in logsArr)
+                {
+                    if (lNode is not JsonObject lObj) continue;
+                    var logItem = new TerminalLocalLogFile
+                    {
+                        FileName = lObj["FileName"]?.ToString() ?? string.Empty
+                    };
+                    uint contentId = lObj["FileContent"]?.GetValue<uint>() ?? 0;
+                    logItem.FileContent = context.ResolveText(contentId);
+                    termItem.LocalLogFiles.Add(logItem);
+                }
+            }
+
+            targetCollection.Add(termItem);
+        }
     }
 
     private void BuildDimensionGridState(DimensionLayoutBlock dim, ImportContext context)
@@ -1003,6 +1222,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             zs.CorpseClusters = zoneObj["CorpseClustersInZone"]?.GetValue<int>() ?? 0;
             zs.ResourceContainerClusters = zoneObj["ResourceContainerClustersInZone"]?.GetValue<int>() ?? 0;
             zs.ContainsGenCluster = (zoneObj["GeneratorClustersInZone"]?.GetValue<int>() ?? 0) > 0;
+            zs.PlayScannerVoiceAudio = zoneObj["PlayScannerVoiceAudio"]?.GetValue<bool>() ?? true;
 
             string spawnersStr = zoneObj["GroundSpawnersInZone"]?.ToString() ?? "None_0";
             if (Enum.TryParse<ZoneDistributionAmount>(spawnersStr, true, out var spawners)) zs.GroundSpawnersInZone = spawners;
@@ -1065,36 +1285,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             // Terminals
             if (zoneObj["TerminalPlacements"] is JsonArray termArr)
             {
-                zs.TerminalPlacements.Clear();
-                foreach (var tNode in termArr)
-                {
-                    if (tNode is not JsonObject tObj) continue;
-                    var termItem = new TerminalPlacement();
-                    if (tObj["PlacementWeights"] is JsonObject pwObj)
-                    {
-                        termItem.PlacementStartWeight = pwObj["Start"]?.GetValue<double>() ?? 0;
-                        termItem.PlacementMiddleWeight = pwObj["Middle"]?.GetValue<double>() ?? 0;
-                        termItem.PlacementEndWeight = pwObj["End"]?.GetValue<double>() ?? 0;
-                    }
-
-                    if (tObj["StartingStateData"] is JsonObject stateObj)
-                    {
-                        string stateStr = stateObj["StartingState"]?.ToString() ?? "Sleeping";
-                        if (Enum.TryParse<TerminalStartingState>(stateStr, true, out var tState))
-                        {
-                            termItem.StartingState = tState;
-                        }
-                        termItem.UseCustomInfoText = stateObj["UseCustomInfoText"]?.GetValue<bool>() ?? false;
-                        uint infoTextId = stateObj["CustomInfoText"]?.GetValue<uint>() ?? 0;
-                        termItem.CustomInfoText = context.ResolveText(infoTextId);
-                        termItem.PasswordProtected = stateObj["PasswordProtected"]?.GetValue<bool>() ?? false;
-                        termItem.GeneratePassword = stateObj["GeneratePassword"]?.GetValue<bool>() ?? false;
-                        termItem.PasswordHintText = stateObj["PasswordHintText"]?.ToString() ?? string.Empty;
-                        termItem.PasswordPartCount = stateObj["PasswordPartCount"]?.GetValue<int>() ?? 1;
-                    }
-
-                    zs.TerminalPlacements.Add(termItem);
-                }
+                ImportTerminalPlacements(termArr, zs.TerminalPlacements, context);
             }
 
             // Disinfection stations
@@ -1356,6 +1547,19 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             uint progTextId = progPuzzleObj?["CustomText"]?.GetValue<uint>() ?? 0;
             int progCount = progPuzzleObj?["PlacementCount"]?.GetValue<int>() ?? 1;
 
+            bool turnOffAlarmOnTerminal = zoneObj["TurnOffAlarmOnTerminal"]?.GetValue<bool>() ?? false;
+            int terminalZone = 0;
+            int terminalIndex = 0;
+            if (zoneObj["TerminalPuzzleZone"] is JsonObject tpzObj)
+            {
+                string localIdx = tpzObj["LocalIndex"]?.ToString() ?? "Zone_0";
+                if (localIdx.StartsWith("Zone_", StringComparison.OrdinalIgnoreCase) && int.TryParse(localIdx.Substring(5), out int tz))
+                {
+                    terminalZone = tz;
+                }
+                terminalIndex = tpzObj["TerminalIndex"]?.GetValue<int>() ?? 0;
+            }
+
             var enteringDoor = ResolveEntranceDoor(gridState, sector, zoneNumber, zoneEntranceDoorMap);
             if (enteringDoor != null)
             {
@@ -1375,12 +1579,58 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                 enteringDoor.IsApexDoor = isApex;
                 enteringDoor.ChainedPuzzleToSolve = chainedPuzzle;
                 enteringDoor.HasBloodDoor = hasBloodDoor;
+                enteringDoor.TurnOffAlarmOnTerminal = turnOffAlarmOnTerminal;
+                enteringDoor.TerminalZone = terminalZone;
+                enteringDoor.TerminalIndex = terminalIndex;
 
                 if (enteringDoor.ConnectedDoor != null)
                 {
                     enteringDoor.ConnectedDoor.IsApexDoor = isApex;
                     enteringDoor.ConnectedDoor.ChainedPuzzleToSolve = chainedPuzzle;
                     enteringDoor.ConnectedDoor.HasBloodDoor = hasBloodDoor;
+                    enteringDoor.ConnectedDoor.TurnOffAlarmOnTerminal = turnOffAlarmOnTerminal;
+                    enteringDoor.ConnectedDoor.TerminalZone = terminalZone;
+                    enteringDoor.ConnectedDoor.TerminalIndex = terminalIndex;
+                }
+
+                if (zoneObj["EventsOnTerminalDeactivateAlarm"] is JsonArray deactEventsArr)
+                {
+                    ImportWardenEvents(deactEventsArr, enteringDoor.EventsOnTerminalDeactivateAlarm, context);
+                    if (enteringDoor.ConnectedDoor != null)
+                    {
+                        ImportWardenEvents(deactEventsArr, enteringDoor.ConnectedDoor.EventsOnTerminalDeactivateAlarm, context);
+                    }
+                }
+
+                if (zoneObj["EventsOnPortalWarp"] is JsonArray pwArr)
+                {
+                    ImportWardenEvents(pwArr, enteringDoor.EventsOnPortalWarp, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(pwArr, enteringDoor.ConnectedDoor.EventsOnPortalWarp, context);
+                }
+                if (zoneObj["EventsOnApproachDoor"] is JsonArray appArr)
+                {
+                    ImportWardenEvents(appArr, enteringDoor.EventsOnApproachDoor, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(appArr, enteringDoor.ConnectedDoor.EventsOnApproachDoor, context);
+                }
+                if (zoneObj["EventsOnUnlockDoor"] is JsonArray unlArr)
+                {
+                    ImportWardenEvents(unlArr, enteringDoor.EventsOnUnlockDoor, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(unlArr, enteringDoor.ConnectedDoor.EventsOnUnlockDoor, context);
+                }
+                if (zoneObj["EventsOnOpenDoor"] is JsonArray opArr)
+                {
+                    ImportWardenEvents(opArr, enteringDoor.EventsOnOpenDoor, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(opArr, enteringDoor.ConnectedDoor.EventsOnOpenDoor, context);
+                }
+                if (zoneObj["EventsOnDoorScanStart"] is JsonArray dssArr)
+                {
+                    ImportWardenEvents(dssArr, enteringDoor.EventsOnDoorScanStart, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(dssArr, enteringDoor.ConnectedDoor.EventsOnDoorScanStart, context);
+                }
+                if (zoneObj["EventsOnDoorScanDone"] is JsonArray dsdArr)
+                {
+                    ImportWardenEvents(dsdArr, enteringDoor.EventsOnDoorScanDone, context);
+                    if (enteringDoor.ConnectedDoor != null) ImportWardenEvents(dsdArr, enteringDoor.ConnectedDoor.EventsOnDoorScanDone, context);
                 }
 
                 if (frontGroup > 0 && context.EnemyGroupBlocks.TryGetValue(frontGroup, out var fgObj))
@@ -1529,8 +1779,8 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             }
         }
 
-        var configuredDoor = candidates.FirstOrDefault(d => d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None ||
-            (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)));
+        var configuredDoor = candidates.FirstOrDefault(d => d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.TurnOffAlarmOnTerminal || d.EventsOnTerminalDeactivateAlarm.Count > 0 ||
+            (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.ConnectedDoor.TurnOffAlarmOnTerminal || d.ConnectedDoor.EventsOnTerminalDeactivateAlarm.Count > 0)));
 
         if (configuredDoor != null) return configuredDoor;
 

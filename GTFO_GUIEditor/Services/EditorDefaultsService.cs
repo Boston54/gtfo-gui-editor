@@ -171,6 +171,7 @@ public static class EditorDefaultsService
         door.EventsOnUnlockDoor = new ObservableCollection<WardenEvent>(d.DoorEvents.EventsOnUnlockDoor.Select(e => e.Clone()));
         door.EventsOnOpenDoor = new ObservableCollection<WardenEvent>(d.DoorEvents.EventsOnOpenDoor.Select(e => e.Clone()));
         door.EventsOnPortalWarp = new ObservableCollection<WardenEvent>(d.DoorEvents.EventsOnPortalWarp.Select(e => e.Clone()));
+        door.EventsOnTerminalDeactivateAlarm = new ObservableCollection<WardenEvent>(d.DoorEvents.EventsOnTerminalDeactivateAlarm.Select(e => e.Clone()));
     }
 
     // --- Zone Settings Defaults ---
@@ -183,6 +184,7 @@ public static class EditorDefaultsService
         zone.MarkerSubSeed = d.GeneralAndSeeds.MarkerSubSeed;
         zone.LightingSubSeed = d.GeneralAndSeeds.LightingSubSeed;
         zone.DcScanSeed = d.GeneralAndSeeds.DcScanSeed;
+        zone.PlayScannerVoiceAudio = d.GeneralAndSeeds.PlayScannerVoiceAudio;
 
         // Enemy Respawning
         zone.EnemyRespawning = d.EnemyRespawning.EnemyRespawning;
@@ -253,6 +255,7 @@ public static class EditorDefaultsService
             ShowPasswordPartPositions = d.ShowPasswordPartPositions,
             PasswordHintText = d.PasswordHintText ?? string.Empty,
             PasswordPartCount = d.PasswordPartCount > 0 ? d.PasswordPartCount : 1,
+            LocalLogFiles = new ObservableCollection<TerminalLocalLogFile>(d.LocalLogFiles.Select(l => l.Clone())),
             TerminalZoneSelectionDatas = new ObservableCollection<TerminalZoneSelectionData>(d.TerminalZoneSelectionDatas.Select(t => t.Clone())),
             UniqueCommands = new ObservableCollection<TerminalUniqueCommand>(d.UniqueCommands.Select(u => u.Clone()))
         };

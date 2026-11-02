@@ -280,8 +280,8 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
 
                     // Prioritize doors that have security / blood / puzzle configured
                     PlacedDoorNode? enteringDoor = candidateDoors.FirstOrDefault(d =>
-                        d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None ||
-                        (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)));
+                        d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.TurnOffAlarmOnTerminal || d.EventsOnTerminalDeactivateAlarm.Count > 0 ||
+                        (d.ConnectedDoor != null && (d.ConnectedDoor.IsSecurityDoor || d.ConnectedDoor.IsApexDoor || d.ConnectedDoor.HasBloodDoor || d.ConnectedDoor.ChainedPuzzleToSolve > 0 || d.ConnectedDoor.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.ConnectedDoor.TurnOffAlarmOnTerminal || d.ConnectedDoor.EventsOnTerminalDeactivateAlarm.Count > 0)));
 
                     if (enteringDoor == null && candidateDoors.Count > 0)
                     {
@@ -318,7 +318,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                         enteringDoor = gridState.PlacedDoors.FirstOrDefault(d =>
                             d.Geomorph != null &&
                             d.Geomorph.GeneratedRooms.Any(a => d.Geomorph.GetRoomSector(a) == sectorCfg.Sector && d.Geomorph.GetRoomZone(a) == zoneNumber) &&
-                            (d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None));
+                            (d.IsSecurityDoor || d.IsApexDoor || d.HasBloodDoor || d.ChainedPuzzleToSolve > 0 || d.ProgressionPuzzleToEnter != ProgressionPuzzleType.None || d.TurnOffAlarmOnTerminal || d.EventsOnTerminalDeactivateAlarm.Count > 0));
                     }
 
                     var activeEnemyWaveObj = new JsonObject
@@ -388,87 +388,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     }
 
                     // Terminal placements
-                    var terminalsArray = new JsonArray();
-                    foreach (var tp in zoneSettings.TerminalPlacements)
-                    {
-                        if (tp == null) continue;
-
-                        var zoneSelections = new JsonArray();
-                        foreach (var zs in tp.TerminalZoneSelectionDatas)
-                        {
-                            if (zs == null) continue;
-                            zoneSelections.Add(new JsonObject
-                            {
-                                ["ZoneIndex"] = $"Zone_{zs.Zone}",
-                                ["ItemIndex"] = zs.Terminal
-                            });
-                        }
-
-                        var uniqueCommands = new JsonArray();
-                        foreach (var uc in tp.UniqueCommands)
-                        {
-                            if (uc == null) continue;
-                            var cmdObj = new JsonObject
-                            {
-                                ["Command"] = uc.Command ?? string.Empty,
-                                ["CommandDesc"] = uc.CommandDesc ?? string.Empty,
-                                ["CommandRule"] = "Normal",
-                                ["SpecialCommand"] = "None"
-                            };
-
-                            var postOutputs = new JsonArray();
-                            foreach (var po in uc.PostCommandOutputs)
-                            {
-                                postOutputs.Add(new JsonObject
-                                {
-                                    ["LineType"] = po.LineType.ToString(),
-                                    ["Time"] = po.Time,
-                                    ["Output"] = context.SynthesizeText(po.Output, "Post Command Output")
-                                });
-                            }
-
-                            cmdObj["PostCommandOutputs"] = postOutputs;
-                            uniqueCommands.Add(cmdObj);
-                        }
-
-                        var startingStateData = new JsonObject
-                        {
-                            ["StartingState"] = tp.StartingState.ToString(),
-                            ["UseCustomInfoText"] = tp.UseCustomInfoText,
-                            ["CustomInfoText"] = tp.UseCustomInfoText
-                                ? context.SynthesizeText(tp.CustomInfoText, "Terminal Custom Info")
-                                : 0,
-                            ["KeepShowingLocalLogCount"] = tp.KeepShowingLocalLogCount,
-                            ["AudioEventEnter"] = 0,
-                            ["AudioEventExit"] = 0,
-                            ["PasswordProtected"] = tp.PasswordProtected,
-                            ["PasswordHintText"] = !string.IsNullOrWhiteSpace(tp.PasswordHintText)
-                                ? tp.PasswordHintText
-                                : "Password Required.",
-                            ["GeneratePassword"] = tp.GeneratePassword,
-                            ["PasswordPartCount"] = tp.PasswordPartCount > 0 ? tp.PasswordPartCount : 1,
-                            ["ShowPasswordLength"] = tp.ShowPasswordLength,
-                            ["ShowPasswordPartPositions"] = tp.ShowPasswordPartPositions,
-                            ["TerminalZoneSelectionDatas"] = zoneSelections
-                        };
-
-                        var tObj = new JsonObject
-                        {
-                            ["PlacementWeights"] = new JsonObject
-                            {
-                                ["Start"] = tp.PlacementStartWeight,
-                                ["Middle"] = tp.PlacementMiddleWeight,
-                                ["End"] = tp.PlacementEndWeight
-                            },
-                            ["AreaSeedOffset"] = tp.AreaSeedOffset,
-                            ["MarkerSeedOffset"] = tp.MarkerSeedOffset,
-                            ["LocalLogFiles"] = new JsonArray(),
-                            ["UniqueCommands"] = uniqueCommands,
-                            ["StartingStateData"] = startingStateData
-                        };
-
-                        terminalsArray.Add(tObj);
-                    }
+                    var terminalsArray = SerializeTerminalPlacements(zoneSettings.TerminalPlacements, context);
 
                     // Enemy respawning exclude list
                     var excludeArray = new JsonArray();
@@ -549,31 +469,42 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                             ["IncludeInBuildFromAggregation"] = false
                         },
                         ["EventsOnEnter"] = new JsonArray(),
-                        ["EventsOnPortalWarp"] = new JsonArray(),
-                        ["EventsOnApproachDoor"] = new JsonArray(),
-                        ["EventsOnUnlockDoor"] = new JsonArray(),
-                        ["EventsOnOpenDoor"] = new JsonArray(),
-                        ["EventsOnDoorScanStart"] = new JsonArray(),
-                        ["EventsOnDoorScanDone"] = new JsonArray(),
+                        ["EventsOnPortalWarp"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnPortalWarp, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
+                        ["EventsOnApproachDoor"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnApproachDoor, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
+                        ["EventsOnUnlockDoor"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnUnlockDoor, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
+                        ["EventsOnOpenDoor"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnOpenDoor, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
+                        ["EventsOnDoorScanStart"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnDoorScanStart, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
+                        ["EventsOnDoorScanDone"] = enteringDoor != null
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnDoorScanDone, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
                         ["ProgressionPuzzleToEnter"] = progPuzzleObj,
                         ["ChainedPuzzleToEnter"] = chainedPuzzleToEnter,
                         ["IsCheckpointDoor"] = false,
-                        ["PlayScannerVoiceAudio"] = true,
+                        ["PlayScannerVoiceAudio"] = zoneSettings.PlayScannerVoiceAudio,
                         ["SkipAutomaticProgressionObjective"] = false,
                         ["SecurityGateToEnter"] = securityGateToEnter,
                         ["UseStaticBioscanPointsInZone"] = false,
-                        ["TurnOffAlarmOnTerminal"] = false,
+                        ["TurnOffAlarmOnTerminal"] = enteringDoor?.TurnOffAlarmOnTerminal ?? false,
                         ["TerminalPuzzleZone"] = new JsonObject
                         {
-                            ["ZoneIndex"] = "Zone_0",
-                            ["ItemIndex"] = 0
+                            ["LocalIndex"] = enteringDoor != null && enteringDoor.TurnOffAlarmOnTerminal ? $"Zone_{enteringDoor.TerminalZone}" : "Zone_0",
+                            ["SeedType"] = "SessionSeed",
+                            ["TerminalIndex"] = enteringDoor != null && enteringDoor.TurnOffAlarmOnTerminal ? enteringDoor.TerminalIndex : 0,
+                            ["StaticSeed"] = 0
                         },
-                        ["TerminalZoneSelectionData"] = new JsonObject
-                        {
-                            ["ZoneIndex"] = "Zone_0",
-                            ["ItemIndex"] = 0
-                        },
-                        ["EventsOnTerminalDeactivateAlarm"] = new JsonArray(),
+                        ["EventsOnTerminalDeactivateAlarm"] = enteringDoor != null && enteringDoor.TurnOffAlarmOnTerminal
+                            ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnTerminalDeactivateAlarm, (t, c) => context.SynthesizeText(t, c))
+                            : new JsonArray(),
                         ["ActiveEnemyWave"] = activeEnemyWaveObj,
                         ["EnemySpawningInZone"] = new JsonArray(),
                         ["EnemyRespawning"] = zoneSettings.EnemyRespawning,
@@ -590,11 +521,11 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                         ["GroundSpawnersInZone"] = zoneSettings.GroundSpawnersInZone.ToString(),
                         ["HSUsInZone"] = zoneSettings.HSUsInZone.ToString(),
                         ["DeconUnitsInZone"] = zoneSettings.DeconUnitsInZone.ToString(),
-                        ["AllowSmallPickupsAllocation"] = true,
+                        ["AllowSmallPickupsAllocation"] = zoneSettings.ConsumableDistributionInZone > 0,
                         ["AllowResourceContainerAllocation"] = true,
-                        ["ForceBigPickupsAllocation"] = false,
+                        ["ForceBigPickupsAllocation"] = zoneSettings.BigPickupDistributionInZone.Count > 0,
                         ["ConsumableDistributionInZone"] = zoneSettings.ConsumableDistributionInZone,
-                        ["BigPickupDistributionInZone"] = 0,
+                        ["BigPickupDistributionInZone"] = zoneSettings.BigPickupDistributionInZone.Count,
                         ["TerminalPlacements"] = terminalsArray,
                         ["ForbidTerminalsInZone"] = false,
                         ["PowerGeneratorPlacements"] = new JsonArray(),
@@ -817,16 +748,18 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             // Compile Dimensions & Dimension ComplexResourceSets
             foreach (var dim in level.Dimensions)
             {
+                if (dim == null) continue;
+
                 uint dimId = context.DimensionAlloc.Allocate();
                 context.DimensionIds[dim] = dimId;
 
-                var dimGeos = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                if (!string.IsNullOrWhiteSpace(dim.DimensionGeomorph))
-                {
-                    dimGeos.Add(dim.DimensionGeomorph);
-                }
+                uint dimSetId = context.DimensionCrsIds.TryGetValue(dim, out uint cid)
+                    ? cid
+                    : (dim.DimensionResourceSetID > 0 ? dim.DimensionResourceSetID : context.ComplexResourceAlloc.Allocate());
 
-                uint dimSetId = context.ComplexResourceAlloc.Allocate();
+                uint atmoId = context.DimensionAtmosphereIds.TryGetValue(dim, out uint aid)
+                    ? aid
+                    : 2;
 
                 uint dimLayoutId = dim.LevelLayoutData;
                 if (dim.GridState != null && dim.GridState.PlacedGeomorphs.Count > 0)
@@ -844,16 +777,87 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     dimLayoutId = mainLayoutId;
                 }
 
+                string linkedToLayerStr = dim.LinkedToLayer == DimensionLinkedToLayer.Secondary
+                    ? "SecondaryLayer"
+                    : (dim.LinkedToLayer == DimensionLinkedToLayer.Overload ? "ThirdLayer" : "MainLayer");
+
+                var dimDataObj = new JsonObject
+                {
+                    ["LevelLayoutData"] = dimLayoutId,
+                    ["DimensionGeomorph"] = dim.DimensionGeomorph,
+                    ["VerticalExtentsUp"] = 50.0,
+                    ["VerticalExtentsDown"] = 50.0,
+                    ["DimensionResourceSetID"] = dimSetId,
+                    ["DimensionFogData"] = dim.DimensionFogData,
+                    ["EnvironmentWetness"] = dim.EnvironmentWetness,
+                    ["DustColor"] = new JsonObject
+                    {
+                        ["a"] = dim.DustColor.A,
+                        ["r"] = dim.DustColor.R,
+                        ["g"] = dim.DustColor.G,
+                        ["b"] = dim.DustColor.B
+                    },
+                    ["DustAlphaBoost"] = dim.DustAlphaBoost,
+                    ["DustTurbulence"] = dim.DustTurbulence,
+                    ["SoundEventOnWarpTo"] = dim.SoundEventOnWarpTo,
+                    ["DisableVFXEventOnWarp"] = dim.DisableVFXEventOnWarp,
+                    ["UseLocalDimensionSeeds"] = false,
+                    ["ForbidWaveSpawning"] = dim.ForbidWaveSpawning,
+                    ["ForbidCarryItemWarps"] = dim.ForbidCarryItemWarps,
+                    ["LeaveDeployablesOnWarp"] = dim.LeaveDeployablesOnWarp,
+                    ["IsStaticDimension"] = dim.IsStaticDimension,
+                    ["StaticZoneSeed"] = dim.StaticZoneSeed,
+                    ["StaticMarkerSeed"] = dim.StaticMarkerSeed,
+                    ["StaticLightSeed"] = 0,
+                    ["StaticLightSettings"] = 0,
+                    ["StaticAliasOverride"] = dim.StaticAliasOverride,
+                    ["StaticEnemySpawningInZone"] = new JsonArray(),
+                    ["StaticAllowResourceContainerAllocation"] = false,
+                    ["StaticAllowSmallPickupsAllocation"] = dim.StaticConsumableDistributionInZone > 0,
+                    ["StaticForceBigPickupsAllocation"] = dim.StaticBigPickupDistributionInZone.Count > 0,
+                    ["StaticConsumableDistributionInZone"] = dim.StaticConsumableDistributionInZone,
+                    ["StaticBigPickupDistributionInZone"] = dim.StaticBigPickupDistributionInZone.Count,
+                    ["StaticGroundSpawnersInZone"] = "None_0",
+                    ["StaticHealthMulti"] = Math.Round(dim.StaticHealthUses * 0.2, 4),
+                    ["StaticToolAmmoMulti"] = Math.Round(dim.StaticToolUses * 0.2, 4),
+                    ["StaticWeaponAmmoMulti"] = Math.Round(dim.StaticAmmoUses * 0.2, 4),
+                    ["StaticDisinfectionMulti"] = Math.Round(dim.StaticDisinfectUses * 0.2, 4),
+                    ["StaticTerminalPlacements"] = SerializeTerminalPlacements(dim.StaticTerminalPlacements, context),
+                    ["ForbidTerminalsInDimension"] = false,
+                    ["IsOutside"] = dim.IsOutside,
+                    ["LightAzimuth"] = dim.LightAzimuth,
+                    ["LightElevation"] = dim.LightElevation,
+                    ["LightIntensity"] = dim.LightIntensity,
+                    ["AmbientIntensity"] = dim.AmbientIntensity,
+                    ["ReflectionsIntensity"] = dim.ReflectionsIntensity,
+                    ["GodrayRange"] = dim.GodrayRange,
+                    ["GodrayExponent"] = dim.GodrayExponent,
+                    ["AtmosphereData"] = atmoId,
+                    ["AtmosphereDensity"] = dim.AtmosphereDensity,
+                    ["Exposure"] = dim.Exposure,
+                    ["AerialScale"] = 12.9,
+                    ["MieScattering"] = 1.0,
+                    ["MieG"] = 0.8,
+                    ["MultipleScattering"] = 1.0,
+                    ["CloudsData"] = (int)dim.CloudsData,
+                    ["CloudsCoverage"] = dim.CloudsCoverage,
+                    ["CloudsDensity"] = dim.CloudsDensity,
+                    ["CloudsSharpness"] = dim.CloudsSharpness,
+                    ["CloudsShadowOpacity"] = dim.CloudsShadowOpacity,
+                    ["CloudsTimescale"] = dim.CloudsTimescale,
+                    ["CloudsCrawling"] = dim.CloudsCrawling,
+                    ["CloudsFade"] = dim.CloudsFade,
+                    ["Sandstorm"] = dim.Sandstorm,
+                    ["SandstormEdgeA"] = dim.SandstormEdgeA,
+                    ["SandstormEdgeB"] = dim.SandstormEdgeB,
+                    ["SandstormMinFog"] = dim.SandstormMinFog,
+                    ["ObjectiveType"] = dim.ObjectiveType.ToString(),
+                    ["LinkedToLayer"] = linkedToLayerStr
+                };
+
                 var dimObj = new JsonObject
                 {
-                    ["DimensionData"] = new JsonObject
-                    {
-                        ["LevelLayoutData"] = dimLayoutId,
-                        ["DimensionGeomorph"] = dim.DimensionGeomorph,
-                        ["DimensionResourceSetID"] = dimSetId,
-                        ["DimensionFogData"] = 0,
-                        ["IsStaticDimension"] = false
-                    },
+                    ["DimensionData"] = dimDataObj,
                     ["name"] = dim.Name,
                     ["internalEnabled"] = dim.InternalEnabled,
                     ["persistentID"] = dimId
@@ -1167,6 +1171,108 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
         }
 
         return roomParentInfo;
+    }
+
+    public static JsonArray SerializeTerminalPlacements(IEnumerable<TerminalPlacement> terminalPlacements, ExportContext context)
+    {
+        var terminalsArray = new JsonArray();
+        foreach (var tp in terminalPlacements)
+        {
+            if (tp == null) continue;
+
+            var zoneSelections = new JsonArray();
+            foreach (var zs in tp.TerminalZoneSelectionDatas)
+            {
+                if (zs == null) continue;
+                zoneSelections.Add(new JsonObject
+                {
+                    ["ZoneIndex"] = $"Zone_{zs.Zone}",
+                    ["ItemIndex"] = zs.Terminal
+                });
+            }
+
+            var uniqueCommands = new JsonArray();
+            foreach (var uc in tp.UniqueCommands)
+            {
+                if (uc == null) continue;
+                var cmdObj = new JsonObject
+                {
+                    ["Command"] = uc.Command ?? string.Empty,
+                    ["CommandDesc"] = uc.CommandDesc ?? string.Empty,
+                    ["CommandRule"] = "Normal",
+                    ["SpecialCommand"] = "None"
+                };
+
+                var postOutputs = new JsonArray();
+                foreach (var po in uc.PostCommandOutputs)
+                {
+                    postOutputs.Add(new JsonObject
+                    {
+                        ["LineType"] = po.LineType.ToString(),
+                        ["Time"] = po.Time,
+                        ["Output"] = context.SynthesizeText(po.Output, "Post Command Output")
+                    });
+                }
+
+                cmdObj["PostCommandOutputs"] = postOutputs;
+                uniqueCommands.Add(cmdObj);
+            }
+
+            var startingStateData = new JsonObject
+            {
+                ["StartingState"] = tp.StartingState.ToString(),
+                ["UseCustomInfoText"] = tp.UseCustomInfoText,
+                ["CustomInfoText"] = tp.UseCustomInfoText
+                    ? context.SynthesizeText(tp.CustomInfoText, "Terminal Custom Info")
+                    : 0,
+                ["KeepShowingLocalLogCount"] = tp.KeepShowingLocalLogCount,
+                ["AudioEventEnter"] = 0,
+                ["AudioEventExit"] = 0,
+                ["PasswordProtected"] = tp.PasswordProtected,
+                ["PasswordHintText"] = !string.IsNullOrWhiteSpace(tp.PasswordHintText)
+                    ? tp.PasswordHintText
+                    : "Password Required.",
+                ["GeneratePassword"] = tp.GeneratePassword,
+                ["PasswordPartCount"] = tp.PasswordPartCount > 0 ? tp.PasswordPartCount : 1,
+                ["ShowPasswordLength"] = tp.ShowPasswordLength,
+                ["ShowPasswordPartPositions"] = tp.ShowPasswordPartPositions,
+                ["TerminalZoneSelectionDatas"] = zoneSelections
+            };
+
+            var localLogFilesArray = new JsonArray();
+            foreach (var log in tp.LocalLogFiles)
+            {
+                if (log == null) continue;
+                uint fileContentTextId = context.SynthesizeText(log.FileContent, $"Terminal Log {log.FileName}");
+                localLogFilesArray.Add(new JsonObject
+                {
+                    ["FileName"] = log.FileName ?? string.Empty,
+                    ["FileContent"] = fileContentTextId,
+                    ["FileContentOriginalLanguage"] = "English",
+                    ["AttachedAudioFile"] = 0,
+                    ["AttachedAudioByteSize"] = 0,
+                    ["PlayerDialogToTriggerAfterAudio"] = 0
+                });
+            }
+
+            var tObj = new JsonObject
+            {
+                ["PlacementWeights"] = new JsonObject
+                {
+                    ["Start"] = tp.PlacementStartWeight,
+                    ["Middle"] = tp.PlacementMiddleWeight,
+                    ["End"] = tp.PlacementEndWeight
+                },
+                ["AreaSeedOffset"] = tp.AreaSeedOffset,
+                ["MarkerSeedOffset"] = tp.MarkerSeedOffset,
+                ["LocalLogFiles"] = localLogFilesArray,
+                ["UniqueCommands"] = uniqueCommands,
+                ["StartingStateData"] = startingStateData
+            };
+
+            terminalsArray.Add(tObj);
+        }
+        return terminalsArray;
     }
 
     private static string ExtractComplexName(string prefabPath, ComplexType fallback)

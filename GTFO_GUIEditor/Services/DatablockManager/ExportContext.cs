@@ -37,6 +37,7 @@ public class ExportContext
     public PersistentIdAllocator ChainedPuzzleAlloc { get; } = new(100000);
     public PersistentIdAllocator WardenObjectiveAlloc { get; } = new(100000);
     public PersistentIdAllocator DimensionAlloc { get; } = new(100000);
+    public PersistentIdAllocator AtmosphereAlloc { get; } = new(100000);
     public PersistentIdAllocator LevelLayoutAlloc { get; } = new(100000);
     public PersistentIdAllocator LightSettingsAlloc { get; } = new(100000);
     public PersistentIdAllocator FogSettingsAlloc { get; } = new(100000);
@@ -53,6 +54,7 @@ public class ExportContext
     public List<JsonObject> VanillaEnemyGroupBlocks { get; private set; } = new();
     public List<JsonObject> VanillaSurvivalWaveSettingsBlocks { get; private set; } = new();
     public List<JsonObject> VanillaSurvivalWavePopulationBlocks { get; private set; } = new();
+    public List<JsonObject> VanillaAtmosphereBlocks { get; private set; } = new();
 
     // Export output containers
     public List<JsonObject> TextBlocks { get; } = new();
@@ -68,6 +70,7 @@ public class ExportContext
     public List<JsonObject> LightSettingsBlocks { get; } = new();
     public List<JsonObject> FogSettingsBlocks { get; } = new();
     public List<JsonObject> ConsumableDistributionBlocks { get; } = new();
+    public List<JsonObject> AtmosphereBlocks { get; } = new();
     public List<JsonObject> GameSetupBlocks { get; } = new();
     public List<JsonObject> RundownBlocks { get; } = new();
 
@@ -76,9 +79,11 @@ public class ExportContext
     public Dictionary<LevelLayoutBlock, uint> SecondaryLayoutIds { get; } = new();
     public Dictionary<LevelLayoutBlock, uint> ThirdLayoutIds { get; } = new();
     public Dictionary<LevelLayoutBlock, uint> LevelCrsIds { get; } = new();
+    public Dictionary<DimensionLayoutBlock, uint> DimensionCrsIds { get; } = new();
     public Dictionary<LevelLayoutBlock, uint> LevelExpeditionBalanceIds { get; } = new();
     public Dictionary<LevelLayoutBlock, (uint Main, uint Secondary, uint Overload, List<uint> Chained)> ObjectiveIds { get; } = new();
     public Dictionary<DimensionLayoutBlock, uint> DimensionIds { get; } = new();
+    public Dictionary<DimensionLayoutBlock, uint> DimensionAtmosphereIds { get; } = new();
     public Dictionary<uint, double> EnemyCosts { get; private set; } = new();
 
     private readonly Dictionary<string, uint> _bloodGroupCache = new();
@@ -121,6 +126,10 @@ public class ExportContext
 
         VanillaSurvivalWavePopulationBlocks = LoadVanillaBlocksArray("SurvivalWavePopulationDataBlock.json");
         RegisterExistingIds(VanillaSurvivalWavePopulationBlocks, SurvivalWavePopulationAlloc);
+
+        VanillaAtmosphereBlocks = LoadVanillaBlocksArray("AtmosphereDataBlock.json");
+        RegisterExistingIds(VanillaAtmosphereBlocks, AtmosphereAlloc);
+        AtmosphereBlocks.AddRange(VanillaAtmosphereBlocks);
 
         EnemyCosts = LoadEnemyCosts(VanillaEnemyBlocks);
     }

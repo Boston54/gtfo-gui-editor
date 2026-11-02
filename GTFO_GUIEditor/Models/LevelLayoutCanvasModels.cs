@@ -49,6 +49,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private ObservableCollection<WardenEvent> _eventsOnDoorScanDone = new();
     private ObservableCollection<WardenEvent> _eventsOnBossDeath = new();
     private ObservableCollection<WardenEvent> _eventsOnTrigger = new();
+    private ObservableCollection<WardenEvent> _eventsOnTerminalDeactivateAlarm = new();
     private ProgressionPuzzleType _progressionPuzzleToEnter = ProgressionPuzzleType.None;
     private string _progressionPuzzleCustomText = string.Empty;
     private int _progressionPuzzlePlacementCount = 1;
@@ -473,6 +474,13 @@ public class PlacedDoorNode : INotifyPropertyChanged
         else if (a.EventsOnTrigger != b.EventsOnTrigger && a.EventsOnTrigger.Count > 0)
             b.EventsOnTrigger = a.EventsOnTrigger;
 
+        if (a.EventsOnTerminalDeactivateAlarm.Count > 0 && b.EventsOnTerminalDeactivateAlarm.Count == 0)
+            b.EventsOnTerminalDeactivateAlarm = a.EventsOnTerminalDeactivateAlarm;
+        else if (b.EventsOnTerminalDeactivateAlarm.Count > 0 && a.EventsOnTerminalDeactivateAlarm.Count == 0)
+            a.EventsOnTerminalDeactivateAlarm = b.EventsOnTerminalDeactivateAlarm;
+        else if (a.EventsOnTerminalDeactivateAlarm != b.EventsOnTerminalDeactivateAlarm && a.EventsOnTerminalDeactivateAlarm.Count > 0)
+            b.EventsOnTerminalDeactivateAlarm = a.EventsOnTerminalDeactivateAlarm;
+
         if (a.EnemyGroupInArea.Count > 0 && b.EnemyGroupInArea.Count == 0)
             b.EnemyGroupInArea = a.EnemyGroupInArea;
         else if (b.EnemyGroupInArea.Count > 0 && a.EnemyGroupInArea.Count == 0)
@@ -761,6 +769,21 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 if (ConnectedDoor != null && ConnectedDoor.EventsOnTrigger != _eventsOnTrigger)
                 {
                     ConnectedDoor.EventsOnTrigger = _eventsOnTrigger;
+                }
+            }
+        }
+    }
+
+    public ObservableCollection<WardenEvent> EventsOnTerminalDeactivateAlarm
+    {
+        get => _eventsOnTerminalDeactivateAlarm;
+        set
+        {
+            if (SetField(ref _eventsOnTerminalDeactivateAlarm, value ?? new()))
+            {
+                if (ConnectedDoor != null && ConnectedDoor.EventsOnTerminalDeactivateAlarm != _eventsOnTerminalDeactivateAlarm)
+                {
+                    ConnectedDoor.EventsOnTerminalDeactivateAlarm = _eventsOnTerminalDeactivateAlarm;
                 }
             }
         }

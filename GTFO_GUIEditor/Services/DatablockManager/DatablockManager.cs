@@ -42,6 +42,7 @@ public class DatablockManager : IDatablockManager
         _exporters.Add(new ChainedPuzzleDataBlockExporter());
         _exporters.Add(new ExpeditionBalanceDataBlockExporter());
         _exporters.Add(new ComplexResourceSetDataBlockExporter());
+        _exporters.Add(new AtmosphereDataBlockExporter());
         _exporters.Add(new WardenObjectiveDataBlockExporter());
         _exporters.Add(new LevelLayoutDataBlockExporter());
         _exporters.Add(new LightSettingsDataBlockExporter());

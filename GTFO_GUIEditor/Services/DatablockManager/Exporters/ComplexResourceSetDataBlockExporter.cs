@@ -38,14 +38,6 @@ public class ComplexResourceSetDataBlockExporter : IDatablockExporter
                 usedPrefabs.Add(level.ElevatorTile);
             }
 
-            foreach (var dim in level.Dimensions)
-            {
-                if (!string.IsNullOrWhiteSpace(dim.DimensionGeomorph))
-                {
-                    usedPrefabs.Add(dim.DimensionGeomorph);
-                }
-            }
-
             var crsObj = BuildSynthesizedComplexResourceSet(
                 crsId,
                 string.IsNullOrWhiteSpace(level.Name) ? $"CRS_{crsId}" : $"Generated_ComplexSet_{level.Name}_Main",
@@ -54,6 +46,39 @@ public class ComplexResourceSetDataBlockExporter : IDatablockExporter
                 geoLookup);
 
             complexBlocks.Add(crsObj);
+
+            foreach (var dim in level.Dimensions)
+            {
+                if (dim == null) continue;
+
+                uint dimCrsId = dim.DimensionResourceSetID > 0
+                    ? dim.DimensionResourceSetID
+                    : context.ComplexResourceAlloc.Allocate();
+
+                context.DimensionCrsIds[dim] = dimCrsId;
+
+                var dimUsedPrefabs = new List<string>();
+                if (!string.IsNullOrWhiteSpace(dim.DimensionGeomorph))
+                {
+                    dimUsedPrefabs.Add(dim.DimensionGeomorph);
+                }
+
+                if (dim.GridState != null)
+                {
+                    dimUsedPrefabs.AddRange(dim.GridState.PlacedGeomorphs
+                        .Select(g => g.PrefabPath)
+                        .Where(p => !string.IsNullOrWhiteSpace(p)));
+                }
+
+                var dimCrsObj = BuildSynthesizedComplexResourceSet(
+                    dimCrsId,
+                    string.IsNullOrWhiteSpace(dim.Name) ? $"CRS_{dimCrsId}" : $"Generated_ComplexSet_{level.Name}_{dim.Name}",
+                    dim.ComplexType,
+                    dimUsedPrefabs,
+                    geoLookup);
+
+                complexBlocks.Add(dimCrsObj);
+            }
         }
 
         context.ComplexResourceSetBlocks.Clear();

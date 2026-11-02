@@ -34,6 +34,7 @@ public class ImportContext
     public Dictionary<uint, JsonObject> ComplexResourceSetBlocks { get; } = new();
     public Dictionary<uint, JsonObject> LevelLayoutBlocks { get; } = new();
     public Dictionary<uint, JsonObject> DimensionBlocks { get; } = new();
+    public Dictionary<uint, JsonObject> AtmosphereBlocks { get; } = new();
     public Dictionary<uint, JsonObject> RundownBlocks { get; } = new();
     public Dictionary<uint, JsonObject> GameSetupBlocks { get; } = new();
 
@@ -69,6 +70,7 @@ public class ImportContext
         LoadBlocks("GameData_ComplexResourceSetDataBlock_bin.json", "ComplexResourceSetDataBlock.json", ComplexResourceSetBlocks);
         LoadBlocks("GameData_LevelLayoutDataBlock_bin.json", "LevelLayoutDataBlock.json", LevelLayoutBlocks);
         LoadBlocks("GameData_DimensionDataBlock_bin.json", "DimensionDataBlock.json", DimensionBlocks);
+        LoadBlocks("GameData_AtmosphereDataBlock_bin.json", "AtmosphereDataBlock.json", AtmosphereBlocks);
         LoadBlocks("GameData_RundownDataBlock_bin.json", "RundownDataBlock.json", RundownBlocks);
         LoadBlocks("GameData_GameSetupDataBlock_bin.json", "GameSetupDataBlock.json", GameSetupBlocks);
     }

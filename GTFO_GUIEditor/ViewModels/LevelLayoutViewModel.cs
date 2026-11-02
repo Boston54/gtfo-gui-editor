@@ -99,6 +99,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public ICommand RemoveBigPickupDistributionItemCommand { get; }
     public ICommand RemoveDisinfectionStationPlacementCommand { get; }
     public ICommand RemoveTerminalPlacementCommand { get; }
+    public ICommand RemoveTerminalLocalLogFileCommand { get; }
     public ICommand RemoveTerminalZoneSelectionDataCommand { get; }
     public ICommand RemoveTerminalUniqueCommandCommand { get; }
     public ICommand RemoveTerminalPostCommandOutputCommand { get; }
@@ -384,6 +385,7 @@ public class LevelLayoutViewModel : ViewModelBase
         RemoveBigPickupDistributionItemCommand = new RelayCommand<BigPickupDistributionItem>(RemoveBigPickupDistributionItem);
         RemoveDisinfectionStationPlacementCommand = new RelayCommand<DisinfectionStationPlacement>(RemoveDisinfectionStationPlacement);
         RemoveTerminalPlacementCommand = new RelayCommand<TerminalPlacement>(RemoveTerminalPlacement);
+        RemoveTerminalLocalLogFileCommand = new RelayCommand<TerminalLocalLogFile>(RemoveTerminalLocalLogFile);
         RemoveTerminalZoneSelectionDataCommand = new RelayCommand<TerminalZoneSelectionData>(RemoveTerminalZoneSelectionData);
         RemoveTerminalUniqueCommandCommand = new RelayCommand<TerminalUniqueCommand>(RemoveTerminalUniqueCommand);
         RemoveTerminalPostCommandOutputCommand = new RelayCommand<TerminalPostCommandOutput>(RemoveTerminalPostCommandOutput);
@@ -1732,6 +1734,9 @@ public class LevelLayoutViewModel : ViewModelBase
     public void AddEventOnTrigger() => EditingDoor?.EventsOnTrigger.Add(new WardenEvent());
     public void RemoveEventOnTrigger(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnTrigger.Remove(ev); }
 
+    public void AddEventOnTerminalDeactivateAlarm() => EditingDoor?.EventsOnTerminalDeactivateAlarm.Add(new WardenEvent());
+    public void RemoveEventOnTerminalDeactivateAlarm(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnTerminalDeactivateAlarm.Remove(ev); }
+
     public void AddEnemyGroupInAreaItem() => EditingDoor?.EnemyGroupInArea.Add(new EnemyGroupItem { EnemyId = 24, Count = 1 });
     public void RemoveEnemyGroupInAreaItem(EnemyGroupItem? item) { if (item != null) EditingDoor?.EnemyGroupInArea.Remove(item); }
 
@@ -1772,6 +1777,7 @@ public class LevelLayoutViewModel : ViewModelBase
             EditingDoor.EventsOnDoorScanDone.Remove(ev);
             EditingDoor.EventsOnBossDeath.Remove(ev);
             EditingDoor.EventsOnTrigger.Remove(ev);
+            EditingDoor.EventsOnTerminalDeactivateAlarm.Remove(ev);
         }
         if (CurrentObjective != null)
         {
@@ -1795,11 +1801,46 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
+    public static IReadOnlyList<DimensionLinkedToLayer> AvailableDimensionLinkedToLayers { get; } =
+        (DimensionLinkedToLayer[])Enum.GetValues(typeof(DimensionLinkedToLayer));
+
+    public static IReadOnlyList<DimensionObjectiveType> AvailableDimensionObjectiveTypes { get; } =
+        (DimensionObjectiveType[])Enum.GetValues(typeof(DimensionObjectiveType));
+
+    public static IReadOnlyList<DimensionCloudsType> AvailableDimensionCloudsTypes { get; } = new[]
+    {
+        DimensionCloudsType.Anvils,
+        DimensionCloudsType.Stratocumulus
+    };
+
+    private DimensionLayoutBlock? _editingDimension;
+    public DimensionLayoutBlock? EditingDimension
+    {
+        get => _editingDimension;
+        set => SetField(ref _editingDimension, value);
+    }
+
     public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
     public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }
 
     public void AddBigPickupDistributionItem() => ActiveZoneSettings?.BigPickupDistributionInZone.Add(new BigPickupDistributionItem());
-    public void RemoveBigPickupDistributionItem(BigPickupDistributionItem? item) { if (item != null) ActiveZoneSettings?.BigPickupDistributionInZone.Remove(item); }
+    public void RemoveBigPickupDistributionItem(BigPickupDistributionItem? item)
+    {
+        if (item != null)
+        {
+            ActiveZoneSettings?.BigPickupDistributionInZone.Remove(item);
+            EditingDimension?.StaticBigPickupDistributionInZone.Remove(item);
+        }
+    }
+
+    public void AddDimensionBigPickupDistributionItem() => EditingDimension?.StaticBigPickupDistributionInZone.Add(new BigPickupDistributionItem());
+    public void RemoveDimensionBigPickupDistributionItem(BigPickupDistributionItem? item)
+    {
+        if (item != null)
+        {
+            EditingDimension?.StaticBigPickupDistributionInZone.Remove(item);
+        }
+    }
 
     public void AddDisinfectionStationPlacement() => ActiveZoneSettings?.DisinfectionStationPlacements.Add(new DisinfectionStationPlacement());
     public void RemoveDisinfectionStationPlacement(DisinfectionStationPlacement? placement) { if (placement != null) ActiveZoneSettings?.DisinfectionStationPlacements.Remove(placement); }
@@ -1810,41 +1851,107 @@ public class LevelLayoutViewModel : ViewModelBase
         UpdateAvailableDoorTerminalZones();
     }
 
+    public void AddDimensionTerminalPlacement()
+    {
+        EditingDimension?.StaticTerminalPlacements.Add(new TerminalPlacement());
+    }
+
     public void RemoveTerminalPlacement(TerminalPlacement? placement)
     {
         if (placement != null)
         {
             ActiveZoneSettings?.TerminalPlacements.Remove(placement);
+            EditingDimension?.StaticTerminalPlacements.Remove(placement);
             UpdateAvailableDoorTerminalZones();
+        }
+    }
+
+    public void RemoveDimensionTerminalPlacement(TerminalPlacement? placement)
+    {
+        if (placement != null)
+        {
+            EditingDimension?.StaticTerminalPlacements.Remove(placement);
+        }
+    }
+
+    public void RemoveTerminalLocalLogFile(TerminalLocalLogFile? logFile)
+    {
+        if (logFile == null) return;
+        if (ActiveZoneSettings != null)
+        {
+            foreach (var term in ActiveZoneSettings.TerminalPlacements)
+            {
+                term.LocalLogFiles.Remove(logFile);
+            }
+        }
+        if (EditingDimension != null)
+        {
+            foreach (var term in EditingDimension.StaticTerminalPlacements)
+            {
+                term.LocalLogFiles.Remove(logFile);
+            }
         }
     }
 
     public void RemoveTerminalUniqueCommand(TerminalUniqueCommand? cmd)
     {
-        if (cmd == null || ActiveZoneSettings == null) return;
-        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        if (cmd == null) return;
+        if (ActiveZoneSettings != null)
         {
-            term.UniqueCommands.Remove(cmd);
+            foreach (var term in ActiveZoneSettings.TerminalPlacements)
+            {
+                term.UniqueCommands.Remove(cmd);
+            }
+        }
+        if (EditingDimension != null)
+        {
+            foreach (var term in EditingDimension.StaticTerminalPlacements)
+            {
+                term.UniqueCommands.Remove(cmd);
+            }
         }
     }
 
     public void RemoveTerminalZoneSelectionData(TerminalZoneSelectionData? data)
     {
-        if (data == null || ActiveZoneSettings == null) return;
-        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        if (data == null) return;
+        if (ActiveZoneSettings != null)
         {
-            term.TerminalZoneSelectionDatas.Remove(data);
+            foreach (var term in ActiveZoneSettings.TerminalPlacements)
+            {
+                term.TerminalZoneSelectionDatas.Remove(data);
+            }
+        }
+        if (EditingDimension != null)
+        {
+            foreach (var term in EditingDimension.StaticTerminalPlacements)
+            {
+                term.TerminalZoneSelectionDatas.Remove(data);
+            }
         }
     }
 
     public void RemoveTerminalPostCommandOutput(TerminalPostCommandOutput? output)
     {
-        if (output == null || ActiveZoneSettings == null) return;
-        foreach (var term in ActiveZoneSettings.TerminalPlacements)
+        if (output == null) return;
+        if (ActiveZoneSettings != null)
         {
-            foreach (var cmd in term.UniqueCommands)
+            foreach (var term in ActiveZoneSettings.TerminalPlacements)
             {
-                cmd.PostCommandOutputs.Remove(output);
+                foreach (var cmd in term.UniqueCommands)
+                {
+                    cmd.PostCommandOutputs.Remove(output);
+                }
+            }
+        }
+        if (EditingDimension != null)
+        {
+            foreach (var term in EditingDimension.StaticTerminalPlacements)
+            {
+                foreach (var cmd in term.UniqueCommands)
+                {
+                    cmd.PostCommandOutputs.Remove(output);
+                }
             }
         }
     }
@@ -2850,6 +2957,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (isReality)
         {
+            EditingDimension = null;
             DimensionCustomName = "Reality";
 
             _availableTileSources.Clear();
@@ -2878,6 +2986,7 @@ public class LevelLayoutViewModel : ViewModelBase
             if (existing != null && _selectedLevel != null &&
                 _selectedLevel.HasDimension(targetDimension.DimensionIndex) && !isNew)
             {
+                EditingDimension = existing.Clone();
                 DimensionCustomName = existing.Name;
                 DimensionSelectedComplexType = existing.ComplexType;
 
@@ -2894,6 +3003,12 @@ public class LevelLayoutViewModel : ViewModelBase
             }
             else
             {
+                EditingDimension = new DimensionLayoutBlock
+                {
+                    DimensionIndex = targetDimension.DimensionIndex,
+                    Name = targetDimension.DisplayName,
+                    ComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining
+                };
                 DimensionCustomName = targetDimension.DisplayName;
                 DimensionSelectedComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining;
 
@@ -2976,7 +3091,26 @@ public class LevelLayoutViewModel : ViewModelBase
 
             var existingDim = _selectedLevel.GetDimension(_promptingDimensionOption.DimensionIndex);
             DimensionLayoutBlock dimBlock;
-            if (existingDim != null)
+            if (EditingDimension != null)
+            {
+                dimBlock = EditingDimension;
+                dimBlock.DimensionIndex = _promptingDimensionOption.DimensionIndex;
+                dimBlock.Name = dimName;
+                dimBlock.ComplexType = DimensionSelectedComplexType;
+                dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
+                dimBlock.TileCategory = tileCategory;
+                dimBlock.InternalEnabled = true;
+
+                if (existingDim?.GridState != null && existingDim.GridState.PlacedGeomorphs.Count > 0)
+                {
+                    dimBlock.GridState = existingDim.GridState;
+                }
+                else if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
+                {
+                    dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
+                }
+            }
+            else if (existingDim != null)
             {
                 dimBlock = existingDim;
                 dimBlock.Name = dimName;
@@ -3002,6 +3136,7 @@ public class LevelLayoutViewModel : ViewModelBase
             }
 
             _selectedLevel.SetDimension(dimBlock);
+            EditingDimension = null;
             _activeDimensionIndex = _promptingDimensionOption.DimensionIndex;
 
             var existingOpt = _availableDimensions.FirstOrDefault(d => d.DimensionIndex == dimBlock.DimensionIndex);
@@ -3033,6 +3168,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public void CancelPromptDimension()
     {
         IsConfiguringDimension = false;
+        EditingDimension = null;
         DimensionPromptErrorMessage = string.Empty;
 
         _selectedDimension = _previousDimensionOption != null && _availableDimensions.Contains(_previousDimensionOption)

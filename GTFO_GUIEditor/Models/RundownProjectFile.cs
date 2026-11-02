@@ -178,6 +178,7 @@ public class PlacedDoorNodeData
     [JsonPropertyName("eventsOnDoorScanDone")] public List<WardenEvent> EventsOnDoorScanDone { get; set; } = new();
     [JsonPropertyName("eventsOnBossDeath")] public List<WardenEvent> EventsOnBossDeath { get; set; } = new();
     [JsonPropertyName("eventsOnTrigger")] public List<WardenEvent> EventsOnTrigger { get; set; } = new();
+    [JsonPropertyName("eventsOnTerminalDeactivateAlarm")] public List<WardenEvent> EventsOnTerminalDeactivateAlarm { get; set; } = new();
 }
 
 public class ZoneSettingsData
@@ -194,6 +195,7 @@ public class ZoneSettingsData
     [JsonPropertyName("markerSubSeed")] public int MarkerSubSeed { get; set; }
     [JsonPropertyName("lightingSubSeed")] public int LightingSubSeed { get; set; }
     [JsonPropertyName("dcScanSeed")] public int DcScanSeed { get; set; }
+    [JsonPropertyName("playScannerVoiceAudio")] public bool PlayScannerVoiceAudio { get; set; } = true;
 
     [JsonPropertyName("enemyRespawning")] public bool EnemyRespawning { get; set; }
     [JsonPropertyName("requireOtherZone")] public bool RequireOtherZone { get; set; } = true;

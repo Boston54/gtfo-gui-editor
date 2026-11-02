@@ -1226,6 +1226,7 @@ public class DatablockExportTests
             zs0.CorpseClusters = 1;
             zs0.ResourceContainerClusters = 3;
             zs0.ContainsGenCluster = true;
+            zs0.ConsumableDistributionInZone = 12;
 
             // Disinfection station placement list
             zs0.DisinfectionStationPlacements.Add(new DisinfectionStationPlacement
@@ -1236,7 +1237,7 @@ public class DatablockExportTests
             });
 
             // Terminal placement with StartingStateData
-            zs0.TerminalPlacements.Add(new TerminalPlacement
+            var termPlacement = new TerminalPlacement
             {
                 PlacementStartWeight = 1.0,
                 PlacementMiddleWeight = 0.0,
@@ -1244,7 +1245,13 @@ public class DatablockExportTests
                 StartingState = TerminalStartingState.Awake,
                 PasswordProtected = true,
                 PasswordHintText = "SECRET_CODE"
+            };
+            termPlacement.LocalLogFiles.Add(new TerminalLocalLogFile
+            {
+                FileName = "LOG_ALPHA.TXT",
+                FileContent = "Restricted Area Log Entry"
             });
+            zs0.TerminalPlacements.Add(termPlacement);
 
             level.GridState = gridState;
             mainVm.LevelLayout.Levels.Clear();
@@ -1362,6 +1369,18 @@ public class DatablockExportTests
             Assert.Equal("Awake", stateData["StartingState"]?.GetValue<string>());
             Assert.True(stateData["PasswordProtected"]?.GetValue<bool>());
             Assert.Equal("SECRET_CODE", stateData["PasswordHintText"]?.GetValue<string>());
+
+            var logFilesArr = term0["LocalLogFiles"]?.AsArray();
+            Assert.NotNull(logFilesArr);
+            Assert.Single(logFilesArr);
+            var log0 = logFilesArr[0]?.AsObject();
+            Assert.NotNull(log0);
+            Assert.Equal("LOG_ALPHA.TXT", log0["FileName"]?.GetValue<string>());
+            Assert.True(log0["FileContent"]?.GetValue<uint>() > 0);
+            Assert.Equal("English", log0["FileContentOriginalLanguage"]?.GetValue<string>());
+            Assert.Equal(0, log0["AttachedAudioFile"]?.GetValue<int>());
+            Assert.Equal(0, log0["AttachedAudioByteSize"]?.GetValue<int>());
+            Assert.Equal(0, log0["PlayerDialogToTriggerAfterAudio"]?.GetValue<int>());
 
             // Resource multipliers and placements
             Assert.Equal(1.0, zone0["HealthMulti"]?.GetValue<double>()); // 4 uses * 0.25 = 1.0

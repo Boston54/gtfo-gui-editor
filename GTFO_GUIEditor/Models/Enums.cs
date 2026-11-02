@@ -350,3 +350,30 @@ public enum Consumables
     ExplosiveTripmine = 139,
     CFoamTripmine = 144
 }
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DimensionLinkedToLayer
+{
+    [JsonPropertyName("MainLayer")]
+    Main,
+    [JsonPropertyName("SecondaryLayer")]
+    Secondary,
+    [JsonPropertyName("ThirdLayer")]
+    Overload
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DimensionObjectiveType
+{
+    Ignore,
+    LinkedToLayer,
+    Independent
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum DimensionCloudsType
+{
+    None = 0,
+    Anvils = 1,
+    Stratocumulus = 2
+}
