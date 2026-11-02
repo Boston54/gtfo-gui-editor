@@ -52,7 +52,7 @@
 
         <!-- Main Editor Area (when a config is selected) -->
         <Grid Grid.Row="1" IsVisible="{Binding HasSelectedBlock}">
-            <ScrollViewer Margin="0">
+            <ScrollViewer Margin="0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                 <StackPanel Spacing="14">
                     <!-- Duplicate ID Warning Banner -->
                     <Border Background="#3A1C1C"

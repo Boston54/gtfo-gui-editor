@@ -61,6 +61,10 @@
                         <MenuItem Header="Export To..."
                                   Command="{Binding ExportDatablocksTo}"/>
                     </MenuItem>
+                    <MenuItem Header="Settings" Foreground="#E0E0E0" FontWeight="SemiBold" FontSize="13">
+                        <MenuItem Header="Appearance"
+                                  Command="{Binding OpenAppearanceSettings}"/>
+                    </MenuItem>
                 </Menu>
 
                 <TextBlock Grid.Column="1"
@@ -123,5 +127,10 @@
         <dialogs:ImportNotificationDialog Grid.Row="0"
                                           Grid.RowSpan="2"
                                           IsVisible="{Binding IsShowingImportNotification}"/>
+
+        <!-- Settings Modal Overlay -->
+        <dialogs:SettingsDialog Grid.Row="0"
+                                Grid.RowSpan="2"
+                                IsVisible="{Binding IsShowingSettings}"/>
     </Grid>
 </Window>

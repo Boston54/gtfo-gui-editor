@@ -21,7 +21,7 @@
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 BoxShadow="0 4 20 #80000000">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                 <StackPanel Spacing="16">
                     <TextBlock Text="{Binding EditingDoorTitle}"
                                FontSize="18"

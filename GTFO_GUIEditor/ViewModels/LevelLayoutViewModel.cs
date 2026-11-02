@@ -132,6 +132,8 @@ public class LevelLayoutViewModel : ViewModelBase
     public ObservableCollection<EventTrigger> InstanceAvailableEventTriggers { get; } = new(Enum.GetValues<EventTrigger>());
     public ObservableCollection<SectorType> InstanceAvailableSectors { get; } = new(Enum.GetValues<SectorType>());
 
+    public AppearanceSettings Appearance => EditorSettingsManager.Instance.Settings.Appearance;
+
     public LevelLayoutGridState GridState => _selectedLevel?.GetGridState(_activeDimensionIndex) ?? _gridState;
 
     public ObservableCollection<LevelLayoutBlock> Levels
@@ -345,6 +347,23 @@ public class LevelLayoutViewModel : ViewModelBase
             {
                 OnPropertyChanged(nameof(HasGridSizeWarning));
                 OnPropertyChanged(nameof(GridSizeWarningMessage));
+            }
+        };
+
+        EditorSettingsManager.Instance.Settings.Appearance.PropertyChanged += (s, e) =>
+        {
+            OnPropertyChanged(nameof(Appearance));
+            GridState.RefreshDoorBrushes();
+            GridState.RefreshRoomBrushes();
+            if (SelectedLevel?.GridState != null && SelectedLevel.GridState != GridState)
+            {
+                SelectedLevel.GridState.RefreshDoorBrushes();
+                SelectedLevel.GridState.RefreshRoomBrushes();
+            }
+            foreach (var level in Levels)
+            {
+                level.GridState?.RefreshDoorBrushes();
+                level.GridState?.RefreshRoomBrushes();
             }
         };
 

@@ -113,18 +113,35 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         OnPropertyChanged(nameof(HasBlockedDoors));
     }
 
+    public void RefreshDoorBrushes()
+    {
+        foreach (var door in PlacedDoors)
+        {
+            door.NotifyBrushChanged();
+        }
+        NotifyLegendProperties();
+    }
+
+    public void RefreshRoomBrushes()
+    {
+        foreach (var room in PlacedRooms)
+        {
+            room.UpdateFillBrush();
+        }
+    }
+
     public event PropertyChangedEventHandler? PropertyChanged;
 
     public bool HasSecondaryDoor => PlacedDoors.Any(d => d.IsSecondaryDoor);
     public bool HasOverloadDoor => PlacedDoors.Any(d => d.IsOverloadDoor);
 
-    public bool HasUnexpandedDoors => PlacedDoors.Any(d => d.DoorBrush == "#FFFF00");
-    public bool HasConnectedDoors => PlacedDoors.Any(d => d.DoorBrush == "#9D00FF");
-    public bool HasSecurityDoors => PlacedDoors.Any(d => d.DoorBrush == "#FF0000");
-    public bool HasMainDoors => PlacedDoors.Any(d => d.DoorBrush == "#CCCCCC");
-    public bool HasSecondaryDoors => PlacedDoors.Any(d => d.DoorBrush == "#FFA200");
-    public bool HasOverloadDoors => PlacedDoors.Any(d => d.DoorBrush == "#00F2FF");
-    public bool HasBlockedDoors => PlacedDoors.Any(d => d.DoorBrush == "#757575");
+    public bool HasUnexpandedDoors => PlacedDoors.Any(d => !d.IsBlocked && !d.IsZoneBoundary && !d.IsConnected);
+    public bool HasConnectedDoors => PlacedDoors.Any(d => !d.IsBlocked && !d.IsZoneBoundary && d.IsConnected);
+    public bool HasSecurityDoors => PlacedDoors.Any(d => !d.IsBlocked && d.IsSecurityDoor);
+    public bool HasMainDoors => PlacedDoors.Any(d => !d.IsBlocked && d.IsMainDoor);
+    public bool HasSecondaryDoors => PlacedDoors.Any(d => !d.IsBlocked && d.IsSecondaryDoor);
+    public bool HasOverloadDoors => PlacedDoors.Any(d => !d.IsBlocked && d.IsOverloadDoor);
+    public bool HasBlockedDoors => PlacedDoors.Any(d => d.IsBlocked);
 
     public int GetNextZoneForSector(SectorType sector)
     {

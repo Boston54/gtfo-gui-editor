@@ -45,7 +45,7 @@
                 <Separator Grid.Row="1" Background="#3A3A3C" Margin="0,0,0,12"/>
 
                 <!-- Failed Levels List -->
-                <ScrollViewer Grid.Row="2" MaxHeight="400" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer Grid.Row="2" MaxHeight="400" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                     <ItemsControl ItemsSource="{Binding ImportFailedLevels}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate x:DataType="models:LevelImportFailure">

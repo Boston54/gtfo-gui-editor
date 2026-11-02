@@ -116,7 +116,7 @@
                     </Grid>
 
                     <!-- Right Column: Selected Preview & Parameters -->
-                    <ScrollViewer Grid.Column="1" Margin="14,0,0,0" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Column="1" Margin="14,0,0,0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                         <StackPanel Spacing="10">
                             <!-- Preview Box -->
                             <Border Background="#1A2026" BorderBrush="#334455" BorderThickness="1" CornerRadius="4" Padding="8">

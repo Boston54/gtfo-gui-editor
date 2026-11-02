@@ -19,6 +19,7 @@ public class MainWindowViewModel : ViewModelBase
     private string _importNotificationTitle = string.Empty;
     private string _importNotificationMessage = string.Empty;
     private ObservableCollection<LevelImportFailure> _importFailedLevels = new();
+    private bool _isShowingSettings;
 
     public DocumentationViewModel Documentation { get; }
     public SoundsViewModel Sounds { get; }
@@ -59,6 +60,14 @@ public class MainWindowViewModel : ViewModelBase
         get => _importFailedLevels;
         set => SetField(ref _importFailedLevels, value);
     }
+
+    public bool IsShowingSettings
+    {
+        get => _isShowingSettings;
+        set => SetField(ref _isShowingSettings, value);
+    }
+
+    public EditorSettings Settings => EditorSettingsManager.Instance.Settings;
 
     public string? CurrentFilePath
     {
@@ -412,6 +421,45 @@ public class MainWindowViewModel : ViewModelBase
     public void CloseImportNotification()
     {
         IsShowingImportNotification = false;
+    }
+
+    public void OpenAppearanceSettings()
+    {
+        IsShowingSettings = true;
+    }
+
+    public void CloseSettings()
+    {
+        IsShowingSettings = false;
+    }
+
+    public void ResetAppearanceSettingsToDefaults()
+    {
+        Settings.Appearance.ResetToDefaults();
+    }
+
+    public void ResetUnexpandedDoorColor() => Settings.Appearance.ResetUnexpandedDoorColor();
+    public void ResetConnectedDoorColor() => Settings.Appearance.ResetConnectedDoorColor();
+    public void ResetSecurityDoorColor() => Settings.Appearance.ResetSecurityDoorColor();
+    public void ResetMainDoorColor() => Settings.Appearance.ResetMainDoorColor();
+    public void ResetSecondaryDoorColor() => Settings.Appearance.ResetSecondaryDoorColor();
+    public void ResetOverloadDoorColor() => Settings.Appearance.ResetOverloadDoorColor();
+    public void ResetBlockedDoorColor() => Settings.Appearance.ResetBlockedDoorColor();
+    public void ResetHeightmapGradient() => Settings.Appearance.ResetHeightmapGradient();
+
+    public void AddHeightmapGradientKeyframe()
+    {
+        Settings.Appearance.AddKeyframe();
+    }
+
+    public void RemoveHeightmapGradientKeyframe(GradientKeyframe? keyframe)
+    {
+        Settings.Appearance.RemoveKeyframe(keyframe);
+    }
+
+    public void RemoveSelectedHeightmapGradientKeyframe()
+    {
+        Settings.Appearance.RemoveSelectedKeyframe();
     }
 
     public ImportResult ImportDatablocks(string inputDirectory)

@@ -206,32 +206,32 @@
                                 <!-- Legend / Status info -->
                                 <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasUnexpandedDoors}">
-                                        <Border Width="10" Height="5" Background="#FFFF00" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Unexpanded" FontSize="11" Foreground="#FFFF00" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.UnexpandedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Unexpanded" FontSize="11" Foreground="{Binding Appearance.UnexpandedDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasConnectedDoors}">
-                                        <Border Width="10" Height="5" Background="#9D00FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Connected" FontSize="11" Foreground="#9D00FF" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.ConnectedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Connected" FontSize="11" Foreground="{Binding Appearance.ConnectedDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecurityDoors}">
-                                        <Border Width="10" Height="5" Background="#FF0000" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Security Door" FontSize="11" Foreground="#FF0000" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.SecurityDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Security Door" FontSize="11" Foreground="{Binding Appearance.SecurityDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasMainDoors}">
-                                        <Border Width="10" Height="5" Background="#CCCCCC" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Main Door" FontSize="11" Foreground="#CCCCCC" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.MainDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Main Door" FontSize="11" Foreground="{Binding Appearance.MainDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecondaryDoors}">
-                                        <Border Width="10" Height="5" Background="#FFA200" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Secondary Door" FontSize="11" Foreground="#FFA200" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.SecondaryDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Secondary Door" FontSize="11" Foreground="{Binding Appearance.SecondaryDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasOverloadDoors}">
-                                        <Border Width="10" Height="5" Background="#00F2FF" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Overload Door" FontSize="11" Foreground="#00F2FF" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.OverloadDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Overload Door" FontSize="11" Foreground="{Binding Appearance.OverloadDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                     <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasBlockedDoors}">
-                                        <Border Width="10" Height="5" Background="#757575" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Blocked" FontSize="11" Foreground="#9E9E9E" VerticalAlignment="Center"/>
+                                        <Border Width="10" Height="5" Background="{Binding Appearance.BlockedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                        <TextBlock Text="Blocked" FontSize="11" Foreground="{Binding Appearance.BlockedDoorColor}" VerticalAlignment="Center"/>
                                     </StackPanel>
                                 </WrapPanel>
                             </WrapPanel>

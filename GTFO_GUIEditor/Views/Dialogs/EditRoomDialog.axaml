@@ -39,7 +39,7 @@
                                 <TabControl SelectedIndex="0" Margin="0,2,0,0">
                                     <!-- TAB 1: Room -->
                                     <TabItem Header="Room" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
                                                 <StackPanel Spacing="12">
                                                     <TextBlock Text="Room Settings"
@@ -78,7 +78,7 @@
 
                                     <!-- TAB 2: Zone -->
                                     <TabItem Header="Zone" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <StackPanel Spacing="12">
                                                 <!-- Seeds & Lighting Section -->
                                                 <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="12">
@@ -658,7 +658,7 @@
 
                                     <!-- TAB 3: Geomorph -->
                                     <TabItem Header="Geomorph" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0">
+                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
                                                 <StackPanel Spacing="12">
                                                     <TextBlock Text="Geomorph Settings"

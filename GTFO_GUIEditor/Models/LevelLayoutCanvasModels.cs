@@ -844,14 +844,20 @@ public class PlacedDoorNode : INotifyPropertyChanged
     {
         get
         {
-            if (IsBlocked) return "#757575"; // Grey
-            if (IsSecondaryDoor) return "#FFA200"; // Secondary Sector
-            if (IsOverloadDoor) return "#00F2FF"; // Overload Sector
-            if (IsMainDoor) return "#CCCCCC"; // Main Door (Light Grey)
-            if (IsSecurityDoor) return "#FF0000"; // Security Door
-            if (IsConnected) return "#9D00FF"; // Expanded / Connected
-            return "#FFFF00"; // Unexpanded
+            var appearance = EditorSettingsManager.Instance.Settings.Appearance;
+            if (IsBlocked) return appearance.BlockedDoorColor;
+            if (IsSecondaryDoor) return appearance.SecondaryDoorColor;
+            if (IsOverloadDoor) return appearance.OverloadDoorColor;
+            if (IsMainDoor) return appearance.MainDoorColor;
+            if (IsSecurityDoor) return appearance.SecurityDoorColor;
+            if (IsConnected) return appearance.ConnectedDoorColor;
+            return appearance.UnexpandedDoorColor;
         }
+    }
+
+    public void NotifyBrushChanged()
+    {
+        OnPropertyChanged(nameof(DoorBrush));
     }
 
     public string DoorStatusLabel => IsBlocked ? "Blocked" : (IsConnected ? "Connected" : "Open");

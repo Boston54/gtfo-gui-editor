@@ -277,7 +277,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     BoxShadow="0 4 20 #80000000">
-                <ScrollViewer>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                     <StackPanel Spacing="16">
                         <!-- Header -->
                         <Grid ColumnDefinitions="*,Auto">
@@ -480,7 +480,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     BoxShadow="0 4 20 #80000000">
-                <ScrollViewer>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                     <StackPanel Spacing="16">
                         <!-- Header -->
                         <Grid ColumnDefinitions="*,Auto">
@@ -684,7 +684,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     BoxShadow="0 4 20 #80000000">
-                <ScrollViewer>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                     <StackPanel Spacing="16">
                         <!-- Header -->
                         <Grid ColumnDefinitions="*,Auto">

@@ -425,6 +425,7 @@
     <Application.Styles>
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
+        <StyleInclude Source="avares://Avalonia.Controls.ColorPicker/Themes/Fluent/Fluent.xaml"/>
         <Style Selector="ToolTip">
             <Setter Property="MaxWidth" Value="1200"/>
             <Setter Property="MaxHeight" Value="800"/>

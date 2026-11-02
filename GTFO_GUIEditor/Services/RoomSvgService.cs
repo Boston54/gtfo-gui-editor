@@ -44,12 +44,19 @@ public static class RoomSvgService
         double maxH = offset * 1.5;
         double t = Math.Clamp((totalHeight - minH) / (maxH - minH), 0.0, 1.0);
 
-        byte r = (byte)Math.Clamp(Math.Round(24.0 + t * (130.0 - 24.0)), 0, 255);
-        byte g = (byte)Math.Clamp(Math.Round(34.0 + t * (165.0 - 34.0)), 0, 255);
-        byte b = (byte)Math.Clamp(Math.Round(48.0 + t * (205.0 - 48.0)), 0, 255);
-        byte a = 210;
+        try
+        {
+            return EditorSettingsManager.Instance.Settings.Appearance.EvaluateHeightmapColor(t);
+        }
+        catch
+        {
+            byte r = (byte)Math.Clamp(Math.Round(24.0 + t * (130.0 - 24.0)), 0, 255);
+            byte g = (byte)Math.Clamp(Math.Round(34.0 + t * (165.0 - 34.0)), 0, 255);
+            byte b = (byte)Math.Clamp(Math.Round(48.0 + t * (205.0 - 48.0)), 0, 255);
+            byte a = 210;
 
-        return Color.FromArgb(a, r, g, b);
+            return Color.FromArgb(a, r, g, b);
+        }
     }
 
     public static Color GetHoverColorForHeight(double totalHeight, double altitudeOffset = 6.0)
