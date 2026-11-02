@@ -135,11 +135,26 @@ public class RundownDataBlockExporter : IDatablockExporter
         {
             if (exp == null) continue;
 
-            var matchingLevel = levelList.FirstOrDefault(l => l.PersistentId == exp.LevelLayoutData) ??
+            var matchingLevel = (exp.LevelLayoutData > 0 ? levelList.FirstOrDefault(l => l.PersistentId == exp.LevelLayoutData) : null) ??
+                                (!string.IsNullOrWhiteSpace(exp.Descriptive?.PublicName) ? levelList.FirstOrDefault(l => string.Equals(l.Name, exp.Descriptive.PublicName, StringComparison.OrdinalIgnoreCase)) : null) ??
                                 levelList.FirstOrDefault();
-            uint expLevelLayoutId = exp.LevelLayoutData > 0
-                ? exp.LevelLayoutData
-                : (matchingLevel?.PersistentId ?? 0);
+
+            uint expLevelLayoutId = 0;
+            if (matchingLevel != null)
+            {
+                if (context.LayoutIds.TryGetValue(matchingLevel, out var allocLayoutId))
+                {
+                    expLevelLayoutId = allocLayoutId;
+                }
+                else
+                {
+                    expLevelLayoutId = matchingLevel.PersistentId;
+                }
+            }
+            else if (exp.LevelLayoutData > 0)
+            {
+                expLevelLayoutId = exp.LevelLayoutData;
+            }
 
             uint complexSetId = 1;
             if (matchingLevel != null && context.LevelCrsIds.TryGetValue(matchingLevel, out var allocCrsId))

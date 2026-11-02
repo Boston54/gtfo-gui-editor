@@ -36,6 +36,30 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             {
                 mainLgTunerFile = context.FindLgTunerConfigFile(exp.Descriptive.PublicName);
             }
+            if (mainLgTunerFile == null && !string.IsNullOrWhiteSpace(exp.Descriptive.Prefix))
+            {
+                mainLgTunerFile = context.FindLgTunerConfigFile(exp.Descriptive.Prefix);
+            }
+            if (mainLgTunerFile == null && context.LevelLayoutBlocks.TryGetValue(mainLayoutId, out var layoutBlock) && layoutBlock != null)
+            {
+                string layoutBlockName = layoutBlock["name"]?.ToString() ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(layoutBlockName))
+                {
+                    mainLgTunerFile = context.FindLgTunerConfigFile(layoutBlockName);
+                }
+            }
+
+            // Fallback: If layout ID was from a stale template or mismatched, check if there is an unused LevelLayoutBlock in context
+            if (mainLgTunerFile == null && !context.LevelLayoutBlocks.ContainsKey(mainLayoutId))
+            {
+                var matchingFallbackKvp = context.LevelLayoutBlocks.FirstOrDefault(kvp => context.FindLgTunerConfigFile(kvp.Key.ToString()) != null);
+                if (matchingFallbackKvp.Value != null)
+                {
+                    mainLayoutId = matchingFallbackKvp.Key;
+                    exp.LevelLayoutData = mainLayoutId;
+                    mainLgTunerFile = context.FindLgTunerConfigFile(mainLayoutId.ToString());
+                }
+            }
 
             if (mainLgTunerFile == null || !File.Exists(mainLgTunerFile))
             {
@@ -155,32 +179,6 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                 }
             }
         }
-
-        // Fallback: Check DimensionBlocks where LevelLayoutData matches exp.LevelLayoutData
-        if (checkedLayoutIds.Count == 0)
-        {
-            foreach (var dimBlock in context.DimensionBlocks.Values)
-            {
-                if (dimBlock == null) continue;
-                var innerData = dimBlock["DimensionData"] as JsonObject;
-                uint targetLayoutId = innerData?["LevelLayoutData"]?.GetValue<uint>() ?? 0;
-
-                if (targetLayoutId == exp.LevelLayoutData && targetLayoutId > 0 && checkedLayoutIds.Add(targetLayoutId))
-                {
-                    string dimName = dimBlock["name"]?.ToString() ?? $"Dimension_{dimBlock["persistentID"]}";
-                    string? dimLgTunerPath = context.FindLgTunerConfigFile(targetLayoutId.ToString());
-                    if (dimLgTunerPath == null && !string.IsNullOrWhiteSpace(dimName))
-                    {
-                        dimLgTunerPath = context.FindLgTunerConfigFile(dimName);
-                    }
-
-                    if (dimLgTunerPath == null || !File.Exists(dimLgTunerPath))
-                    {
-                        missingConfigs.Add($"Dimension '{dimName}' (Layout ID: {targetLayoutId})");
-                    }
-                }
-            }
-        }
     }
 
     private List<ExpeditionBlock> GetExpeditionsToProcess(ImportContext context)
@@ -201,6 +199,8 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             activeRundownObj = context.RundownBlocks.Values.FirstOrDefault();
         }
 
+        var processedLayoutIds = new HashSet<uint>();
+
         if (activeRundownObj != null)
         {
             ExtractTierExpeditions(activeRundownObj["TierA"] as JsonArray, result, context);
@@ -208,11 +208,48 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             ExtractTierExpeditions(activeRundownObj["TierC"] as JsonArray, result, context);
             ExtractTierExpeditions(activeRundownObj["TierD"] as JsonArray, result, context);
             ExtractTierExpeditions(activeRundownObj["TierE"] as JsonArray, result, context);
+
+            foreach (var exp in result)
+            {
+                if (exp.LevelLayoutData > 0) processedLayoutIds.Add(exp.LevelLayoutData);
+                if (exp.SecondaryLayout > 0) processedLayoutIds.Add(exp.SecondaryLayout);
+                if (exp.ThirdLayout > 0) processedLayoutIds.Add(exp.ThirdLayout);
+
+                var dimDatas = GetDimensionDatasFromExpedition(exp, context);
+                foreach (var dim in dimDatas)
+                {
+                    if (dim.LevelLayoutData > 0) processedLayoutIds.Add(dim.LevelLayoutData);
+                }
+            }
         }
-        else
+
+        // Also check if there are LevelLayoutBlocks not covered by the expeditions (or if no active rundown)
+        foreach (var kvp in context.LevelLayoutBlocks)
         {
-            // Fallback: create standalone expedition blocks for all LevelLayoutBlocks
-            foreach (var kvp in context.LevelLayoutBlocks)
+            if (processedLayoutIds.Contains(kvp.Key)) continue;
+
+            // Check if this layout ID is a secondary/third layout or dimension layout of an existing expedition
+            bool isSubSector = result.Any(e => e.SecondaryLayout == kvp.Key || e.ThirdLayout == kvp.Key ||
+                GetDimensionDatasFromExpedition(e, context).Any(d => d.LevelLayoutData == kvp.Key));
+            if (isSubSector) continue;
+
+            // Check if this layout ID is referenced by any DimensionDataBlock
+            bool isDimBlock = context.DimensionBlocks.Values.Any(dObj =>
+            {
+                var inner = dObj?["DimensionData"] as JsonObject;
+                uint dimLayId = inner?["LevelLayoutData"]?.GetValue<uint>() ?? dObj?["LevelLayoutData"]?.GetValue<uint>() ?? 0;
+                return dimLayId == kvp.Key;
+            });
+            if (isDimBlock) continue;
+
+            // Only add if an LGTuner config file actually exists for this layout!
+            string? cfgFile = context.FindLgTunerConfigFile(kvp.Key.ToString());
+            if (cfgFile == null && kvp.Value?["name"] != null)
+            {
+                cfgFile = context.FindLgTunerConfigFile(kvp.Value["name"]!.ToString());
+            }
+
+            if (cfgFile != null)
             {
                 result.Add(new ExpeditionBlock
                 {
@@ -221,9 +258,10 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                     Descriptive = new ExpeditionDescriptiveData
                     {
                         Prefix = "EXP",
-                        PublicName = kvp.Value["name"]?.ToString() ?? $"Level_{kvp.Key}"
+                        PublicName = kvp.Value?["name"]?.ToString() ?? $"Level_{kvp.Key}"
                     }
                 });
+                processedLayoutIds.Add(kvp.Key);
             }
         }
 
@@ -388,10 +426,18 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
 
     private LevelLayoutBlock ImportSingleLevel(ExpeditionBlock exp, string mainLgTunerPath, ImportContext context)
     {
-        string levelName = exp.Descriptive.PublicName;
+        string levelName = string.Empty;
+        if (context.LevelLayoutBlocks.TryGetValue(exp.LevelLayoutData, out var layoutObj) && layoutObj != null)
+        {
+            levelName = layoutObj["name"]?.ToString() ?? string.Empty;
+        }
+        if (string.IsNullOrWhiteSpace(levelName) || levelName.StartsWith("LevelLayout_"))
+        {
+            levelName = exp.Descriptive.PublicName;
+        }
         if (string.IsNullOrWhiteSpace(levelName))
         {
-            levelName = $"Level_{exp.LevelLayoutData}";
+            levelName = !string.IsNullOrWhiteSpace(exp.Descriptive.Prefix) ? exp.Descriptive.Prefix : $"Level_{exp.LevelLayoutData}";
         }
 
         var level = new LevelLayoutBlock
@@ -2285,25 +2331,25 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         settings.ChanceToSpawnCommodityLargePack = obj["ChanceToSpawnCommodityLargePack"]?.GetValue<double>() ?? 0.0;
         settings.ChanceToSpawnCommodityMediumPack = obj["ChanceToSpawnCommodityMediumPack"]?.GetValue<double>() ?? 0.0;
         settings.ChanceToReUseResourceContainer = obj["ChanceToReUseResourceContainer"]?.GetValue<double>() ?? 0.0;
-        settings.MaxPacksPerResourceContainer = obj["MaxPacksPerResourceContainer"]?.GetValue<int>() ?? 0;
-        settings.EmptyWeakResourceContainersPerZone = obj["EmptyWeakResourceContainersPerZone"]?.GetValue<int>() ?? 0;
-        settings.EmptySecureResourceContainersPerZone = obj["EmptySecureResourceContainersPerZone"]?.GetValue<int>() ?? 0;
+        settings.MaxPacksPerResourceContainer = (int)(obj["MaxPacksPerResourceContainer"]?.GetValue<double>() ?? 0);
+        settings.EmptyWeakResourceContainersPerZone = obj["EmptyWeakResourceContainersPerZone"]?.GetValue<double>() ?? 0.0;
+        settings.EmptySecureResourceContainersPerZone = obj["EmptySecureResourceContainersPerZone"]?.GetValue<double>() ?? 0.0;
         settings.LootPerZone = obj["LootPerZone"]?.GetValue<double>() ?? 0.0;
         settings.AirPerZone = obj["AirPerZone"]?.GetValue<double>() ?? 0.0;
         settings.AirPerZoneInNoAir = obj["AirPerZoneInNoAir"]?.GetValue<double>() ?? 0.0;
-        settings.TerminalsPerZone = obj["TerminalsPerZone"]?.GetValue<int>() ?? 0;
+        settings.TerminalsPerZone = obj["TerminalsPerZone"]?.GetValue<double>() ?? 0.0;
 
-        settings.EnemyPatrolGroupsPerZone = obj["EnemyPatrolGroupsPerZone"]?.GetValue<int>() ?? 0;
-        settings.StaticEnemiesMaxPerZone = obj["StaticEnemiesMaxPerZone"]?.GetValue<int>() ?? 0;
-        settings.StaticEnemiesMaxSmallArea = obj["StaticEnemiesMaxSmallArea"]?.GetValue<int>() ?? 0;
-        settings.StaticEnemiesMaxMediumArea = obj["StaticEnemiesMaxMediumArea"]?.GetValue<int>() ?? 0;
-        settings.StaticEnemiesMaxLargeArea = obj["StaticEnemiesMaxLargeArea"]?.GetValue<int>() ?? 0;
-        settings.StaticEnemiesMaxHugeArea = obj["StaticEnemiesMaxHugeArea"]?.GetValue<int>() ?? 0;
-        settings.EnemyPopulationPerZone = obj["EnemyPopulationPerZone"]?.GetValue<int>() ?? 0;
+        settings.EnemyPatrolGroupsPerZone = (int)(obj["EnemyPatrolGroupsPerZone"]?.GetValue<double>() ?? 0);
+        settings.StaticEnemiesMaxPerZone = (int)(obj["StaticEnemiesMaxPerZone"]?.GetValue<double>() ?? 0);
+        settings.StaticEnemiesMaxSmallArea = (int)(obj["StaticEnemiesMaxSmallArea"]?.GetValue<double>() ?? 0);
+        settings.StaticEnemiesMaxMediumArea = (int)(obj["StaticEnemiesMaxMediumArea"]?.GetValue<double>() ?? 0);
+        settings.StaticEnemiesMaxLargeArea = (int)(obj["StaticEnemiesMaxLargeArea"]?.GetValue<double>() ?? 0);
+        settings.StaticEnemiesMaxHugeArea = (int)(obj["StaticEnemiesMaxHugeArea"]?.GetValue<double>() ?? 0);
+        settings.EnemyPopulationPerZone = obj["EnemyPopulationPerZone"]?.GetValue<double>() ?? 0.0;
         settings.VoxelCoverageAreaMultiplier = obj["VoxelCoverageAreaMultiplier"]?.GetValue<double>() ?? 1.0;
         settings.VoxelCoverageAreaScoringRandomMultiplier = obj["VoxelCoverageAreaScoringRandomMultiplier"]?.GetValue<double>() ?? 1.0;
-        settings.ArtifactsPerSegment = obj["ArtifactsPerSegment"]?.GetValue<int>() ?? 0;
-        settings.ArtifactsPerLayer = obj["ArtifactsPerLayer"]?.GetValue<int>() ?? 0;
+        settings.ArtifactsPerSegment = (int)(obj["ArtifactsPerSegment"]?.GetValue<double>() ?? 0);
+        settings.ArtifactsPerLayer = (int)(obj["ArtifactsPerLayer"]?.GetValue<double>() ?? 0);
         settings.WeakDoor4x4Health = obj["WeakDoor4x4Health"]?.GetValue<double>() ?? 0.0;
         settings.WeakDoor8x4Health = obj["WeakDoor8x4Health"]?.GetValue<double>() ?? 0.0;
         settings.WeakDoorChanceLockWeightNoLock = obj["WeakDoorChanceLockWeightNoLock"]?.GetValue<double>() ?? 0.0;
@@ -2322,11 +2368,11 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             {
                 Health = ttObj["Health"]?.GetValue<double>() ?? 10.0,
                 AttackDamage = ttObj["AttackDamage"]?.GetValue<double>() ?? 1.0,
-                MaxPerZone = ttObj["MaxPerZone"]?.GetValue<int>() ?? 3,
-                MaxSmallArea = ttObj["MaxSmallArea"]?.GetValue<int>() ?? 1,
-                MaxMediumArea = ttObj["MaxMediumArea"]?.GetValue<int>() ?? 1,
-                MaxLargeArea = ttObj["MaxLargeArea"]?.GetValue<int>() ?? 1,
-                MaxHugeArea = ttObj["MaxHugeArea"]?.GetValue<int>() ?? 1
+                MaxPerZone = (int)(ttObj["MaxPerZone"]?.GetValue<double>() ?? 3),
+                MaxSmallArea = (int)(ttObj["MaxSmallArea"]?.GetValue<double>() ?? 1),
+                MaxMediumArea = (int)(ttObj["MaxMediumArea"]?.GetValue<double>() ?? 1),
+                MaxLargeArea = (int)(ttObj["MaxLargeArea"]?.GetValue<double>() ?? 1),
+                MaxHugeArea = (int)(ttObj["MaxHugeArea"]?.GetValue<double>() ?? 1)
             };
         }
 
@@ -2336,11 +2382,11 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             {
                 Health = pnObj["Health"]?.GetValue<double>() ?? 20.0,
                 AttackDamage = pnObj["AttackDamage"]?.GetValue<double>() ?? 1.0,
-                MaxPerZone = pnObj["MaxPerZone"]?.GetValue<int>() ?? 2,
-                MaxSmallArea = pnObj["MaxSmallArea"]?.GetValue<int>() ?? 1,
-                MaxMediumArea = pnObj["MaxMediumArea"]?.GetValue<int>() ?? 1,
-                MaxLargeArea = pnObj["MaxLargeArea"]?.GetValue<int>() ?? 1,
-                MaxHugeArea = pnObj["MaxHugeArea"]?.GetValue<int>() ?? 1
+                MaxPerZone = (int)(pnObj["MaxPerZone"]?.GetValue<double>() ?? 2),
+                MaxSmallArea = (int)(pnObj["MaxSmallArea"]?.GetValue<double>() ?? 1),
+                MaxMediumArea = (int)(pnObj["MaxMediumArea"]?.GetValue<double>() ?? 1),
+                MaxLargeArea = (int)(pnObj["MaxLargeArea"]?.GetValue<double>() ?? 1),
+                MaxHugeArea = (int)(pnObj["MaxHugeArea"]?.GetValue<double>() ?? 1)
             };
         }
 

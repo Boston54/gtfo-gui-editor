@@ -21,6 +21,10 @@
   * EnvironmentWetness and DustColor as well, but maybe put these in the Dimension config under Reality to keep consistency between dimensions
 * **Missing fields from Level config (from ExpeditionBalance datablock)**
   * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
+* **Settings button**
+  * There should be a new button at the top next to export for Settings, which should persist between projects, and not part of the project itself.
+  * Users should be able to change the colour of all of their door types
+  * Users should be able to change the colour of the gradient used by the heightmap
 
 *If we are wanting to add support for modded enemies and weapons, then:*
 

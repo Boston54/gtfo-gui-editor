@@ -2193,4 +2193,106 @@ public class DatablockImportTests : IDisposable
         Assert.NotNull(shooterArea);
         Assert.Equal(3, shooterArea.Count);
     }
+
+    [Fact]
+    public void ExportAndImport_NewlyCreatedLevel_SingleTileExpanded_LoadsSuccessfully()
+    {
+        // Simulate user workflow: create a new level, expand single tile, export, then import
+        var originalVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        originalVm.LevelLayout.Levels.Clear();
+
+        originalVm.LevelLayout.OpenCreateLevelDialog();
+        originalVm.LevelLayout.NewLevelName = "Newly Created Level";
+        originalVm.LevelLayout.ConfirmCreateLevel();
+
+        var newLevel = originalVm.LevelLayout.SelectedLevel;
+        Assert.NotNull(newLevel);
+        Assert.True(newLevel.PersistentId > 0);
+
+        var grid = newLevel.GridState;
+        grid.InitializeStartingTile(newLevel.ElevatorTile, 0, 0);
+
+        // Expand a single tile
+        var elevGeo = grid.PlacedGeomorphs.First(g => g.GridX == 0 && g.GridY == 0);
+        var geo1 = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab", 0, -1, initialAreaIndex: 0);
+        grid.PlacedGeomorphs.Add(geo1);
+
+        var elevDoor = elevGeo.Doors.FirstOrDefault(d => !d.IsInternal);
+        var geo1Door = geo1.Doors.FirstOrDefault(d => !d.IsInternal && d.AreaFrom == 0);
+        Assert.NotNull(elevDoor);
+        Assert.NotNull(geo1Door);
+
+        elevDoor.IsConnected = true;
+        geo1Door.IsConnected = true;
+        elevDoor.ConnectedDoor = geo1Door;
+        geo1Door.ConnectedDoor = elevDoor;
+
+        geo1.GenerateRoom(0);
+        geo1.SetRoomZone(0, 0);
+
+        string exportDir = Path.Combine(_tempDir, "ExportNewLevelSingleTileTest");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(originalVm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        // Now import in a fresh ViewModel
+        var importVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        var importResult = DatablockManager.Instance.ImportDatablocks(importVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        Assert.Single(importVm.LevelLayout.Levels);
+        var importedLevel = importVm.LevelLayout.Levels[0];
+        Assert.Equal("Newly Created Level", importedLevel.Name);
+        Assert.Equal(newLevel.PersistentId, importedLevel.PersistentId);
+        Assert.Equal(2, importedLevel.GridState.PlacedGeomorphs.Count);
+    }
+
+    [Fact]
+    public void ExportAndImport_MultipleLevels_WithoutExplicitRundownTierMapping_ImportsAllLevels()
+    {
+        var originalVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        originalVm.LevelLayout.Levels.Clear();
+
+        // Level 1
+        var level1 = new LevelLayoutBlock
+        {
+            PersistentId = 11111,
+            Name = "Level Alpha",
+            ComplexType = ComplexType.Tech,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/ElevatorShaft_01.prefab"
+        };
+        level1.GridState.InitializeStartingTile(level1.ElevatorTile, 0, 0);
+        originalVm.LevelLayout.Levels.Add(level1);
+
+        // Level 2
+        var level2 = new LevelLayoutBlock
+        {
+            PersistentId = 22222,
+            Name = "Level Beta",
+            ComplexType = ComplexType.Mining,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/ElevatorShaft_01.prefab"
+        };
+        level2.GridState.InitializeStartingTile(level2.ElevatorTile, 0, 0);
+        originalVm.LevelLayout.Levels.Add(level2);
+
+        // Rundown only has Level 1 explicitly mapped in TierA
+        originalVm.Rundown.SelectedRundown!.TierA.Clear();
+        originalVm.Rundown.SelectedRundown!.TierA.Add(new ExpeditionBlock
+        {
+            Enabled = true,
+            LevelLayoutData = 11111,
+            Descriptive = new ExpeditionDescriptiveData { Prefix = "A1", PublicName = "Level Alpha" }
+        });
+
+        string exportDir = Path.Combine(_tempDir, "ExportMultiLevelsTest");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(originalVm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        var importVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        var importResult = DatablockManager.Instance.ImportDatablocks(importVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        Assert.Equal(2, importVm.LevelLayout.Levels.Count);
+        Assert.Contains(importVm.LevelLayout.Levels, l => l.PersistentId == 11111 && l.Name == "Level Alpha");
+        Assert.Contains(importVm.LevelLayout.Levels, l => l.PersistentId == 22222 && l.Name == "Level Beta");
+    }
 }

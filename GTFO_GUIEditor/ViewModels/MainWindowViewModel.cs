@@ -92,7 +92,7 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     public MainWindowViewModel()
-        : this(new AvaloniaFileDialogService(), autoReopenLastRundown: true)
+        : this(new AvaloniaFileDialogService(), autoReopenLastRundown: false)
     {
     }
 
@@ -101,7 +101,7 @@ public class MainWindowViewModel : ViewModelBase
     {
     }
 
-    public MainWindowViewModel(IFileDialogService? fileDialogService, bool autoReopenLastRundown = true)
+    public MainWindowViewModel(IFileDialogService? fileDialogService, bool autoReopenLastRundown = false)
     {
         _fileDialogService = fileDialogService ?? new AvaloniaFileDialogService();
 
@@ -113,7 +113,12 @@ public class MainWindowViewModel : ViewModelBase
         Lighting = new LightingViewModel();
         FogSettings = new FogSettingsViewModel();
         LevelLayout = new LevelLayoutViewModel(null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks, Consumables.Blocks);
-        Rundown = new RundownViewModel(Services.RundownService.CreateFreshBlock(1, "New Rundown"), LevelLayout.Levels);
+        var defaultRundown = Services.RundownService.CreateFreshBlock(1, "New Rundown");
+        if (defaultRundown.TierA.Count == 0)
+        {
+            defaultRundown.TierA.Add(EditorDefaultsService.CreateDefaultExpedition("A", 1, LevelLayout.Levels.FirstOrDefault()?.PersistentId ?? 1));
+        }
+        Rundown = new RundownViewModel(defaultRundown, LevelLayout.Levels);
 
         RefreshRecentFiles();
 
@@ -186,6 +191,10 @@ public class MainWindowViewModel : ViewModelBase
         LevelLayout.SelectedLevel = defaultLevel;
 
         var freshRundown = Services.RundownService.CreateFreshBlock(1, "New Rundown");
+        if (freshRundown.TierA.Count == 0)
+        {
+            freshRundown.TierA.Add(EditorDefaultsService.CreateDefaultExpedition("A", 1, defaultLevel.PersistentId));
+        }
         Rundown.SelectedRundown = freshRundown;
 
         StatusMessage = "Created new rundown.";

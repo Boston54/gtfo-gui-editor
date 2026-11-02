@@ -831,7 +831,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                 uint dimLayoutId = dim.LevelLayoutData;
                 if (dim.GridState != null && dim.GridState.PlacedGeomorphs.Count > 0)
                 {
-                    if (dimLayoutId == 0)
+                    if (dimLayoutId == 0 || dimLayoutId == mainLayoutId)
                     {
                         dimLayoutId = context.LevelLayoutAlloc.Allocate();
                         dim.LevelLayoutData = dimLayoutId;

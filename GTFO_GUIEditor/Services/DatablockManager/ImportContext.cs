@@ -102,21 +102,23 @@ public class ImportContext
 
     public List<JsonObject> LoadBlocksArray(string fileName, string vanillaFallbackFileName, out bool isCustom)
     {
-        string directPath = Path.Combine(ImportRootPath, fileName);
         string shortName = fileName.StartsWith("GameData_") && fileName.EndsWith("_bin.json")
             ? fileName.Substring("GameData_".Length, fileName.Length - "GameData_".Length - "_bin.json".Length) + ".json"
             : fileName;
-        string altPath = Path.Combine(ImportRootPath, shortName);
 
-        string? resolvedPath = null;
-        if (File.Exists(directPath))
+        var candidatePaths = new[]
         {
-            resolvedPath = directPath;
-        }
-        else if (File.Exists(altPath))
-        {
-            resolvedPath = altPath;
-        }
+            Path.Combine(ImportRootPath, fileName),
+            Path.Combine(ImportRootPath, shortName),
+            Path.Combine(ImportRootPath, "Datablocks", fileName),
+            Path.Combine(ImportRootPath, "datablocks", fileName),
+            Path.Combine(ImportRootPath, "Datablocks", shortName),
+            Path.Combine(ImportRootPath, "datablocks", shortName),
+            Path.Combine(ImportRootPath, "GameData", fileName),
+            Path.Combine(ImportRootPath, "GameData", shortName)
+        };
+
+        string? resolvedPath = candidatePaths.FirstOrDefault(File.Exists);
 
         if (resolvedPath != null)
         {
@@ -161,11 +163,19 @@ public class ImportContext
 
     public string? FindLgTunerConfigFile(string levelName)
     {
+        if (string.IsNullOrWhiteSpace(levelName)) return null;
+
         var possibleDirNames = new[]
         {
             LgTunerDirectory,
+            Path.Combine(ImportRootPath, "Custom", "LGTunerAdvanced"),
+            Path.Combine(ImportRootPath, "custom", "lgtuneradvanced"),
+            Path.Combine(ImportRootPath, "Custom", "LGTuner"),
+            Path.Combine(ImportRootPath, "custom", "lgtuner"),
             Path.Combine(ImportRootPath, "LGTunerAdvanced"),
+            Path.Combine(ImportRootPath, "lgtuneradvanced"),
             Path.Combine(ImportRootPath, "LGTuner"),
+            Path.Combine(ImportRootPath, "lgtuner"),
             ImportRootPath
         };
 
@@ -203,6 +213,26 @@ public class ImportContext
             {
                 // Ignore directory enumeration failures
             }
+        }
+
+        // Recursive fallback across ImportRootPath
+        try
+        {
+            if (Directory.Exists(ImportRootPath))
+            {
+                var found = Directory.EnumerateFiles(ImportRootPath, "*.json", SearchOption.AllDirectories)
+                    .FirstOrDefault(f =>
+                    {
+                        string nameOnly = Path.GetFileNameWithoutExtension(f);
+                        return nameOnly.Equals($"LevelGen_{levelName}", StringComparison.OrdinalIgnoreCase) ||
+                               nameOnly.Equals(levelName, StringComparison.OrdinalIgnoreCase);
+                    });
+                if (found != null) return found;
+            }
+        }
+        catch
+        {
+            // Ignore directory enumeration failures
         }
 
         return null;
