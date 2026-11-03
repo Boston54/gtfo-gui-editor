@@ -41,6 +41,10 @@ public class PlacedDoorNode : INotifyPropertyChanged
     private bool _hasBloodDoor;
     private ObservableCollection<EnemyGroupItem> _enemyGroupInArea = new();
     private ObservableCollection<EnemyGroupItem> _enemyGroupInFrontOfDoor = new();
+
+    public const string DefaultLockedNoKeyCustomText =
+        "<color=red>://ERROR: Door in emergency lockdown, unable to operate.</color>";
+
     private ObservableCollection<WardenEvent> _eventsOnPortalWarp = new();
     private ObservableCollection<WardenEvent> _eventsOnApproachDoor = new();
     private ObservableCollection<WardenEvent> _eventsOnUnlockDoor = new();
@@ -193,6 +197,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
+
                 OnPropertyChanged(nameof(IsZoneBoundary));
                 OnPropertyChanged(nameof(DoorBrush));
                 OnPropertyChanged(nameof(TooltipText));
@@ -217,6 +222,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
+
                 OnPropertyChanged(nameof(IsZoneBoundary));
                 OnPropertyChanged(nameof(DoorBrush));
                 OnPropertyChanged(nameof(TooltipText));
@@ -241,6 +247,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
                     OnPropertyChanged(nameof(IsOverloadDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
+
                 OnPropertyChanged(nameof(IsZoneBoundary));
                 OnPropertyChanged(nameof(DoorBrush));
                 OnPropertyChanged(nameof(TooltipText));
@@ -265,6 +272,7 @@ public class PlacedDoorNode : INotifyPropertyChanged
                     OnPropertyChanged(nameof(IsSecondaryDoor));
                     OnPropertyChanged(nameof(DoorType));
                 }
+
                 OnPropertyChanged(nameof(IsZoneBoundary));
                 OnPropertyChanged(nameof(DoorBrush));
                 OnPropertyChanged(nameof(TooltipText));
@@ -363,9 +371,11 @@ public class PlacedDoorNode : INotifyPropertyChanged
                 else if (AliasOverride == -1 && value.AliasOverride != -1)
                     AliasOverride = value.AliasOverride;
 
-                if (string.IsNullOrEmpty(value.AliasPrefixShortOverride) && !string.IsNullOrEmpty(AliasPrefixShortOverride))
+                if (string.IsNullOrEmpty(value.AliasPrefixShortOverride) &&
+                    !string.IsNullOrEmpty(AliasPrefixShortOverride))
                     value.AliasPrefixShortOverride = AliasPrefixShortOverride;
-                else if (string.IsNullOrEmpty(AliasPrefixShortOverride) && !string.IsNullOrEmpty(value.AliasPrefixShortOverride))
+                else if (string.IsNullOrEmpty(AliasPrefixShortOverride) &&
+                         !string.IsNullOrEmpty(value.AliasPrefixShortOverride))
                     AliasPrefixShortOverride = value.AliasPrefixShortOverride;
 
                 if (value.TurnOffAlarmOnTerminal || TurnOffAlarmOnTerminal)
@@ -396,14 +406,18 @@ public class PlacedDoorNode : INotifyPropertyChanged
                     HasBloodDoor = true;
                 }
 
-                if (value.ProgressionPuzzleToEnter == ProgressionPuzzleType.None && ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
+                if (value.ProgressionPuzzleToEnter == ProgressionPuzzleType.None &&
+                    ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
                     value.ProgressionPuzzleToEnter = ProgressionPuzzleToEnter;
-                else if (ProgressionPuzzleToEnter == ProgressionPuzzleType.None && value.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
+                else if (ProgressionPuzzleToEnter == ProgressionPuzzleType.None &&
+                         value.ProgressionPuzzleToEnter != ProgressionPuzzleType.None)
                     ProgressionPuzzleToEnter = value.ProgressionPuzzleToEnter;
 
-                if (string.IsNullOrEmpty(value.ProgressionPuzzleCustomText) && !string.IsNullOrEmpty(ProgressionPuzzleCustomText))
+                if (string.IsNullOrEmpty(value.ProgressionPuzzleCustomText) &&
+                    !string.IsNullOrEmpty(ProgressionPuzzleCustomText))
                     value.ProgressionPuzzleCustomText = ProgressionPuzzleCustomText;
-                else if (string.IsNullOrEmpty(ProgressionPuzzleCustomText) && !string.IsNullOrEmpty(value.ProgressionPuzzleCustomText))
+                else if (string.IsNullOrEmpty(ProgressionPuzzleCustomText) &&
+                         !string.IsNullOrEmpty(value.ProgressionPuzzleCustomText))
                     ProgressionPuzzleCustomText = value.ProgressionPuzzleCustomText;
 
                 if (value.ProgressionPuzzlePlacementCount <= 1 && ProgressionPuzzlePlacementCount > 1)
@@ -478,7 +492,8 @@ public class PlacedDoorNode : INotifyPropertyChanged
             b.EventsOnTerminalDeactivateAlarm = a.EventsOnTerminalDeactivateAlarm;
         else if (b.EventsOnTerminalDeactivateAlarm.Count > 0 && a.EventsOnTerminalDeactivateAlarm.Count == 0)
             a.EventsOnTerminalDeactivateAlarm = b.EventsOnTerminalDeactivateAlarm;
-        else if (a.EventsOnTerminalDeactivateAlarm != b.EventsOnTerminalDeactivateAlarm && a.EventsOnTerminalDeactivateAlarm.Count > 0)
+        else if (a.EventsOnTerminalDeactivateAlarm != b.EventsOnTerminalDeactivateAlarm &&
+                 a.EventsOnTerminalDeactivateAlarm.Count > 0)
             b.EventsOnTerminalDeactivateAlarm = a.EventsOnTerminalDeactivateAlarm;
 
         if (a.EnemyGroupInArea.Count > 0 && b.EnemyGroupInArea.Count == 0)
@@ -781,7 +796,8 @@ public class PlacedDoorNode : INotifyPropertyChanged
         {
             if (SetField(ref _eventsOnTerminalDeactivateAlarm, value ?? new()))
             {
-                if (ConnectedDoor != null && ConnectedDoor.EventsOnTerminalDeactivateAlarm != _eventsOnTerminalDeactivateAlarm)
+                if (ConnectedDoor != null &&
+                    ConnectedDoor.EventsOnTerminalDeactivateAlarm != _eventsOnTerminalDeactivateAlarm)
                 {
                     ConnectedDoor.EventsOnTerminalDeactivateAlarm = _eventsOnTerminalDeactivateAlarm;
                 }
@@ -796,10 +812,17 @@ public class PlacedDoorNode : INotifyPropertyChanged
         {
             if (SetField(ref _progressionPuzzleToEnter, value))
             {
+                if (value == ProgressionPuzzleType.Locked_No_Key &&
+                    string.IsNullOrWhiteSpace(_progressionPuzzleCustomText))
+                {
+                    ProgressionPuzzleCustomText = DefaultLockedNoKeyCustomText;
+                }
+
                 if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzleToEnter != value)
                 {
                     ConnectedDoor.ProgressionPuzzleToEnter = value;
                 }
+
                 OnPropertyChanged(nameof(IsKeycardPuzzle));
                 OnPropertyChanged(nameof(IsGeneratorPuzzle));
                 OnPropertyChanged(nameof(IsKeycardOrGeneratorPuzzle));
@@ -853,7 +876,8 @@ public class PlacedDoorNode : INotifyPropertyChanged
         {
             if (SetField(ref _progressionPuzzleCandidateZones, value ?? new()))
             {
-                if (ConnectedDoor != null && ConnectedDoor.ProgressionPuzzleCandidateZones != _progressionPuzzleCandidateZones)
+                if (ConnectedDoor != null &&
+                    ConnectedDoor.ProgressionPuzzleCandidateZones != _progressionPuzzleCandidateZones)
                 {
                     ConnectedDoor.ProgressionPuzzleCandidateZones = _progressionPuzzleCandidateZones;
                 }
@@ -886,8 +910,8 @@ public class PlacedDoorNode : INotifyPropertyChanged
     public string DoorStatusLabel => IsBlocked ? "Blocked" : (IsConnected ? "Connected" : "Open");
 
     public bool IsVertical => string.Equals(Direction, "Left", StringComparison.OrdinalIgnoreCase)
-                           || string.Equals(Direction, "Right", StringComparison.OrdinalIgnoreCase)
-                           || Math.Abs(LocalX) > 28;
+                              || string.Equals(Direction, "Right", StringComparison.OrdinalIgnoreCase)
+                              || Math.Abs(LocalX) > 28;
 
     public double DoorWidth => 4.0;
 
@@ -923,12 +947,17 @@ public class PlacedDoorNode : INotifyPropertyChanged
 
                 if (IsConnected)
                 {
-                    return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [{descFrom} <-> {descTo}] (Connected)";
+                    return
+                        $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [{descFrom} <-> {descTo}] (Connected)";
                 }
+
                 int ungeneratedArea = (Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom)) ? AreaTo : AreaFrom;
                 var sourceRoom = (Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom)) ? roomFrom : roomTo;
-                string sourceDesc = sourceRoom != null ? sourceRoom.UserFacingDisplayName : $"Area {(Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom) ? AreaFrom : AreaTo)}";
-                return $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [From {sourceDesc}] (Click to expand Area {ungeneratedArea})";
+                string sourceDesc = sourceRoom != null
+                    ? sourceRoom.UserFacingDisplayName
+                    : $"Area {(Geomorph != null && Geomorph.IsRoomGenerated(AreaFrom) ? AreaFrom : AreaTo)}";
+                return
+                    $"Room Door ({Direction}, {RotationAngle:0.#}°){secLabel} [From {sourceDesc}] (Click to expand Area {ungeneratedArea})";
             }
 
             string status = IsConnected ? "(Connected)" : "(Click to expand geomorph)";
@@ -1053,6 +1082,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
         {
             _rooms.Remove(room);
         }
+
         return _generatedRooms.Remove(areaIndex);
     }
 
@@ -1309,6 +1339,7 @@ public class GeomorphOption : INotifyPropertyChanged
                     OnPropertyChanged(nameof(HasImageBitmap));
                 }
             }
+
             return _imageBitmap;
         }
         set
@@ -1594,12 +1625,14 @@ public class PlacedRoomNode : INotifyPropertyChanged
             OnPropertyChanged(nameof(IsHovered));
             changed = true;
         }
+
         if (_isZoneHighlighted != isZoneHighlighted)
         {
             _isZoneHighlighted = isZoneHighlighted;
             OnPropertyChanged(nameof(IsZoneHighlighted));
             changed = true;
         }
+
         if (changed)
         {
             UpdateFillBrush();

@@ -4,10 +4,6 @@
   * Waiting on a custom mod
 * **Spawning enemies in a specific room (Room Settings Config)**
   * Waiting on a custom mod
-* **Checkpoints (Security Door Config)**
-* **Snatcher boxes**
-  * Three options for this: Manual addition in the Level Config dialog, automatic addition if snatchers are anywhere in the level, or just add to all levels.
-* `LockedNoKey` doors should default the custom text to the vanilla "lockdown" text (TextID 972)
 * **Tampered Data Cube events**
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override

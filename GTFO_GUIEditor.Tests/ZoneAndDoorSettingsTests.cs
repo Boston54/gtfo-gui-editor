@@ -1310,4 +1310,56 @@ public class ZoneAndDoorSettingsTests
             }
         }
     }
+
+    [Fact]
+    public void PlacedDoorNode_ProgressionPuzzleToEnter_LockedNoKey_DefaultsCustomText()
+    {
+        var door = new PlacedDoorNode { Id = "door-lock-test" };
+        Assert.Equal(ProgressionPuzzleType.None, door.ProgressionPuzzleToEnter);
+        Assert.False(door.IsLockedNoKey);
+        Assert.Equal(string.Empty, door.ProgressionPuzzleCustomText);
+
+        // When switching to Locked_No_Key, default text is automatically populated
+        door.ProgressionPuzzleToEnter = ProgressionPuzzleType.Locked_No_Key;
+        Assert.True(door.IsLockedNoKey);
+        Assert.Equal(PlacedDoorNode.DefaultLockedNoKeyCustomText, door.ProgressionPuzzleCustomText);
+        Assert.Equal("<color=red>://ERROR: Door in emergency lockdown, unable to operate.</color>", door.ProgressionPuzzleCustomText);
+
+        // User customization should be retained
+        door.ProgressionPuzzleCustomText = "Custom Lockdown Message";
+        Assert.Equal("Custom Lockdown Message", door.ProgressionPuzzleCustomText);
+
+        // Switching back and forth without clearing text maintains user customization
+        door.ProgressionPuzzleToEnter = ProgressionPuzzleType.None;
+        Assert.False(door.IsLockedNoKey);
+        Assert.Equal("Custom Lockdown Message", door.ProgressionPuzzleCustomText);
+
+        door.ProgressionPuzzleToEnter = ProgressionPuzzleType.Locked_No_Key;
+        Assert.True(door.IsLockedNoKey);
+        Assert.Equal("Custom Lockdown Message", door.ProgressionPuzzleCustomText);
+
+        // Clearing text and switching to Locked_No_Key should re-apply default text
+        door.ProgressionPuzzleToEnter = ProgressionPuzzleType.None;
+        door.ProgressionPuzzleCustomText = "";
+        door.ProgressionPuzzleToEnter = ProgressionPuzzleType.Locked_No_Key;
+        Assert.Equal(PlacedDoorNode.DefaultLockedNoKeyCustomText, door.ProgressionPuzzleCustomText);
+    }
+
+    [Fact]
+    public void PlacedDoorNode_LockedNoKey_SyncsWithConnectedDoor()
+    {
+        var doorA = new PlacedDoorNode { Id = "door-A" };
+        var doorB = new PlacedDoorNode { Id = "door-B" };
+        doorA.ConnectedDoor = doorB;
+        doorB.ConnectedDoor = doorA;
+
+        doorA.ProgressionPuzzleToEnter = ProgressionPuzzleType.Locked_No_Key;
+
+        Assert.True(doorB.IsLockedNoKey);
+        Assert.Equal(ProgressionPuzzleType.Locked_No_Key, doorB.ProgressionPuzzleToEnter);
+        Assert.Equal(PlacedDoorNode.DefaultLockedNoKeyCustomText, doorB.ProgressionPuzzleCustomText);
+
+        doorA.ProgressionPuzzleCustomText = "Override Message";
+        Assert.Equal("Override Message", doorB.ProgressionPuzzleCustomText);
+    }
 }
