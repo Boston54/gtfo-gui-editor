@@ -36,6 +36,116 @@ public class DatablockImportTests : IDisposable
     }
 
     [Fact]
+    public void Import_ConsumableDistributionFile_LoadsOnlyCustomBlocks()
+    {
+        var vm = new MainWindowViewModel();
+        vm.Consumables.Blocks.Clear();
+        vm.Consumables.Blocks.Add(new ConsumableDistributionBlock
+        {
+            PersistentId = 303,
+            Name = "Custom Consumables",
+            SpawnsPerZone = 8
+        });
+
+        string exportDir = Path.Combine(_tempDir, "ExportedDatablocks");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(vm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        var importedVm = new MainWindowViewModel();
+        var importResult = DatablockManager.Instance.ImportDatablocks(importedVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        Assert.Single(importedVm.Consumables.Blocks);
+        Assert.Equal((uint)303, importedVm.Consumables.Blocks[0].PersistentId);
+        Assert.Equal("Custom Consumables", importedVm.Consumables.Blocks[0].Name);
+    }
+
+    [Fact]
+    public void Import_LevelLayoutAndMatchingLGTuner_LoadWithoutRundown()
+    {
+        var levelDatablock = new JsonObject
+        {
+            ["Headers"] = new JsonArray(),
+            ["Blocks"] = new JsonArray
+            {
+                new JsonObject
+                {
+                    ["persistentID"] = 1,
+                    ["name"] = "Standalone_Level_1",
+                    ["Zones"] = new JsonArray()
+                }
+            }
+        };
+
+        string lgTunerDir = Path.Combine(_tempDir, "Custom", "LGTunerAdvanced");
+        Directory.CreateDirectory(lgTunerDir);
+        File.WriteAllText(
+            Path.Combine(_tempDir, "GameData_LevelLayoutDataBlock_bin.json"),
+            levelDatablock.ToJsonString());
+        File.WriteAllText(
+            Path.Combine(lgTunerDir, "LevelGen_1.json"),
+            new JsonObject
+            {
+                ["GeoOverrides"] = new JsonArray(),
+                ["ZoneOverrides"] = new JsonArray()
+            }.ToJsonString());
+
+        var vm = new MainWindowViewModel();
+        var result = DatablockManager.Instance.ImportDatablocks(vm, _tempDir);
+
+        Assert.True(result.Success, result.Message);
+        Assert.Single(vm.LevelLayout.Levels);
+        Assert.Equal((uint)1, vm.LevelLayout.Levels[0].PersistentId);
+    }
+
+    [Fact]
+    public void Import_AlarmLightingAndFog_LoadsOnlyCustomBlocks()
+    {
+        var vm = new MainWindowViewModel();
+
+        vm.Alarms.Alarms.Clear();
+        vm.Alarms.Alarms.Add(new AlarmBlock
+        {
+            PersistentId = 90404,
+            Name = "Test Custom Alarm",
+            PublicAlarmName = "Custom Alarm",
+            SpawnsEnemies = false
+        });
+
+        vm.Lighting.Blocks.Clear();
+        vm.Lighting.Blocks.Add(new LightSettingsBlock
+        {
+            PersistentId = 505,
+            Name = "Test Custom Lighting"
+        });
+
+        vm.FogSettings.Blocks.Clear();
+        vm.FogSettings.Blocks.Add(new FogSettingsBlock
+        {
+            PersistentId = 606,
+            Name = "Test Custom Fog",
+            FogDensity = 0.25
+        });
+
+        string exportDir = Path.Combine(_tempDir, "CustomBlocks");
+        var exportResult = DatablockManager.Instance.ExportDatablocks(vm, exportDir);
+        Assert.True(exportResult.Success, exportResult.Message);
+
+        var importedVm = new MainWindowViewModel();
+        var importResult = DatablockManager.Instance.ImportDatablocks(importedVm, exportDir);
+        Assert.True(importResult.Success, importResult.Message);
+
+        Assert.Single(importedVm.Alarms.Alarms);
+        Assert.Equal((uint)90404, importedVm.Alarms.Alarms[0].PersistentId);
+
+        Assert.Single(importedVm.Lighting.Blocks);
+        Assert.Equal((uint)505, importedVm.Lighting.Blocks[0].PersistentId);
+
+        Assert.Single(importedVm.FogSettings.Blocks);
+        Assert.Equal((uint)606, importedVm.FogSettings.Blocks[0].PersistentId);
+    }
+
+    [Fact]
     public void ExportAndImport_Roundtrip_PreservesRundownState()
     {
         // 1. Arrange a populated MainWindowViewModel

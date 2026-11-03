@@ -33,7 +33,7 @@ public class PersistentIdAllocator
 
     public uint Allocate(uint? requestedId = null)
     {
-        if (requestedId.HasValue && requestedId.Value > 0 && !_usedIds.Contains(requestedId.Value))
+        if (requestedId.HasValue && requestedId.Value > 0)
         {
             _usedIds.Add(requestedId.Value);
             return requestedId.Value;

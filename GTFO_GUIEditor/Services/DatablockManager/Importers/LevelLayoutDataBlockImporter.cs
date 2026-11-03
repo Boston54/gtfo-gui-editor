@@ -15,6 +15,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
     public void Import(ImportContext context)
     {
         var importedLevels = new List<LevelLayoutBlock>();
+        var importedLayoutIds = new HashSet<uint>();
 
         // Find all expeditions from loaded rundown datablocks
         var expeditionsToProcess = GetExpeditionsToProcess(context);
@@ -112,6 +113,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                 if (level != null)
                 {
                     importedLevels.Add(level);
+                    importedLayoutIds.Add(level.PersistentId);
                     context.LevelsImportedCount++;
                 }
             }
@@ -119,6 +121,47 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             {
                 string errorMsg = $"Failed to import level '{levelName}': {ex.Message}";
                 context.Warnings.Add(errorMsg);
+            }
+        }
+
+        // LevelLayout datablocks may be imported without a rundown/GameSetup reference.
+        // In that case, import each layout that has a matching LevelGen_<layout ID>.json file.
+        foreach (var layout in context.LevelLayoutBlocks)
+        {
+            if (importedLayoutIds.Contains(layout.Key)) continue;
+
+            string? lgTunerFile = context.FindLgTunerConfigFile(layout.Key.ToString());
+            if (lgTunerFile == null && layout.Value?["name"] != null)
+            {
+                lgTunerFile = context.FindLgTunerConfigFile(layout.Value["name"]!.ToString());
+            }
+            if (lgTunerFile == null || !File.Exists(lgTunerFile)) continue;
+
+            string levelName = layout.Value?["name"]?.ToString() ?? $"Level_{layout.Key}";
+            var fallbackExpedition = new ExpeditionBlock
+            {
+                Enabled = true,
+                LevelLayoutData = layout.Key,
+                Descriptive = new ExpeditionDescriptiveData
+                {
+                    Prefix = "EXP",
+                    PublicName = levelName
+                }
+            };
+
+            try
+            {
+                var level = ImportSingleLevel(fallbackExpedition, lgTunerFile, context);
+                if (level != null)
+                {
+                    importedLevels.Add(level);
+                    importedLayoutIds.Add(level.PersistentId);
+                    context.LevelsImportedCount++;
+                }
+            }
+            catch (Exception ex)
+            {
+                context.Warnings.Add($"Failed to import level '{levelName}': {ex.Message}");
             }
         }
 
@@ -1704,7 +1747,23 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                         foreach (var zpNode in zpArr)
                         {
                             if (zpNode is not JsonObject zpObj) continue;
-                            int targetZone = zpObj["LocalIndex"]?.GetValue<int>() ?? 0;
+                            int targetZone = 0;
+                            var localIndexNode = zpObj["LocalIndex"];
+                            if (localIndexNode != null)
+                            {
+                                try
+                                {
+                                    targetZone = localIndexNode.GetValue<int>();
+                                }
+                                catch
+                                {
+                                    string localIndex = localIndexNode.ToString();
+                                    if (localIndex.StartsWith("Zone_", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        int.TryParse(localIndex.Substring("Zone_".Length), out targetZone);
+                                    }
+                                }
+                            }
                             var cand = new CandidateZonePlacement
                             {
                                 Zone = targetZone,

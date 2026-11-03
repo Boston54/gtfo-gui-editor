@@ -78,16 +78,19 @@ public class ImportContext
     private void LoadBlocks(string fileName, string vanillaFileName, Dictionary<uint, JsonObject> targetDict)
     {
         var blocks = LoadBlocksArray(fileName, vanillaFileName, out bool isCustom);
+        if (isCustom) DatablocksImportedCount++;
+
+        Dictionary<uint, JsonObject>? vanillaBlocks = null;
         if (isCustom)
         {
-            DatablocksImportedCount++;
-            var vanillaBlocks = ExportContext.LoadVanillaBlocksArray(vanillaFileName);
-            foreach (var block in vanillaBlocks)
+            vanillaBlocks = new Dictionary<uint, JsonObject>();
+            foreach (var vanillaBlock in ExportContext.LoadVanillaBlocksArray(vanillaFileName))
             {
-                if (block.TryGetPropertyValue("persistentID", out var pidNode) && pidNode != null &&
-                    uint.TryParse(pidNode.ToString(), out uint pid) && !targetDict.ContainsKey(pid))
+                if (vanillaBlock.TryGetPropertyValue("persistentID", out var vanillaIdNode) &&
+                    vanillaIdNode != null &&
+                    uint.TryParse(vanillaIdNode.ToString(), out uint vanillaId))
                 {
-                    targetDict[pid] = block;
+                    vanillaBlocks[vanillaId] = vanillaBlock;
                 }
             }
         }
@@ -97,6 +100,16 @@ public class ImportContext
             if (block.TryGetPropertyValue("persistentID", out var pidNode) && pidNode != null &&
                 uint.TryParse(pidNode.ToString(), out uint pid))
             {
+                if (isCustom &&
+                    vanillaBlocks != null &&
+                    vanillaBlocks.TryGetValue(pid, out var vanillaBlock) &&
+                    string.Equals(
+                        block["name"]?.ToString(),
+                        vanillaBlock["name"]?.ToString(),
+                        StringComparison.Ordinal))
+                {
+                    continue;
+                }
                 targetDict[pid] = block;
             }
         }
@@ -141,7 +154,7 @@ public class ImportContext
         }
 
         isCustom = false;
-        return ExportContext.LoadVanillaBlocksArray(vanillaFallbackFileName);
+        return new List<JsonObject>();
     }
 
     public string ResolveText(uint textId)
