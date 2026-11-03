@@ -24,6 +24,7 @@ public class MainWindowViewModel : ViewModelBase
     private string _importNotificationMessage = string.Empty;
     private ObservableCollection<LevelImportFailure> _importFailedLevels = new();
     private bool _isShowingSettings;
+    private int _selectedSettingsTabIndex;
     private bool _isLoadingSetProjectSelection;
 
     public DocumentationViewModel Documentation { get; }
@@ -70,6 +71,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _isShowingSettings;
         set => SetField(ref _isShowingSettings, value);
+    }
+
+    public int SelectedSettingsTabIndex
+    {
+        get => _selectedSettingsTabIndex;
+        set => SetField(ref _selectedSettingsTabIndex, value);
     }
 
     public EditorSettings Settings => EditorSettingsManager.Instance.Settings;
@@ -728,12 +735,19 @@ public class MainWindowViewModel : ViewModelBase
     public void ChooseStartupProjectFolder() => _ = ChooseStartupProjectFolderAsync();
     public void ResetGeneralSettingsToDefaults() => Settings.General.ResetToDefaults();
 
-    public void OpenAppearanceSettings()
+    public void OpenGeneralSettings()
     {
+        SelectedSettingsTabIndex = 0;
         IsShowingSettings = true;
     }
 
-    public void OpenSettings() => OpenAppearanceSettings();
+    public void OpenAppearanceSettings()
+    {
+        SelectedSettingsTabIndex = 1;
+        IsShowingSettings = true;
+    }
+
+    public void OpenSettings() => OpenGeneralSettings();
     public void QuitApplication()
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
@@ -784,6 +798,18 @@ public class MainWindowViewModel : ViewModelBase
 
         EditorSettingsManager.Instance.SaveSettings();
         IsShowingSettings = false;
+    }
+
+    public void ResetSettingsToDefaults()
+    {
+        if (SelectedSettingsTabIndex == 0)
+        {
+            ResetGeneralSettingsToDefaults();
+        }
+        else
+        {
+            ResetAppearanceSettingsToDefaults();
+        }
     }
 
     public void ResetAppearanceSettingsToDefaults()

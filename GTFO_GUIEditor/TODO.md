@@ -20,6 +20,7 @@
   * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
 * **Blood Doors**
   * Waiting on a custom mod
+* **Redesign of Config tabs** - change how the different config options are swapped between
 
 *If we are wanting to add support for modded enemies and weapons, then:*
 

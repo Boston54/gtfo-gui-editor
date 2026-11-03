@@ -1,3 +1,5 @@
+using System;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 
 namespace GTFO_GUIEditor.Models;
@@ -376,4 +378,89 @@ public enum DimensionCloudsType
     None = 0,
     Anvils = 1,
     Stratocumulus = 2
+}
+
+[JsonConverter(typeof(AlarmSoundStartJsonConverter))]
+public enum AlarmSoundStart : uint
+{
+    Standard = 3339129407,
+    Error = 2200133294
+}
+
+[JsonConverter(typeof(AlarmSoundStopJsonConverter))]
+public enum AlarmSoundStop : uint
+{
+    Standard = 42633153,
+    Error = 1190355274,
+    Error_Start = 2200133294
+}
+
+public class AlarmSoundStartJsonConverter : JsonConverter<AlarmSoundStart>
+{
+    public override AlarmSoundStart Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            if (reader.TryGetUInt32(out uint num) && Enum.IsDefined(typeof(AlarmSoundStart), num))
+            {
+                return (AlarmSoundStart)num;
+            }
+        }
+        else if (reader.TokenType == JsonTokenType.String)
+        {
+            string? str = reader.GetString();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                if (Enum.TryParse<AlarmSoundStart>(str, true, out var result))
+                {
+                    return result;
+                }
+                if (uint.TryParse(str, out uint parsedNum) && Enum.IsDefined(typeof(AlarmSoundStart), parsedNum))
+                {
+                    return (AlarmSoundStart)parsedNum;
+                }
+            }
+        }
+        return AlarmSoundStart.Standard;
+    }
+
+    public override void Write(Utf8JsonWriter writer, AlarmSoundStart value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
+}
+
+public class AlarmSoundStopJsonConverter : JsonConverter<AlarmSoundStop>
+{
+    public override AlarmSoundStop Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        if (reader.TokenType == JsonTokenType.Number)
+        {
+            if (reader.TryGetUInt32(out uint num) && Enum.IsDefined(typeof(AlarmSoundStop), num))
+            {
+                return (AlarmSoundStop)num;
+            }
+        }
+        else if (reader.TokenType == JsonTokenType.String)
+        {
+            string? str = reader.GetString();
+            if (!string.IsNullOrWhiteSpace(str))
+            {
+                if (Enum.TryParse<AlarmSoundStop>(str, true, out var result))
+                {
+                    return result;
+                }
+                if (uint.TryParse(str, out uint parsedNum) && Enum.IsDefined(typeof(AlarmSoundStop), parsedNum))
+                {
+                    return (AlarmSoundStop)parsedNum;
+                }
+            }
+        }
+        return AlarmSoundStop.Standard;
+    }
+
+    public override void Write(Utf8JsonWriter writer, AlarmSoundStop value, JsonSerializerOptions options)
+    {
+        writer.WriteStringValue(value.ToString());
+    }
 }

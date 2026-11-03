@@ -144,7 +144,8 @@ public static class EditorDefaultsService
             InternalEnabled = defaults.InternalEnabled,
             ComplexType = complex,
             ElevatorTile = elev,
-            FogSettings = defaults.FogSettings
+            FogSettings = defaults.FogSettings,
+            SnatcherBoxes = defaults.SnatcherBoxes
         };
     }
 

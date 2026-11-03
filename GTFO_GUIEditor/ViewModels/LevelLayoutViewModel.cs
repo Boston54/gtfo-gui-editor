@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Avalonia.Media;
 using GTFO_GUIEditor.Models;
@@ -95,10 +97,12 @@ public class LevelLayoutViewModel : ViewModelBase
     public static ProgressionPuzzleType[] AvailableProgressionPuzzleTypes { get; } = (ProgressionPuzzleType[])Enum.GetValues(typeof(ProgressionPuzzleType));
 
     public ICommand RemoveWardenEventCommand { get; }
+    public ICommand CopyWardenEventCommand { get; }
     public ICommand RemoveEnemyExcludeItemCommand { get; }
     public ICommand RemoveBigPickupDistributionItemCommand { get; }
     public ICommand RemoveDisinfectionStationPlacementCommand { get; }
     public ICommand RemoveTerminalPlacementCommand { get; }
+    public ICommand CopyTerminalPlacementCommand { get; }
     public ICommand RemoveTerminalLocalLogFileCommand { get; }
     public ICommand RemoveTerminalZoneSelectionDataCommand { get; }
     public ICommand RemoveTerminalUniqueCommandCommand { get; }
@@ -381,10 +385,12 @@ public class LevelLayoutViewModel : ViewModelBase
         UpdateActiveDimensionView();
 
         RemoveWardenEventCommand = new RelayCommand<WardenEvent>(RemoveWardenEvent);
+        CopyWardenEventCommand = new RelayCommand<WardenEvent>(ev => _ = CopyWardenEventAsync(ev));
         RemoveEnemyExcludeItemCommand = new RelayCommand<EnemyExcludeItem>(RemoveEnemyExcludeItem);
         RemoveBigPickupDistributionItemCommand = new RelayCommand<BigPickupDistributionItem>(RemoveBigPickupDistributionItem);
         RemoveDisinfectionStationPlacementCommand = new RelayCommand<DisinfectionStationPlacement>(RemoveDisinfectionStationPlacement);
         RemoveTerminalPlacementCommand = new RelayCommand<TerminalPlacement>(RemoveTerminalPlacement);
+        CopyTerminalPlacementCommand = new RelayCommand<TerminalPlacement>(term => _ = CopyTerminalPlacementAsync(term));
         RemoveTerminalLocalLogFileCommand = new RelayCommand<TerminalLocalLogFile>(RemoveTerminalLocalLogFile);
         RemoveTerminalZoneSelectionDataCommand = new RelayCommand<TerminalZoneSelectionData>(RemoveTerminalZoneSelectionData);
         RemoveTerminalUniqueCommandCommand = new RelayCommand<TerminalUniqueCommand>(RemoveTerminalUniqueCommand);
@@ -1710,6 +1716,168 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
+    private IClipboardService _clipboardService = new AvaloniaClipboardService();
+    public IClipboardService ClipboardService
+    {
+        get => _clipboardService;
+        set => _clipboardService = value ?? new AvaloniaClipboardService();
+    }
+
+    private static readonly JsonSerializerOptions ClipboardJsonOptions = new()
+    {
+        WriteIndented = true,
+        PropertyNameCaseInsensitive = true
+    };
+
+    public async Task CopyWardenEventAsync(WardenEvent? ev)
+    {
+        if (ev == null) return;
+        string json = JsonSerializer.Serialize(ev, ClipboardJsonOptions);
+        await _clipboardService.SetTextAsync(json);
+    }
+
+    public async Task CopyTerminalPlacementAsync(TerminalPlacement? term)
+    {
+        if (term == null) return;
+        string json = JsonSerializer.Serialize(term, ClipboardJsonOptions);
+        await _clipboardService.SetTextAsync(json);
+    }
+
+    public async Task<List<WardenEvent>> GetWardenEventsFromClipboardAsync()
+    {
+        string? text = await _clipboardService.GetTextAsync();
+        if (string.IsNullOrWhiteSpace(text)) return new List<WardenEvent>();
+
+        text = text.Trim();
+        try
+        {
+            if (text.StartsWith("["))
+            {
+                var list = JsonSerializer.Deserialize<List<WardenEvent>>(text, ClipboardJsonOptions);
+                return list ?? new List<WardenEvent>();
+            }
+            else
+            {
+                var single = JsonSerializer.Deserialize<WardenEvent>(text, ClipboardJsonOptions);
+                return single != null ? new List<WardenEvent> { single } : new List<WardenEvent>();
+            }
+        }
+        catch
+        {
+            return new List<WardenEvent>();
+        }
+    }
+
+    public async Task<List<TerminalPlacement>> GetTerminalPlacementsFromClipboardAsync()
+    {
+        string? text = await _clipboardService.GetTextAsync();
+        if (string.IsNullOrWhiteSpace(text)) return new List<TerminalPlacement>();
+
+        text = text.Trim();
+        try
+        {
+            if (text.StartsWith("["))
+            {
+                var list = JsonSerializer.Deserialize<List<TerminalPlacement>>(text, ClipboardJsonOptions);
+                return list ?? new List<TerminalPlacement>();
+            }
+            else
+            {
+                var single = JsonSerializer.Deserialize<TerminalPlacement>(text, ClipboardJsonOptions);
+                return single != null ? new List<TerminalPlacement> { single } : new List<TerminalPlacement>();
+            }
+        }
+        catch
+        {
+            return new List<TerminalPlacement>();
+        }
+    }
+
+    public async Task AddWardenEventsToCollectionFromClipboardAsync(ObservableCollection<WardenEvent>? target)
+    {
+        if (target == null) return;
+        var events = await GetWardenEventsFromClipboardAsync();
+        foreach (var ev in events)
+        {
+            target.Add(ev);
+        }
+    }
+
+    public async Task AddEventOnPortalWarpFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnPortalWarp);
+
+    public async Task AddEventOnApproachDoorFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnApproachDoor);
+
+    public async Task AddEventOnUnlockDoorFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnUnlockDoor);
+
+    public async Task AddEventOnOpenDoorFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnOpenDoor);
+
+    public async Task AddEventOnDoorScanStartFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnDoorScanStart);
+
+    public async Task AddEventOnDoorScanDoneFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnDoorScanDone);
+
+    public async Task AddEventOnBossDeathFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnBossDeath);
+
+    public async Task AddEventOnTriggerFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnTrigger);
+
+    public async Task AddEventOnTerminalDeactivateAlarmFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(EditingDoor?.EventsOnTerminalDeactivateAlarm);
+
+    public async Task AddEventOnElevatorLandFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnElevatorLand);
+
+    public async Task AddEventOnActivateFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnActivate);
+
+    public async Task AddEventOnGotoWinFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnGotoWin);
+
+    public async Task AddEventOnActivationFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnActivation);
+
+    public async Task AddEventOnSequenceStartFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnSequenceStart);
+
+    public async Task AddEventOnSequenceDoneFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnSequenceDone);
+
+    public async Task AddEventOnSequenceFailFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnSequenceFail);
+
+    public async Task AddTerminalPlacementFromClipboardCommand()
+    {
+        if (ActiveZoneSettings == null) return;
+        var placements = await GetTerminalPlacementsFromClipboardAsync();
+        foreach (var p in placements)
+        {
+            ActiveZoneSettings.TerminalPlacements.Add(p);
+        }
+        UpdateAvailableDoorTerminalZones();
+    }
+
+    public async Task AddDimensionTerminalPlacementFromClipboardCommand()
+    {
+        if (EditingDimension == null) return;
+        var placements = await GetTerminalPlacementsFromClipboardAsync();
+        foreach (var p in placements)
+        {
+            EditingDimension.StaticTerminalPlacements.Add(p);
+        }
+    }
+
+    public async Task AddUniqueCommandEventFromClipboardCommand(TerminalUniqueCommand? cmd)
+    {
+        if (cmd == null) return;
+        await AddWardenEventsToCollectionFromClipboardAsync(cmd.CommandEvents);
+    }
+
     public void AddEventOnPortalWarp() => EditingDoor?.EventsOnPortalWarp.Add(new WardenEvent());
     public void RemoveEventOnPortalWarp(WardenEvent? ev) { if (ev != null) EditingDoor?.EventsOnPortalWarp.Remove(ev); }
 
@@ -2824,8 +2992,7 @@ public class LevelLayoutViewModel : ViewModelBase
         get => _selectedTileSource;
         set
         {
-            string targetValue = IsPromptingReality ? "Elevator Shafts" : value;
-            if (SetField(ref _selectedTileSource, targetValue))
+            if (SetField(ref _selectedTileSource, value))
             {
                 UpdateDimensionTilesForSelectedSet();
             }
@@ -2955,70 +3122,46 @@ public class LevelLayoutViewModel : ViewModelBase
 
         bool isReality = string.Equals(targetDimension.DimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase);
 
-        if (isReality)
+        _availableTileSources.Clear();
+        _availableTileSources.Add("Elevator Shafts");
+        _availableTileSources.Add("Dimension Geomorphs (Custom Objective 1x1)");
+
+        var existing = _selectedLevel?.GetDimension(targetDimension.DimensionIndex);
+        if (existing != null && _selectedLevel != null &&
+            _selectedLevel.HasDimension(targetDimension.DimensionIndex) && !isNew)
         {
-            EditingDimension = null;
-            DimensionCustomName = "Reality";
+            EditingDimension = existing.Clone();
+            DimensionCustomName = existing.Name;
+            DimensionSelectedComplexType = existing.ComplexType;
 
-            _availableTileSources.Clear();
-            _availableTileSources.Add("Elevator Shafts");
+            SelectedTileSource = existing.TileCategory == "Elevator Shaft" || isReality
+                ? "Elevator Shafts"
+                : "Dimension Geomorphs (Custom Objective 1x1)";
 
-            if (_selectedLevel != null)
-            {
-                DimensionSelectedComplexType = _selectedLevel.ComplexType;
+            UpdateDimensionTilesForSelectedSet();
 
-                SelectedTileSource = "Elevator Shafts";
-                UpdateDimensionTilesForSelectedSet();
-
-                SelectedDimensionTile = _availableDimensionTiles.FirstOrDefault(t =>
-                                            string.Equals(t.Prefab, _selectedLevel.ElevatorTile,
-                                                StringComparison.OrdinalIgnoreCase))
-                                        ?? _availableDimensionTiles.FirstOrDefault();
-            }
+            SelectedDimensionTile = _availableDimensionTiles.FirstOrDefault(t =>
+                                        string.Equals(t.Prefab, existing.DimensionGeomorph,
+                                            StringComparison.OrdinalIgnoreCase))
+                                    ?? _availableDimensionTiles.FirstOrDefault();
         }
         else
         {
-            _availableTileSources.Clear();
-            _availableTileSources.Add("Elevator Shafts");
-            _availableTileSources.Add("Dimension Geomorphs (Custom Objective 1x1)");
-
-            var existing = _selectedLevel?.GetDimension(targetDimension.DimensionIndex);
-            if (existing != null && _selectedLevel != null &&
-                _selectedLevel.HasDimension(targetDimension.DimensionIndex) && !isNew)
+            EditingDimension = new DimensionLayoutBlock
             {
-                EditingDimension = existing.Clone();
-                DimensionCustomName = existing.Name;
-                DimensionSelectedComplexType = existing.ComplexType;
+                DimensionIndex = targetDimension.DimensionIndex,
+                Name = targetDimension.DisplayName,
+                ComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining
+            };
+            DimensionCustomName = targetDimension.DisplayName;
+            DimensionSelectedComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining;
 
-                SelectedTileSource = existing.TileCategory == "Elevator Shaft"
-                    ? "Elevator Shafts"
-                    : "Dimension Geomorphs (Custom Objective 1x1)";
-
-                UpdateDimensionTilesForSelectedSet();
-
-                SelectedDimensionTile = _availableDimensionTiles.FirstOrDefault(t =>
-                                            string.Equals(t.Prefab, existing.DimensionGeomorph,
-                                                StringComparison.OrdinalIgnoreCase))
-                                        ?? _availableDimensionTiles.FirstOrDefault();
-            }
-            else
+            SelectedTileSource = isReality ? "Elevator Shafts" : "Dimension Geomorphs (Custom Objective 1x1)";
+            UpdateDimensionTilesForSelectedSet();
+            if (_availableDimensionTiles.Count == 0)
             {
-                EditingDimension = new DimensionLayoutBlock
-                {
-                    DimensionIndex = targetDimension.DimensionIndex,
-                    Name = targetDimension.DisplayName,
-                    ComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining
-                };
-                DimensionCustomName = targetDimension.DisplayName;
-                DimensionSelectedComplexType = _selectedLevel?.ComplexType ?? ComplexType.Mining;
-
-                SelectedTileSource = "Dimension Geomorphs (Custom Objective 1x1)";
+                SelectedTileSource = isReality ? "Dimension Geomorphs (Custom Objective 1x1)" : "Elevator Shafts";
                 UpdateDimensionTilesForSelectedSet();
-                if (_availableDimensionTiles.Count == 0)
-                {
-                    SelectedTileSource = "Elevator Shafts";
-                    UpdateDimensionTilesForSelectedSet();
-                }
             }
         }
 
@@ -3033,7 +3176,7 @@ public class LevelLayoutViewModel : ViewModelBase
     {
         _availableDimensionTiles.Clear();
 
-        if (_selectedTileSource == "Elevator Shafts" || IsPromptingReality)
+        if (_selectedTileSource == "Elevator Shafts")
         {
             var options = GetElevatorTilesForComplex(_dimensionSelectedComplexType);
             foreach (var opt in options)
@@ -3076,69 +3219,68 @@ public class LevelLayoutViewModel : ViewModelBase
         bool isReality = string.Equals(_promptingDimensionOption.DimensionIndex, "Reality",
             StringComparison.OrdinalIgnoreCase);
 
+        string tileCategory = SelectedTileSource == "Elevator Shafts" ? "Elevator Shaft" : "Dimension Geomorph";
+        string dimName = string.IsNullOrWhiteSpace(DimensionCustomName)
+            ? _promptingDimensionOption.DimensionIndex
+            : DimensionCustomName.Trim();
+
+        var existingDim = _selectedLevel.GetDimension(_promptingDimensionOption.DimensionIndex);
+        DimensionLayoutBlock dimBlock;
+        if (EditingDimension != null)
+        {
+            dimBlock = EditingDimension;
+            dimBlock.DimensionIndex = _promptingDimensionOption.DimensionIndex;
+            dimBlock.Name = dimName;
+            dimBlock.ComplexType = DimensionSelectedComplexType;
+            dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
+            dimBlock.TileCategory = tileCategory;
+            dimBlock.InternalEnabled = true;
+
+            if (existingDim?.GridState != null && existingDim.GridState.PlacedGeomorphs.Count > 0)
+            {
+                dimBlock.GridState = existingDim.GridState;
+            }
+            else if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
+            {
+                dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
+            }
+        }
+        else if (existingDim != null)
+        {
+            dimBlock = existingDim;
+            dimBlock.Name = dimName;
+            dimBlock.ComplexType = DimensionSelectedComplexType;
+            dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
+            dimBlock.TileCategory = tileCategory;
+            if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
+            {
+                dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
+            }
+        }
+        else
+        {
+            dimBlock = new DimensionLayoutBlock
+            {
+                DimensionIndex = _promptingDimensionOption.DimensionIndex,
+                Name = dimName,
+                ComplexType = DimensionSelectedComplexType,
+                DimensionGeomorph = SelectedDimensionTile.Prefab,
+                TileCategory = tileCategory,
+                InternalEnabled = true
+            };
+        }
+
+        _selectedLevel.SetDimension(dimBlock);
+        EditingDimension = null;
+        _activeDimensionIndex = _promptingDimensionOption.DimensionIndex;
+
         if (isReality)
         {
             _selectedLevel.ComplexType = DimensionSelectedComplexType;
             _selectedLevel.ElevatorTile = SelectedDimensionTile.Prefab;
-            _activeDimensionIndex = "Reality";
         }
         else
         {
-            string tileCategory = SelectedTileSource == "Elevator Shafts" ? "Elevator Shaft" : "Dimension Geomorph";
-            string dimName = string.IsNullOrWhiteSpace(DimensionCustomName)
-                ? _promptingDimensionOption.DimensionIndex
-                : DimensionCustomName.Trim();
-
-            var existingDim = _selectedLevel.GetDimension(_promptingDimensionOption.DimensionIndex);
-            DimensionLayoutBlock dimBlock;
-            if (EditingDimension != null)
-            {
-                dimBlock = EditingDimension;
-                dimBlock.DimensionIndex = _promptingDimensionOption.DimensionIndex;
-                dimBlock.Name = dimName;
-                dimBlock.ComplexType = DimensionSelectedComplexType;
-                dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
-                dimBlock.TileCategory = tileCategory;
-                dimBlock.InternalEnabled = true;
-
-                if (existingDim?.GridState != null && existingDim.GridState.PlacedGeomorphs.Count > 0)
-                {
-                    dimBlock.GridState = existingDim.GridState;
-                }
-                else if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
-                {
-                    dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
-                }
-            }
-            else if (existingDim != null)
-            {
-                dimBlock = existingDim;
-                dimBlock.Name = dimName;
-                dimBlock.ComplexType = DimensionSelectedComplexType;
-                dimBlock.DimensionGeomorph = SelectedDimensionTile.Prefab;
-                dimBlock.TileCategory = tileCategory;
-                if (dimBlock.GridState.PlacedGeomorphs.Count == 0 && !string.IsNullOrWhiteSpace(dimBlock.DimensionGeomorph))
-                {
-                    dimBlock.GridState.InitializeStartingTile(dimBlock.DimensionGeomorph, 0, 0);
-                }
-            }
-            else
-            {
-                dimBlock = new DimensionLayoutBlock
-                {
-                    DimensionIndex = _promptingDimensionOption.DimensionIndex,
-                    Name = dimName,
-                    ComplexType = DimensionSelectedComplexType,
-                    DimensionGeomorph = SelectedDimensionTile.Prefab,
-                    TileCategory = tileCategory,
-                    InternalEnabled = true
-                };
-            }
-
-            _selectedLevel.SetDimension(dimBlock);
-            EditingDimension = null;
-            _activeDimensionIndex = _promptingDimensionOption.DimensionIndex;
-
             var existingOpt = _availableDimensions.FirstOrDefault(d => d.DimensionIndex == dimBlock.DimensionIndex);
             if (existingOpt != null)
             {
@@ -3220,6 +3362,14 @@ public class LevelLayoutViewModel : ViewModelBase
         set => SetField(ref _selectedElevatorTile, value);
     }
 
+    private bool _newLevelSnatcherBoxes;
+
+    public bool NewLevelSnatcherBoxes
+    {
+        get => _newLevelSnatcherBoxes;
+        set => SetField(ref _newLevelSnatcherBoxes, value);
+    }
+
     private ExpeditionBalanceSettings _editingExpeditionBalance = new();
 
     public ExpeditionBalanceSettings EditingExpeditionBalance
@@ -3269,6 +3419,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         CreationErrorMessage = string.Empty;
         EditingExpeditionBalance = new ExpeditionBalanceSettings();
+        NewLevelSnatcherBoxes = levelDefaults.SnatcherBoxes;
         IsCreatingLevel = true;
     }
 
@@ -3294,6 +3445,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         CreationErrorMessage = string.Empty;
         EditingExpeditionBalance = _selectedLevel.ExpeditionBalance.Clone();
+        NewLevelSnatcherBoxes = _selectedLevel.SnatcherBoxes;
         IsCreatingLevel = true;
     }
 
@@ -3361,6 +3513,7 @@ public class LevelLayoutViewModel : ViewModelBase
                 _selectedLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
                 _selectedLevel.ElevatorTile = SelectedElevatorTile.Prefab;
                 _selectedLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
+                _selectedLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
 
                 var reality = _selectedLevel.GetDimension("Reality");
                 if (reality != null)
@@ -3400,6 +3553,7 @@ public class LevelLayoutViewModel : ViewModelBase
         );
         newLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
         newLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
+        newLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
 
         _levels.Add(newLevel);
         SelectedLevel = newLevel;

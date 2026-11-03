@@ -47,6 +47,7 @@ public class LevelSettingsDialogDefaults
     public ComplexType ComplexType { get; set; } = ComplexType.Mining;
     public uint FogSettings { get; set; } = 0;
     public string DimensionGeomorph { get; set; } = string.Empty;
+    public bool SnatcherBoxes { get; set; } = false;
 }
 
 public class SecurityDoorSettingsDefaults

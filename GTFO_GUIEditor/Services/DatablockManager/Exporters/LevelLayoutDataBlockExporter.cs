@@ -871,6 +871,18 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             var vanillaDim = ExportContext.LoadVanillaBlocksArray("DimensionDataBlock.json");
             dimensionBlocks.AddRange(vanillaDim);
         }
+        else
+        {
+            if (!dimensionBlocks.Any(b => b.TryGetPropertyValue("persistentID", out var pid) && pid != null && uint.TryParse(pid.ToString(), out uint id) && id == 14))
+            {
+                var vanillaDim = ExportContext.LoadVanillaBlocksArray("DimensionDataBlock.json");
+                var vanillaBlock14 = vanillaDim.FirstOrDefault(b => b.TryGetPropertyValue("persistentID", out var pid) && pid != null && uint.TryParse(pid.ToString(), out uint id) && id == 14);
+                if (vanillaBlock14 != null)
+                {
+                    dimensionBlocks.Add(vanillaBlock14);
+                }
+            }
+        }
 
         context.LevelLayoutBlocks.Clear();
         context.LevelLayoutBlocks.AddRange(levelLayoutBlocks);

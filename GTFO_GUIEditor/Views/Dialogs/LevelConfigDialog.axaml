@@ -44,7 +44,7 @@
                                            FontWeight="Bold"
                                            Foreground="#FFFFFF"/>
 
-                                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
+                                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
                                     <!-- Level Name -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Level Name:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..." Margin="0,4"/>
@@ -85,6 +85,10 @@
                                             </DataTemplate>
                                         </ComboBox.ItemTemplate>
                                     </ComboBox>
+
+                                    <!-- Snatcher Boxes -->
+                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Snatcher Boxes:" ToolTip.Tip="If a level contains snatchers, this adds the 'Snatcher Boxes' dimension required to make snatchers function properly." FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding NewLevelSnatcherBoxes, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
                         </Border>

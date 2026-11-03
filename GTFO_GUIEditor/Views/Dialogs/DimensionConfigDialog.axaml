@@ -37,36 +37,9 @@
                 <!-- Scrollable Content -->
                 <ScrollViewer Grid.Row="1" Margin="0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                     <StackPanel Spacing="14">
-                        <!-- REALITY GENERAL (Only when IsPromptingReality) -->
-                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12" IsVisible="{Binding IsPromptingReality}">
+                        <!-- 1. GENERAL SECTION -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
                             <StackPanel Spacing="10">
-                                <TextBlock Text="General" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="Tileset:" FontSize="13" Foreground="LightGray"/>
-                                    <ComboBox ItemsSource="{Binding AvailableComplexTypes}"
-                                              SelectedItem="{Binding DimensionSelectedComplexType, Mode=TwoWay}"
-                                              HorizontalAlignment="Stretch"/>
-                                </StackPanel>
-                                <StackPanel Spacing="6">
-                                    <TextBlock Text="{Binding PromptStartingTileLabel}" FontSize="13" Foreground="LightGray"/>
-                                    <ComboBox ItemsSource="{Binding AvailableDimensionTiles}"
-                                              SelectedItem="{Binding SelectedDimensionTile, Mode=TwoWay}"
-                                              HorizontalAlignment="Stretch">
-                                        <ComboBox.ItemTemplate>
-                                            <DataTemplate x:DataType="models:ElevatorTileOption">
-                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
-                                            </DataTemplate>
-                                        </ComboBox.ItemTemplate>
-                                    </ComboBox>
-                                </StackPanel>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- DIMENSION SECTIONS (When !IsPromptingReality) -->
-                        <StackPanel Spacing="14" IsVisible="{Binding !IsPromptingReality}">
-                            <!-- 1. GENERAL SECTION -->
-                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
-                                <StackPanel Spacing="10">
                                     <TextBlock Text="General" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
                                     <StackPanel Spacing="6">
                                         <TextBlock Text="Dimension Name:" FontSize="13" Foreground="LightGray"/>
@@ -280,7 +253,10 @@
                                             <Expander.Header>
                                                 <Grid ColumnDefinitions="*,Auto">
                                                     <TextBlock Grid.Column="0" Text="Terminal Placements" ToolTip.Tip="Placements and configs for terminals in the zone" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-                                                    <Button Grid.Column="1" Content="+ Add Terminal" Command="{Binding AddDimensionTerminalPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                                        <Button Content="+ Add Terminal" Command="{Binding AddDimensionTerminalPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                        <Button Content="+ Add from Clipboard" Command="{Binding AddDimensionTerminalPlacementFromClipboardCommand}" ToolTip.Tip="Add terminal placement from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                                    </StackPanel>
                                                 </Grid>
                                             </Expander.Header>
                                             <ItemsControl ItemsSource="{Binding EditingDimension.StaticTerminalPlacements}" Margin="0,8,0,0">
@@ -290,7 +266,10 @@
                                                             <Expander.Header>
                                                                 <Grid ColumnDefinitions="*,Auto">
                                                                     <TextBlock Grid.Column="0" Text="Terminal Configuration" ToolTip.Tip="Custom configuration for this terminal" FontWeight="SemiBold" FontSize="12" Foreground="#FFA200" VerticalAlignment="Center"/>
-                                                                    <Button Grid.Column="1" Content="✕ Remove Terminal" Command="{Binding #DimensionConfigDialogRoot.DataContext.RemoveDimensionTerminalPlacement}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                                                        <Button Content="Copy to Clipboard" ToolTip.Tip="Copy terminal placement configuration to clipboard as JSON" Command="{Binding #DimensionConfigDialogRoot.DataContext.CopyTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                                                        <Button Content="✕ Remove Terminal" Command="{Binding #DimensionConfigDialogRoot.DataContext.RemoveDimensionTerminalPlacement}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                    </StackPanel>
                                                                 </Grid>
                                                             </Expander.Header>
                                                             <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -532,7 +511,6 @@
                                 </StackPanel>
                             </Border>
                         </StackPanel>
-                    </StackPanel>
                 </ScrollViewer>
 
                 <!-- Footer (Error message + Action buttons) -->

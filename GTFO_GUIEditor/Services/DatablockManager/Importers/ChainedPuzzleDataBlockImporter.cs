@@ -26,8 +26,40 @@ public class ChainedPuzzleDataBlockImporter : IDatablockImporter
             double wantedDistFromStart = puzzleObj["WantedDistanceFromStartPos"]?.GetValue<double>() ?? 0;
             double wantedDistBetween = puzzleObj["WantedDistanceBetweenPuzzleComponents"]?.GetValue<double>() ?? 0;
             bool onlyShowHud = puzzleObj["OnlyShowHUDWhenPlayerIsClose"]?.GetValue<bool>() ?? false;
-            uint soundStart = puzzleObj["AlarmSoundStart"]?.GetValue<uint>() ?? 3339129407;
-            uint soundStop = puzzleObj["AlarmSoundStop"]?.GetValue<uint>() ?? 42633153;
+
+            AlarmSoundStart soundStart = AlarmSoundStart.Standard;
+            if (puzzleObj["AlarmSoundStart"] is JsonNode startNode)
+            {
+                if (startNode is JsonValue val && val.TryGetValue<uint>(out uint uVal) && Enum.IsDefined(typeof(AlarmSoundStart), uVal))
+                {
+                    soundStart = (AlarmSoundStart)uVal;
+                }
+                else if (Enum.TryParse<AlarmSoundStart>(startNode.ToString(), true, out var parsedStart))
+                {
+                    soundStart = parsedStart;
+                }
+                else if (startNode is JsonValue strVal && strVal.TryGetValue<string>(out string? sVal) && uint.TryParse(sVal, out uint puVal) && Enum.IsDefined(typeof(AlarmSoundStart), puVal))
+                {
+                    soundStart = (AlarmSoundStart)puVal;
+                }
+            }
+
+            AlarmSoundStop soundStop = AlarmSoundStop.Standard;
+            if (puzzleObj["AlarmSoundStop"] is JsonNode stopNode)
+            {
+                if (stopNode is JsonValue val && val.TryGetValue<uint>(out uint uVal) && Enum.IsDefined(typeof(AlarmSoundStop), uVal))
+                {
+                    soundStop = (AlarmSoundStop)uVal;
+                }
+                else if (Enum.TryParse<AlarmSoundStop>(stopNode.ToString(), true, out var parsedStop))
+                {
+                    soundStop = parsedStop;
+                }
+                else if (stopNode is JsonValue strVal && strVal.TryGetValue<string>(out string? sVal) && uint.TryParse(sVal, out uint puVal) && Enum.IsDefined(typeof(AlarmSoundStop), puVal))
+                {
+                    soundStop = (AlarmSoundStop)puVal;
+                }
+            }
 
             uint waveSettingsId = puzzleObj["SurvivalWaveSettings"]?.GetValue<uint>() ?? 0;
             uint popId = puzzleObj["SurvivalWavePopulation"]?.GetValue<uint>() ?? 0;

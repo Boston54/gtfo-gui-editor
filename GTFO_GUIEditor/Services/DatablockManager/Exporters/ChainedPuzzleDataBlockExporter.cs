@@ -98,8 +98,8 @@ public class ChainedPuzzleDataBlockExporter : IDatablockExporter
                 ["WantedDistanceBetweenPuzzleComponents"] = alarm.WantedDistanceBetweenPuzzleComponents,
                 ["ChainedPuzzle"] = puzzleSteps,
                 ["OnlyShowHUDWhenPlayerIsClose"] = alarm.OnlyShowHUDWhenPlayerIsClose,
-                ["AlarmSoundStart"] = alarm.AlarmSoundStart,
-                ["AlarmSoundStop"] = alarm.AlarmSoundStop,
+                ["AlarmSoundStart"] = (uint)alarm.AlarmSoundStart,
+                ["AlarmSoundStop"] = (uint)alarm.AlarmSoundStop,
                 ["name"] = string.IsNullOrWhiteSpace(alarm.Name) ? $"ChainedPuzzle_{puzzleId}" : alarm.Name,
                 ["internalEnabled"] = true,
                 ["persistentID"] = puzzleId

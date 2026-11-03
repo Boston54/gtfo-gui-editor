@@ -31,55 +31,55 @@ public class SettingsTests : IDisposable
             {
                 File.Delete(_tempSettingsPath);
             }
-
-            [Fact]
-            public void GeneralSettings_HasExpectedDefaults()
-            {
-                var settings = new GeneralSettings();
-
-                Assert.Equal(StartupProjectMode.PreviousOpenedProject, settings.StartupProject);
-                Assert.Equal(DataFlowMode.RundownFile, settings.DataFlow);
-                Assert.True(settings.IsPreviousOpenedProjectStartup);
-                Assert.True(settings.IsRundownDataFlow);
-                Assert.Null(settings.StartupProjectPath);
-            }
-
-            [Fact]
-            public void GeneralSettings_DataFlowChangeClearsStartupProjectPath()
-            {
-                var settings = new GeneralSettings
-                {
-                    StartupProject = StartupProjectMode.SetProject,
-                    StartupProjectPath = "/tmp/startup-project"
-                };
-
-                settings.DataFlow = DataFlowMode.Datablocks;
-
-                Assert.Null(settings.StartupProjectPath);
-
-                settings.StartupProjectPath = "/tmp/startup-folder";
-                settings.DataFlow = DataFlowMode.RundownFile;
-
-                Assert.Null(settings.StartupProjectPath);
-            }
-
-            [Fact]
-            public void CloseSettings_FallsBackToPreviousProjectWhenSetProjectHasNoPath()
-            {
-                var vm = new MainWindowViewModel(autoReopenLastRundown: false);
-                vm.Settings.General.StartupProject = StartupProjectMode.SetProject;
-                vm.Settings.General.StartupProjectPath = null;
-
-                vm.CloseSettings();
-
-                Assert.Equal(StartupProjectMode.PreviousOpenedProject, vm.Settings.General.StartupProject);
-                Assert.False(vm.IsShowingSettings);
-            }
             catch
             {
                 // Ignore cleanup error
             }
         }
+    }
+
+    [Fact]
+    public void GeneralSettings_HasExpectedDefaults()
+    {
+        var settings = new GeneralSettings();
+
+        Assert.Equal(StartupProjectMode.PreviousOpenedProject, settings.StartupProject);
+        Assert.Equal(DataFlowMode.RundownFile, settings.DataFlow);
+        Assert.True(settings.IsPreviousOpenedProjectStartup);
+        Assert.True(settings.IsRundownDataFlow);
+        Assert.Null(settings.StartupProjectPath);
+    }
+
+    [Fact]
+    public void GeneralSettings_DataFlowChangeClearsStartupProjectPath()
+    {
+        var settings = new GeneralSettings
+        {
+            StartupProject = StartupProjectMode.SetProject,
+            StartupProjectPath = "/tmp/startup-project"
+        };
+
+        settings.DataFlow = DataFlowMode.Datablocks;
+
+        Assert.Null(settings.StartupProjectPath);
+
+        settings.StartupProjectPath = "/tmp/startup-folder";
+        settings.DataFlow = DataFlowMode.RundownFile;
+
+        Assert.Null(settings.StartupProjectPath);
+    }
+
+    [Fact]
+    public void CloseSettings_FallsBackToPreviousProjectWhenSetProjectHasNoPath()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        vm.Settings.General.StartupProject = StartupProjectMode.SetProject;
+        vm.Settings.General.StartupProjectPath = null;
+
+        vm.CloseSettings();
+
+        Assert.Equal(StartupProjectMode.PreviousOpenedProject, vm.Settings.General.StartupProject);
+        Assert.False(vm.IsShowingSettings);
     }
 
     [Fact]
@@ -239,12 +239,22 @@ public class SettingsTests : IDisposable
 
         Assert.False(vm.IsShowingSettings);
 
+        vm.OpenGeneralSettings();
+        Assert.True(vm.IsShowingSettings);
+        Assert.Equal(0, vm.SelectedSettingsTabIndex);
+
         vm.OpenAppearanceSettings();
         Assert.True(vm.IsShowingSettings);
+        Assert.Equal(1, vm.SelectedSettingsTabIndex);
 
         vm.Settings.Appearance.UnexpandedDoorColor = "#111111";
-        vm.ResetAppearanceSettingsToDefaults();
+        vm.ResetSettingsToDefaults(); // resets tab 1 (Appearance)
         Assert.Equal("#FFFF00", vm.Settings.Appearance.UnexpandedDoorColor);
+
+        vm.SelectedSettingsTabIndex = 0;
+        vm.Settings.General.DataFlow = DataFlowMode.Datablocks;
+        vm.ResetSettingsToDefaults(); // resets tab 0 (General)
+        Assert.Equal(DataFlowMode.RundownFile, vm.Settings.General.DataFlow);
 
         vm.CloseSettings();
         Assert.False(vm.IsShowingSettings);

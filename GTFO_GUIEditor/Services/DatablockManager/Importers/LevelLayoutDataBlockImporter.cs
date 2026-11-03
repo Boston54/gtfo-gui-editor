@@ -471,6 +471,23 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
 
         // 3. Dimensions
+        if (exp.DimensionDatas.HasValue && exp.DimensionDatas.Value.ValueKind == JsonValueKind.Array)
+        {
+            foreach (var item in exp.DimensionDatas.Value.EnumerateArray())
+            {
+                if (item.TryGetProperty("DimensionIndex", out var diProp) &&
+                    string.Equals(diProp.GetString(), "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase))
+                {
+                    bool arenaEnabled = true;
+                    if (item.TryGetProperty("Enabled", out var enProp))
+                    {
+                        arenaEnabled = enProp.GetBoolean();
+                    }
+                    level.SnatcherBoxes = arenaEnabled;
+                }
+            }
+        }
+
         var dimDatas = GetDimensionDatasFromExpedition(exp, context);
         foreach (var dimItem in dimDatas)
         {
@@ -654,6 +671,11 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                     enabled = enProp.GetBoolean();
                 }
 
+                if (string.Equals(dimIndex, "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase) || dimDataId == 14)
+                {
+                    continue;
+                }
+
                 if (dimDataId > 0 && context.DimensionBlocks.TryGetValue(dimDataId, out var dimBlock) && dimBlock != null)
                 {
                     var inner = dimBlock["DimensionData"] as JsonObject;
@@ -698,6 +720,8 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         foreach (var dimBlock in context.DimensionBlocks.Values)
         {
             if (dimBlock == null) continue;
+            uint pid = dimBlock["persistentID"]?.GetValue<uint>() ?? 0;
+            if (pid == 14) continue;
             var innerData = dimBlock["DimensionData"] as JsonObject;
             uint targetLayoutId = innerData?["LevelLayoutData"]?.GetValue<uint>() ?? 0;
 

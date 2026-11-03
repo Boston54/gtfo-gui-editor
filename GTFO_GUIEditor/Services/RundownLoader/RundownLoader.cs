@@ -88,11 +88,13 @@ public class RundownLoader : IRundownLoader
                 ElevatorTile = level.ElevatorTile,
                 FogSettings = level.FogSettings,
                 InternalEnabled = level.InternalEnabled,
+                RealityDimension = level.RealityDimension.Clone(),
                 Dimensions = level.Dimensions.Select(d => d.Clone()).ToList(),
                 MainSector = level.MainSector.Clone(),
                 SecondarySector = level.SecondarySector.Clone(),
                 OverloadSector = level.OverloadSector.Clone(),
                 ExpeditionBalance = level.ExpeditionBalance.Clone(),
+                SnatcherBoxes = level.SnatcherBoxes,
                 GridState = level.GridState.ExportStateData()
             };
             project.Levels.Add(levelData);
@@ -222,12 +224,14 @@ public class RundownLoader : IRundownLoader
                     ElevatorTile = levelData.ElevatorTile,
                     FogSettings = levelData.FogSettings,
                     InternalEnabled = levelData.InternalEnabled,
+                    RealityDimension = levelData.RealityDimension?.Clone() ?? new DimensionLayoutBlock { DimensionIndex = "Reality", Name = "Reality" },
                     Dimensions = new ObservableCollection<DimensionLayoutBlock>(
                         levelData.Dimensions?.Select(d => d.Clone()) ?? Enumerable.Empty<DimensionLayoutBlock>()),
                     MainSector = levelData.MainSector?.Clone() ?? new SectorSettings { ZoneAliasStart = 0 },
                     SecondarySector = levelData.SecondarySector?.Clone() ?? new SectorSettings { ZoneAliasStart = 100 },
                     OverloadSector = levelData.OverloadSector?.Clone() ?? new SectorSettings { ZoneAliasStart = 200 },
-                    ExpeditionBalance = levelData.ExpeditionBalance?.Clone() ?? new ExpeditionBalanceSettings()
+                    ExpeditionBalance = levelData.ExpeditionBalance?.Clone() ?? new ExpeditionBalanceSettings(),
+                    SnatcherBoxes = levelData.SnatcherBoxes
                 };
 
                 if (levelData.GridState != null)

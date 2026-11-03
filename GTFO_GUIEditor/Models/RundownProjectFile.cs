@@ -48,6 +48,8 @@ public class LevelLayoutBlockData
 
     [JsonPropertyName("internalEnabled")] public bool InternalEnabled { get; set; } = true;
 
+    [JsonPropertyName("RealityDimension")] public DimensionLayoutBlock? RealityDimension { get; set; }
+
     [JsonPropertyName("Dimensions")] public List<DimensionLayoutBlock> Dimensions { get; set; } = new();
 
     [JsonPropertyName("mainSector")] public SectorSettings MainSector { get; set; } = new() { ZoneAliasStart = 0 };
@@ -57,6 +59,8 @@ public class LevelLayoutBlockData
     [JsonPropertyName("overloadSector")] public SectorSettings OverloadSector { get; set; } = new() { ZoneAliasStart = 200 };
 
     [JsonPropertyName("expeditionBalance")] public ExpeditionBalanceSettings? ExpeditionBalance { get; set; }
+
+    [JsonPropertyName("snatcherBoxes")] public bool SnatcherBoxes { get; set; }
 
     [JsonPropertyName("gridState")] public LevelLayoutGridStateData GridState { get; set; } = new();
 }

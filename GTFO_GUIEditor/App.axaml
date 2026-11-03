@@ -51,13 +51,21 @@
                                   Margin="0,0,12,0"
                                   Foreground="#CCCCCC"/>
 
-                        <Button Grid.Column="5"
-                                Content="✕ Remove"
-                                Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveWardenEventCommand}"
-                                CommandParameter="{Binding}"
-                                Background="#4A1C1C"
-                                Foreground="#FF6B6B"
-                                Padding="10,4"/>
+                        <StackPanel Grid.Column="5" Orientation="Horizontal" Spacing="6">
+                            <Button Content="Copy to Clipboard"
+                                    ToolTip.Tip="Copy event configuration to clipboard as JSON"
+                                    Command="{Binding $parent[Window].DataContext.LevelLayout.CopyWardenEventCommand}"
+                                    CommandParameter="{Binding}"
+                                    Background="#2E5B88"
+                                    Foreground="White"
+                                    Padding="10,4"/>
+                            <Button Content="✕ Remove"
+                                    Command="{Binding $parent[Window].DataContext.LevelLayout.RemoveWardenEventCommand}"
+                                    CommandParameter="{Binding}"
+                                    Background="#4A1C1C"
+                                    Foreground="#FF6B6B"
+                                    Padding="10,4"/>
+                        </StackPanel>
                     </Grid>
 
                     <!-- Common Row 1: Delay, Layer (Sector) -->

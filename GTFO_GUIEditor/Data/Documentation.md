@@ -154,6 +154,15 @@ TODO
 ## Fog
 TODO
 
+# Dimensions
+## Snatcher Boxes
+Snatcher boxes are a special type of dimension that snatchers teleport players to when they 'snatch' them. Without snatcher boxes being added to an expedition, snatchers will not work as intended.
+
+Adding snatcher boxes to an expedition can be done through the Level Config dialog (accessible via the Level bar at the top of the level view), via the `Snatcher Boxes` field.
+
+## Outdoor Dimensions
+TODO
+
 # Events
 ## Introduction
 TODO
@@ -181,6 +190,10 @@ TODO
 
 ## Publishing a Rundown
 TODO
+
+## Common Issues
+TODO
+mention snatcher boxes here
 
 # Importing
 Rundowns can be imported directly into the editor via the `File -> Import` option, or by pressing `CTRL+I`.

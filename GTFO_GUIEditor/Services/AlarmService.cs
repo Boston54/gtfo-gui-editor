@@ -248,10 +248,10 @@ public static class AlarmService
         public bool OnlyShowHUDWhenPlayerIsClose { get; set; }
 
         [JsonPropertyName("AlarmSoundStart")]
-        public uint AlarmSoundStart { get; set; } = 3339129407;
+        public AlarmSoundStart AlarmSoundStart { get; set; } = AlarmSoundStart.Standard;
 
         [JsonPropertyName("AlarmSoundStop")]
-        public uint AlarmSoundStop { get; set; } = 42633153;
+        public AlarmSoundStop AlarmSoundStop { get; set; } = AlarmSoundStop.Standard;
 
         [JsonPropertyName("ChainedPuzzle")]
         public List<ChainedPuzzleItem>? ChainedPuzzle { get; set; }

@@ -540,7 +540,10 @@
                                 <Expander.Header>
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0" Text="Events On Elevator Land" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger as soon as the players are ejected from the elevator" Foreground="#03C700" VerticalAlignment="Center"/>
-                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnElevatorLand}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                            <Button Content="+ Add Event" Command="{Binding AddEventOnElevatorLand}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                            <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnElevatorLandFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -765,7 +768,10 @@
                                 <Expander.Header>
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0" Text="Events On Activate" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the objective is 'activated'. This means different things based on the objective type" Foreground="#03C700" VerticalAlignment="Center"/>
-                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnActivate}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                            <Button Content="+ Add Event" Command="{Binding AddEventOnActivate}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                            <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnActivateFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -1045,7 +1051,10 @@
                                 <Expander.Header>
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0" Text="Events On Goto Win" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger as soon as the 'Goto Win' phase exists." Foreground="#03C700" VerticalAlignment="Center"/>
-                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnGotoWin}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                            <Button Content="+ Add Event" Command="{Binding AddEventOnGotoWin}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                            <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnGotoWinFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -2687,7 +2696,10 @@
                                         <Expander.Header>
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <TextBlock Grid.Column="0" Text="Events On Activation" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the objective is 'activated'. This means different things based on the objective type" Foreground="#03C700" VerticalAlignment="Center"/>
-                                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnActivation}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                                    <Button Content="+ Add Event" Command="{Binding AddEventOnActivation}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnActivationFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Expander.Header>
                                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -3275,7 +3287,10 @@
                                         <Expander.Header>
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <TextBlock Grid.Column="0" Text="Events On Sequence Start" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger at the start of a sequence" Foreground="#03C700" VerticalAlignment="Center"/>
-                                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnSequenceStart}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                                    <Button Content="+ Add Event" Command="{Binding AddEventOnSequenceStart}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnSequenceStartFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Expander.Header>
                                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -3289,7 +3304,10 @@
                                         <Expander.Header>
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <TextBlock Grid.Column="0" Text="Events On Sequence Done" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when a sequence is successfully completed" Foreground="#03C700" VerticalAlignment="Center"/>
-                                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnSequenceDone}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                                    <Button Content="+ Add Event" Command="{Binding AddEventOnSequenceDone}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnSequenceDoneFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Expander.Header>
                                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -3303,7 +3321,10 @@
                                         <Expander.Header>
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <TextBlock Grid.Column="0" Text="Events On Sequence Fail" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when a sequence is failed" Foreground="#03C700" VerticalAlignment="Center"/>
-                                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnSequenceFail}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                                    <Button Content="+ Add Event" Command="{Binding AddEventOnSequenceFail}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnSequenceFailFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                                </StackPanel>
                                             </Grid>
                                         </Expander.Header>
                                         <StackPanel Spacing="8" Margin="0,8,0,0">

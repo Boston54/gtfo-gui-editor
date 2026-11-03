@@ -10,12 +10,18 @@ namespace GTFO_GUIEditor.Tests;
 
 public class MockClipboardService : IClipboardService
 {
-    public string? LastCopiedText { get; private set; }
+    public string? LastCopiedText { get; set; }
+    public string? Content { get => LastCopiedText; set => LastCopiedText = value; }
 
     public Task SetTextAsync(string text)
     {
         LastCopiedText = text;
         return Task.CompletedTask;
+    }
+
+    public Task<string?> GetTextAsync()
+    {
+        return Task.FromResult(LastCopiedText);
     }
 }
 

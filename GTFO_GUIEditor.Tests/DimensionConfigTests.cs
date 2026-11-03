@@ -20,7 +20,7 @@ public class DimensionConfigTests
 
         // General
         Assert.False(dim.ForbidWaveSpawning);
-        Assert.Equal(DimensionLinkedToLayer.MainLayer, dim.LinkedToLayer);
+        Assert.Equal(DimensionLinkedToLayer.Main, dim.LinkedToLayer);
         Assert.Equal(DimensionObjectiveType.Ignore, dim.ObjectiveType);
 
         // Warp
@@ -673,7 +673,7 @@ public class DimensionConfigTests
                 DimensionGeomorph = "Assets/AssetPrefabs/Complex/Dimensions/Desert/Dimension_Desert_Static_01.prefab",
                 ComplexType = ComplexType.Tech,
                 ForbidWaveSpawning = true,
-                LinkedToLayer = DimensionLinkedToLayer.MainLayer,
+                LinkedToLayer = DimensionLinkedToLayer.Main,
                 ObjectiveType = DimensionObjectiveType.Ignore,
                 SoundEventOnWarpTo = 1998147319,
                 DisableVFXEventOnWarp = true,
@@ -757,7 +757,7 @@ public class DimensionConfigTests
             Assert.NotNull(importedDim);
             Assert.Equal("Roundtrip_Dimension", importedDim.Name);
             Assert.True(importedDim.ForbidWaveSpawning);
-            Assert.Equal(DimensionLinkedToLayer.MainLayer, importedDim.LinkedToLayer);
+            Assert.Equal(DimensionLinkedToLayer.Main, importedDim.LinkedToLayer);
             Assert.Equal(DimensionObjectiveType.Ignore, importedDim.ObjectiveType);
             Assert.Equal(1998147319u, importedDim.SoundEventOnWarpTo);
             Assert.True(importedDim.DisableVFXEventOnWarp);
@@ -822,6 +822,273 @@ public class DimensionConfigTests
             Assert.Equal(0.3, importedDim.SandstormEdgeA, 1);
             Assert.Equal(0.8, importedDim.SandstormEdgeB, 1);
             Assert.Equal(0.02, importedDim.SandstormMinFog, 2);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void EditDimension_And_NewDimension_ProvideIdenticalEditingDimensionState()
+    {
+        var level = new LevelLayoutBlock
+        {
+            Name = "DimensionTestLevel",
+            PersistentId = 1,
+            ComplexType = ComplexType.Mining,
+            ElevatorTile = "Assets/Elevators/Shaft1.prefab"
+        };
+
+        var vm = new LevelLayoutViewModel(new System.Collections.ObjectModel.ObservableCollection<ComplexResourceSetBlock>(), new List<LevelLayoutBlock> { level });
+
+        // 1. Edit Reality Dimension
+        vm.RequestEditActiveDimension();
+        Assert.True(vm.IsConfiguringDimension);
+        Assert.NotNull(vm.EditingDimension);
+        Assert.Equal("Reality", vm.EditingDimension.DimensionIndex);
+        Assert.Equal(ComplexType.Mining, vm.EditingDimension.ComplexType);
+        Assert.Equal(1998147319u, vm.EditingDimension.SoundEventOnWarpTo);
+        Assert.True(vm.EditingDimension.IsStaticDimension);
+        Assert.True(vm.EditingDimension.IsOutside);
+        vm.CancelPromptDimension();
+        Assert.False(vm.IsConfiguringDimension);
+        Assert.Null(vm.EditingDimension);
+
+        // 2. Add New Dimension
+        vm.OpenAddDimensionDialog();
+        Assert.True(vm.IsConfiguringDimension);
+        Assert.NotNull(vm.EditingDimension);
+        Assert.Equal("Dimension_1", vm.EditingDimension.DimensionIndex);
+        Assert.Equal(1998147319u, vm.EditingDimension.SoundEventOnWarpTo);
+        Assert.True(vm.EditingDimension.IsStaticDimension);
+        Assert.True(vm.EditingDimension.IsOutside);
+
+        // Modify and confirm
+        vm.EditingDimension.SoundEventOnWarpTo = 54321;
+        vm.EditingDimension.ForbidWaveSpawning = true;
+        vm.EditingDimension.EnvironmentWetness = 0.8;
+        vm.ConfirmPromptDimension();
+        Assert.False(vm.IsConfiguringDimension);
+
+        // 3. Edit Non-Reality Dimension
+        vm.SelectedDimension = vm.AvailableDimensions.FirstOrDefault(d => d.DimensionIndex == "Dimension_1");
+        vm.RequestEditActiveDimension();
+        Assert.True(vm.IsConfiguringDimension);
+        Assert.NotNull(vm.EditingDimension);
+        Assert.Equal("Dimension_1", vm.EditingDimension.DimensionIndex);
+        Assert.Equal(54321u, vm.EditingDimension.SoundEventOnWarpTo);
+        Assert.True(vm.EditingDimension.ForbidWaveSpawning);
+        Assert.Equal(0.8, vm.EditingDimension.EnvironmentWetness);
+        vm.CancelPromptDimension();
+        Assert.False(vm.IsConfiguringDimension);
+    }
+
+    [Fact]
+    public void LevelLayoutBlock_SnatcherBoxes_PropertyAndCloning_Works()
+    {
+        var level = new LevelLayoutBlock();
+        Assert.False(level.SnatcherBoxes);
+
+        level.SnatcherBoxes = true;
+        Assert.True(level.SnatcherBoxes);
+
+        var clone = level.Clone();
+        Assert.True(clone.SnatcherBoxes);
+
+        clone.SnatcherBoxes = false;
+        Assert.False(clone.SnatcherBoxes);
+        Assert.True(level.SnatcherBoxes);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_SnatcherBoxes_CreateAndEditLevel_Works()
+    {
+        var level = new LevelLayoutBlock
+        {
+            Name = "Original Level",
+            PersistentId = 101,
+            ComplexType = ComplexType.Mining,
+            ElevatorTile = "Assets/Elevators/Shaft1.prefab",
+            SnatcherBoxes = false
+        };
+
+        var vm = new LevelLayoutViewModel(new System.Collections.ObjectModel.ObservableCollection<ComplexResourceSetBlock>(), new List<LevelLayoutBlock> { level });
+
+        // Edit level and set SnatcherBoxes = true
+        vm.SelectedLevel = level;
+        vm.OpenEditLevelDialog();
+        Assert.True(vm.IsCreatingLevel);
+        Assert.True(vm.IsEditingExistingLevel);
+        Assert.False(vm.NewLevelSnatcherBoxes);
+
+        vm.NewLevelSnatcherBoxes = true;
+        bool confirmed = vm.ConfirmCreateLevel();
+        Assert.True(confirmed);
+        Assert.False(vm.IsCreatingLevel);
+        Assert.True(level.SnatcherBoxes);
+
+        // Create new level with SnatcherBoxes
+        vm.OpenCreateLevelDialog();
+        Assert.True(vm.IsCreatingLevel);
+        Assert.False(vm.IsEditingExistingLevel);
+        vm.NewLevelName = "New Snatcher Level";
+        vm.NewLevelPersistentId = 102;
+        vm.NewLevelSnatcherBoxes = true;
+
+        confirmed = vm.ConfirmCreateLevel();
+        Assert.True(confirmed);
+        var created = vm.Levels.FirstOrDefault(l => l.PersistentId == 102);
+        Assert.NotNull(created);
+        Assert.True(created.SnatcherBoxes);
+    }
+
+    [Fact]
+    public void RundownLoader_SnatcherBoxes_SaveAndLoad_PreservesState()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"gtfo_test_snatcher_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var mainVm = new MainWindowViewModel();
+            var levelWithSnatcher = mainVm.LevelLayout.Levels[0];
+            levelWithSnatcher.SnatcherBoxes = true;
+
+            var levelWithoutSnatcher = EditorDefaultsService.CreateDefaultLevel(2, "Level 2 Without Snatchers");
+            levelWithoutSnatcher.SnatcherBoxes = false;
+            mainVm.LevelLayout.Levels.Add(levelWithoutSnatcher);
+
+            var loader = new RundownLoader();
+            loader.SaveProject(mainVm, tempFile);
+
+            var loadedProject = loader.LoadProject(tempFile);
+            var loadedVm = new MainWindowViewModel();
+            loader.ApplyProject(loadedVm, loadedProject);
+
+            var loaded1 = loadedVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == levelWithSnatcher.PersistentId);
+            var loaded2 = loadedVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == 2);
+
+            Assert.NotNull(loaded1);
+            Assert.True(loaded1.SnatcherBoxes);
+
+            Assert.NotNull(loaded2);
+            Assert.False(loaded2.SnatcherBoxes);
+        }
+        finally
+        {
+            if (File.Exists(tempFile))
+            {
+                File.Delete(tempFile);
+            }
+        }
+    }
+
+    [Fact]
+    public void RundownDataBlockExporter_SnatcherBoxes_ExportsArenaDimensionBlock()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"gtfo_snatcher_export_{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(tempDir);
+            var mainVm = new MainWindowViewModel();
+            var level = mainVm.LevelLayout.Levels[0];
+            level.PersistentId = 42;
+            level.SnatcherBoxes = true;
+
+            var tierA = mainVm.Rundown.SelectedRundown?.TierA;
+            Assert.NotNull(tierA);
+            tierA.Clear();
+            var exp = new ExpeditionBlock
+            {
+                Enabled = true,
+                LevelLayoutData = 42
+            };
+            tierA.Add(exp);
+
+            var exportResult = DatablockManager.Instance.ExportDatablocks(mainVm, tempDir);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            string rundownFilePath = Path.Combine(tempDir, "GameData_RundownDataBlock_bin.json");
+            Assert.True(File.Exists(rundownFilePath));
+
+            string json = File.ReadAllText(rundownFilePath);
+            var rundownDoc = JsonNode.Parse(json) as JsonObject;
+            var blocks = rundownDoc?["Blocks"] as JsonArray;
+            Assert.NotNull(blocks);
+
+            var firstBlock = blocks[0] as JsonObject;
+            var tierAObj = firstBlock?["TierA"] as JsonArray;
+            Assert.NotNull(tierAObj);
+
+            var expObj = tierAObj[0] as JsonObject;
+            Assert.NotNull(expObj);
+
+            var dimDatas = expObj["DimensionDatas"] as JsonArray;
+            Assert.NotNull(dimDatas);
+
+            var arenaDim = dimDatas.FirstOrDefault(d => string.Equals(d?["DimensionIndex"]?.ToString(), "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase)) as JsonObject;
+            Assert.NotNull(arenaDim);
+            Assert.Equal(14u, arenaDim["DimensionData"]?.GetValue<uint>());
+            Assert.True(arenaDim["Enabled"]?.GetValue<bool>());
+
+            // Check DimensionDataBlock always has persistentID 14
+            string dimFilePath = Path.Combine(tempDir, "GameData_DimensionDataBlock_bin.json");
+            Assert.True(File.Exists(dimFilePath));
+
+            string dimJson = File.ReadAllText(dimFilePath);
+            var dimDoc = JsonNode.Parse(dimJson) as JsonObject;
+            var dimBlocks = dimDoc?["Blocks"] as JsonArray;
+            Assert.NotNull(dimBlocks);
+
+            var block14 = dimBlocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 14);
+            Assert.NotNull(block14);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void LevelLayoutDataBlockImporter_SnatcherBoxes_ParsesArenaDimensionFromExpedition()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), $"gtfo_snatcher_import_{Guid.NewGuid():N}");
+        try
+        {
+            Directory.CreateDirectory(tempDir);
+            var mainVm = new MainWindowViewModel();
+            var level = mainVm.LevelLayout.Levels[0];
+            level.PersistentId = 88;
+            level.SnatcherBoxes = true;
+
+            var tierA = mainVm.Rundown.SelectedRundown?.TierA;
+            Assert.NotNull(tierA);
+            tierA.Clear();
+            var exp = new ExpeditionBlock
+            {
+                Enabled = true,
+                LevelLayoutData = 88
+            };
+            tierA.Add(exp);
+
+            var exportResult = DatablockManager.Instance.ExportDatablocks(mainVm, tempDir);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            // Now import back
+            var importVm = new MainWindowViewModel();
+            var importResult = DatablockManager.Instance.ImportDatablocks(importVm, tempDir);
+            Assert.True(importResult.Success, importResult.Message);
+
+            var importedLevel = importVm.LevelLayout.Levels.FirstOrDefault(l => l.PersistentId == 88);
+            Assert.NotNull(importedLevel);
+            Assert.True(importedLevel.SnatcherBoxes);
+            // Ensure ARENA_DIMENSION is NOT in Dimensions list
+            Assert.DoesNotContain(importedLevel.Dimensions, d => string.Equals(d.DimensionIndex, "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase));
         }
         finally
         {

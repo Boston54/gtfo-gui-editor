@@ -141,7 +141,10 @@
                                 <Expander.Header>
                                     <Grid ColumnDefinitions="*,Auto">
                                         <TextBlock Grid.Column="0" Text="Events On Terminal Deactivate Alarm" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the alarm is deactivated from the terminal" Foreground="#03C700" VerticalAlignment="Center"/>
-                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnTerminalDeactivateAlarm}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                            <Button Content="+ Add Event" Command="{Binding AddEventOnTerminalDeactivateAlarm}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                            <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnTerminalDeactivateAlarmFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                        </StackPanel>
                                     </Grid>
                                 </Expander.Header>
                                 <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -438,7 +441,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Portal Warp" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the portal scan is completed (this is for source zone, not destination zone). Hardcoded to be used with the portal geomorph (R6B1 and R6D1)" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnPortalWarp}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnPortalWarp}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnPortalWarpFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -452,7 +458,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Approach Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when a player gets close to the door" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnApproachDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnApproachDoor}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnApproachDoorFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -466,7 +475,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Unlock Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the door is unlocked" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnUnlockDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnUnlockDoor}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnUnlockDoorFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -480,7 +492,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Open Door" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when this door is opened" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnOpenDoor}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnOpenDoor}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnOpenDoorFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -494,7 +509,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Door Scan Start" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the scan for this door starts" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnDoorScanStart}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnDoorScanStart}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnDoorScanStartFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -508,7 +526,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Door Scan Done" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when the scan of this zone is finished" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnDoorScanDone}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnDoorScanDone}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnDoorScanDoneFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -522,7 +543,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Boss Death" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Events to trigger when an enemy considered to be a 'boss' dies. In vanilla, this is specific to the R6D1 kraken, making it unusable" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnBossDeath}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnBossDeath}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnBossDeathFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -536,7 +560,10 @@
                         <Expander.Header>
                             <Grid ColumnDefinitions="*,Auto">
                                 <TextBlock Grid.Column="0" Text="Events On Trigger" FontWeight="SemiBold" FontSize="13" ToolTip.Tip="Used to trigger events when a player approaches an object using the triggers that are defined in the prefabs" Foreground="#03C700" VerticalAlignment="Center"/>
-                                <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddEventOnTrigger}" Background="#2D5A27" Foreground="White" Padding="10,4" Margin="0,0,10,0"/>
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                    <Button Content="+ Add Event" Command="{Binding AddEventOnTrigger}" Background="#2D5A27" Foreground="White" Padding="10,4"/>
+                                    <Button Content="+ Add from Clipboard" Command="{Binding AddEventOnTriggerFromClipboardCommand}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="10,4"/>
+                                </StackPanel>
                             </Grid>
                         </Expander.Header>
                         <StackPanel Spacing="8" Margin="0,8,0,0">

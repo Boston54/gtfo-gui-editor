@@ -101,11 +101,18 @@
                         <StackPanel Spacing="10">
                             <TextBlock Text="Audio" FontWeight="Bold" FontSize="14"/>
                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
-                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Alarm Sound Start:" ToolTip.Tip="The sound to play when the alarm starts. This is an ID of a sound effect, view the Sounds tab to see a list." VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedAlarm.AlarmSoundStart, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Alarm Sound Start:" ToolTip.Tip="The sound to play when the alarm starts." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ComboBox Grid.Row="0" Grid.Column="1"
+                                          ItemsSource="{x:Static vm:AlarmsViewModel.AvailableAlarmSoundStarts}"
+                                          SelectedItem="{Binding SelectedAlarm.AlarmSoundStart, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"
+                                          Margin="0,0,16,0"/>
 
-                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Alarm Sound Stop:" ToolTip.Tip="The sound to play when the alarm stops. This is an ID of a sound effect, view the Sounds tab to see a list." VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedAlarm.AlarmSoundStop, Mode=TwoWay}" Margin="0,0,0,0"/>
+                                <TextBlock Grid.Row="0" Grid.Column="2" Text="Alarm Sound Stop:" ToolTip.Tip="The sound to play when the alarm stops." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                <ComboBox Grid.Row="0" Grid.Column="3"
+                                          ItemsSource="{x:Static vm:AlarmsViewModel.AvailableAlarmSoundStops}"
+                                          SelectedItem="{Binding SelectedAlarm.AlarmSoundStop, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"/>
                             </Grid>
                         </StackPanel>
                     </Border>

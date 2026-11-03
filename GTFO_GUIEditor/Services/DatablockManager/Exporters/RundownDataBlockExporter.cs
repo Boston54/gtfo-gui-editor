@@ -326,9 +326,9 @@ public class RundownDataBlockExporter : IDatablockExporter
                 ["Zone"] = thirdZone
             };
 
+            var dimDatasArray = new JsonArray();
             if (matchingLevel != null && matchingLevel.Dimensions.Count > 0)
             {
-                var dimDatasArray = new JsonArray();
                 foreach (var dim in matchingLevel.Dimensions)
                 {
                     uint dimPersistentId = context.DimensionIds.TryGetValue(dim, out uint pid) ? pid : 0;
@@ -342,14 +342,44 @@ public class RundownDataBlockExporter : IDatablockExporter
                         });
                     }
                 }
-                if (dimDatasArray.Count > 0)
-                {
-                    expObj["DimensionDatas"] = dimDatasArray;
-                }
             }
             else if (exp.DimensionDatas.HasValue)
             {
-                expObj["DimensionDatas"] = ConvertToJsonArrayOrEmpty(exp.DimensionDatas);
+                var fallbackArray = ConvertToJsonArrayOrEmpty(exp.DimensionDatas);
+                foreach (var item in fallbackArray)
+                {
+                    if (item is JsonObject jObj)
+                    {
+                        if (matchingLevel != null && string.Equals(jObj["DimensionIndex"]?.ToString(), "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+                        var cloned = JsonNode.Parse(jObj.ToJsonString());
+                        if (cloned != null)
+                        {
+                            dimDatasArray.Add(cloned);
+                        }
+                    }
+                }
+            }
+
+            if (matchingLevel != null && matchingLevel.SnatcherBoxes)
+            {
+                bool alreadyHasArena = dimDatasArray.Any(n => n is JsonObject obj && string.Equals(obj["DimensionIndex"]?.ToString(), "ARENA_DIMENSION", StringComparison.OrdinalIgnoreCase));
+                if (!alreadyHasArena)
+                {
+                    dimDatasArray.Add(new JsonObject
+                    {
+                        ["DimensionIndex"] = "ARENA_DIMENSION",
+                        ["DimensionData"] = 14,
+                        ["Enabled"] = true
+                    });
+                }
+            }
+
+            if (dimDatasArray.Count > 0)
+            {
+                expObj["DimensionDatas"] = dimDatasArray;
             }
 
             array.Add(expObj);

@@ -60,10 +60,14 @@
                                       Header="{Binding ExportToMenuHeader}"/>
                     </MenuItem>
                     <MenuItem Header="Settings"
-                                  Command="{Binding OpenAppearanceSettings}"
-                                  Foreground="#E0E0E0"
-                                  FontWeight="SemiBold"
-                                  FontSize="13"/>
+                              Foreground="#E0E0E0"
+                              FontWeight="SemiBold"
+                              FontSize="13">
+                        <MenuItem Header="General"
+                                  Command="{Binding OpenGeneralSettings}"/>
+                        <MenuItem Header="Appearance"
+                                  Command="{Binding OpenAppearanceSettings}"/>
+                    </MenuItem>
                 </Menu>
 
                 <TextBlock Grid.Column="1"
@@ -137,8 +141,8 @@
                                           IsVisible="{Binding IsShowingImportNotification}"/>
 
         <!-- Settings Modal Overlay -->
-        <views:SettingsView Grid.Row="0"
-                            Grid.RowSpan="2"
-                            IsVisible="{Binding IsShowingSettings}"/>
+        <dialogs:SettingsDialog Grid.Row="0"
+                                Grid.RowSpan="2"
+                                IsVisible="{Binding IsShowingSettings}"/>
     </Grid>
 </Window>

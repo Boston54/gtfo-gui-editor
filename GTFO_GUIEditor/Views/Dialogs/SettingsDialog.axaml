@@ -6,7 +6,7 @@
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
              xmlns:controls="clr-namespace:GTFO_GUIEditor.Controls;assembly=GTFO_GUIEditor"
              mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
-             x:Class="GTFO_GUIEditor.Views.SettingsView"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.SettingsDialog"
              x:Name="SettingsDialogRoot"
              x:DataType="vm:MainWindowViewModel">
     <UserControl.Styles>
@@ -26,8 +26,10 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                HorizontalAlignment="Stretch"
-                VerticalAlignment="Stretch"
+                Width="640"
+                MaxHeight="750"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
                 BoxShadow="0 4 20 #80000000">
             <Grid RowDefinitions="Auto,*,Auto">
                 <!-- Header -->
@@ -48,11 +50,16 @@
                 </Grid>
 
                 <!-- Tabbed Settings Content -->
-                <TabControl Grid.Row="1" Margin="0,0,0,12">
+                <TabControl Grid.Row="1" SelectedIndex="{Binding SelectedSettingsTabIndex, Mode=TwoWay}" Margin="0,0,0,12">
                     <TabItem Header="General" Foreground="#E0E0E0" FontSize="14" FontWeight="SemiBold">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0" Margin="0,10,0,0">
-                            <StackPanel Spacing="18">
+                            <StackPanel Spacing="16">
+                                <!-- Startup Project -->
                                 <TextBlock Text="Startup Project" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <TextBlock Text="Choose which projects will be automatically opened when the editor launches."
+                                           FontSize="12"
+                                           Foreground="#AAAAAA"
+                                           TextWrapping="Wrap"/>
                                 <StackPanel Spacing="8">
                                     <RadioButton Content="New project" IsChecked="{Binding Settings.General.IsNewProjectStartup, Mode=TwoWay}" Foreground="#E0E0E0"/>
                                     <RadioButton Content="Previous opened project" IsChecked="{Binding Settings.General.IsPreviousOpenedProjectStartup, Mode=TwoWay}" Foreground="#E0E0E0"/>
@@ -74,13 +81,23 @@
                                     </Border>
                                 </StackPanel>
 
-                                <TextBlock Text="Data Flow" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <!-- Data Flow -->
+                                <TextBlock Text="Data Flow" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,4,0,0"/>
+                                <TextBlock Text="Select the data format used for datablocks. The 'Datablocks' option effectively inverts the behaviour of saving/exporting and opening/importing - CTRL+S now produces datablocks, and default open behaviour is to open from datablocks."
+                                           FontSize="12"
+                                           Foreground="#AAAAAA"
+                                           TextWrapping="Wrap"/>
                                 <StackPanel Spacing="8">
                                     <RadioButton Content=".rundown file" IsChecked="{Binding Settings.General.IsRundownDataFlow, Mode=TwoWay}" Foreground="#E0E0E0"/>
                                     <RadioButton Content="Datablocks" IsChecked="{Binding Settings.General.IsDatablocksDataFlow, Mode=TwoWay}" Foreground="#E0E0E0"/>
                                 </StackPanel>
 
-                                <TextBlock Text="Window Mode" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <!-- Window Mode -->
+                                <TextBlock Text="Window Mode" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,4,0,0"/>
+                                <TextBlock Text="Set the display mode for the editor application window."
+                                           FontSize="12"
+                                           Foreground="#AAAAAA"
+                                           TextWrapping="Wrap"/>
                                 <StackPanel Spacing="8">
                                     <RadioButton Content="Windowed" IsChecked="{Binding Settings.General.IsWindowed, Mode=TwoWay}" Foreground="#E0E0E0"/>
                                     <RadioButton Content="Windowed Fullscreen" IsChecked="{Binding Settings.General.IsWindowedFullscreen, Mode=TwoWay}" Foreground="#E0E0E0"/>
@@ -272,7 +289,7 @@
                 <Grid Grid.Row="2" ColumnDefinitions="Auto,*" Margin="0,8,0,0">
                     <Button Grid.Column="0"
                             Content="Reset to Defaults"
-                            Command="{Binding ResetAppearanceSettingsToDefaults}"
+                            Command="{Binding ResetSettingsToDefaults}"
                             Padding="14,8"/>
                     <Button Grid.Column="1"
                             Content="Close"

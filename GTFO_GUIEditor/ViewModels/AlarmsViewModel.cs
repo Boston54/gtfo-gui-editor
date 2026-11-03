@@ -34,9 +34,13 @@ public class AlarmsViewModel : ViewModelBase
 
     public static SurvivalWaveSpawnType[] AvailableWaveSpawnTypes => Enum.GetValues<SurvivalWaveSpawnType>();
     public static WaveFilterType[] AvailableFilterTypes => Enum.GetValues<WaveFilterType>();
+    public static AlarmSoundStart[] AvailableAlarmSoundStarts => Enum.GetValues<AlarmSoundStart>();
+    public static AlarmSoundStop[] AvailableAlarmSoundStops => Enum.GetValues<AlarmSoundStop>();
 
     public SurvivalWaveSpawnType[] WaveSpawnTypes => AvailableWaveSpawnTypes;
     public WaveFilterType[] FilterTypes => AvailableFilterTypes;
+    public AlarmSoundStart[] AlarmSoundStartOptions => AvailableAlarmSoundStarts;
+    public AlarmSoundStop[] AlarmSoundStopOptions => AvailableAlarmSoundStops;
 
     public ObservableCollection<EnemyEntry> Enemies { get; }
     public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes { get; }

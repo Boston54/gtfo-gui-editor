@@ -361,7 +361,10 @@
                                                     <Expander.Header>
                                                         <Grid ColumnDefinitions="*,Auto">
                                                             <TextBlock Grid.Column="0" Text="Terminal Placements" ToolTip.Tip="Placements and configs for terminals in the zone" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
-                                                            <Button Grid.Column="1" Content="+ Add Terminal" Command="{Binding AddTerminalPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                                                <Button Content="+ Add Terminal" Command="{Binding AddTerminalPlacement}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                                <Button Content="+ Add from Clipboard" Command="{Binding AddTerminalPlacementFromClipboardCommand}" ToolTip.Tip="Add terminal placement from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                                            </StackPanel>
                                                         </Grid>
                                                     </Expander.Header>
                                                     <ItemsControl ItemsSource="{Binding ActiveZoneSettings.TerminalPlacements}" Margin="0,8,0,0">
@@ -371,7 +374,10 @@
                                                                     <Expander.Header>
                                                                         <Grid ColumnDefinitions="*,Auto">
                                                                             <TextBlock Grid.Column="0" Text="Terminal Configuration" ToolTip.Tip="Custom configuration for this terminal" FontWeight="SemiBold" FontSize="12" Foreground="#FFA200" VerticalAlignment="Center"/>
-                                                                            <Button Grid.Column="1" Content="✕ Remove Terminal" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                                                                <Button Content="Copy to Clipboard" ToolTip.Tip="Copy terminal placement configuration to clipboard as JSON" Command="{Binding #EditRoomDialogRoot.DataContext.CopyTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                                                                <Button Content="✕ Remove Terminal" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveTerminalPlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                            </StackPanel>
                                                                         </Grid>
                                                                     </Expander.Header>
                                                                     <StackPanel Spacing="8" Margin="0,8,0,0">
@@ -588,7 +594,10 @@
                                                                                                     <Expander.Header>
                                                                                                         <Grid ColumnDefinitions="*,Auto">
                                                                                                             <TextBlock Grid.Column="0" Text="Command Events" ToolTip.Tip="Events to trigger when the command is run" FontWeight="SemiBold" FontSize="11" Foreground="#03C700" VerticalAlignment="Center"/>
-                                                                                                            <Button Grid.Column="1" Content="+ Add Event" Command="{Binding AddCommandEvent}" Background="#2D5A27" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
+                                                                                                                <Button Content="+ Add Event" Command="{Binding AddCommandEvent}" Background="#2D5A27" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                                                <Button Content="+ Add from Clipboard" Command="{Binding #EditRoomDialogRoot.DataContext.AddUniqueCommandEventFromClipboardCommand}" CommandParameter="{Binding}" ToolTip.Tip="Add event from clipboard JSON" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                                                                                            </StackPanel>
                                                                                                         </Grid>
                                                                                                     </Expander.Header>
                                                                                                     <StackPanel Spacing="6" Margin="0,6,0,0">

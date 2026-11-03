@@ -712,22 +712,26 @@ public class AlarmTests
     public void AlarmBlock_AudioAndHUDProperties_HaveCorrectDefaultsAndClone()
     {
         var alarm = new AlarmBlock();
-        Assert.Equal((uint)3339129407, alarm.AlarmSoundStart);
-        Assert.Equal((uint)42633153, alarm.AlarmSoundStop);
+        Assert.Equal(AlarmSoundStart.Standard, alarm.AlarmSoundStart);
+        Assert.Equal(AlarmSoundStop.Standard, alarm.AlarmSoundStop);
+        Assert.Equal((uint)3339129407, (uint)alarm.AlarmSoundStart);
+        Assert.Equal((uint)42633153, (uint)alarm.AlarmSoundStop);
         Assert.False(alarm.OnlyShowHUDWhenPlayerIsClose);
 
-        alarm.AlarmSoundStart = 12345678;
-        alarm.AlarmSoundStop = 87654321;
+        alarm.AlarmSoundStart = AlarmSoundStart.Error;
+        alarm.AlarmSoundStop = AlarmSoundStop.Error_Start;
         alarm.OnlyShowHUDWhenPlayerIsClose = true;
 
         var clone = alarm.Clone();
-        Assert.Equal((uint)12345678, clone.AlarmSoundStart);
-        Assert.Equal((uint)87654321, clone.AlarmSoundStop);
+        Assert.Equal(AlarmSoundStart.Error, clone.AlarmSoundStart);
+        Assert.Equal(AlarmSoundStop.Error_Start, clone.AlarmSoundStop);
+        Assert.Equal((uint)2200133294, (uint)clone.AlarmSoundStart);
+        Assert.Equal((uint)2200133294, (uint)clone.AlarmSoundStop);
         Assert.True(clone.OnlyShowHUDWhenPlayerIsClose);
 
         var templateCloned = AlarmService.CreateAlarmFromTemplate(alarm, 9001, "ClonedAudioAlarm");
-        Assert.Equal((uint)12345678, templateCloned.AlarmSoundStart);
-        Assert.Equal((uint)87654321, templateCloned.AlarmSoundStop);
+        Assert.Equal(AlarmSoundStart.Error, templateCloned.AlarmSoundStart);
+        Assert.Equal(AlarmSoundStop.Error_Start, templateCloned.AlarmSoundStop);
         Assert.True(templateCloned.OnlyShowHUDWhenPlayerIsClose);
     }
 
@@ -739,8 +743,8 @@ public class AlarmTests
         {
             var mainVm = new MainWindowViewModel();
             var customAlarm = AlarmService.CreateFreshAlarm(9999, "Custom Audio Alarm");
-            customAlarm.AlarmSoundStart = 11223344;
-            customAlarm.AlarmSoundStop = 55667788;
+            customAlarm.AlarmSoundStart = AlarmSoundStart.Error;
+            customAlarm.AlarmSoundStop = AlarmSoundStop.Error;
             customAlarm.OnlyShowHUDWhenPlayerIsClose = true;
 
             mainVm.Alarms.Alarms.Add(customAlarm);
@@ -754,8 +758,8 @@ public class AlarmTests
             var loadedAlarm = loadedVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 9999);
             Assert.NotNull(loadedAlarm);
             Assert.Equal("Custom Audio Alarm", loadedAlarm.Name);
-            Assert.Equal((uint)11223344, loadedAlarm.AlarmSoundStart);
-            Assert.Equal((uint)55667788, loadedAlarm.AlarmSoundStop);
+            Assert.Equal(AlarmSoundStart.Error, loadedAlarm.AlarmSoundStart);
+            Assert.Equal(AlarmSoundStop.Error, loadedAlarm.AlarmSoundStop);
             Assert.True(loadedAlarm.OnlyShowHUDWhenPlayerIsClose);
         }
         finally
@@ -775,8 +779,8 @@ public class AlarmTests
         {
             var mainVm = new MainWindowViewModel();
             var audioAlarm = AlarmService.CreateFreshAlarm(80001, "Export Audio Alarm");
-            audioAlarm.AlarmSoundStart = 11112222;
-            audioAlarm.AlarmSoundStop = 33334444;
+            audioAlarm.AlarmSoundStart = AlarmSoundStart.Error;
+            audioAlarm.AlarmSoundStop = AlarmSoundStop.Error_Start;
             audioAlarm.OnlyShowHUDWhenPlayerIsClose = true;
 
             mainVm.Alarms.Alarms.Clear();
@@ -796,8 +800,8 @@ public class AlarmTests
 
             var expAudioBlock = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 80001)?.AsObject();
             Assert.NotNull(expAudioBlock);
-            Assert.Equal((uint)11112222, expAudioBlock["AlarmSoundStart"]?.GetValue<uint>());
-            Assert.Equal((uint)33334444, expAudioBlock["AlarmSoundStop"]?.GetValue<uint>());
+            Assert.Equal((uint)2200133294, expAudioBlock["AlarmSoundStart"]?.GetValue<uint>());
+            Assert.Equal((uint)2200133294, expAudioBlock["AlarmSoundStop"]?.GetValue<uint>());
             Assert.True(expAudioBlock["OnlyShowHUDWhenPlayerIsClose"]?.GetValue<bool>());
 
             // Test Import
@@ -808,8 +812,8 @@ public class AlarmTests
             var importedAlarm = importVm.Alarms.Alarms.FirstOrDefault(a => a.PersistentId == 80001);
             Assert.NotNull(importedAlarm);
             Assert.Equal("Export Audio Alarm", importedAlarm.Name);
-            Assert.Equal((uint)11112222, importedAlarm.AlarmSoundStart);
-            Assert.Equal((uint)33334444, importedAlarm.AlarmSoundStop);
+            Assert.Equal(AlarmSoundStart.Error, importedAlarm.AlarmSoundStart);
+            Assert.Equal(AlarmSoundStop.Error_Start, importedAlarm.AlarmSoundStop);
             Assert.True(importedAlarm.OnlyShowHUDWhenPlayerIsClose);
         }
         finally
@@ -819,5 +823,30 @@ public class AlarmTests
                 try { System.IO.Directory.Delete(tempDir, true); } catch { }
             }
         }
+    }
+
+    [Fact]
+    public void AlarmSoundEnum_ValuesAndJsonSerialization_AreValid()
+    {
+        Assert.Equal((uint)3339129407, (uint)AlarmSoundStart.Standard);
+        Assert.Equal((uint)2200133294, (uint)AlarmSoundStart.Error);
+
+        Assert.Equal((uint)42633153, (uint)AlarmSoundStop.Standard);
+        Assert.Equal((uint)1190355274, (uint)AlarmSoundStop.Error);
+        Assert.Equal((uint)2200133294, (uint)AlarmSoundStop.Error_Start);
+
+        // Test numeric deserialization
+        string jsonStartNum = "{\"AlarmSoundStart\":2200133294,\"AlarmSoundStop\":1190355274}";
+        var deserializedFromNum = System.Text.Json.JsonSerializer.Deserialize<AlarmBlock>(jsonStartNum);
+        Assert.NotNull(deserializedFromNum);
+        Assert.Equal(AlarmSoundStart.Error, deserializedFromNum.AlarmSoundStart);
+        Assert.Equal(AlarmSoundStop.Error, deserializedFromNum.AlarmSoundStop);
+
+        // Test string deserialization
+        string jsonStartStr = "{\"AlarmSoundStart\":\"Standard\",\"AlarmSoundStop\":\"Error_Start\"}";
+        var deserializedFromStr = System.Text.Json.JsonSerializer.Deserialize<AlarmBlock>(jsonStartStr);
+        Assert.NotNull(deserializedFromStr);
+        Assert.Equal(AlarmSoundStart.Standard, deserializedFromStr.AlarmSoundStart);
+        Assert.Equal(AlarmSoundStop.Error_Start, deserializedFromStr.AlarmSoundStop);
     }
 }

@@ -22,8 +22,8 @@ public class AlarmBlock : INotifyPropertyChanged
     private double _wantedDistanceFromStartPos = 0;
     private double _wantedDistanceBetweenPuzzleComponents = 0;
     private bool _onlyShowHUDWhenPlayerIsClose = false;
-    private uint _alarmSoundStart = 3339129407;
-    private uint _alarmSoundStop = 42633153;
+    private AlarmSoundStart _alarmSoundStart = AlarmSoundStart.Standard;
+    private AlarmSoundStop _alarmSoundStop = AlarmSoundStop.Standard;
     private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
 
     // Wave Roles (Enemy References)
@@ -179,14 +179,14 @@ public class AlarmBlock : INotifyPropertyChanged
     }
 
     [JsonPropertyName("AlarmSoundStart")]
-    public uint AlarmSoundStart
+    public AlarmSoundStart AlarmSoundStart
     {
         get => _alarmSoundStart;
         set => SetField(ref _alarmSoundStart, value);
     }
 
     [JsonPropertyName("AlarmSoundStop")]
-    public uint AlarmSoundStop
+    public AlarmSoundStop AlarmSoundStop
     {
         get => _alarmSoundStop;
         set => SetField(ref _alarmSoundStop, value);

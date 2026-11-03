@@ -579,17 +579,24 @@ public class LevelLayoutTests
         Assert.True(vm.IsConfiguringDimension);
         Assert.True(vm.IsPromptingReality);
         Assert.Equal("Starting Elevator Tile:", vm.PromptStartingTileLabel);
+        Assert.NotNull(vm.EditingDimension);
+        Assert.Equal("Reality", vm.EditingDimension.DimensionIndex);
 
-        // Only Elevator Shafts source should be available for Reality
-        Assert.Single(vm.AvailableTileSources);
-        Assert.Equal("Elevator Shafts", vm.AvailableTileSources[0]);
+        // Elevator Shafts and Dimension Geomorphs source should be available
+        Assert.Equal(2, vm.AvailableTileSources.Count);
+        Assert.Contains("Elevator Shafts", vm.AvailableTileSources);
+        Assert.Contains("Dimension Geomorphs (Custom Objective 1x1)", vm.AvailableTileSources);
         Assert.Equal("Elevator Shafts", vm.SelectedTileSource);
 
-        // Attempting to select Custom Geomorphs on Reality should coerce back to Elevator Shafts
+        // Can switch tile source
         vm.SelectedTileSource = "Dimension Geomorphs (Custom Objective 1x1)";
+        Assert.Equal("Dimension Geomorphs (Custom Objective 1x1)", vm.SelectedTileSource);
+
+        // Switch back to Elevator Shafts
+        vm.SelectedTileSource = "Elevator Shafts";
         Assert.Equal("Elevator Shafts", vm.SelectedTileSource);
 
-        // Only elevator tiles are available to pick
+        // Only elevator tiles are available to pick when Elevator Shafts is selected
         Assert.Equal(11, vm.AvailableDimensionTiles.Count);
         Assert.All(vm.AvailableDimensionTiles, t => Assert.Equal("Elevator Shaft", t.Category));
 

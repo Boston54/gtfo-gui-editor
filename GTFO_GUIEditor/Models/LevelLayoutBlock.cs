@@ -16,12 +16,14 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private uint _complexResourceSet;
     private string _elevatorTile = string.Empty;
     private uint _fogSettings;
+    private DimensionLayoutBlock _realityDimension = new() { DimensionIndex = "Reality", Name = "Reality" };
     private ObservableCollection<DimensionLayoutBlock> _dimensions = new();
     private LevelLayoutGridState? _gridState;
     private SectorSettings _mainSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 0 };
     private SectorSettings _secondarySector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 100 };
     private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 200 };
     private ExpeditionBalanceSettings _expeditionBalance = new();
+    private bool _snatcherBoxes;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -99,6 +101,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
         set => ElevatorTile = value;
     }
 
+    [JsonPropertyName("RealityDimension")]
+    public DimensionLayoutBlock RealityDimension
+    {
+        get => _realityDimension;
+        set => SetField(ref _realityDimension, value ?? new DimensionLayoutBlock { DimensionIndex = "Reality", Name = "Reality" });
+    }
+
     [JsonPropertyName("Dimensions")]
     public ObservableCollection<DimensionLayoutBlock> Dimensions
     {
@@ -132,6 +141,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _expeditionBalance;
         set => SetField(ref _expeditionBalance, value ?? new ExpeditionBalanceSettings());
+    }
+
+    [JsonPropertyName("SnatcherBoxes")]
+    public bool SnatcherBoxes
+    {
+        get => _snatcherBoxes;
+        set => SetField(ref _snatcherBoxes, value);
     }
 
     public SectorSettings GetSectorSettings(SectorType sectorType)
@@ -244,16 +260,14 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         if (string.IsNullOrWhiteSpace(dimensionIndex) || string.Equals(dimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase))
         {
-            return new DimensionLayoutBlock
-            {
-                DimensionIndex = "Reality",
-                Name = "Reality",
-                ComplexType = ComplexType,
-                ComplexResourceSet = ComplexResourceSet,
-                DimensionGeomorph = ElevatorTile,
-                LevelLayoutData = PersistentId,
-                InternalEnabled = InternalEnabled
-            };
+            _realityDimension.DimensionIndex = "Reality";
+            _realityDimension.Name = "Reality";
+            _realityDimension.ComplexType = ComplexType;
+            _realityDimension.ComplexResourceSet = ComplexResourceSet;
+            _realityDimension.DimensionGeomorph = ElevatorTile;
+            _realityDimension.LevelLayoutData = PersistentId;
+            _realityDimension.InternalEnabled = InternalEnabled;
+            return _realityDimension;
         }
 
         return _dimensions.FirstOrDefault(d => string.Equals(d.DimensionIndex, dimensionIndex, StringComparison.OrdinalIgnoreCase));
@@ -265,6 +279,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
 
         if (string.Equals(dimension.DimensionIndex, "Reality", StringComparison.OrdinalIgnoreCase))
         {
+            _realityDimension = dimension;
             ComplexType = dimension.ComplexType;
             ComplexResourceSet = dimension.ComplexResourceSet;
             ElevatorTile = dimension.DimensionGeomorph;
@@ -309,11 +324,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             ComplexResourceSet = ComplexResourceSet,
             FogSettings = FogSettings,
             ElevatorTile = ElevatorTile,
+            RealityDimension = _realityDimension.Clone(),
             Dimensions = new ObservableCollection<DimensionLayoutBlock>(_dimensions.Select(d => d.Clone())),
             MainSector = MainSector.Clone(),
             SecondarySector = SecondarySector.Clone(),
             OverloadSector = OverloadSector.Clone(),
-            ExpeditionBalance = ExpeditionBalance.Clone()
+            ExpeditionBalance = ExpeditionBalance.Clone(),
+            SnatcherBoxes = SnatcherBoxes
         };
         if (_gridState != null)
         {
