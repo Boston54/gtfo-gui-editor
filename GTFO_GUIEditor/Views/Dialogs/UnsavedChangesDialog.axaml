@@ -1,0 +1,22 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GTFO_GUIEditor.Views.Dialogs.UnsavedChangesDialog"
+        Title="Unsaved Changes"
+        Width="420"
+        Height="170"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner">
+    <Border Background="#252526" Padding="20">
+        <Grid RowDefinitions="*,Auto">
+            <TextBlock Text="You have unsaved changes. Save before closing?"
+                       Foreground="#FFFFFF"
+                       FontSize="14"
+                       TextWrapping="Wrap"/>
+            <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Content="Save" Click="Save_Click" IsDefault="True"/>
+                <Button Content="Don't Save" Click="Discard_Click"/>
+                <Button Content="Cancel" Click="Cancel_Click" IsCancel="True"/>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

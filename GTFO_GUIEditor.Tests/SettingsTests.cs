@@ -70,6 +70,32 @@ public class SettingsTests : IDisposable
     }
 
     [Fact]
+    public void GeneralSettings_AutosaveDefaultsToTwoMinutes()
+    {
+        var settings = new GeneralSettings();
+
+        Assert.Equal(2, settings.AutosaveIntervalMinutes);
+    }
+
+    [Fact]
+    public void SwitchingDataFlow_PreservesDirtyStateAndUsesMatchingQueue()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+
+        vm.Settings.General.DataFlow = DataFlowMode.RundownFile;
+        vm.MarkProjectEdited();
+        Assert.True(vm.IsDirty);
+
+        vm.Settings.General.DataFlow = DataFlowMode.Datablocks;
+        Assert.True(vm.IsDirty);
+        Assert.NotEmpty(vm.EditedDatablockFiles);
+
+        vm.Settings.General.DataFlow = DataFlowMode.RundownFile;
+        Assert.True(vm.IsDirty);
+        Assert.Empty(vm.EditedDatablockFiles);
+    }
+
+    [Fact]
     public void CloseSettings_FallsBackToPreviousProjectWhenSetProjectHasNoPath()
     {
         var vm = new MainWindowViewModel(autoReopenLastRundown: false);

@@ -54,8 +54,15 @@ public class GeneralSettings : ViewModelBase
     private string? _startupProjectPath;
     private DataFlowMode _dataFlow = DataFlowMode.RundownFile;
     private WindowDisplayMode _windowDisplayMode = WindowDisplayMode.Windowed;
+    private int _autosaveIntervalMinutes = 2;
     private string? _lastOpenedRundownPath;
     private string? _lastOpenedDatablockPath;
+
+    public int AutosaveIntervalMinutes
+    {
+        get => _autosaveIntervalMinutes;
+        set => SetField(ref _autosaveIntervalMinutes, Math.Max(0, value));
+    }
 
     public StartupProjectMode StartupProject
     {
@@ -170,6 +177,7 @@ public class GeneralSettings : ViewModelBase
         StartupProject = StartupProjectMode.PreviousOpenedProject;
         StartupProjectPath = null;
         DataFlow = DataFlowMode.RundownFile;
+        AutosaveIntervalMinutes = 2;
         LastOpenedRundownPath = null;
         LastOpenedDatablockPath = null;
         WindowDisplayMode = WindowDisplayMode.Windowed;

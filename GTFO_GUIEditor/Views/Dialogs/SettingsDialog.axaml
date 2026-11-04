@@ -92,6 +92,21 @@
                                     <RadioButton Content="Datablocks" IsChecked="{Binding Settings.General.IsDatablocksDataFlow, Mode=TwoWay}" Foreground="#E0E0E0"/>
                                 </StackPanel>
 
+                                <!-- Autosave -->
+                                <TextBlock Text="Autosave" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,4,0,0"/>
+                                <TextBlock Text="Automatically save after this many minutes. Set to 0 to disable autosave."
+                                           FontSize="12"
+                                           Foreground="#AAAAAA"
+                                           TextWrapping="Wrap"/>
+                                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                    <TextBlock Text="Interval (minutes):" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                    <NumericUpDown Minimum="0"
+                                                   Maximum="1440"
+                                                   Increment="1"
+                                                   Value="{Binding Settings.General.AutosaveIntervalMinutes, Mode=TwoWay}"
+                                                   Width="120"/>
+                                </StackPanel>
+
                                 <!-- Window Mode -->
                                 <TextBlock Text="Window Mode" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF" Margin="0,4,0,0"/>
                                 <TextBlock Text="Set the display mode for the editor application window."

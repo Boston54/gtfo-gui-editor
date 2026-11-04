@@ -2,6 +2,12 @@ using System;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.ComponentModel;
+using System.Collections.Generic;
+using System.Collections;
+using System.Collections.Specialized;
+using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -26,6 +32,14 @@ public class MainWindowViewModel : ViewModelBase
     private bool _isShowingSettings;
     private int _selectedSettingsTabIndex;
     private bool _isLoadingSetProjectSelection;
+    private bool _isDirty;
+    private readonly SemaphoreSlim _saveLock = new(1, 1);
+    private readonly System.Threading.Timer _autosaveTimer;
+    private DateTime _lastAutosaveUtc = DateTime.UtcNow;
+    private readonly HashSet<INotifyPropertyChanged> _dirtyPropertySubscribers = new();
+    private readonly HashSet<INotifyCollectionChanged> _dirtyCollectionSubscribers = new();
+    private bool _isLoadingProject;
+    private long _dirtyRevision;
 
     public DocumentationViewModel Documentation { get; }
     public SoundsViewModel Sounds { get; }
@@ -137,6 +151,43 @@ public class MainWindowViewModel : ViewModelBase
         set => SetField(ref _statusMessage, value);
     }
 
+    public bool IsDirty
+    {
+        get => _isDirty;
+        private set => SetField(ref _isDirty, value);
+    }
+
+    public IReadOnlyCollection<string> EditedDatablockFiles => DatablockSaveQueue.Instance.Files;
+
+    private void MarkProjectClean()
+    {
+        _dirtyRevision = 0;
+        IsDirty = false;
+        DatablockSaveQueue.Instance.Clear();
+    }
+
+    public void MarkProjectEdited()
+    {
+        if (_isLoadingProject)
+        {
+            return;
+        }
+        IsDirty = true;
+        unchecked { _dirtyRevision++; }
+        if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+        {
+            DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+        }
+    }
+
+    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender != Settings && sender != Settings.General && sender != Settings.Appearance)
+        {
+            MarkProjectEdited();
+        }
+    }
+
     public MainWindowViewModel()
         : this(new AvaloniaFileDialogService(), autoReopenLastRundown: false)
     {
@@ -167,11 +218,132 @@ public class MainWindowViewModel : ViewModelBase
         Rundown = new RundownViewModel(defaultRundown, LevelLayout.Levels);
         Settings.General.PropertyChanged += OnGeneralSettingsPropertyChanged;
 
+        Documentation.PropertyChanged += OnProjectPropertyChanged;
+        Sounds.PropertyChanged += OnProjectPropertyChanged;
+        Geomorphs.PropertyChanged += OnProjectPropertyChanged;
+        Alarms.PropertyChanged += OnProjectPropertyChanged;
+        Consumables.PropertyChanged += OnProjectPropertyChanged;
+        Lighting.PropertyChanged += OnProjectPropertyChanged;
+        FogSettings.PropertyChanged += OnProjectPropertyChanged;
+        LevelLayout.PropertyChanged += OnProjectPropertyChanged;
+        Rundown.PropertyChanged += OnProjectPropertyChanged;
+
+        _autosaveTimer = new System.Threading.Timer(
+            _ => _ = RunAutosaveAsync(),
+            null,
+            TimeSpan.FromSeconds(30),
+            TimeSpan.FromSeconds(30));
+
         RefreshRecentFiles();
 
         if (autoReopenLastRundown)
         {
             ApplyStartupProjectSetting();
+        }
+
+        AttachDirtyTracking(this);
+        MarkProjectClean();
+        DatablockSaveQueue.Instance.Clear();
+    }
+
+    private void AttachDirtyTracking(object? root)
+    {
+        var visited = new HashSet<object>(ReferenceEqualityComparer.Instance);
+        TraverseDirtyObject(root, visited);
+    }
+
+    private void TraverseDirtyObject(object? value, HashSet<object> visited)
+    {
+        if (value == null || !visited.Add(value))
+        {
+            return;
+        }
+
+        if (value is EditorSettings || value is GeneralSettings)
+        {
+            return;
+        }
+
+        if (value is INotifyPropertyChanged notifyPropertyChanged &&
+            _dirtyPropertySubscribers.Add(notifyPropertyChanged))
+        {
+            if (value is not MainWindowViewModel)
+            {
+                notifyPropertyChanged.PropertyChanged += DirtyPropertyChanged;
+            }
+        }
+
+        if (value is INotifyCollectionChanged notifyCollectionChanged &&
+            _dirtyCollectionSubscribers.Add(notifyCollectionChanged))
+        {
+            if (!ReferenceEquals(notifyCollectionChanged, RecentFiles))
+            {
+                notifyCollectionChanged.CollectionChanged += DirtyCollectionChanged;
+            }
+        }
+
+        if (value is IEnumerable enumerable)
+        {
+            foreach (object? item in enumerable)
+            {
+                if (item != null && IsProjectObject(item.GetType()))
+                {
+                    TraverseDirtyObject(item, visited);
+                }
+            }
+        }
+
+        Type type = value.GetType();
+        if (!IsProjectObject(type))
+        {
+            return;
+        }
+
+        foreach (PropertyInfo property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
+        {
+            if (property.GetIndexParameters().Length != 0 ||
+                !IsProjectObject(property.PropertyType))
+            {
+                continue;
+            }
+
+            try
+            {
+                TraverseDirtyObject(property.GetValue(value), visited);
+            }
+            catch
+            {
+                // A property getter can be unavailable while the UI is changing state.
+            }
+        }
+    }
+
+    private static bool IsProjectObject(Type type) =>
+        type.Namespace?.StartsWith("GTFO_GUIEditor", StringComparison.Ordinal) == true;
+
+    private void DirtyPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (sender is EditorSettings || sender is GeneralSettings)
+        {
+            return;
+        }
+
+        if (sender != null)
+        {
+            AttachDirtyTracking(sender);
+        }
+        MarkProjectEdited();
+    }
+
+    private void DirtyCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    {
+        MarkProjectEdited();
+        if (e.NewItems != null)
+        {
+            foreach (object? item in e.NewItems)
+            {
+                AttachDirtyTracking(item);
+            }
         }
     }
 
@@ -189,6 +361,22 @@ public class MainWindowViewModel : ViewModelBase
             OnPropertyChanged(nameof(ExportMenuHeader));
             OnPropertyChanged(nameof(QuickExportMenuHeader));
             OnPropertyChanged(nameof(ExportToMenuHeader));
+            _lastAutosaveUtc = DateTime.UtcNow;
+            if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+            {
+                if (IsDirty)
+                {
+                    DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+                }
+                else
+                {
+                    DatablockSaveQueue.Instance.Clear();
+                }
+            }
+            else
+            {
+                DatablockSaveQueue.Instance.Clear();
+            }
         }
 
         if (e.PropertyName == nameof(GeneralSettings.WindowDisplayMode) ||
@@ -211,20 +399,29 @@ public class MainWindowViewModel : ViewModelBase
     }
     public void ApplyStartupProjectSetting()
     {
-        switch (Settings.General.StartupProject)
+        _isLoadingProject = true;
+        try
         {
-            case StartupProjectMode.NewProject:
-                break;
-            case StartupProjectMode.SetProject:
-                if (!string.IsNullOrWhiteSpace(Settings.General.StartupProjectPath))
-                {
-                    TryOpenStartupProject(Settings.General.StartupProjectPath);
-                }
-                break;
-            case StartupProjectMode.PreviousOpenedProject:
-            default:
-                TryReopenLastRundown();
-                break;
+            switch (Settings.General.StartupProject)
+            {
+                case StartupProjectMode.NewProject:
+                    break;
+                case StartupProjectMode.SetProject:
+                    if (!string.IsNullOrWhiteSpace(Settings.General.StartupProjectPath))
+                    {
+                        TryOpenStartupProject(Settings.General.StartupProjectPath);
+                    }
+                    break;
+                case StartupProjectMode.PreviousOpenedProject:
+                default:
+                    TryReopenLastRundown();
+                    break;
+            }
+        }
+        finally
+        {
+            _isLoadingProject = false;
+            MarkProjectClean();
         }
     }
 
@@ -235,83 +432,106 @@ public class MainWindowViewModel : ViewModelBase
 
     private async Task OpenStartupProjectAsync(string path)
     {
-        if (File.Exists(path))
+        _isLoadingProject = true;
+        try
         {
-            await OpenFileDirectAsync(path);
-            return;
-        }
-
-        if (Directory.Exists(path))
-        {
-            if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+            if (File.Exists(path))
             {
-                try
-                {
-                    var result = DatablockManager.Instance.ImportDatablocks(this, path);
-                    HandleImportResult(result);
-                }
-                catch (Exception ex)
-                {
-                    StatusMessage = $"Error loading startup folder: {ex.Message}";
-                }
+                await OpenFileDirectAsync(path);
                 return;
             }
 
-            string? rundownFile = Directory.EnumerateFiles(path, "*.rundown", SearchOption.AllDirectories).FirstOrDefault();
-            if (!string.IsNullOrWhiteSpace(rundownFile))
+            if (Directory.Exists(path))
             {
-                await OpenFileDirectAsync(rundownFile);
+                if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+                {
+                    try
+                    {
+                        var result = DatablockManager.Instance.ImportDatablocks(this, path);
+                        HandleImportResult(result);
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusMessage = $"Error loading startup folder: {ex.Message}";
+                    }
+                    return;
+                }
+
+                string? rundownFile = Directory.EnumerateFiles(path, "*.rundown", SearchOption.AllDirectories).FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(rundownFile))
+                {
+                    await OpenFileDirectAsync(rundownFile);
+                }
+                else
+                {
+                    StatusMessage = $"No .rundown file found in startup folder: {path}";
+                }
             }
-            else
-            {
-                StatusMessage = $"No .rundown file found in startup folder: {path}";
-            }
+        }
+        finally
+        {
+            _isLoadingProject = false;
+            MarkProjectClean();
         }
     }
 
     public bool TryReopenLastRundown()
     {
-        if (Settings.General.DataFlow == DataFlowMode.Datablocks)
-        {
-            string? lastDatablockPath = Settings.General.LastOpenedDatablockPath;
-            if (!string.IsNullOrWhiteSpace(lastDatablockPath) && Directory.Exists(lastDatablockPath))
-            {
-                try
-                {
-                    CurrentDatablocksPath = lastDatablockPath;
-                    var result = DatablockManager.Instance.ImportDatablocks(this, lastDatablockPath);
-                    HandleImportResult(result);
-                    StatusMessage = $"Reopened datablocks: {Path.GetFileName(lastDatablockPath)}";
-                    return result.Success;
-                }
-                catch (Exception ex)
-                {
-                    StatusMessage = $"Failed to reopen last datablocks: {ex.Message}";
-                    return false;
-                }
-            }
-            return false;
-        }
-
-        var recentFiles = RundownProjectService.LoadRecentFiles();
-        var lastFile = recentFiles.FirstOrDefault(f => !f.IsPlaceholder && !string.IsNullOrWhiteSpace(f.FilePath) && File.Exists(f.FilePath));
-        if (lastFile == null)
-        {
-            return false;
-        }
-
+        bool previousLoading = _isLoadingProject;
+        _isLoadingProject = true;
         try
         {
-            var project = RundownProjectService.LoadProject(lastFile.FilePath);
-            RundownProjectService.ApplyProject(this, project, lastFile.FilePath);
-            RefreshRecentFiles();
-            StatusMessage = $"Reopened: {Path.GetFileName(lastFile.FilePath)}";
-            return true;
+            if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+            {
+                string? lastDatablockPath = Settings.General.LastOpenedDatablockPath;
+                if (!string.IsNullOrWhiteSpace(lastDatablockPath) && Directory.Exists(lastDatablockPath))
+                {
+                    try
+                    {
+                        CurrentDatablocksPath = lastDatablockPath;
+                        var result = DatablockManager.Instance.ImportDatablocks(this, lastDatablockPath);
+                        HandleImportResult(result);
+                        StatusMessage = $"Reopened datablocks: {Path.GetFileName(lastDatablockPath)}";
+                        return result.Success;
+                    }
+                    catch (Exception ex)
+                    {
+                        StatusMessage = $"Failed to reopen last datablocks: {ex.Message}";
+                        return false;
+                    }
+                }
+                return false;
+            }
+
+            var recentFiles = RundownProjectService.LoadRecentFiles();
+            var lastFile = recentFiles.FirstOrDefault(f => !f.IsPlaceholder && !string.IsNullOrWhiteSpace(f.FilePath) && File.Exists(f.FilePath));
+            if (lastFile == null)
+            {
+                return false;
+            }
+
+            try
+            {
+                var project = RundownProjectService.LoadProject(lastFile.FilePath);
+                RundownProjectService.ApplyProject(this, project, lastFile.FilePath);
+                RefreshRecentFiles();
+                StatusMessage = $"Reopened: {Path.GetFileName(lastFile.FilePath)}";
+                return true;
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed to reopen last rundown: {ex.Message}";
+                return false;
+            }
         }
-        catch (Exception ex)
+        finally
         {
-            StatusMessage = $"Failed to reopen last rundown: {ex.Message}";
-            return false;
+            _isLoadingProject = previousLoading;
+            if (!previousLoading)
+            {
+                AttachDirtyTracking(this);
+                MarkProjectClean();
+            }
         }
     }
 
@@ -361,43 +581,92 @@ public class MainWindowViewModel : ViewModelBase
         }
         Rundown.SelectedRundown = freshRundown;
 
+        MarkProjectClean();
         StatusMessage = "Created new rundown.";
     }
 
     public async Task SaveRundownAsync()
     {
-        if (Settings.General.DataFlow == DataFlowMode.Datablocks)
-        {
-            if (!string.IsNullOrWhiteSpace(CurrentDatablocksPath) && Directory.Exists(CurrentDatablocksPath))
-            {
-                await SaveDatablocksToCurrentFolderAsync();
-            }
-            else
-            {
-                await ExportDatablocksFolderAsync();
-            }
-            return;
-        }
-
-        if (string.IsNullOrWhiteSpace(CurrentFilePath))
-        {
-            await SaveAsRundownAsync();
-            return;
-        }
-
+        await _saveLock.WaitAsync();
         try
         {
-            RundownProjectService.SaveProject(this, CurrentFilePath);
-            RundownProjectService.AddRecentFile(CurrentFilePath);
+            long revision = _dirtyRevision;
+            DataFlowMode dataFlow = Settings.General.DataFlow;
+            if (dataFlow == DataFlowMode.Datablocks)
+            {
+                if (!string.IsNullOrWhiteSpace(CurrentDatablocksPath) && Directory.Exists(CurrentDatablocksPath))
+                {
+                    await SaveDatablocksToCurrentFolderAsync();
+                }
+                else
+                {
+                    await ExportDatablocksFolderAsync();
+                }
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(CurrentFilePath))
+            {
+                await SaveAsRundownAsync();
+                return;
+            }
+
+            await Task.Run(() =>
+            {
+                RundownProjectService.SaveProject(this, CurrentFilePath);
+                RundownProjectService.AddRecentFile(CurrentFilePath);
+            });
             Settings.General.LastOpenedRundownPath = CurrentFilePath;
             EditorSettingsManager.Instance.SaveSettings();
             RefreshRecentFiles();
+            if (_dirtyRevision == revision)
+            {
+                MarkProjectClean();
+            }
             StatusMessage = $"Saved: {Path.GetFileName(CurrentFilePath)}";
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error saving: {ex.Message}";
         }
+        finally
+        {
+            _saveLock.Release();
+        }
+    }
+
+    private async Task RunAutosaveAsync()
+    {
+        if (!IsDirty)
+        {
+            return;
+        }
+
+        if (Settings.General.DataFlow == DataFlowMode.RundownFile &&
+            string.IsNullOrWhiteSpace(CurrentFilePath))
+        {
+            return;
+        }
+
+        if (Settings.General.DataFlow == DataFlowMode.Datablocks &&
+            (string.IsNullOrWhiteSpace(CurrentDatablocksPath) || !Directory.Exists(CurrentDatablocksPath)))
+        {
+            return;
+        }
+
+        int intervalMinutes = Settings.General.AutosaveIntervalMinutes;
+        if (intervalMinutes <= 0)
+        {
+            return;
+        }
+
+        if (DateTime.UtcNow - _lastAutosaveUtc < TimeSpan.FromMinutes(intervalMinutes))
+        {
+            return;
+        }
+
+        _lastAutosaveUtc = DateTime.UtcNow;
+        await SaveRundownAsync();
     }
 
     public async Task SaveAsRundownAsync()
@@ -424,12 +693,17 @@ public class MainWindowViewModel : ViewModelBase
 
         try
         {
+            long revision = _dirtyRevision;
             CurrentFilePath = selectedPath;
-            RundownProjectService.SaveProject(this, selectedPath);
+            await Task.Run(() => RundownProjectService.SaveProject(this, selectedPath));
             RundownProjectService.AddRecentFile(selectedPath);
             Settings.General.LastOpenedRundownPath = selectedPath;
             EditorSettingsManager.Instance.SaveSettings();
             RefreshRecentFiles();
+            if (_dirtyRevision == revision)
+            {
+                MarkProjectClean();
+            }
             StatusMessage = $"Saved: {Path.GetFileName(selectedPath)}";
         }
         catch (Exception ex)
@@ -477,6 +751,8 @@ public class MainWindowViewModel : ViewModelBase
 
     public Task OpenFileDirectAsync(string filePath)
     {
+        bool previousLoading = _isLoadingProject;
+        _isLoadingProject = true;
         try
         {
             var project = RundownProjectService.LoadProject(filePath);
@@ -484,11 +760,22 @@ public class MainWindowViewModel : ViewModelBase
             Settings.General.LastOpenedRundownPath = filePath;
             EditorSettingsManager.Instance.SaveSettings();
             RefreshRecentFiles();
+            AttachDirtyTracking(this);
+            MarkProjectClean();
             StatusMessage = $"Loaded: {Path.GetFileName(filePath)}";
         }
         catch (Exception ex)
         {
             StatusMessage = $"Error loading file: {ex.Message}";
+        }
+        finally
+        {
+            _isLoadingProject = previousLoading;
+            if (!previousLoading)
+            {
+                AttachDirtyTracking(this);
+                MarkProjectClean();
+            }
         }
         return Task.CompletedTask;
     }
@@ -509,7 +796,7 @@ public class MainWindowViewModel : ViewModelBase
 
         try
         {
-            var result = DatablockExportService.ExportAll(this, LastExportDirectory);
+            var result = await Task.Run(() => DatablockExportService.ExportAll(this, LastExportDirectory));
             if (result.Success)
             {
                 StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(LastExportDirectory)}";
@@ -555,9 +842,15 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             LastExportDirectory = selectedFolder;
-            var result = DatablockExportService.ExportAll(this, selectedFolder);
+            DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+            var result = await Task.Run(() => DatablockExportService.ExportAll(this, selectedFolder));
             if (result.Success)
             {
+                DatablockSaveQueue.Instance.Clear();
+                if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+                {
+                    MarkProjectClean();
+                }
                 StatusMessage = $"Exported {result.DatablocksExportedCount} datablocks & {result.LevelGenFilesExportedCount} level schemas to: {Path.GetFileName(selectedFolder)}";
             }
             else
@@ -571,13 +864,26 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private Task SaveDatablocksToCurrentFolderAsync()
+    private async Task SaveDatablocksToCurrentFolderAsync()
     {
         try
         {
-            var result = DatablockExportService.ExportAll(this, CurrentDatablocksPath!);
+            var snapshot = DatablockSaveQueue.Instance.TakeRevisionSnapshot();
+            var result = await Task.Run(() => DatablockExportService.ExportAll(this, CurrentDatablocksPath!));
             if (result.Success)
             {
+                foreach (var item in snapshot)
+                {
+                    DatablockSaveQueue.Instance.MarkSaved(item.Key, item.Value);
+                }
+                if (DatablockSaveQueue.Instance.Count == 0)
+                {
+                    if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+                    {
+                        IsDirty = false;
+                        _dirtyRevision = 0;
+                    }
+                }
                 StatusMessage = $"Saved datablocks to: {Path.GetFileName(CurrentDatablocksPath)}";
             }
             else
@@ -589,8 +895,6 @@ public class MainWindowViewModel : ViewModelBase
         {
             StatusMessage = $"Save error: {ex.Message}";
         }
-
-        return Task.CompletedTask;
     }
 
     public async Task ImportDatablocksFromAsync()
@@ -654,6 +958,8 @@ public class MainWindowViewModel : ViewModelBase
 
         if (result.Success)
         {
+            AttachDirtyTracking(this);
+            MarkProjectClean();
             StatusMessage = result.Message;
         }
         else
@@ -686,11 +992,12 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             CurrentFilePath = selectedPath;
-            RundownProjectService.SaveProject(this, selectedPath);
+            await Task.Run(() => RundownProjectService.SaveProject(this, selectedPath));
             RundownProjectService.AddRecentFile(selectedPath);
             Settings.General.LastOpenedRundownPath = selectedPath;
             EditorSettingsManager.Instance.SaveSettings();
             RefreshRecentFiles();
+            MarkProjectClean();
             StatusMessage = $"Saved rundown: {Path.GetFileName(selectedPath)}";
         }
         catch (Exception ex)
@@ -752,7 +1059,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         if (Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.Shutdown();
+            desktop.MainWindow?.Close();
         }
     }
 
