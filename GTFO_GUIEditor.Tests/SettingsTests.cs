@@ -96,6 +96,80 @@ public class SettingsTests : IDisposable
     }
 
     [Fact]
+    public void DatablockSavedQueue_IsAuthoritativeForUnsavedChanges()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        vm.Settings.General.DataFlow = DataFlowMode.Datablocks;
+        DatablockSaveQueue.Instance.Clear();
+
+        vm.MarkProjectEdited();
+        Assert.True(vm.HasUnsavedChanges);
+
+        DatablockSaveQueue.Instance.Clear();
+        Assert.False(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public void DatablockQueue_EditDuringSave_RemainsUnsaved()
+    {
+        DatablockSaveQueue.Instance.Clear();
+        DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+        var snapshot = DatablockSaveQueue.Instance.TakeRevisionSnapshot();
+
+        DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+        foreach (var item in snapshot)
+        {
+            DatablockSaveQueue.Instance.MarkSaved(item.Key, item.Value);
+        }
+
+        Assert.NotEmpty(DatablockSaveQueue.Instance.Files);
+        Assert.True(DatablockSaveQueue.Instance.Count > 0);
+    }
+
+    [Fact]
+    public void OpeningRundown_ClearsOutstandingEdits()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), $"open_clean_test_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            vm.MarkProjectEdited();
+            Assert.True(vm.HasUnsavedChanges);
+            Assert.Contains("Unsaved changes", vm.StatusMessage, StringComparison.OrdinalIgnoreCase);
+
+            RundownProjectService.SaveProject(vm, filePath);
+            vm.OpenFileDirectAsync(filePath).GetAwaiter().GetResult();
+
+            Assert.False(vm.IsDirty);
+            Assert.Empty(vm.EditedDatablockFiles);
+            Assert.False(vm.HasUnsavedChanges);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+    }
+
+    [Fact]
+    public void LevelLayoutViewState_DoesNotMarkProjectEdited()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+
+        vm.LevelLayout.GridState.Pan(25, -10);
+        vm.LevelLayout.GridState.Zoom = 2.5;
+        vm.LevelLayout.GridState.ViewportWidth = 1000;
+        vm.LevelLayout.GridState.ViewportHeight = 700;
+        vm.LevelLayout.GridState.HoveredRoom = null;
+
+        Assert.False(vm.IsDirty);
+        Assert.Empty(vm.EditedDatablockFiles);
+        Assert.False(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
     public void CloseSettings_FallsBackToPreviousProjectWhenSetProjectHasNoPath()
     {
         var vm = new MainWindowViewModel(autoReopenLastRundown: false);

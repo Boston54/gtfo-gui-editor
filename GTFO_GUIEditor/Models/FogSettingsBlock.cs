@@ -84,6 +84,7 @@ public class FogSettingsBlock : INotifyPropertyChanged
     private double _densityHeightRange;
     private double _densityHeightMaxBoost;
     private double _infection;
+    private bool _isExpanded;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -204,6 +205,20 @@ public class FogSettingsBlock : INotifyPropertyChanged
 
     [JsonIgnore]
     public string DisplayText => $"[{PersistentId}] {Name}";
+
+    [JsonIgnore]
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded != value)
+            {
+                _isExpanded = value;
+                OnPropertyChanged(nameof(IsExpanded));
+            }
+        }
+    }
 
     public FogSettingsBlock Clone() => new()
     {

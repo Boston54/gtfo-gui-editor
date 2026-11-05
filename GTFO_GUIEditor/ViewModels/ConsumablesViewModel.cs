@@ -15,6 +15,8 @@ public class ConsumablesViewModel : ViewModelBase
     private ObservableCollection<ConsumableDistributionBlock> _blocks;
     private ConsumableDistributionBlock? _selectedBlock;
     private string _statusText = string.Empty;
+    private string _searchText = string.Empty;
+    private bool _isExpanded;
 
     // Create block prompt / modal state
     private bool _isCreatingBlock;
@@ -33,6 +35,10 @@ public class ConsumablesViewModel : ViewModelBase
 
     public ICommand AddSpawnDataItemCommand { get; }
     public ICommand RemoveSpawnDataItemCommand { get; }
+    public ICommand ToggleBlockCommand { get; }
+    public ICommand DuplicateBlockCommand { get; }
+    public ICommand DeleteBlockCommand { get; }
+    public ObservableCollection<ConsumableDistributionBlock> FilteredBlocks { get; } = new();
 
     public ObservableCollection<ConsumableDistributionBlock> Blocks
     {
@@ -56,17 +62,21 @@ public class ConsumablesViewModel : ViewModelBase
         {
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
+            RefreshFilteredBlocks();
         };
 
         AvailableTemplates = new ObservableCollection<ConsumableDistributionBlock>(_vanillaTemplates);
 
         AddSpawnDataItemCommand = new RelayCommand(AddSpawnDataItem);
         RemoveSpawnDataItemCommand = new RelayCommand<ConsumableDistributionItem>(RemoveSpawnDataItem);
-
+        ToggleBlockCommand = new RelayCommand<ConsumableDistributionBlock>(ToggleBlockExpanded);
+        DuplicateBlockCommand = new RelayCommand<ConsumableDistributionBlock>(DuplicateBlock);
+        DeleteBlockCommand = new RelayCommand<ConsumableDistributionBlock>(RequestDeleteBlock);
         if (_blocks.Count > 0)
         {
             SelectedBlock = _blocks[0];
         }
+        RefreshFilteredBlocks();
 
         UpdateStatusText();
     }
@@ -108,6 +118,57 @@ public class ConsumablesViewModel : ViewModelBase
     }
 
     public bool HasSelectedBlock => SelectedBlock != null;
+
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        private set => SetField(ref _isExpanded, value);
+    }
+
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetField(ref _searchText, value))
+            {
+                RefreshFilteredBlocks();
+            }
+        }
+    }
+
+    private void RefreshFilteredBlocks()
+    {
+        FilteredBlocks.Clear();
+        foreach (var block in _blocks.Where(block =>
+                     string.IsNullOrWhiteSpace(_searchText) ||
+                     block.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                     block.DisplayText.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+        {
+            FilteredBlocks.Add(block);
+        }
+    }
+
+    public void ToggleBlockExpanded(ConsumableDistributionBlock? block)
+    {
+        if (block == null) return;
+        block.IsExpanded = !block.IsExpanded;
+        SelectedBlock = block;
+    }
+
+    public void DuplicateBlock(ConsumableDistributionBlock? source)
+    {
+        if (source == null) return;
+        uint newId = _blocks.Count == 0 ? 1 : _blocks.Max(block => block.PersistentId) + 1;
+        var copy = ConsumableDistributionService.CreateBlockFromTemplate(
+            source,
+            newId,
+            string.IsNullOrWhiteSpace(source.Name) ? "Consumable Distribution_copy" : $"{source.Name}_copy");
+        _blocks.Add(copy);
+        SelectedBlock = copy;
+        copy.IsExpanded = true;
+        StatusText = $"Duplicated distribution [{source.PersistentId}] {source.Name}";
+    }
 
     public string StatusText
     {
@@ -321,6 +382,13 @@ public class ConsumablesViewModel : ViewModelBase
     {
         if (SelectedBlock == null) return;
         BlockToDelete = SelectedBlock;
+        IsConfirmingDelete = true;
+    }
+
+    public void RequestDeleteBlock(ConsumableDistributionBlock? block)
+    {
+        if (block == null) return;
+        BlockToDelete = block;
         IsConfirmingDelete = true;
     }
 

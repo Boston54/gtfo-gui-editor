@@ -14,6 +14,7 @@ public class LightSettingsBlock : INotifyPropertyChanged
     private string _name = string.Empty;
     private bool _internalEnabled = true;
     private ObservableCollection<LightCategorySettingItem> _lightCategorySettings = new();
+    private bool _isExpanded;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -63,6 +64,20 @@ public class LightSettingsBlock : INotifyPropertyChanged
 
     [JsonIgnore]
     public string DisplayText => $"[{PersistentId}] {Name}";
+
+    [JsonIgnore]
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded != value)
+            {
+                _isExpanded = value;
+                OnPropertyChanged(nameof(IsExpanded));
+            }
+        }
+    }
 
     public LightSettingsBlock Clone()
     {

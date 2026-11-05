@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
 
@@ -14,6 +15,8 @@ public class LightingViewModel : ViewModelBase
     private ObservableCollection<LightSettingsBlock> _blocks;
     private LightSettingsBlock? _selectedBlock;
     private string _statusText = string.Empty;
+    private string _searchText = string.Empty;
+    private bool _isExpanded;
     private LightCategory _selectedCategory = LightCategory.General;
     private ObservableCollection<LightCategorySettingItem> _currentCategorySettings = new();
     private string _missingCategoriesWarning = string.Empty;
@@ -35,6 +38,8 @@ public class LightingViewModel : ViewModelBase
 
     public static LightCategory[] AvailableCategories => Enum.GetValues<LightCategory>();
     public LightCategory[] Categories => AvailableCategories;
+    public ICommand ToggleBlockCommand { get; private set; } = null!;
+    public ObservableCollection<LightSettingsBlock> FilteredBlocks { get; } = new();
 
     public ObservableCollection<LightSettingsBlock> Blocks
     {
@@ -60,14 +65,17 @@ public class LightingViewModel : ViewModelBase
             OnPropertyChanged(nameof(HasExistingConfigs));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
+            RefreshFilteredBlocks();
         };
 
         AvailableTemplates = new ObservableCollection<LightSettingsBlock>(_vanillaTemplates);
 
+        ToggleBlockCommand = new RelayCommand<LightSettingsBlock>(ToggleBlockExpanded);
         if (_blocks.Count > 0)
         {
             SelectedBlock = _blocks[0];
         }
+        RefreshFilteredBlocks();
 
         UpdateStatusText();
     }
@@ -101,6 +109,37 @@ public class LightingViewModel : ViewModelBase
                 OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
             }
         }
+    }
+
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetField(ref _searchText, value))
+            {
+                RefreshFilteredBlocks();
+            }
+        }
+    }
+
+    private void RefreshFilteredBlocks()
+    {
+        FilteredBlocks.Clear();
+        foreach (var block in _blocks.Where(block =>
+                     string.IsNullOrWhiteSpace(_searchText) ||
+                     block.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                     block.DisplayText.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+        {
+            FilteredBlocks.Add(block);
+        }
+    }
+
+    public void ToggleBlockExpanded(LightSettingsBlock? block)
+    {
+        if (block == null) return;
+        block.IsExpanded = !block.IsExpanded;
+        SelectedBlock = block;
     }
 
     private void SelectedBlock_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -199,6 +238,12 @@ public class LightingViewModel : ViewModelBase
     }
 
     public bool HasSelectedBlock => _selectedBlock != null;
+
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        private set => SetField(ref _isExpanded, value);
+    }
 
     public bool HasDuplicatePersistentId
     {
@@ -473,13 +518,17 @@ public class LightingViewModel : ViewModelBase
 
     public void OpenDuplicateBlockDialog(LightSettingsBlock? block = null)
     {
-        var target = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
-        OpenCreateBlockDialog();
-        if (target != null)
-        {
-            SelectedExistingBlock = target;
-            IsCreatingFromExisting = true;
-        }
+        var source = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
+        if (source == null) return;
+
+        var copy = source.Clone();
+        copy.PersistentId = GenerateRandomPersistentId();
+        copy.Name = $"{source.Name}_copy";
+        _blocks.Add(copy);
+        SelectedBlock = copy;
+        copy.IsExpanded = true;
+        RefreshFilteredBlocks();
+        StatusText = $"Duplicated lighting config [{source.PersistentId}] {source.Name}";
     }
 
     public bool ConfirmCreateBlock()

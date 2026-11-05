@@ -25,7 +25,7 @@ public partial class MainWindow : Window
     {
         e.Cancel = true;
 
-        if (_allowClose || DataContext is not MainWindowViewModel viewModel || !viewModel.IsDirty)
+        if (_allowClose || DataContext is not MainWindowViewModel viewModel || !viewModel.HasUnsavedChanges)
         {
             e.Cancel = false;
             return;
@@ -49,7 +49,7 @@ public partial class MainWindow : Window
         if (result == true)
         {
             await viewModel.SaveRundownAsync();
-            if (viewModel.IsDirty)
+            if (viewModel.HasUnsavedChanges)
             {
                 return;
             }

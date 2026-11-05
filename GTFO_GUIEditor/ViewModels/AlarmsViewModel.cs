@@ -15,6 +15,8 @@ public class AlarmsViewModel : ViewModelBase
     private ObservableCollection<AlarmBlock> _alarms;
     private AlarmBlock? _selectedAlarm;
     private string _statusText = string.Empty;
+    private string _searchText = string.Empty;
+    private bool _isExpanded;
 
     // Create alarm modal state
     private bool _isCreatingAlarm;
@@ -46,6 +48,8 @@ public class AlarmsViewModel : ViewModelBase
     public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes { get; }
     public ICommand RemoveChainedPuzzleItemCommand { get; }
     public ICommand AddChainedPuzzleItemCommand { get; }
+    public ICommand ToggleAlarmCommand { get; }
+    public ObservableCollection<AlarmBlock> FilteredAlarms { get; } = new();
 
     public ObservableCollection<AlarmBlock> Alarms
     {
@@ -70,6 +74,7 @@ public class AlarmsViewModel : ViewModelBase
             OnPropertyChanged(nameof(HasExistingAlarms));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
+            RefreshFilteredAlarms();
         };
 
         AvailableTemplates = new ObservableCollection<AlarmBlock>(_vanillaTemplates);
@@ -82,11 +87,12 @@ public class AlarmsViewModel : ViewModelBase
 
         RemoveChainedPuzzleItemCommand = new RelayCommand<ChainedPuzzleItem>(RemoveChainedPuzzleItem);
         AddChainedPuzzleItemCommand = new RelayCommand(AddChainedPuzzleItem);
-
+        ToggleAlarmCommand = new RelayCommand<AlarmBlock>(ToggleAlarmExpanded);
         if (_alarms.Count > 0)
         {
             SelectedAlarm = _alarms[0];
         }
+        RefreshFilteredAlarms();
 
         UpdateStatusText();
     }
@@ -116,6 +122,37 @@ public class AlarmsViewModel : ViewModelBase
         }
     }
 
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetField(ref _searchText, value))
+            {
+                RefreshFilteredAlarms();
+            }
+        }
+    }
+
+    private void RefreshFilteredAlarms()
+    {
+        FilteredAlarms.Clear();
+        foreach (var alarm in _alarms.Where(alarm =>
+                     string.IsNullOrWhiteSpace(_searchText) ||
+                     alarm.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                     alarm.DisplayText.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+        {
+            FilteredAlarms.Add(alarm);
+        }
+    }
+
+    public void ToggleAlarmExpanded(AlarmBlock? alarm)
+    {
+        if (alarm == null) return;
+        alarm.IsExpanded = !alarm.IsExpanded;
+        SelectedAlarm = alarm;
+    }
+
     private void SelectedAlarm_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(AlarmBlock.PersistentId))
@@ -126,6 +163,12 @@ public class AlarmsViewModel : ViewModelBase
     }
 
     public bool HasSelectedAlarm => _selectedAlarm != null;
+
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        private set => SetField(ref _isExpanded, value);
+    }
 
     public string StatusText
     {
@@ -350,13 +393,17 @@ public class AlarmsViewModel : ViewModelBase
 
     public void OpenDuplicateAlarmDialog(AlarmBlock? alarm = null)
     {
-        var target = alarm ?? _selectedAlarm ?? _alarms.FirstOrDefault();
-        OpenCreateAlarmDialog();
-        if (target != null)
-        {
-            SelectedExistingAlarm = target;
-            IsCreatingFromExisting = true;
-        }
+        var source = alarm ?? _selectedAlarm ?? _alarms.FirstOrDefault();
+        if (source == null) return;
+
+        var copy = source.Clone();
+        copy.PersistentId = GenerateUniquePersistentId();
+        copy.Name = $"{source.Name}_copy";
+        _alarms.Add(copy);
+        SelectedAlarm = copy;
+        copy.IsExpanded = true;
+        RefreshFilteredAlarms();
+        StatusText = $"Duplicated alarm [{source.PersistentId}] {source.Name}";
     }
 
     private uint GenerateUniquePersistentId()

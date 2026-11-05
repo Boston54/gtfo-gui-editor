@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Windows.Input;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
 
@@ -14,6 +15,8 @@ public class FogSettingsViewModel : ViewModelBase
     private ObservableCollection<FogSettingsBlock> _blocks;
     private FogSettingsBlock? _selectedBlock;
     private string _statusText = string.Empty;
+    private string _searchText = string.Empty;
+    private bool _isExpanded;
 
     // Create block prompt / modal state
     private bool _isCreatingBlock;
@@ -37,6 +40,8 @@ public class FogSettingsViewModel : ViewModelBase
     }
 
     public ObservableCollection<FogSettingsBlock> AvailableTemplates { get; }
+    public ICommand ToggleBlockCommand { get; private set; } = null!;
+    public ObservableCollection<FogSettingsBlock> FilteredBlocks { get; } = new();
 
     public FogSettingsViewModel()
         : this(new List<FogSettingsBlock>())
@@ -54,14 +59,17 @@ public class FogSettingsViewModel : ViewModelBase
             OnPropertyChanged(nameof(HasExistingConfigs));
             OnPropertyChanged(nameof(HasDuplicatePersistentId));
             OnPropertyChanged(nameof(DuplicatePersistentIdWarning));
+            RefreshFilteredBlocks();
         };
 
         AvailableTemplates = new ObservableCollection<FogSettingsBlock>(_vanillaTemplates);
 
+        ToggleBlockCommand = new RelayCommand<FogSettingsBlock>(ToggleBlockExpanded);
         if (_blocks.Count > 0)
         {
             SelectedBlock = _blocks[0];
         }
+        RefreshFilteredBlocks();
 
         UpdateStatusText();
     }
@@ -93,6 +101,37 @@ public class FogSettingsViewModel : ViewModelBase
         }
     }
 
+    public string SearchText
+    {
+        get => _searchText;
+        set
+        {
+            if (SetField(ref _searchText, value))
+            {
+                RefreshFilteredBlocks();
+            }
+        }
+    }
+
+    private void RefreshFilteredBlocks()
+    {
+        FilteredBlocks.Clear();
+        foreach (var block in _blocks.Where(block =>
+                     string.IsNullOrWhiteSpace(_searchText) ||
+                     block.Name.Contains(_searchText, StringComparison.OrdinalIgnoreCase) ||
+                     block.DisplayText.Contains(_searchText, StringComparison.OrdinalIgnoreCase)))
+        {
+            FilteredBlocks.Add(block);
+        }
+    }
+
+    public void ToggleBlockExpanded(FogSettingsBlock? block)
+    {
+        if (block == null) return;
+        block.IsExpanded = !block.IsExpanded;
+        SelectedBlock = block;
+    }
+
     private void SelectedBlock_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(FogSettingsBlock.PersistentId))
@@ -103,6 +142,12 @@ public class FogSettingsViewModel : ViewModelBase
     }
 
     public bool HasSelectedBlock => SelectedBlock != null;
+
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        private set => SetField(ref _isExpanded, value);
+    }
 
     public string StatusText
     {
@@ -348,13 +393,17 @@ public class FogSettingsViewModel : ViewModelBase
 
     public void OpenDuplicateBlockDialog(FogSettingsBlock? block = null)
     {
-        var target = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
-        OpenCreateBlockDialog();
-        if (target != null)
-        {
-            SelectedExistingBlock = target;
-            IsCreatingFromExisting = true;
-        }
+        var source = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
+        if (source == null) return;
+
+        var copy = source.Clone();
+        copy.PersistentId = GenerateRandomPersistentId();
+        copy.Name = $"{source.Name}_copy";
+        _blocks.Add(copy);
+        SelectedBlock = copy;
+        copy.IsExpanded = true;
+        RefreshFilteredBlocks();
+        StatusText = $"Duplicated fog config [{source.PersistentId}] {source.Name}";
     }
 
     public bool ConfirmCreateBlock()
@@ -446,6 +495,13 @@ public class FogSettingsViewModel : ViewModelBase
     {
         if (SelectedBlock == null) return;
         BlockToDelete = SelectedBlock;
+        IsConfirmingDelete = true;
+    }
+
+    public void RequestDeleteBlock(FogSettingsBlock? block)
+    {
+        if (block == null) return;
+        BlockToDelete = block;
         IsConfirmingDelete = true;
     }
 

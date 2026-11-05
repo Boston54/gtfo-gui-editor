@@ -25,6 +25,7 @@ public class AlarmBlock : INotifyPropertyChanged
     private AlarmSoundStart _alarmSoundStart = AlarmSoundStart.Standard;
     private AlarmSoundStop _alarmSoundStop = AlarmSoundStop.Standard;
     private ObservableCollection<ChainedPuzzleItem> _chainedPuzzle = new();
+    private bool _isExpanded;
 
     // Wave Roles (Enemy References)
     private uint _waveRoleWeakling = 0;
@@ -460,6 +461,19 @@ public class AlarmBlock : INotifyPropertyChanged
 
     [JsonIgnore]
     public string DisplayText => $"[{PersistentId}] {Name}";
+    [JsonIgnore]
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded != value)
+            {
+                _isExpanded = value;
+                OnPropertyChanged(nameof(IsExpanded));
+            }
+        }
+    }
 
     public AlarmBlock Clone()
     {

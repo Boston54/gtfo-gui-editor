@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
 
@@ -40,6 +41,9 @@ public class MainWindowViewModel : ViewModelBase
     private readonly HashSet<INotifyCollectionChanged> _dirtyCollectionSubscribers = new();
     private bool _isLoadingProject;
     private long _dirtyRevision;
+    private System.Threading.Timer? _statusFadeTimer;
+    private long _statusFadeGeneration;
+    private double _statusOpacity = 1;
 
     public DocumentationViewModel Documentation { get; }
     public SoundsViewModel Sounds { get; }
@@ -148,7 +152,60 @@ public class MainWindowViewModel : ViewModelBase
     public string StatusMessage
     {
         get => _statusMessage;
-        set => SetField(ref _statusMessage, value);
+        set
+        {
+            SetField(ref _statusMessage, value);
+
+            _statusFadeTimer?.Dispose();
+            _statusFadeTimer = null;
+            long generation = unchecked(++_statusFadeGeneration);
+            StatusOpacity = 1;
+
+            if (string.IsNullOrWhiteSpace(value) ||
+                value.Contains("unsaved changes", StringComparison.OrdinalIgnoreCase))
+            {
+                return;
+            }
+
+            _statusFadeTimer = new System.Threading.Timer(
+                _ => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                {
+                    if (generation != _statusFadeGeneration)
+                    {
+                        return;
+                    }
+
+                    _statusFadeTimer?.Dispose();
+                    var fadeStartedAt = DateTime.UtcNow;
+                    _statusFadeTimer = new System.Threading.Timer(
+                        fadeState => Avalonia.Threading.Dispatcher.UIThread.Post(() =>
+                        {
+                            if (generation != _statusFadeGeneration)
+                            {
+                                return;
+                            }
+
+                            double elapsed = (DateTime.UtcNow - fadeStartedAt).TotalMilliseconds;
+                            StatusOpacity = Math.Max(0, 1 - elapsed / 2000);
+                            if (elapsed >= 2000)
+                            {
+                                StatusMessage = string.Empty;
+                            }
+                        }),
+                        null,
+                        TimeSpan.FromMilliseconds(50),
+                        TimeSpan.FromMilliseconds(50));
+                }),
+                null,
+                TimeSpan.FromSeconds(3),
+                Timeout.InfiniteTimeSpan);
+        }
+    }
+
+    public double StatusOpacity
+    {
+        get => _statusOpacity;
+        set => SetField(ref _statusOpacity, value);
     }
 
     public bool IsDirty
@@ -156,6 +213,11 @@ public class MainWindowViewModel : ViewModelBase
         get => _isDirty;
         private set => SetField(ref _isDirty, value);
     }
+
+    public bool HasUnsavedChanges =>
+        Settings.General.DataFlow == DataFlowMode.Datablocks
+            ? DatablockSaveQueue.Instance.Count > 0
+            : IsDirty;
 
     public IReadOnlyCollection<string> EditedDatablockFiles => DatablockSaveQueue.Instance.Files;
 
@@ -177,11 +239,33 @@ public class MainWindowViewModel : ViewModelBase
         if (Settings.General.DataFlow == DataFlowMode.Datablocks)
         {
             DatablockSaveQueue.Instance.MarkDirty(DatablockSaveQueue.AllDatablockFiles);
+            StatusMessage = $"Unsaved changes — {DatablockSaveQueue.Instance.Count} datablock files in save queue";
+        }
+        else
+        {
+            StatusMessage = "Unsaved changes — rundown file has changes";
         }
     }
 
     private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is "SelectedAlarm"
+            or "SelectedBlock"
+            or "IsExpanded"
+            or "SearchText"
+            or "HasSelectedAlarm"
+            or "HasSelectedBlock"
+            or "StatusText"
+            or "DisplayText"
+            or "SelectedCategory"
+            or "CurrentCategorySettings"
+            or "HasCurrentCategorySettings"
+            or "FilteredAlarms"
+            or "FilteredBlocks")
+        {
+            return;
+        }
+
         if (sender != Settings && sender != Settings.General && sender != Settings.Appearance)
         {
             MarkProjectEdited();
@@ -328,6 +412,35 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        if (e.PropertyName is "SelectedAlarm"
+            or "SelectedBlock"
+            or "IsExpanded"
+            or "SearchText"
+            or "HasSelectedAlarm"
+            or "HasSelectedBlock"
+            or "StatusText"
+            or "DisplayText"
+            or "SelectedCategory"
+            or "CurrentCategorySettings"
+            or "HasCurrentCategorySettings"
+            or "FilteredAlarms"
+            or "FilteredBlocks")
+        {
+            return;
+        }
+
+        if (sender is LevelLayoutGridState &&
+            (e.PropertyName == nameof(LevelLayoutGridState.Zoom) ||
+             e.PropertyName == nameof(LevelLayoutGridState.ZoomPercentage) ||
+             e.PropertyName == nameof(LevelLayoutGridState.PanX) ||
+             e.PropertyName == nameof(LevelLayoutGridState.PanY) ||
+             e.PropertyName == nameof(LevelLayoutGridState.ViewportWidth) ||
+             e.PropertyName == nameof(LevelLayoutGridState.ViewportHeight) ||
+             e.PropertyName == nameof(LevelLayoutGridState.HoveredRoom)))
+        {
+            return;
+        }
+
         if (sender != null)
         {
             AttachDirtyTracking(sender);
@@ -337,6 +450,14 @@ public class MainWindowViewModel : ViewModelBase
 
     private void DirtyCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        if (sender == Alarms.FilteredAlarms ||
+            sender == Consumables.FilteredBlocks ||
+            sender == Lighting.FilteredBlocks ||
+            sender == FogSettings.FilteredBlocks)
+        {
+            return;
+        }
+
         MarkProjectEdited();
         if (e.NewItems != null)
         {
@@ -479,6 +600,7 @@ public class MainWindowViewModel : ViewModelBase
     {
         bool previousLoading = _isLoadingProject;
         _isLoadingProject = true;
+        MarkProjectClean();
         try
         {
             if (Settings.General.DataFlow == DataFlowMode.Datablocks)
@@ -611,19 +733,21 @@ public class MainWindowViewModel : ViewModelBase
                 return;
             }
 
+            string filePath = CurrentFilePath;
+            var projectSnapshot = await ExportProjectForSaveAsync();
             await Task.Run(() =>
             {
-                RundownProjectService.SaveProject(this, CurrentFilePath);
-                RundownProjectService.AddRecentFile(CurrentFilePath);
+                RundownProjectService.SaveProject(projectSnapshot, filePath);
+                RundownProjectService.AddRecentFile(filePath);
             });
-            Settings.General.LastOpenedRundownPath = CurrentFilePath;
+            Settings.General.LastOpenedRundownPath = filePath;
             EditorSettingsManager.Instance.SaveSettings();
             RefreshRecentFiles();
             if (_dirtyRevision == revision)
             {
                 MarkProjectClean();
             }
-            StatusMessage = $"Saved: {Path.GetFileName(CurrentFilePath)}";
+            StatusMessage = $"Saved: {Path.GetFileName(filePath)}";
         }
         catch (Exception ex)
         {
@@ -669,6 +793,16 @@ public class MainWindowViewModel : ViewModelBase
         await SaveRundownAsync();
     }
 
+    private async Task<RundownProjectFile> ExportProjectForSaveAsync()
+    {
+        if (Dispatcher.UIThread.CheckAccess())
+        {
+            return RundownProjectService.ExportProject(this);
+        }
+
+        return await Dispatcher.UIThread.InvokeAsync(() => RundownProjectService.ExportProject(this));
+    }
+
     public async Task SaveAsRundownAsync()
     {
         if (Settings.General.DataFlow == DataFlowMode.Datablocks)
@@ -695,7 +829,8 @@ public class MainWindowViewModel : ViewModelBase
         {
             long revision = _dirtyRevision;
             CurrentFilePath = selectedPath;
-            await Task.Run(() => RundownProjectService.SaveProject(this, selectedPath));
+            var projectSnapshot = await ExportProjectForSaveAsync();
+            await Task.Run(() => RundownProjectService.SaveProject(projectSnapshot, selectedPath));
             RundownProjectService.AddRecentFile(selectedPath);
             Settings.General.LastOpenedRundownPath = selectedPath;
             EditorSettingsManager.Instance.SaveSettings();
@@ -883,8 +1018,12 @@ public class MainWindowViewModel : ViewModelBase
                         IsDirty = false;
                         _dirtyRevision = 0;
                     }
+                    StatusMessage = $"Saved datablocks to: {Path.GetFileName(CurrentDatablocksPath)}";
                 }
-                StatusMessage = $"Saved datablocks to: {Path.GetFileName(CurrentDatablocksPath)}";
+                else if (Settings.General.DataFlow == DataFlowMode.Datablocks)
+                {
+                    StatusMessage = $"Unsaved changes — {DatablockSaveQueue.Instance.Count} datablock files remain in save queue";
+                }
             }
             else
             {
@@ -929,6 +1068,8 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        bool previousLoading = _isLoadingProject;
+        _isLoadingProject = true;
         try
         {
             CurrentDatablocksPath = selectedFolder;
@@ -938,6 +1079,11 @@ public class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             StatusMessage = $"Import error: {ex.Message}";
+        }
+        finally
+        {
+            _isLoadingProject = previousLoading;
+            MarkProjectClean();
         }
     }
 
@@ -992,7 +1138,8 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             CurrentFilePath = selectedPath;
-            await Task.Run(() => RundownProjectService.SaveProject(this, selectedPath));
+            var projectSnapshot = await ExportProjectForSaveAsync();
+            await Task.Run(() => RundownProjectService.SaveProject(projectSnapshot, selectedPath));
             RundownProjectService.AddRecentFile(selectedPath);
             Settings.General.LastOpenedRundownPath = selectedPath;
             EditorSettingsManager.Instance.SaveSettings();

@@ -16,6 +16,7 @@ public class ConsumableDistributionBlock : INotifyPropertyChanged
     private int _spawnsPerZone = 5;
     private double _chanceToSpawnInResourceContainer = 0.8;
     private ObservableCollection<ConsumableDistributionItem> _spawnData = new();
+    private bool _isExpanded;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -79,6 +80,20 @@ public class ConsumableDistributionBlock : INotifyPropertyChanged
 
     [JsonIgnore]
     public string DisplayText => $"[{PersistentId}] {Name}";
+
+    [JsonIgnore]
+    public bool IsExpanded
+    {
+        get => _isExpanded;
+        set
+        {
+            if (_isExpanded != value)
+            {
+                _isExpanded = value;
+                OnPropertyChanged(nameof(IsExpanded));
+            }
+        }
+    }
 
     public ConsumableDistributionBlock Clone()
     {
