@@ -142,6 +142,9 @@
                 <TabItem Header="Rundown">
                     <views:RundownView DataContext="{Binding Rundown}"/>
                 </TabItem>
+                <TabItem Header="Modded">
+                    <views:ModdedView DataContext="{Binding Modded}"/>
+                </TabItem>
             </TabControl>
         </Grid>
 

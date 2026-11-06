@@ -2,11 +2,13 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
              xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             xmlns:converters="clr-namespace:GTFO_GUIEditor.Converters;assembly=GTFO_GUIEditor"
              x:Class="GTFO_GUIEditor.App"
              RequestedThemeVariant="Dark">
              <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Resources>
+        <converters:EventTypeColorConverter x:Key="EventTypeColorConverter"/>
         <DataTemplate x:Key="WardenEventTemplate" x:CompileBindings="False">
             <Border Background="#1A1A1A"
                     BorderBrush="#3E3E42"
@@ -24,11 +26,17 @@
                                    Margin="0,0,8,0"
                                    Foreground="#CCCCCC"/>
                         <ComboBox Grid.Column="1"
-                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableEventTypes}"
+                                  ItemsSource="{Binding AvailableEventTypes}"
                                   SelectedItem="{Binding Type, Mode=TwoWay}"
                                   HorizontalAlignment="Stretch"
                                   VerticalAlignment="Center"
-                                  Margin="0,0,12,0"/>
+                                  Margin="0,0,12,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate x:DataType="models:EventType">
+                                    <TextBlock Text="{Binding}" Foreground="{Binding Converter={StaticResource EventTypeColorConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <TextBlock Grid.Column="2"
                                    Text="Trigger:"
@@ -125,6 +133,19 @@
                         <TextBox Grid.Column="3" Text="{Binding SoundSubtitle, Mode=TwoWay}"/>
                     </Grid>
 
+                    <!-- Conditional: DialogueID [DialogueOnClosest, ForcePlayPlayerDialogue] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsDialogueIdVisible}">
+                        <TextBlock Grid.Column="0" Text="Dialogue ID:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
+                        <TextBox Grid.Column="1" Text="{Binding DialogueID, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- Conditional: SpecialBool [ClearWardenIntelQueue] -->
+                    <CheckBox Content="Special Bool"
+                              IsChecked="{Binding SpecialBool, Mode=TwoWay}"
+                              IsVisible="{Binding IsSpecialBoolVisible}"
+                              ToolTip.Tip="#todo"
+                              Foreground="#87CEEB"/>
+
                     <!-- Conditional: ActivateChainedPuzzle [ChainPuzzle & UseStaticBioscanPoints] -->
                     <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
                             IsVisible="{Binding IsChainPuzzleVisible}">
@@ -198,27 +219,30 @@
                         </Grid>
                     </Border>
 
-                    <!-- Conditional: SpawnEnemyOnPoint [EnemyID & Count] -->
+                    <!-- Conditional: EnemyID [SpawnEnemyOnPoint] -->
                     <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
                             IsVisible="{Binding IsEnemyIdVisible}">
-                        <Grid ColumnDefinitions="Auto,*,Auto,*">
+                        <Grid ColumnDefinitions="Auto,*">
                             <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
                             <ComboBox Grid.Column="1"
                                       ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
                                       SelectedValue="{Binding EnemyID, Mode=TwoWay}"
                                       SelectedValueBinding="{Binding PersistentId}"
-                                      HorizontalAlignment="Stretch"
-                                      Margin="0,0,12,0">
+                                      HorizontalAlignment="Stretch">
                                 <ComboBox.ItemTemplate>
                                     <DataTemplate x:DataType="models:EnemyEntry">
                                         <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
                                     </DataTemplate>
                                 </ComboBox.ItemTemplate>
                             </ComboBox>
-                            <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn (these will spawn on top of each other, typically used to spawn groups of flyers)" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
-                            <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}"/>
                         </Grid>
                     </Border>
+
+                    <!-- Conditional: Count [SpawnEnemyOnPoint, SpawnHibernateInZone, SpawnScoutInZone, StopEventLoop, ForceCompleteChainPuzzle, SpawnNavMarker] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsCountVisible}">
+                        <TextBlock Grid.Column="0" Text="Count:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#FFA200"/>
+                        <TextBox Grid.Column="1" Text="{Binding Count, Mode=TwoWay}"/>
+                    </Grid>
 
                     <!-- Conditional: WorldEventObjectFilter [SpawnEnemyOnPoint, SetNavMarker] -->
                     <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsWorldEventObjectFilterVisible}">
@@ -425,6 +449,1472 @@
                             </Border>
                         </StackPanel>
                     </Expander>
+
+                    <!-- AWO Conditional: CleanUpEnemiesBehind [CloseSecurityDoor] -->
+                    <CheckBox Content="Clean Up Enemies Behind"
+                              IsChecked="{Binding CleanUpEnemiesBehind, Mode=TwoWay}"
+                              IsVisible="{Binding IsCleanUpEnemiesBehindVisible}"
+                              ToolTip.Tip="#todo"
+                              Foreground="#87CEEB"/>
+
+                    <!-- AWO Conditional: SpecialText [LockSecurityDoor, SetDoorInteraction] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsSpecialTextVisible}">
+                        <TextBlock Grid.Column="0" Text="Special Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
+                        <TextBox Grid.Column="1" Text="{Binding SpecialText, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- AWO Conditional: Reactor [ModifyReactorWaveState] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsReactorVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Reactor Wave State" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="State:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableReactorStates}"
+                                          SelectedItem="{Binding Reactor.State, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Wave:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding Reactor.Wave, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Progress:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding Reactor.Progress, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: Countdown [Countdown] -->
+                    <Expander IsVisible="{Binding IsCountdownVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Countdown Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto,*">
+                                <CheckBox Grid.Column="0" Content="Can Show Hours" IsChecked="{Binding Countdown.CanShowHours, Mode=TwoWay}" ToolTip.Tip="#todo" Foreground="#CCCCCC" Margin="0,0,12,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Title Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding Countdown.TitleText, Mode=TwoWay}" Margin="0,0,12,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Timer Color:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding Countdown.TimerColor, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- EventsOnProgress -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Progress" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Progress Event" Command="{Binding Countdown.AddProgressEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding Countdown.EventsOnProgress}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                    <StackPanel Spacing="6">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Progress (0.0 - 1.0):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding Progress, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                                            <Button Grid.Column="2" Content="+ Add Event" Command="{Binding AddEvent}" Background="#2E5B88" Foreground="White" Padding="8,3" Margin="0,0,6,0"/>
+                                                            <Button Grid.Column="3" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.Countdown.RemoveProgressEventCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                        </Grid>
+                                                        <ItemsControl ItemsSource="{Binding Events}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- EventsOnDone -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Done" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Done Event" Command="{Binding Countdown.AddDoneEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding Countdown.EventsOnDone}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: SetZoneLight [SetLightDataInZone] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsSetZoneLightVisible}">
+                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*">
+                            <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                            <ComboBox Grid.Column="1"
+                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableZoneLightTypes}"
+                                      SelectedItem="{Binding SetZoneLight.Type, Mode=TwoWay}"
+                                      HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                            <TextBlock Grid.Column="2" Text="Light Data:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                            <ComboBox Grid.Column="3"
+                                      ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.AvailableLightingConfigs}"
+                                      SelectedValue="{Binding SetZoneLight.LightDataID, Mode=TwoWay}"
+                                      SelectedValueBinding="{Binding PersistentId}"
+                                      HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate x:DataType="models:LightSettingsBlock">
+                                        <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+
+                            <TextBlock Grid.Column="4" Text="Duration (s):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                            <TextBox Grid.Column="5" Text="{Binding SetZoneLight.TransitionDuration, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                            <TextBlock Grid.Column="6" Text="Seed:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                            <TextBox Grid.Column="7" Text="{Binding SetZoneLight.Seed, Mode=TwoWay}"/>
+                        </Grid>
+                    </Border>
+
+                    <!-- AWO Conditional: SpecialNumber [AlertEnemiesInZone] -->
+                    <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsSpecialNumberVisible}">
+                        <TextBlock Grid.Column="0" Text="Special Number:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
+                        <TextBox Grid.Column="1" Text="{Binding SpecialNumber, Mode=TwoWay}"/>
+                    </Grid>
+
+                    <!-- AWO Conditional: CleanupEnemies [CleanUpEnemiesInZone] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsCleanupEnemiesVisible}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Cleanup Enemies Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableCleanupTypes}"
+                                          SelectedItem="{Binding CleanupEnemies.Type, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Area:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3"
+                                          ItemsSource="{Binding AvailableAreas}"
+                                          SelectedValue="{Binding CleanupEnemies.AreaIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding AreaIndex}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AreaOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <CheckBox Content="Include Hibernate" IsChecked="{Binding CleanupEnemies.IncludeHibernate, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Include Aggressive" IsChecked="{Binding CleanupEnemies.IncludeAggressive, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Include Scout" IsChecked="{Binding CleanupEnemies.IncludeScout, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                            </WrapPanel>
+
+                            <!-- Area Blacklist -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Area Blacklist" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Blacklist Area" Command="{Binding CleanupEnemies.AddAreaBlacklist}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding CleanupEnemies.AreaBlacklist}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <ComboBox Grid.Column="0"
+                                                              ItemsSource="{Binding $parent[ItemsControl].DataContext.AvailableAreasOnly}"
+                                                              SelectedValue="{Binding AreaIndex, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding AreaIndex}"
+                                                              HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:AreaOption">
+                                                                <TextBlock Text="{Binding DisplayName}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.CleanupEnemies.RemoveAreaBlacklistCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Exclude Enemy IDs -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Exclude Enemy IDs" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Exclude Enemy" Command="{Binding CleanupEnemies.AddExcludeEnemy}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding CleanupEnemies.ExcludeEnemyIDs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <ComboBox Grid.Column="0"
+                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              SelectedValue="{Binding EnemyID, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding PersistentId}"
+                                                              HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                                <TextBlock Text="{Binding DisplayText}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.CleanupEnemies.RemoveExcludeEnemyCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Include Only IDs -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Include Only IDs" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Include Enemy" Command="{Binding CleanupEnemies.AddIncludeOnlyEnemy}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding CleanupEnemies.IncludeOnlyIDs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <ComboBox Grid.Column="0"
+                                                              ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                                              SelectedValue="{Binding EnemyID, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding PersistentId}"
+                                                              HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                                <TextBlock Text="{Binding DisplayText}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.CleanupEnemies.RemoveIncludeOnlyEnemyCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: SpawnHibernates [SpawnHibernateInZone] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsSpawnHibernatesVisible}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Spawn Hibernates Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Area:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableAreas}"
+                                          SelectedValue="{Binding SpawnHibernates.AreaIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding AreaIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AreaOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2" Text="Enemy:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3"
+                                          ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.Enemies}"
+                                          SelectedValue="{Binding SpawnHibernates.EnemyID, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding PersistentId}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:EnemyEntry">
+                                            <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Random Weight:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding SpawnHibernates.PlacementRandomWeight, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Placement Score:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpawnHibernates.PlacementScore, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Reset Placement Info" IsChecked="{Binding SpawnHibernates.ResetPlacementInfo, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                <CheckBox Grid.Column="5" Content="Randomize Rotation" IsChecked="{Binding SpawnHibernates.RandomizeRotation, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+
+                            <!-- Position & Rotation for SpawnHibernates -->
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Pos X:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding SpawnHibernates.Position.X, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpawnHibernates.Position.Y, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding SpawnHibernates.Position.Z, Mode=TwoWay}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Rot X:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding SpawnHibernates.Rotation.X, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpawnHibernates.Rotation.Y, Mode=TwoWay}" Margin="0,0,8,0"/>
+                                <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding SpawnHibernates.Rotation.Z, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- Area Blacklist -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Area Blacklist" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Blacklist Area" Command="{Binding SpawnHibernates.AddAreaBlacklist}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding SpawnHibernates.AreaBlacklist}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <ComboBox Grid.Column="0"
+                                                              ItemsSource="{Binding $parent[ItemsControl].DataContext.AvailableAreasOnly}"
+                                                              SelectedValue="{Binding AreaIndex, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding AreaIndex}"
+                                                              HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:AreaOption">
+                                                                <TextBlock Text="{Binding DisplayName}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.SpawnHibernates.RemoveAreaBlacklistCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: SpawnScouts [SpawnScoutInZone] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsSpawnScoutsVisible}">
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Spawn Scouts Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Area:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableAreas}"
+                                          SelectedValue="{Binding SpawnScouts.AreaIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding AreaIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:AreaOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2" Text="Scout Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3"
+                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableScoutTypes}"
+                                          SelectedValue="{Binding SpawnScouts.ScoutType, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding Type}"
+                                          HorizontalAlignment="Stretch">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:ScoutTypeOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+
+                            <!-- Area Blacklist -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Area Blacklist" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Blacklist Area" Command="{Binding SpawnScouts.AddAreaBlacklist}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding SpawnScouts.AreaBlacklist}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="*,Auto" Margin="0,2">
+                                                    <ComboBox Grid.Column="0"
+                                                              ItemsSource="{Binding $parent[ItemsControl].DataContext.AvailableAreasOnly}"
+                                                              SelectedValue="{Binding AreaIndex, Mode=TwoWay}"
+                                                              SelectedValueBinding="{Binding AreaIndex}"
+                                                              HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                                        <ComboBox.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:AreaOption">
+                                                                <TextBlock Text="{Binding DisplayName}"/>
+                                                            </DataTemplate>
+                                                        </ComboBox.ItemTemplate>
+                                                    </ComboBox>
+                                                    <Button Grid.Column="1" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.SpawnScouts.RemoveAreaBlacklistCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: AddTerminalCommand [AddTerminalCommand] -->
+                    <Expander IsVisible="{Binding IsAddTerminalCommandVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Add Terminal Command Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Terminal:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableTerminals}"
+                                          SelectedValue="{Binding AddTerminalCommand.TerminalIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding TerminalIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:TerminalOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2" Text="Command Number:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding AddTerminalCommand.CommandNumber, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Special Rule:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="5"
+                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSpecialCommandRulesList}"
+                                          SelectedItem="{Binding AddTerminalCommand.SpecialCommandRule, Mode=TwoWay}"
+                                          HorizontalAlignment="Stretch"/>
+                            </Grid>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Command:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding AddTerminalCommand.Command, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Command Desc:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding AddTerminalCommand.CommandDesc, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <WrapPanel Orientation="Horizontal">
+                                <CheckBox Content="Auto Indent Command Desc" IsChecked="{Binding AddTerminalCommand.AutoIndentCommandDesc, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,0"/>
+                                <CheckBox Content="Progress Wait Before Events" IsChecked="{Binding AddTerminalCommand.ProgressWaitBeforeEvents, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </WrapPanel>
+
+                            <!-- PostCommandOutputs -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Post Command Outputs" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Output" Command="{Binding AddTerminalCommand.AddPostCommandOutput}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding AddTerminalCommand.PostCommandOutputs}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto" Margin="0,2">
+                                                    <TextBlock Grid.Column="0" Text="Line Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#CCCCCC" FontSize="11"/>
+                                                    <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTerminalLineTypes}" SelectedItem="{Binding LineType, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,6,0"/>
+                                                    <TextBlock Grid.Column="2" Text="Time:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#CCCCCC" FontSize="11"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding Time, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                    <TextBlock Grid.Column="4" Text="Output:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#CCCCCC" FontSize="11"/>
+                                                    <TextBox Grid.Column="5" Text="{Binding Output, Mode=TwoWay}" Margin="0,0,6,0"/>
+                                                    <Button Grid.Column="6" Content="✕" Command="{Binding $parent[ItemsControl].DataContext.AddTerminalCommand.RemovePostCommandOutputCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- CommandEvents -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Command Events" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Command Event" Command="{Binding AddTerminalCommand.AddCommandEvent}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding AddTerminalCommand.CommandEvents}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: HideTerminalCommand [HideTerminalCommand] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsHideTerminalCommandVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Hide Terminal Command" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Terminal:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableTerminals}"
+                                          SelectedValue="{Binding HideTerminalCommand.TerminalIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding TerminalIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:TerminalOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <CheckBox Grid.Column="2" Content="Is AWO Command" IsChecked="{Binding HideTerminalCommand.IsAwoCommand, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="3" Text="Command:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="4" Text="{Binding HideTerminalCommand.CommandNumber, Mode=TwoWay}" IsVisible="{Binding HideTerminalCommand.IsAwoCommand}" Margin="0,0,10,0"/>
+                                <ComboBox Grid.Column="4" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTERMCommands}" SelectedItem="{Binding HideTerminalCommand.CommandEnum, Mode=TwoWay}" IsVisible="{Binding !HideTerminalCommand.IsAwoCommand}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="5" Content="Delete Command" IsChecked="{Binding HideTerminalCommand.DeleteCommand, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: UnhideTerminalCommand [UnhideTerminalCommand] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsUnhideTerminalCommandVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Unhide Terminal Command" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Terminal:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableTerminals}"
+                                          SelectedValue="{Binding UnhideTerminalCommand.TerminalIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding TerminalIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:TerminalOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <CheckBox Grid.Column="2" Content="Is AWO Command" IsChecked="{Binding UnhideTerminalCommand.IsAwoCommand, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="3" Text="Command:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="4" Text="{Binding UnhideTerminalCommand.CommandNumber, Mode=TwoWay}" IsVisible="{Binding UnhideTerminalCommand.IsAwoCommand}"/>
+                                <ComboBox Grid.Column="4" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTERMCommands}" SelectedItem="{Binding UnhideTerminalCommand.CommandEnum, Mode=TwoWay}" IsVisible="{Binding !UnhideTerminalCommand.IsAwoCommand}" HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: ActiveEnemyWave [SetActiveEnemyWave] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsActiveEnemyWaveVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Active Enemy Wave" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <CheckBox Content="Has Active Enemy Wave" IsChecked="{Binding ActiveEnemyWave.HasActiveEnemyWave, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,0,6"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Group Infront Of Door:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding ActiveEnemyWave.EnemyGroupInfrontOfDoor, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Group In Area:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding ActiveEnemyWave.EnemyGroupInArea, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Groups In Area:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding ActiveEnemyWave.EnemyGroupsInArea, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: GiveResource [GiveResource] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsGiveResourceVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Give Resource" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Health:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding GiveResource.Health, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Main Ammo:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding GiveResource.MainAmmo, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Special Ammo:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding GiveResource.SpecialAmmo, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="6" Text="Tool Ammo:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="7" Text="{Binding GiveResource.ToolAmmo, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
+                                <TextBlock Text="Target Players:" ToolTip.Tip="#todo" VerticalAlignment="Center" Foreground="#87CEEB"/>
+                                <CheckBox Content="Woods" IsChecked="{Binding GiveResource.PlayerWoods, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Dauda" IsChecked="{Binding GiveResource.PlayerDauda, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Hackett" IsChecked="{Binding GiveResource.PlayerHackett, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Bishop" IsChecked="{Binding GiveResource.PlayerBishop, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </StackPanel>
+
+                            <WrapPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                <CheckBox Content="Full Team Overflow" IsChecked="{Binding GiveResource.FullTeamOverflow, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,0"/>
+                                <CheckBox Content="Use Location" IsChecked="{Binding GiveResource.UseLocation, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,0"/>
+                                <CheckBox Content="Include Supply Efficiency" IsChecked="{Binding GiveResource.IncludeSupplyEfficiency, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </WrapPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: NestedEvent [NestedEvent] -->
+                    <Expander IsVisible="{Binding IsNestedEventVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Nested Event Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableNestedEventTypes}" SelectedItem="{Binding NestedEvent.Type, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Max Random Events:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding NestedEvent.MaxRandomEvents, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Allow Repeats In Random" IsChecked="{Binding NestedEvent.AllowRepeatsInRandom, Mode=TwoWay}" ToolTip.Tip="#todo" Foreground="#CCCCCC"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,4,0,0">
+                                <TextBlock Text="Target Players:" ToolTip.Tip="#todo" VerticalAlignment="Center" Foreground="#87CEEB"/>
+                                <CheckBox Content="Woods" IsChecked="{Binding NestedEvent.PlayerWoods, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Dauda" IsChecked="{Binding NestedEvent.PlayerDauda, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Hackett" IsChecked="{Binding NestedEvent.PlayerHackett, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Bishop" IsChecked="{Binding NestedEvent.PlayerBishop, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </StackPanel>
+
+                            <!-- EventsToActivate -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events To Activate" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding NestedEvent.AddEventToActivate}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding NestedEvent.EventsToActivate}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- WheelOfEvents -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Wheel Of Events (RandomWeighted)" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Wheel Item" Command="{Binding NestedEvent.AddWheelItem}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding NestedEvent.WheelOfEvents}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                    <StackPanel Spacing="6">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,Auto,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Debug Name:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB" FontSize="11"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding DebugName, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <TextBlock Grid.Column="2" Text="Weight:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB" FontSize="11"/>
+                                                            <TextBox Grid.Column="3" Text="{Binding Weight, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <TextBlock Grid.Column="4" Text="Repeat Count:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB" FontSize="11"/>
+                                                            <TextBox Grid.Column="5" Text="{Binding RepeatCount, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <CheckBox Grid.Column="6" Content="Is Infinite" IsChecked="{Binding IsInfinite, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+
+                                                            <Button Grid.Column="7" Content="+ Add Event" Command="{Binding AddEvent}" Background="#2E5B88" Foreground="White" Padding="6,2" Margin="0,0,4,0"/>
+                                                            <Button Grid.Column="8" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.NestedEvent.RemoveWheelItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                        </Grid>
+                                                        <ItemsControl ItemsSource="{Binding Events}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: EventLoop [StartEventLoop] -->
+                    <Expander IsVisible="{Binding IsEventLoopVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Event Loop Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Loop Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding EventLoop.LoopIndex, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Loop Delay (s):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding EventLoop.LoopDelay, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Loop Count (-1 for inf):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding EventLoop.LoopCount, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events To Activate" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding EventLoop.AddEventToActivate}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding EventLoop.EventsToActivate}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: TeleportPlayer [TeleportPlayer] -->
+                    <Expander IsVisible="{Binding IsTeleportPlayerVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Teleport Player Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <WrapPanel Orientation="Horizontal">
+                                <CheckBox Content="Flash Teleport" IsChecked="{Binding TeleportPlayer.FlashTeleport, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Warp Sentries" IsChecked="{Binding TeleportPlayer.WarpSentries, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Warp Big Pickups" IsChecked="{Binding TeleportPlayer.WarpBigPickups, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Send Big Pickups To Host" IsChecked="{Binding TeleportPlayer.SendBigPickupsToHost, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                                <CheckBox Content="Full Team Overflow" IsChecked="{Binding TeleportPlayer.FullTeamOverflow, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,12,4"/>
+                            </WrapPanel>
+
+                            <!-- FromLocation -->
+                            <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="4">
+                                    <CheckBox Content="From Location Enabled" IsChecked="{Binding TeleportPlayer.FromLocation.Enabled, Mode=TwoWay}" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" IsVisible="{Binding TeleportPlayer.FromLocation.Enabled}">
+                                        <TextBlock Grid.Column="0" Text="Dimension:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                        <TextBox Grid.Column="1" Text="{Binding TeleportPlayer.FromLocation.DimensionIndex, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                        <TextBlock Grid.Column="2" Text="Layer:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                        <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSectors}" SelectedItem="{Binding TeleportPlayer.FromLocation.Layer, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                        <TextBlock Grid.Column="4" Text="Zone:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                        <TextBox Grid.Column="5" Text="{Binding TeleportPlayer.FromLocation.LocalIndex, Mode=TwoWay}"/>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- TPData -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Player Specific TP Data (Optional overrides per player)" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Player TP Data" Command="{Binding TeleportPlayer.AddTPData}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding TeleportPlayer.TPData}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                    <StackPanel Spacing="6">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Player (0-3):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding PlayerIndex, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                            <TextBlock Grid.Column="2" Text="Dimension:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="3" Text="{Binding DimensionIndex, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                            <CheckBox Grid.Column="4" Content="Play Warp Animation" IsChecked="{Binding PlayWarpAnimation, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,8,0"/>
+                                                            <Button Grid.Column="6" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.TeleportPlayer.RemoveTPDataCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*">
+                                                            <TextBlock Grid.Column="0" Text="Pos X:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding Position.X, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="3" Text="{Binding Position.Y, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="5" Text="{Binding Position.Z, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                            <TextBlock Grid.Column="6" Text="Flash Duration:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="7" Text="{Binding FlashDuration, Mode=TwoWay}"/>
+                                                        </Grid>
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                                            <TextBlock Grid.Column="0" Text="Filter:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding WorldEventObjectFilter, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                            <CheckBox Grid.Column="2" Content="Use Look Vector (V3)" IsChecked="{Binding UseLookDirectionVector, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,8,0"/>
+                                                            <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTeleportLookDirections}" SelectedItem="{Binding LookDirection, Mode=TwoWay}" IsVisible="{Binding !UseLookDirectionVector}" HorizontalAlignment="Stretch"/>
+                                                            <Grid Grid.Column="3" ColumnDefinitions="Auto,*,Auto,*,Auto,*" IsVisible="{Binding UseLookDirectionVector}">
+                                                                <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="#87CEEB"/>
+                                                                <TextBox Grid.Column="1" Text="{Binding LookDirectionV3.X, Mode=TwoWay}" Margin="0,0,4,0"/>
+                                                                <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="#87CEEB"/>
+                                                                <TextBox Grid.Column="3" Text="{Binding LookDirectionV3.Y, Mode=TwoWay}" Margin="0,0,4,0"/>
+                                                                <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,2,0" Foreground="#87CEEB"/>
+                                                                <TextBox Grid.Column="5" Text="{Binding LookDirectionV3.Z, Mode=TwoWay}"/>
+                                                            </Grid>
+                                                        </Grid>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: InfectPlayer [InfectPlayer] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsInfectPlayerVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Infect Player Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="Target Players:" ToolTip.Tip="#todo" VerticalAlignment="Center" Foreground="#87CEEB"/>
+                                <CheckBox Content="Woods" IsChecked="{Binding InfectPlayer.PlayerWoods, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Dauda" IsChecked="{Binding InfectPlayer.PlayerDauda, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Hackett" IsChecked="{Binding InfectPlayer.PlayerHackett, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Bishop" IsChecked="{Binding InfectPlayer.PlayerBishop, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </StackPanel>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Infection Amount:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding InfectPlayer.InfectionAmount, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Interval (s):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding InfectPlayer.Interval, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Infect Over Time" IsChecked="{Binding InfectPlayer.InfectOverTime, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                <CheckBox Grid.Column="5" Content="Full Team Overflow" IsChecked="{Binding InfectPlayer.FullTeamOverflow, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                <CheckBox Grid.Column="6" Content="Use Zone" IsChecked="{Binding InfectPlayer.UseZone, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: DamagePlayer [DamagePlayer] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsDamagePlayerVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Damage Player Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="Target Players:" ToolTip.Tip="#todo" VerticalAlignment="Center" Foreground="#87CEEB"/>
+                                <CheckBox Content="Woods" IsChecked="{Binding DamagePlayer.PlayerWoods, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Dauda" IsChecked="{Binding DamagePlayer.PlayerDauda, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Hackett" IsChecked="{Binding DamagePlayer.PlayerHackett, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Bishop" IsChecked="{Binding DamagePlayer.PlayerBishop, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </StackPanel>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Damage Amount:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding DamagePlayer.DamageAmount, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Interval (s):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding DamagePlayer.Interval, Mode=TwoWay}"/>
+                            </Grid>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <CheckBox Content="Deal % Damage" IsChecked="{Binding DamagePlayer.DealPercentageDamage, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Damage Over Time" IsChecked="{Binding DamagePlayer.DamageOverTime, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Full Team Overflow" IsChecked="{Binding DamagePlayer.FullTeamOverflow, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Use Zone" IsChecked="{Binding DamagePlayer.UseZone, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: RevivePlayer [RevivePlayer] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsRevivePlayerVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Revive Player Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <StackPanel Orientation="Horizontal" Spacing="10">
+                                <TextBlock Text="Target Players:" ToolTip.Tip="#todo" VerticalAlignment="Center" Foreground="#87CEEB"/>
+                                <CheckBox Content="Woods" IsChecked="{Binding RevivePlayer.PlayerWoods, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Dauda" IsChecked="{Binding RevivePlayer.PlayerDauda, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Hackett" IsChecked="{Binding RevivePlayer.PlayerHackett, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Bishop" IsChecked="{Binding RevivePlayer.PlayerBishop, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                                <CheckBox Content="Full Team Overflow" IsChecked="{Binding RevivePlayer.FullTeamOverflow, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="10,0,0,0"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: AdjustTimer [AdjustAWOTimer] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsAdjustTimerVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Adjust AWO Timer Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Duration:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding AdjustTimer.Duration, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Speed:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding AdjustTimer.Speed, Mode=TwoWay}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <CheckBox Grid.Column="0" Content="Update Title" IsChecked="{Binding AdjustTimer.UpdateTitleText, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+                                <TextBox Grid.Column="1" Text="{Binding AdjustTimer.TitleText, Mode=TwoWay}" IsVisible="{Binding AdjustTimer.UpdateTitleText}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="2" Content="Update Body" IsChecked="{Binding AdjustTimer.UpdateBodyText, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+                                <TextBox Grid.Column="3" Text="{Binding AdjustTimer.BodyText, Mode=TwoWay}" IsVisible="{Binding AdjustTimer.UpdateBodyText}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Update Color" IsChecked="{Binding AdjustTimer.UpdateColor, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+                                <TextBox Grid.Column="5" Text="{Binding AdjustTimer.TimerColor, Mode=TwoWay}" IsVisible="{Binding AdjustTimer.UpdateColor}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,Auto,*,Auto,*">
+                                <CheckBox Grid.Column="0" Content="Update Special HUD" IsChecked="{Binding AdjustTimer.UpdateSpecialHud, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                <TextBlock Grid.Column="1" Text="HUD Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB" IsVisible="{Binding AdjustTimer.UpdateSpecialHud}"/>
+                                <TextBox Grid.Column="2" Text="{Binding AdjustTimer.SpecialHudIndex, Mode=TwoWay}" IsVisible="{Binding AdjustTimer.UpdateSpecialHud}" Margin="0,0,10,0"/>
+                                <TextBlock Grid.Column="3" Text="Time Modifier:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB" IsVisible="{Binding AdjustTimer.UpdateSpecialHud}"/>
+                                <TextBox Grid.Column="4" Text="{Binding AdjustTimer.SpecialHudTimeModifier, Mode=TwoWay}" IsVisible="{Binding AdjustTimer.UpdateSpecialHud}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: Countup [Countup] -->
+                    <Expander IsVisible="{Binding IsCountupVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Countup Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Start Value:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding Countup.StartValue, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Speed:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding Countup.Speed, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Decimals:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding Countup.DecimalPoints, Mode=TwoWay}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Title Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding Countup.TitleText, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Body Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding Countup.BodyText, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Timer Color:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding Countup.TimerColor, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- EventsOnProgress -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Progress" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Progress Event" Command="{Binding Countup.AddProgressEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding Countup.EventsOnProgress}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                    <StackPanel Spacing="6">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Progress (0.0 - 1.0):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding Progress, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                                            <Button Grid.Column="2" Content="+ Add Event" Command="{Binding AddEvent}" Background="#2E5B88" Foreground="White" Padding="8,3" Margin="0,0,6,0"/>
+                                                            <Button Grid.Column="3" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.Countup.RemoveProgressEventCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                        </Grid>
+                                                        <ItemsControl ItemsSource="{Binding Events}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- EventsOnDone -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Done" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Done Event" Command="{Binding Countup.AddDoneEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding Countup.EventsOnDone}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: NavMarker [SpawnNavMarker] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsNavMarkerVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Nav Marker Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding NavMarker.Index, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Style:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding NavMarker.Style, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Title:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding NavMarker.Title, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="6" Text="Color:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="7" Text="{Binding NavMarker.Color, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="8" Content="Use Pin" IsChecked="{Binding NavMarker.UsePin, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: CameraShake [ShakeScreen] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsCameraShakeVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Camera Shake Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Radius:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding CameraShake.Radius, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Amplitude:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding CameraShake.Amplitude, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Frequency:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding CameraShake.Frequency, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="6" Content="Directional" IsChecked="{Binding CameraShake.Directional, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: Portal [StartPortalMachine] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsPortalVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Portal Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Target Dimension:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding Portal.TargetDimension, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Teleport Delay (s):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding Portal.TeleportDelay, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Prevent Portal Warp Team Event" IsChecked="{Binding Portal.PreventPortalWarpTeamEvent, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: SuccessScreen [SetSuccessScreen] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsSuccessScreenVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Success Screen Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <CheckBox Content="Override Success Screen Object" IsChecked="{Binding SuccessScreen.HasSuccessScreen, Mode=TwoWay}" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" IsVisible="{Binding SuccessScreen.HasSuccessScreen}">
+                                <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSuccessScreenTypes}" SelectedItem="{Binding SuccessScreen.Type, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Custom Screen ID:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SuccessScreen.CustomSuccessScreen, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Override Music:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding SuccessScreen.OverrideMusic, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: MultiProgression [MultiProgression] -->
+                    <Expander IsVisible="{Binding IsMultiProgressionVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Multi-Progression Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Multi-Progression Items" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                <Button Grid.Column="1" Content="+ Add Item" Command="{Binding MultiProgression.AddItem}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                            </Grid>
+                            <ItemsControl ItemsSource="{Binding MultiProgression.Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                                    <TextBlock Grid.Column="0" Text="Header:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="1" Text="{Binding CustomSubObjectiveHeader, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                    <TextBlock Grid.Column="2" Text="SubObjective:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding CustomSubObjective, Mode=TwoWay}"/>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                                    <TextBlock Grid.Column="0" Text="Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="1" Text="{Binding Index, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                    <TextBlock Grid.Column="2" Text="Priority:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding Priority, Mode=TwoWay}" Margin="0,0,8,0"/>
+
+                                                    <TextBlock Grid.Column="4" Text="Layer:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <ComboBox Grid.Column="5" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSectors}" SelectedItem="{Binding Layer, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                    <TextBlock Grid.Column="0" Text="Override Tag:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="1" Text="{Binding OverrideTag, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                                    <CheckBox Grid.Column="2" Content="Layer Independent" IsChecked="{Binding IsLayerIndependent, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                                    <Button Grid.Column="3" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.MultiProgression.RemoveItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: WaveRoarSound [PlayWaveRoarSound] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsWaveRoarSoundVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Wave Roar Sound Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto">
+                                <TextBlock Grid.Column="0" Text="Roar Sound:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRoarSounds}" SelectedItem="{Binding WaveRoarSound.RoarSound, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Roar Size:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRoarSizes}" SelectedItem="{Binding WaveRoarSound.RoarSize, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Is Outside" IsChecked="{Binding WaveRoarSound.IsOutside, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: CustomHud [CustomHudText] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsCustomHudVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Custom HUD Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Title Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding CustomHud.TitleText, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Body Text:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding CustomHud.BodyText, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: SpecialHud [SpecialHudTimer] -->
+                    <Expander IsVisible="{Binding IsSpecialHudVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Special HUD Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="10" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSpecialHudTypes}" SelectedItem="{Binding SpecialHud.Type, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpecialHud.Index, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Message:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding SpecialHud.Message, Mode=TwoWay}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,Auto">
+                                <TextBlock Grid.Column="0" Text="Style:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSpecialHudStyles}" SelectedItem="{Binding SpecialHud.Style, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Priority:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding SpecialHud.Priority, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="4" Content="Show Time In Progress Bar" IsChecked="{Binding SpecialHud.ShowTimeInProgressBar, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,10,0"/>
+                                <CheckBox Grid.Column="5" Content="Invert Progress" IsChecked="{Binding SpecialHud.InvertProgress, Mode=TwoWay}" ToolTip.Tip="#todo"/>
+                            </Grid>
+
+                            <!-- EventsOnProgress -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Progress" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Progress Event" Command="{Binding SpecialHud.AddProgressEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding SpecialHud.EventsOnProgress}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                    <StackPanel Spacing="6">
+                                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Progress (0.0 - 1.0):" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                                            <TextBox Grid.Column="1" Text="{Binding Progress, Mode=TwoWay}" Margin="0,0,10,0"/>
+                                                            <Button Grid.Column="2" Content="+ Add Event" Command="{Binding AddEvent}" Background="#2E5B88" Foreground="White" Padding="8,3" Margin="0,0,6,0"/>
+                                                            <Button Grid.Column="3" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.SpecialHud.RemoveProgressEventCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                        </Grid>
+                                                        <ItemsControl ItemsSource="{Binding Events}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- EventsOnDone -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On Done" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Done Event" Command="{Binding SpecialHud.AddDoneEvent}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding SpecialHud.EventsOnDone}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: PlayerDialogue [ForcePlayPlayerDialogue] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsPlayerDialogueVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Player Dialogue Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailablePlayerDialogueTypes}" SelectedItem="{Binding PlayerDialogue.Type, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Character:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailablePlayerCharacters}" SelectedItem="{Binding PlayerDialogue.Character, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Intensity State:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="5" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableDialogueIntensityStates}" SelectedItem="{Binding PlayerDialogue.IntensityState, Mode=TwoWay}" HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: SetTerminalLog [SetTerminalLog] -->
+                    <Expander IsVisible="{Binding IsSetTerminalLogVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Set Terminal Log Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Terminal:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="1"
+                                          ItemsSource="{Binding AvailableTerminals}"
+                                          SelectedValue="{Binding SetTerminalLog.TerminalIndex, Mode=TwoWay}"
+                                          SelectedValueBinding="{Binding TerminalIndex}"
+                                          HorizontalAlignment="Stretch" Margin="0,0,10,0">
+                                    <ComboBox.ItemTemplate>
+                                        <DataTemplate x:DataType="models:TerminalOption">
+                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+
+                                <TextBlock Grid.Column="2" Text="Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableTerminalLogTypes}" SelectedItem="{Binding SetTerminalLog.Type, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="4" Text="File Name:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding SetTerminalLog.FileName, Mode=TwoWay}"/>
+                            </Grid>
+
+                            <!-- If Add: file content & audio & events -->
+                            <StackPanel Spacing="6">
+                                <Grid ColumnDefinitions="Auto,*">
+                                    <TextBlock Grid.Column="0" Text="File Content:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                    <TextBox Grid.Column="1" Text="{Binding SetTerminalLog.FileContent, Mode=TwoWay}"/>
+                                </Grid>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="Audio File ID:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                    <TextBox Grid.Column="1" Text="{Binding SetTerminalLog.AttachedAudioFile, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                    <TextBlock Grid.Column="2" Text="Audio Size:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                    <TextBox Grid.Column="3" Text="{Binding SetTerminalLog.AttachedAudioByteSize, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                    <TextBlock Grid.Column="4" Text="Dialog After Audio:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                    <TextBox Grid.Column="5" Text="{Binding SetTerminalLog.PlayerDialogToTriggerAfterAudio, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                    <TextBlock Grid.Column="6" Text="Original Lang:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                    <TextBox Grid.Column="7" Text="{Binding SetTerminalLog.FileContentOriginalLanguage, Mode=TwoWay}"/>
+                                </Grid>
+                            </StackPanel>
+
+                            <!-- If Move: target coords -->
+                            <Border Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6"
+                                    IsVisible="{Binding SetTerminalLog.IsMoveType}">
+                                <StackPanel Spacing="4">
+                                    <TextBlock Text="Target Location (For Move Type)" FontWeight="SemiBold" Foreground="#87CEEB" FontSize="11" ToolTip.Tip="#todo"/>
+                                    <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*">
+                                        <TextBlock Grid.Column="0" Text="Target Dim:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                        <ComboBox Grid.Column="1"
+                                                  ItemsSource="{Binding $parent[Window].DataContext.LevelLayout.AvailableDimensions}"
+                                                  SelectedValue="{Binding SetTerminalLog.TargetDimensionIndex, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding DimensionIndex}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:DimensionOption">
+                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Column="2" Text="Target Layer:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                        <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableSectors}" SelectedItem="{Binding SetTerminalLog.TargetLayer, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,6,0"/>
+
+                                        <TextBlock Grid.Column="4" Text="Target Zone:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                        <ComboBox Grid.Column="5"
+                                                  ItemsSource="{Binding SetTerminalLog.AvailableTargetZones}"
+                                                  SelectedValue="{Binding SetTerminalLog.TargetLocalIndex, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding ZoneIndex}"
+                                                  HorizontalAlignment="Stretch" Margin="0,0,6,0">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:ZoneOption">
+                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+
+                                        <TextBlock Grid.Column="6" Text="Target Terminal:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                        <ComboBox Grid.Column="7"
+                                                  ItemsSource="{Binding SetTerminalLog.AvailableTargetTerminals}"
+                                                  SelectedValue="{Binding SetTerminalLog.TargetTerminalIndex, Mode=TwoWay}"
+                                                  SelectedValueBinding="{Binding TerminalIndex}"
+                                                  HorizontalAlignment="Stretch">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate x:DataType="models:TerminalOption">
+                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- EventsOnFileRead -->
+                            <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="6">
+                                <StackPanel Spacing="4">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Grid.Column="0" Text="Events On File Read" FontWeight="SemiBold" Foreground="#FFFFFF" FontSize="11" ToolTip.Tip="#todo"/>
+                                        <Button Grid.Column="1" Content="+ Add Event" Command="{Binding SetTerminalLog.AddEventOnFileRead}" Background="#2E5B88" Foreground="White" Padding="6,2" FontSize="11"/>
+                                    </Grid>
+                                    <ItemsControl ItemsSource="{Binding SetTerminalLog.EventsOnFileRead}" ItemTemplate="{StaticResource WardenEventTemplate}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: ObjectiveItems [SetPocketItem] -->
+                    <Expander IsVisible="{Binding IsObjectiveItemsVisible}"
+                              Background="#252526"
+                              BorderBrush="#3E3E42"
+                              BorderThickness="1"
+                              CornerRadius="4"
+                              HorizontalAlignment="Stretch">
+                        <Expander.Header>
+                            <TextBlock Text="Pocket Items Configuration" FontWeight="SemiBold" ToolTip.Tip="#todo" Foreground="#87CEEB"/>
+                        </Expander.Header>
+                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBlock Grid.Column="0" Text="Objective Pocket Items" FontWeight="Bold" Foreground="#FFFFFF" FontSize="12" ToolTip.Tip="#todo"/>
+                                <Button Grid.Column="1" Content="+ Add Pocket Item" Command="{Binding ObjectiveItems.AddItem}" Background="#2E5B88" Foreground="White" Padding="8,3"/>
+                            </Grid>
+                            <ItemsControl ItemsSource="{Binding ObjectiveItems.Items}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Background="#1E1E1E" BorderBrush="#444444" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                            <StackPanel Spacing="6">
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,Auto">
+                                                    <TextBlock Grid.Column="0" Text="Index:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="1" Text="{Binding Index, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                    <TextBlock Grid.Column="4" Text="Item Name:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="5" Text="{Binding ItemName, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                                    <CheckBox Grid.Column="6" Content="Is On Top" IsChecked="{Binding IsOnTop, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+                                                    <Button Grid.Column="7" Content="✕ Remove" Command="{Binding $parent[ItemsControl].DataContext.ObjectiveItems.RemoveItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2"/>
+                                                </Grid>
+                                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                                    <TextBlock Grid.Column="0" Text="Tag Type:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailablePocketItemTagTypes}" SelectedItem="{Binding TagType, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,6,0"/>
+
+                                                    <TextBlock Grid.Column="2" Text="Player:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailablePlayerCharacters}" SelectedItem="{Binding Player, Mode=TwoWay}" HorizontalAlignment="Stretch" Margin="0,0,6,0"/>
+
+                                                    <TextBlock Grid.Column="4" Text="Custom Tag:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                                    <TextBox Grid.Column="5" Text="{Binding CustomTag, Mode=TwoWay}"/>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Expander>
+
+                    <!-- AWO Conditional: EnvironmentData [SetExpeditionEnvironment] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsEnvironmentDataVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Expedition Environment Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Wetness:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding EnvironmentData.EnvironmentWetness, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <CheckBox Grid.Column="2" Content="Update Color" IsChecked="{Binding EnvironmentData.UpdateColor, Mode=TwoWay}" ToolTip.Tip="#todo" Margin="0,0,6,0"/>
+                                <TextBlock Grid.Column="3" Text="Dust Color:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB" IsVisible="{Binding EnvironmentData.UpdateColor}"/>
+                                <TextBox Grid.Column="4" Text="{Binding EnvironmentData.DustColor, Mode=TwoWay}" IsVisible="{Binding EnvironmentData.UpdateColor}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Alpha Boost:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding EnvironmentData.DustAlphaBoost, Mode=TwoWay}" Margin="0,0,10,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Turbulence:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding EnvironmentData.DustTurbulence, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- AWO Conditional: FadeScreen [FadeScreenInOut] -->
+                    <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8"
+                            IsVisible="{Binding IsFadeScreenVisible}">
+                        <StackPanel Spacing="6">
+                            <TextBlock Text="Fade Screen Configuration" FontWeight="Bold" Foreground="#87CEEB" FontSize="12" ToolTip.Tip="#todo"/>
+                            <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*,Auto,*,Auto,*,Auto,*">
+                                <TextBlock Grid.Column="0" Text="Color:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="1" Text="{Binding FadeScreen.FadeColor, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                <TextBlock Grid.Column="2" Text="Time Start:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="3" Text="{Binding FadeScreen.CurveTimeStart, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                <TextBlock Grid.Column="4" Text="Val Start:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="5" Text="{Binding FadeScreen.CurveValueStart, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                <TextBlock Grid.Column="6" Text="Time End:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="7" Text="{Binding FadeScreen.CurveTimeEnd, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                <TextBlock Grid.Column="8" Text="Val End:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="9" Text="{Binding FadeScreen.CurveValueEnd, Mode=TwoWay}" Margin="0,0,6,0"/>
+
+                                <TextBlock Grid.Column="10" Text="Speed:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,4,0" Foreground="#87CEEB"/>
+                                <TextBox Grid.Column="11" Text="{Binding FadeScreen.FadeSpeed, Mode=TwoWay}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                 </StackPanel>
             </Border>
         </DataTemplate>

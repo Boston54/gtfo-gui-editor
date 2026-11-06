@@ -132,11 +132,46 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public static LevelLayoutViewModel? Instance { get; private set; }
 
-    public static EventType[] AvailableEventTypes => Enum.GetValues<EventType>();
+    public static EventType[] AvailableEventTypes
+    {
+        get
+        {
+            if (ModManager.Instance.AdvancedWardenObjective)
+            {
+                return Enum.GetValues<EventType>();
+            }
+            return Enum.GetValues<EventType>().Where(t => (int)t < 10000).ToArray();
+        }
+    }
     public static EventTrigger[] AvailableEventTriggers => Enum.GetValues<EventTrigger>();
     public static SectorType[] AvailableSectors => Enum.GetValues<SectorType>();
+    public static AwoReactorState[] AvailableReactorStates => Enum.GetValues<AwoReactorState>();
+    public static AwoZoneLightType[] AvailableZoneLightTypes => Enum.GetValues<AwoZoneLightType>();
+    public static AwoCleanupType[] AvailableCleanupTypes => Enum.GetValues<AwoCleanupType>();
+    public static SpecialCommandRule[] AvailableSpecialCommandRulesList => Enum.GetValues<SpecialCommandRule>();
+    public static TERM_Command[] AvailableTERMCommands => Enum.GetValues<TERM_Command>();
+    public static ScoutTypeOption[] AvailableScoutTypes { get; } = new[]
+    {
+        new ScoutTypeOption(ScoutType.Scout, "Scout"),
+        new ScoutTypeOption(ScoutType.Charger_Scout, "Charger Scout"),
+        new ScoutTypeOption(ScoutType.Shadow_Scout, "Shadow Scout"),
+        new ScoutTypeOption(ScoutType.Zoomer_Scout, "Zoomer Scout"),
+        new ScoutTypeOption(ScoutType.Nightmare_Scout, "Nightmare Scout")
+    };
+    public static AwoNestedEventType[] AvailableNestedEventTypes => Enum.GetValues<AwoNestedEventType>();
+    public static AwoRoarSound[] AvailableRoarSounds => Enum.GetValues<AwoRoarSound>();
+    public static AwoRoarSize[] AvailableRoarSizes => Enum.GetValues<AwoRoarSize>();
+    public static AwoSpecialHudType[] AvailableSpecialHudTypes => Enum.GetValues<AwoSpecialHudType>();
+    public static AwoSpecialHudStyle[] AvailableSpecialHudStyles => Enum.GetValues<AwoSpecialHudStyle>();
+    public static AwoPlayerDialogueType[] AvailablePlayerDialogueTypes => Enum.GetValues<AwoPlayerDialogueType>();
+    public static AwoDialogueIntensityState[] AvailableDialogueIntensityStates => Enum.GetValues<AwoDialogueIntensityState>();
+    public static AwoTerminalLogType[] AvailableTerminalLogTypes => Enum.GetValues<AwoTerminalLogType>();
+    public static AwoPocketItemTagType[] AvailablePocketItemTagTypes => Enum.GetValues<AwoPocketItemTagType>();
+    public static AwoTeleportLookDirection[] AvailableTeleportLookDirections => Enum.GetValues<AwoTeleportLookDirection>();
+    public static AwoSuccessScreenType[] AvailableSuccessScreenTypes => Enum.GetValues<AwoSuccessScreenType>();
+    public static AwoPlayerCharacter[] AvailablePlayerCharacters => Enum.GetValues<AwoPlayerCharacter>();
 
-    public ObservableCollection<EventType> InstanceAvailableEventTypes { get; } = new(Enum.GetValues<EventType>());
+    public ObservableCollection<EventType> InstanceAvailableEventTypes => new(AvailableEventTypes);
     public ObservableCollection<EventTrigger> InstanceAvailableEventTriggers { get; } = new(Enum.GetValues<EventTrigger>());
     public ObservableCollection<SectorType> InstanceAvailableSectors { get; } = new(Enum.GetValues<SectorType>());
 
@@ -402,6 +437,151 @@ public class LevelLayoutViewModel : ViewModelBase
         RemoveEnemyGroupInAreaItemCommand = new RelayCommand<EnemyGroupItem>(RemoveEnemyGroupInAreaItem);
         RemoveEnemyGroupInFrontOfDoorItemCommand = new RelayCommand<EnemyGroupItem>(RemoveEnemyGroupInFrontOfDoorItem);
         RemoveDoorCandidateZoneCommand = new RelayCommand<CandidateZonePlacement>(RemoveDoorCandidateZone);
+
+        ModManager.Instance.RegisterFeature(
+            ModManager.AdvancedWardenObjectiveModId,
+            "Advanced Warden Objective Events",
+            () => HasAnyAwoEventsInUse());
+
+        ModManager.Instance.PropertyChanged += (s, e) =>
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) ||
+                e.PropertyName == nameof(ModManager.AdvancedWardenObjective) ||
+                e.PropertyName == ModManager.AdvancedWardenObjectiveModId)
+            {
+                OnPropertyChanged(nameof(AvailableEventTypes));
+                OnPropertyChanged(nameof(InstanceAvailableEventTypes));
+            }
+        };
+    }
+
+    public bool HasAnyAwoEventsInUse()
+    {
+        if (Levels == null) return false;
+        foreach (var level in Levels)
+        {
+            if (level == null) continue;
+            if (CheckSectorEvents(level.MainSector) ||
+                CheckSectorEvents(level.SecondarySector) ||
+                CheckSectorEvents(level.OverloadSector))
+            {
+                return true;
+            }
+
+            if (CheckGridStateEvents(level.GridState)) return true;
+            if (level.Dimensions != null)
+            {
+                foreach (var dim in level.Dimensions)
+                {
+                    if (dim != null && CheckGridStateEvents(dim.GridState)) return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static bool CheckSectorEvents(SectorSettings? sector)
+    {
+        if (sector == null) return false;
+        return CheckEvents(sector.EventsOnElevatorLand) ||
+               CheckEvents(sector.EventsOnActivate) ||
+               CheckEvents(sector.EventsOnActivation) ||
+               CheckEvents(sector.EventsOnGotoWin) ||
+               CheckEvents(sector.EventsOnSequenceStart) ||
+               CheckEvents(sector.EventsOnSequenceDone) ||
+               CheckEvents(sector.EventsOnSequenceFail);
+    }
+
+    private static bool CheckGridStateEvents(LevelLayoutGridState? grid)
+    {
+        if (grid == null) return false;
+        foreach (var door in grid.PlacedDoors)
+        {
+            if (door == null) continue;
+            if (CheckEvents(door.EventsOnPortalWarp) ||
+                CheckEvents(door.EventsOnApproachDoor) ||
+                CheckEvents(door.EventsOnUnlockDoor) ||
+                CheckEvents(door.EventsOnOpenDoor) ||
+                CheckEvents(door.EventsOnDoorScanStart) ||
+                CheckEvents(door.EventsOnDoorScanDone) ||
+                CheckEvents(door.EventsOnBossDeath) ||
+                CheckEvents(door.EventsOnTrigger) ||
+                CheckEvents(door.EventsOnTerminalDeactivateAlarm))
+            {
+                return true;
+            }
+        }
+
+        foreach (var zs in grid.ZoneSettingsMap.Values)
+        {
+            if (zs == null) continue;
+            foreach (var tp in zs.TerminalPlacements)
+            {
+                if (tp == null) continue;
+                foreach (var uc in tp.UniqueCommands)
+                {
+                    if (uc == null) continue;
+                    if (CheckEvents(uc.CommandEvents)) return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private static bool CheckEvents(IEnumerable<WardenEvent>? events)
+    {
+        if (events == null) return false;
+        foreach (var ev in events)
+        {
+            if (ev == null) continue;
+            if ((int)ev.Type >= 10000) return true;
+            if (ev.Countdown != null)
+            {
+                if (CheckEvents(ev.Countdown.EventsOnDone)) return true;
+                foreach (var p in ev.Countdown.EventsOnProgress)
+                {
+                    if (p != null && CheckEvents(p.Events)) return true;
+                }
+            }
+            if (ev.AddTerminalCommand != null)
+            {
+                if (CheckEvents(ev.AddTerminalCommand.CommandEvents)) return true;
+            }
+            if (ev.NestedEvent != null)
+            {
+                if (CheckEvents(ev.NestedEvent.EventsToActivate)) return true;
+                foreach (var w in ev.NestedEvent.WheelOfEvents)
+                {
+                    if (w != null && CheckEvents(w.Events)) return true;
+                }
+            }
+            if (ev.EventLoop != null)
+            {
+                if (CheckEvents(ev.EventLoop.EventsToActivate)) return true;
+            }
+            if (ev.Countup != null)
+            {
+                if (CheckEvents(ev.Countup.EventsOnDone)) return true;
+                foreach (var p in ev.Countup.EventsOnProgress)
+                {
+                    if (p != null && CheckEvents(p.Events)) return true;
+                }
+            }
+            if (ev.SpecialHud != null)
+            {
+                if (CheckEvents(ev.SpecialHud.EventsOnDone)) return true;
+                foreach (var p in ev.SpecialHud.EventsOnProgress)
+                {
+                    if (p != null && CheckEvents(p.Events)) return true;
+                }
+            }
+            if (ev.SetTerminalLog != null)
+            {
+                if (CheckEvents(ev.SetTerminalLog.EventsOnFileRead)) return true;
+            }
+        }
+        return false;
     }
 
     public void RefreshAvailableDimensions()
@@ -1939,38 +2119,193 @@ public class LevelLayoutViewModel : ViewModelBase
     public void RemoveWardenEvent(WardenEvent? ev)
     {
         if (ev == null) return;
-        if (EditingDoor != null)
+        if (EditingDoor != null && TryRemoveEventFromDoor(EditingDoor, ev)) return;
+        if (CurrentObjective != null && TryRemoveEventFromObjective(CurrentObjective, ev)) return;
+        if (ActiveZoneSettings != null && TryRemoveEventFromZoneSettings(ActiveZoneSettings, ev)) return;
+        if (EditingDimension != null && TryRemoveEventFromDimension(EditingDimension, ev)) return;
+
+        if (GridState != null)
         {
-            EditingDoor.EventsOnPortalWarp.Remove(ev);
-            EditingDoor.EventsOnApproachDoor.Remove(ev);
-            EditingDoor.EventsOnUnlockDoor.Remove(ev);
-            EditingDoor.EventsOnOpenDoor.Remove(ev);
-            EditingDoor.EventsOnDoorScanStart.Remove(ev);
-            EditingDoor.EventsOnDoorScanDone.Remove(ev);
-            EditingDoor.EventsOnBossDeath.Remove(ev);
-            EditingDoor.EventsOnTrigger.Remove(ev);
-            EditingDoor.EventsOnTerminalDeactivateAlarm.Remove(ev);
-        }
-        if (CurrentObjective != null)
-        {
-            CurrentObjective.EventsOnActivation.Remove(ev);
-            CurrentObjective.EventsOnSequenceStart.Remove(ev);
-            CurrentObjective.EventsOnSequenceDone.Remove(ev);
-            CurrentObjective.EventsOnSequenceFail.Remove(ev);
-            CurrentObjective.EventsOnElevatorLand.Remove(ev);
-            CurrentObjective.EventsOnGotoWin.Remove(ev);
-            CurrentObjective.EventsOnActivate.Remove(ev);
-        }
-        if (ActiveZoneSettings != null)
-        {
-            foreach (var term in ActiveZoneSettings.TerminalPlacements)
+            foreach (var door in GridState.PlacedDoors)
             {
-                foreach (var cmd in term.UniqueCommands)
+                if (TryRemoveEventFromDoor(door, ev)) return;
+            }
+            foreach (var zs in GridState.ZoneSettingsMap.Values)
+            {
+                if (TryRemoveEventFromZoneSettings(zs, ev)) return;
+            }
+        }
+        if (SelectedLevel != null)
+        {
+            if (TryRemoveEventFromSector(SelectedLevel.MainSector, ev)) return;
+            if (TryRemoveEventFromSector(SelectedLevel.SecondarySector, ev)) return;
+            if (TryRemoveEventFromSector(SelectedLevel.OverloadSector, ev)) return;
+            if (TryRemoveEventFromDimension(SelectedLevel.RealityDimension, ev)) return;
+            foreach (var dim in SelectedLevel.Dimensions)
+            {
+                if (TryRemoveEventFromDimension(dim, ev)) return;
+            }
+        }
+    }
+
+    private static bool TryRemoveEventFromSector(SectorSettings sector, WardenEvent ev)
+    {
+        foreach (var obj in sector.Objectives)
+        {
+            if (TryRemoveEventFromObjective(obj, ev)) return true;
+        }
+        return false;
+    }
+
+    private static bool TryRemoveEventFromDoor(PlacedDoorNode door, WardenEvent ev)
+    {
+        return TryRemoveEventFromCollection(door.EventsOnPortalWarp, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnApproachDoor, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnUnlockDoor, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnOpenDoor, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnDoorScanStart, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnDoorScanDone, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnBossDeath, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnTrigger, ev) ||
+               TryRemoveEventFromCollection(door.EventsOnTerminalDeactivateAlarm, ev);
+    }
+
+    private static bool TryRemoveEventFromObjective(WardenObjective objective, WardenEvent ev)
+    {
+        return TryRemoveEventFromCollection(objective.EventsOnActivation, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnSequenceStart, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnSequenceDone, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnSequenceFail, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnElevatorLand, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnGotoWin, ev) ||
+               TryRemoveEventFromCollection(objective.EventsOnActivate, ev);
+    }
+
+    private static bool TryRemoveEventFromZoneSettings(ZoneSettings zoneSettings, WardenEvent ev)
+    {
+        foreach (var term in zoneSettings.TerminalPlacements)
+        {
+            foreach (var cmd in term.UniqueCommands)
+            {
+                if (TryRemoveEventFromCollection(cmd.CommandEvents, ev)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool TryRemoveEventFromDimension(DimensionLayoutBlock dimension, WardenEvent ev)
+    {
+        foreach (var term in dimension.StaticTerminalPlacements)
+        {
+            foreach (var cmd in term.UniqueCommands)
+            {
+                if (TryRemoveEventFromCollection(cmd.CommandEvents, ev)) return true;
+            }
+        }
+        return false;
+    }
+
+    private static bool TryRemoveEventFromCollection(ICollection<WardenEvent> collection, WardenEvent ev)
+    {
+        if (collection.Remove(ev)) return true;
+        foreach (var parentEvent in collection)
+        {
+            if (TryRemoveEventFromNested(parentEvent, ev)) return true;
+        }
+        return false;
+    }
+
+    private static bool TryRemoveEventFromNested(WardenEvent parentEvent, WardenEvent ev)
+    {
+        if (parentEvent.Countdown != null)
+        {
+            if (parentEvent.Countdown.EventsOnDone.Remove(ev)) return true;
+            foreach (var sub in parentEvent.Countdown.EventsOnDone)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+            foreach (var progress in parentEvent.Countdown.EventsOnProgress)
+            {
+                if (progress.Events.Remove(ev)) return true;
+                foreach (var sub in progress.Events)
                 {
-                    cmd.CommandEvents.Remove(ev);
+                    if (TryRemoveEventFromNested(sub, ev)) return true;
                 }
             }
         }
+        if (parentEvent.AddTerminalCommand != null)
+        {
+            if (parentEvent.AddTerminalCommand.CommandEvents.Remove(ev)) return true;
+            foreach (var sub in parentEvent.AddTerminalCommand.CommandEvents)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+        }
+        if (parentEvent.NestedEvent != null)
+        {
+            if (parentEvent.NestedEvent.EventsToActivate.Remove(ev)) return true;
+            foreach (var sub in parentEvent.NestedEvent.EventsToActivate)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+            foreach (var wheel in parentEvent.NestedEvent.WheelOfEvents)
+            {
+                if (wheel.Events.Remove(ev)) return true;
+                foreach (var sub in wheel.Events)
+                {
+                    if (TryRemoveEventFromNested(sub, ev)) return true;
+                }
+            }
+        }
+        if (parentEvent.EventLoop != null)
+        {
+            if (parentEvent.EventLoop.EventsToActivate.Remove(ev)) return true;
+            foreach (var sub in parentEvent.EventLoop.EventsToActivate)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+        }
+        if (parentEvent.Countup != null)
+        {
+            if (parentEvent.Countup.EventsOnDone.Remove(ev)) return true;
+            foreach (var sub in parentEvent.Countup.EventsOnDone)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+            foreach (var progress in parentEvent.Countup.EventsOnProgress)
+            {
+                if (progress.Events.Remove(ev)) return true;
+                foreach (var sub in progress.Events)
+                {
+                    if (TryRemoveEventFromNested(sub, ev)) return true;
+                }
+            }
+        }
+        if (parentEvent.SpecialHud != null)
+        {
+            if (parentEvent.SpecialHud.EventsOnDone.Remove(ev)) return true;
+            foreach (var sub in parentEvent.SpecialHud.EventsOnDone)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+            foreach (var progress in parentEvent.SpecialHud.EventsOnProgress)
+            {
+                if (progress.Events.Remove(ev)) return true;
+                foreach (var sub in progress.Events)
+                {
+                    if (TryRemoveEventFromNested(sub, ev)) return true;
+                }
+            }
+        }
+        if (parentEvent.SetTerminalLog != null)
+        {
+            if (parentEvent.SetTerminalLog.EventsOnFileRead.Remove(ev)) return true;
+            foreach (var sub in parentEvent.SetTerminalLog.EventsOnFileRead)
+            {
+                if (TryRemoveEventFromNested(sub, ev)) return true;
+            }
+        }
+        return false;
     }
 
     public static IReadOnlyList<DimensionLinkedToLayer> AvailableDimensionLinkedToLayers { get; } =

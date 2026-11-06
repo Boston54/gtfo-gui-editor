@@ -6,9 +6,6 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
-using GTFO_GUIEditor.Services.DatablockManager;
-using GTFO_GUIEditor.Services.DatablockManager.Exporters;
-using GTFO_GUIEditor.Services.DatablockManager.Importers;
 using GTFO_GUIEditor.ViewModels;
 using Xunit;
 
@@ -157,7 +154,7 @@ public class EnemySpawningTests
     [Fact]
     public void LevelLayoutDataBlock_ExportAndImport_EnemySpawningInZoneRoundtrip()
     {
-        var mainVm = new MainViewModel();
+        var mainVm = new MainWindowViewModel();
         var level = new LevelLayoutBlock { Name = "Test Level", PersistentId = 100 };
         mainVm.LevelLayout.Levels.Add(level);
 
@@ -187,7 +184,7 @@ public class EnemySpawningTests
             var exporter = new LevelLayoutDataBlockExporter();
             exporter.Export(exportCtx);
 
-            string layoutJsonPath = Path.Combine(exportCtx.DatablocksDirectory, "LevelLayoutDataBlock.json");
+            string layoutJsonPath = Path.Combine(exportCtx.ExportRootPath, "GameData_LevelLayoutDataBlock_bin.json");
             Assert.True(File.Exists(layoutJsonPath));
 
             string jsonContent = File.ReadAllText(layoutJsonPath);
@@ -198,13 +195,13 @@ public class EnemySpawningTests
             Assert.NotNull(blocks);
             Assert.NotEmpty(blocks);
 
-            var mainBlock = blocks[0] as JsonObject;
+            var mainBlock = blocks.OfType<JsonObject>().FirstOrDefault(b => b["persistentID"]?.GetValue<uint>() == 100);
             Assert.NotNull(mainBlock);
             var zones = mainBlock["Zones"] as JsonArray;
             Assert.NotNull(zones);
             Assert.NotEmpty(zones);
 
-            var zone0 = zones[0] as JsonObject;
+            var zone0 = zones.OfType<JsonObject>().FirstOrDefault(z => z["LocalIndex"]?.GetValue<string>() == "Zone_0");
             Assert.NotNull(zone0);
 
             var enemySpawningInZone = zone0["EnemySpawningInZone"] as JsonArray;
@@ -219,7 +216,7 @@ public class EnemySpawningTests
             Assert.Equal(0.4, firstItem["DistributionValue"]?.GetValue<double>());
 
             // Test Import
-            var importMainVm = new MainViewModel();
+            var importMainVm = new MainWindowViewModel();
             var importCtx = new ImportContext(importMainVm, tempDir);
             var importer = new LevelLayoutDataBlockImporter();
             importer.Import(importCtx);

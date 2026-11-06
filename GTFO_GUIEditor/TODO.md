@@ -1,9 +1,6 @@
 ﻿# TODO List:
 ## Features
-* **Adding enemies to a zone (Zone Settings Config)**
-  * Waiting on a custom mod
-* **Spawning enemies in a specific room (Room Settings Config)**
-  * Waiting on a custom mod
+* **Enemy spawning in specific rooms (AWO)**
 * **Tampered Data Cube events**
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
@@ -16,7 +13,12 @@
   * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
 * **Blood Doors**
   * Waiting on a custom mod
-* **Redesign of Config tabs** - change how the different config options are swapped between
+* **Imports should automatically detect what mods the datablocks are relying on and enable them**
+* **Export as Thunderstore Profile**
+  * Will need to integrate quite a bit for this - thunderstore API for downloading the rundown's dependencies, etc
+  * Could even add a way for users to specify what other mods they want to be part of their rundown (outside of datablocks/configs), like TheArchive sorta thing
+* **Desktop App Integration**
+  * An installer, automatic update handling, and the ability to open .rundown files by double-clicking them
 
 *If we are wanting to add support for modded enemies and weapons, then:*
 
@@ -39,6 +41,7 @@
 * Zones are being assigned the wrong index when created
   * Zones should be assigned the index in order of creation, not based on where they are in the level.
 * The margins in the user docs are slightly too far out and text can get cut off. Both vertical and horizontal
+* The AWO events that use ChainedPuzzles by index are currently using the Alarm types as inputs, so are not working properly.
 
 ## Modded Support
 Support for mods should be implemented as its own tab with toggles for each mod. If a mod is enabled, it can only be disabled if the things that are dependent on it are never used. The fields added by a mod in the editor should be coloured differently to make it obvious that it is a mod requirement (different colour for each mod)

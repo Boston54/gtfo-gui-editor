@@ -1,0 +1,86 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="600"
+             x:Class="GTFO_GUIEditor.Views.ModdedView"
+             x:DataType="vm:ModdedViewModel">
+    <Grid RowDefinitions="Auto,*" Margin="10">
+        <!-- Top Banner / Header -->
+        <Border Grid.Row="0" Background="#252526" Padding="12" Margin="0,0,0,10" CornerRadius="4">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Modded Support" FontWeight="Bold" FontSize="15" Foreground="#E0E0E0"/>
+                <TextBlock Text="Configure community mod support for this rundown. Enabled mods reveal additional config settings throughout the editor."
+                           Foreground="#888888" FontSize="12" TextWrapping="Wrap"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Spacing="12">
+                <!-- Warning / Error banner if attempted invalid disable -->
+                <Border Background="#3A1C1C" BorderBrush="#FF6B6B" BorderThickness="1" CornerRadius="4" Padding="10,8"
+                        IsVisible="{Binding HasErrorMessage}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <TextBlock Text="{Binding ErrorMessage}" Foreground="#FF6B6B" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Section: Mods -->
+                <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="14">
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="Rundown Mods" FontWeight="Bold" FontSize="13" Foreground="#E0E0E0"/>
+                        <Separator Background="#333333" Margin="0,2,0,6"/>
+
+                        <!-- AdvancedWardenObjective Expander Item -->
+                        <Expander Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,4">
+                                    <CheckBox Grid.Column="0"
+                                              IsChecked="{Binding AdvancedWardenObjective, Mode=TwoWay}"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,8,0"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Advanced Warden Objective"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#FFFFFF"/>
+                                        <TextBlock Text="by hirnukuono"
+                                                   Foreground="#888888"
+                                                   FontSize="11"
+                                                   TextWrapping="Wrap"/>
+
+                                        <!-- In-use notice -->
+                                        <TextBlock Text="⚠ This mod is actively used by features in this rundown and cannot be disabled."
+                                                   Foreground="#E5A93C"
+                                                   FontSize="11"
+                                                   IsVisible="{Binding IsAdvancedWardenObjectiveInUse}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Expander.Header>
+
+                            <StackPanel Margin="0,8,0,0" Spacing="6">
+                                <TextBlock Foreground="#AAAAAA" FontSize="12" TextWrapping="Wrap">
+                                    Adds a whole heap of new Event types for use in your rundown. In the editor, adds the ability to spawn enemies in a specific room inside the Room config.&#x0a;Detailed descriptions and usage information of all added events can be found at
+                                    <InlineUIContainer>
+                                        <HyperlinkButton NavigateUri="https://github.com/hirnukuono/AdvancedWardenObjective/wiki/AWO-Events-(10k)" Padding="0" Margin="4,0,4,0" VerticalAlignment="Bottom">
+                                            AWO 10k Events
+                                        </HyperlinkButton>
+                                    </InlineUIContainer>
+                                     and 
+                                    <InlineUIContainer>
+                                        <HyperlinkButton NavigateUri="https://github.com/hirnukuono/AdvancedWardenObjective/wiki/AWO-Events-(20k)" Padding="0" Margin="4,0,4,0" VerticalAlignment="Bottom">
+                                            AWO 20k Events
+                                        </HyperlinkButton>
+                                    </InlineUIContainer>
+                                </TextBlock>
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

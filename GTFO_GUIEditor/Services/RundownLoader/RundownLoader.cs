@@ -74,7 +74,8 @@ public class RundownLoader : IRundownLoader
             Alarms = vm.Alarms.Alarms.Select(a => a.Clone()).ToList(),
             Lighting = vm.Lighting.Blocks.Select(b => b.Clone()).ToList(),
             FogSettings = vm.FogSettings.Blocks.Select(b => b.Clone()).ToList(),
-            ConsumableDistributions = vm.Consumables.Blocks.Select(b => b.Clone()).ToList()
+            ConsumableDistributions = vm.Consumables.Blocks.Select(b => b.Clone()).ToList(),
+            ModdedSettings = vm.Modded.ExportData()
         };
 
         foreach (var level in vm.LevelLayout.Levels)
@@ -208,6 +209,16 @@ public class RundownLoader : IRundownLoader
             }
         }
         vm.Consumables.SelectedBlock = vm.Consumables.Blocks.FirstOrDefault();
+
+        // Apply Modded Settings
+        if (project.ModdedSettings != null)
+        {
+            vm.Modded.ApplyData(project.ModdedSettings);
+        }
+        else
+        {
+            vm.Modded.Reset();
+        }
 
         // Apply Level Layouts
         vm.LevelLayout.Levels.Clear();

@@ -29,6 +29,24 @@ public class RundownProjectFile
 
     [JsonPropertyName("consumableDistributions")]
     public List<ConsumableDistributionBlock> ConsumableDistributions { get; set; } = new();
+
+    [JsonPropertyName("moddedSettings")]
+    public ModdedSettingsData ModdedSettings { get; set; } = new();
+}
+
+public class ModdedSettingsData
+{
+    [JsonPropertyName("advancedWardenObjective")]
+    public bool AdvancedWardenObjective { get; set; }
+
+    [JsonPropertyName("enabledMods")]
+    public HashSet<string> EnabledMods { get; set; } = new(StringComparer.OrdinalIgnoreCase);
+
+    public ModdedSettingsData Clone() => new()
+    {
+        AdvancedWardenObjective = AdvancedWardenObjective,
+        EnabledMods = new HashSet<string>(EnabledMods, StringComparer.OrdinalIgnoreCase)
+    };
 }
 
 public class LevelLayoutBlockData

@@ -979,6 +979,10 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                             });
                         }
                     }
+                    if (uqObj["CommandEvents"] is JsonArray ceArr)
+                    {
+                        ImportWardenEvents(ceArr, cmdItem.CommandEvents, context);
+                    }
                     termItem.UniqueCommands.Add(cmdItem);
                 }
             }
@@ -2604,7 +2608,14 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
     }
 
-    private void ImportWardenEvents(JsonArray? eventsArray, ObservableCollection<WardenEvent> target, ImportContext context)
+    private static uint GetUintValue(JsonNode? node)
+    {
+        if (node == null) return 0;
+        if (uint.TryParse(node.ToString(), out uint val)) return val;
+        return 0;
+    }
+
+    public static void ImportWardenEvents(JsonArray? eventsArray, ObservableCollection<WardenEvent> target, ImportContext context)
     {
         if (eventsArray == null) return;
         target.Clear();
@@ -2643,11 +2654,23 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                     posObj["z"]?.GetValue<double>() ?? 0);
             }
 
-            target.Add(new WardenEvent
+            uint chainPuzzle = GetUintValue(evObj["ChainPuzzle"]);
+            int specialNumber = 0;
+            if (evObj["SpecialNumber"] != null && int.TryParse(evObj["SpecialNumber"]!.ToString(), out int snVal))
+            {
+                specialNumber = snVal;
+            }
+
+            if (chainPuzzle == 0 && specialNumber > 0 && (evType == EventType.AddChainPuzzleToSecurityDoor || evType == EventType.ForceResetChainPuzzle || evType == EventType.ForceCompleteChainPuzzle))
+            {
+                chainPuzzle = (uint)specialNumber;
+            }
+
+            var wardenEvent = new WardenEvent
             {
                 Type = evType,
                 Trigger = evTrigger,
-                ChainPuzzle = evObj["ChainPuzzle"]?.GetValue<uint>() ?? 0,
+                ChainPuzzle = chainPuzzle,
                 UseStaticBioscanPoints = evObj["UseStaticBioscanPoints"]?.GetValue<bool>() ?? false,
                 Layer = layer,
                 Dimension = evObj["DimensionIndex"]?.ToString() ?? "Reality",
@@ -2655,19 +2678,717 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                 Delay = evObj["Delay"]?.GetValue<double>() ?? 0,
                 Duration = evObj["Duration"]?.GetValue<double>() ?? 0,
                 ClearDimension = evObj["ClearDimension"]?.GetValue<bool>() ?? false,
-                WardenIntel = context.ResolveText(evObj["WardenIntel"]?.GetValue<uint>() ?? 0),
-                CustomSubObjectiveHeader = context.ResolveText(evObj["CustomSubObjectiveHeader"]?.GetValue<uint>() ?? 0),
-                CustomSubObjective = context.ResolveText(evObj["CustomSubObjective"]?.GetValue<uint>() ?? 0),
-                SoundID = evObj["SoundID"]?.GetValue<uint>() ?? 0,
-                SoundSubtitle = context.ResolveText(evObj["SoundSubtitle"]?.GetValue<uint>() ?? 0),
-                FogSetting = evObj["FogSetting"]?.GetValue<uint>() ?? 0,
+                WardenIntel = context.ResolveText(GetUintValue(evObj["WardenIntel"])),
+                CustomSubObjectiveHeader = context.ResolveText(GetUintValue(evObj["CustomSubObjectiveHeader"])),
+                CustomSubObjective = context.ResolveText(GetUintValue(evObj["CustomSubObjective"])),
+                SoundID = GetUintValue(evObj["SoundID"]),
+                SoundSubtitle = context.ResolveText(GetUintValue(evObj["SoundSubtitle"])),
+                DialogueID = GetUintValue(evObj["DialogueID"]),
+                FogSetting = GetUintValue(evObj["FogSetting"]),
                 FogTransitionDuration = (int)(evObj["FogTransitionDuration"]?.GetValue<double>() ?? 0),
-                EnemyID = evObj["EnemyID"]?.GetValue<uint>() ?? 0,
+                EnemyID = GetUintValue(evObj["EnemyID"]),
                 Position = pos,
                 Count = evObj["Count"]?.GetValue<int>() ?? 0,
                 Enabled = evObj["Enabled"]?.GetValue<bool>() ?? true,
-                WorldEventObjectFilter = evObj["WorldEventObjectFilter"]?.ToString() ?? string.Empty
-            });
+                WorldEventObjectFilter = evObj["WorldEventObjectFilter"]?.ToString() ?? string.Empty,
+                CleanUpEnemiesBehind = evObj["CleanUpEnemiesBehind"]?.GetValue<bool>() ?? false,
+                SpecialText = context.ResolveText(GetUintValue(evObj["SpecialText"])),
+                SpecialNumber = specialNumber,
+                SpecialBool = evObj["SpecialBool"]?.GetValue<bool>() ?? false
+            };
+
+            // Reactor object
+            if (evObj["Reactor"] is JsonObject reactorObj)
+            {
+                string stateStr = reactorObj["State"]?.ToString() ?? "Intro";
+                Enum.TryParse<AwoReactorState>(stateStr, true, out var rState);
+                wardenEvent.Reactor.State = rState;
+                wardenEvent.Reactor.Wave = reactorObj["Wave"]?.GetValue<int>() ?? 1;
+                wardenEvent.Reactor.Progress = reactorObj["Progress"]?.GetValue<double>() ?? 0.0;
+            }
+
+            // Countdown object
+            if (evObj["Countdown"] is JsonObject cdObj)
+            {
+                wardenEvent.Countdown.CanShowHours = cdObj["CanShowHours"]?.GetValue<bool>() ?? true;
+                wardenEvent.Countdown.TitleText = context.ResolveText(GetUintValue(cdObj["TitleText"]));
+                wardenEvent.Countdown.TimerColor = cdObj["TimerColor"]?.ToString() ?? "red";
+
+                if (cdObj["EventsOnProgress"] is JsonArray progressArr)
+                {
+                    wardenEvent.Countdown.EventsOnProgress.Clear();
+                    foreach (var pNode in progressArr)
+                    {
+                        if (pNode is not JsonObject pObj) continue;
+                        var pItem = new AwoCountdownProgressEvent
+                        {
+                            Progress = pObj["Progress"]?.GetValue<double>() ?? 0.0
+                        };
+                        if (pObj["Events"] is JsonArray peArr)
+                        {
+                            ImportWardenEvents(peArr, pItem.Events, context);
+                        }
+                        wardenEvent.Countdown.EventsOnProgress.Add(pItem);
+                    }
+                }
+
+                if (cdObj["EventsOnDone"] is JsonArray doneArr)
+                {
+                    ImportWardenEvents(doneArr, wardenEvent.Countdown.EventsOnDone, context);
+                }
+            }
+
+            // SetZoneLight object
+            if (evObj["SetZoneLight"] is JsonObject lightObj)
+            {
+                string typeLightStr = lightObj["Type"]?.ToString() ?? "SetZoneLightData";
+                Enum.TryParse<AwoZoneLightType>(typeLightStr, true, out var lType);
+                wardenEvent.SetZoneLight.Type = lType;
+                wardenEvent.SetZoneLight.LightDataID = lightObj["LightDataID"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SetZoneLight.TransitionDuration = lightObj["TransitionDuration"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.SetZoneLight.Seed = lightObj["Seed"]?.GetValue<int>() ?? 0;
+            }
+
+            // CleanupEnemies object
+            if (evObj["CleanupEnemies"] is JsonObject cleanObj)
+            {
+                string cleanTypeStr = cleanObj["Type"]?.ToString() ?? "Despawn";
+                Enum.TryParse<AwoCleanupType>(cleanTypeStr, true, out var cType);
+                wardenEvent.CleanupEnemies.Type = cType;
+                wardenEvent.CleanupEnemies.AreaIndex = cleanObj["AreaIndex"]?.GetValue<int>() ?? -1;
+                wardenEvent.CleanupEnemies.IncludeHibernate = cleanObj["IncludeHibernate"]?.GetValue<bool>() ?? true;
+                wardenEvent.CleanupEnemies.IncludeAggressive = cleanObj["IncludeAggressive"]?.GetValue<bool>() ?? true;
+                wardenEvent.CleanupEnemies.IncludeScout = cleanObj["IncludeScout"]?.GetValue<bool>() ?? true;
+
+                wardenEvent.CleanupEnemies.AreaBlacklist.Clear();
+                if (cleanObj["AreaBlacklist"] is JsonArray cblArr)
+                {
+                    foreach (var item in cblArr)
+                    {
+                        int area = item?.GetValue<int>() ?? 0;
+                        wardenEvent.CleanupEnemies.AreaBlacklist.Add(new AwoAreaItem { AreaIndex = area });
+                    }
+                }
+
+                wardenEvent.CleanupEnemies.ExcludeEnemyIDs.Clear();
+                if (cleanObj["ExcludeEnemyID"] is JsonArray exArr)
+                {
+                    foreach (var item in exArr)
+                    {
+                        uint eId = item?.GetValue<uint>() ?? 0;
+                        wardenEvent.CleanupEnemies.ExcludeEnemyIDs.Add(new AwoEnemyIdItem { EnemyID = eId });
+                    }
+                }
+
+                wardenEvent.CleanupEnemies.IncludeOnlyIDs.Clear();
+                if (cleanObj["IncludeOnlyID"] is JsonArray incArr)
+                {
+                    foreach (var item in incArr)
+                    {
+                        uint eId = item?.GetValue<uint>() ?? 0;
+                        wardenEvent.CleanupEnemies.IncludeOnlyIDs.Add(new AwoEnemyIdItem { EnemyID = eId });
+                    }
+                }
+            }
+
+            // SpawnHibernates object
+            if (evObj["SpawnHibernates"] is JsonObject hibObj)
+            {
+                wardenEvent.SpawnHibernates.AreaIndex = hibObj["AreaIndex"]?.GetValue<int>() ?? -1;
+                wardenEvent.SpawnHibernates.EnemyID = hibObj["EnemyID"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SpawnHibernates.PlacementRandomWeight = hibObj["PlacementRandomWeight"]?.GetValue<double>() ?? 0.25;
+                wardenEvent.SpawnHibernates.PlacementScore = hibObj["PlacementScore"]?.GetValue<double>() ?? 3.0;
+                wardenEvent.SpawnHibernates.ResetPlacementInfo = hibObj["ResetPlacementInfo"]?.GetValue<bool>() ?? false;
+                wardenEvent.SpawnHibernates.RandomizeRotation = hibObj["RandomizeRotation"]?.GetValue<bool>() ?? false;
+
+                if (hibObj["Position"] is JsonObject hibPos)
+                {
+                    wardenEvent.SpawnHibernates.Position = new Vector3Data(
+                        hibPos["x"]?.GetValue<double>() ?? 0,
+                        hibPos["y"]?.GetValue<double>() ?? 0,
+                        hibPos["z"]?.GetValue<double>() ?? 0);
+                }
+
+                if (hibObj["Rotation"] is JsonObject hibRot)
+                {
+                    wardenEvent.SpawnHibernates.Rotation = new Vector3Data(
+                        hibRot["x"]?.GetValue<double>() ?? 0,
+                        hibRot["y"]?.GetValue<double>() ?? 0,
+                        hibRot["z"]?.GetValue<double>() ?? 0);
+                }
+
+                wardenEvent.SpawnHibernates.AreaBlacklist.Clear();
+                if (hibObj["AreaBlacklist"] is JsonArray hibBlArr)
+                {
+                    foreach (var item in hibBlArr)
+                    {
+                        int area = item?.GetValue<int>() ?? 0;
+                        wardenEvent.SpawnHibernates.AreaBlacklist.Add(new AwoAreaItem { AreaIndex = area });
+                    }
+                }
+            }
+
+            // SpawnScouts object
+            if (evObj["SpawnScouts"] is JsonObject scoutObj)
+            {
+                wardenEvent.SpawnScouts.AreaIndex = scoutObj["AreaIndex"]?.GetValue<int>() ?? -1;
+                int gt = 3;
+                if (scoutObj["GroupType"] != null)
+                {
+                    string gtStr = scoutObj["GroupType"]!.ToString();
+                    if (int.TryParse(gtStr, out int gtInt))
+                    {
+                        gt = gtInt;
+                    }
+                    else if (Enum.TryParse<ScoutType>(gtStr.Replace(" ", "_"), true, out var parsedGt))
+                    {
+                        gt = parsedGt.ToGroupTypeAndDifficulty().GroupType;
+                    }
+                }
+                int diff = scoutObj["Difficulty"]?.GetValue<int>() ?? 0;
+                wardenEvent.SpawnScouts.GroupType = gt;
+                wardenEvent.SpawnScouts.Difficulty = diff;
+                wardenEvent.SpawnScouts.ScoutType = ScoutTypeExtensions.FromGroupTypeAndDifficulty(gt, diff);
+
+                wardenEvent.SpawnScouts.AreaBlacklist.Clear();
+                if (scoutObj["AreaBlacklist"] is JsonArray scoutBlArr)
+                {
+                    foreach (var item in scoutBlArr)
+                    {
+                        int area = item?.GetValue<int>() ?? 0;
+                        wardenEvent.SpawnScouts.AreaBlacklist.Add(new AwoAreaItem { AreaIndex = area });
+                    }
+                }
+            }
+
+            // AddTerminalCommand object
+            if (evObj["AddTerminalCommand"] is JsonObject atcObj)
+            {
+                wardenEvent.AddTerminalCommand.TerminalIndex = atcObj["TerminalIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.AddTerminalCommand.CommandNumber = atcObj["CommandNumber"]?.GetValue<int>() ?? 0;
+                wardenEvent.AddTerminalCommand.Command = atcObj["Command"]?.ToString() ?? string.Empty;
+                wardenEvent.AddTerminalCommand.CommandDesc = context.ResolveText(atcObj["CommandDesc"]?.GetValue<uint>() ?? 0);
+                wardenEvent.AddTerminalCommand.AutoIndentCommandDesc = atcObj["AutoIndentCommandDesc"]?.GetValue<bool>() ?? false;
+                wardenEvent.AddTerminalCommand.ProgressWaitBeforeEvents = atcObj["ProgressWaitBeforeEvents"]?.GetValue<bool>() ?? false;
+
+                if (atcObj["SpecialCommandRule"] != null)
+                {
+                    string ruleStr = atcObj["SpecialCommandRule"]!.ToString();
+                    if (Enum.TryParse<SpecialCommandRule>(ruleStr, true, out var parsedRule))
+                    {
+                        wardenEvent.AddTerminalCommand.SpecialCommandRule = parsedRule;
+                    }
+                    else if (int.TryParse(ruleStr, out int ruleInt) && Enum.IsDefined(typeof(SpecialCommandRule), ruleInt))
+                    {
+                        wardenEvent.AddTerminalCommand.SpecialCommandRule = (SpecialCommandRule)ruleInt;
+                    }
+                }
+
+                wardenEvent.AddTerminalCommand.PostCommandOutputs.Clear();
+                if (atcObj["PostCommandOutputs"] is JsonArray pcoArr)
+                {
+                    foreach (var pNode in pcoArr)
+                    {
+                        if (pNode is not JsonObject pObj) continue;
+                        string ltStr = pObj["LineType"]?.ToString() ?? "Normal";
+                        Enum.TryParse<TerminalLineType>(ltStr, true, out var parsedLt);
+                        wardenEvent.AddTerminalCommand.PostCommandOutputs.Add(new TerminalPostCommandOutput
+                        {
+                            LineType = parsedLt,
+                            Time = pObj["Time"]?.GetValue<double>() ?? 0.0,
+                            Output = context.ResolveText(pObj["Output"]?.GetValue<uint>() ?? 0)
+                        });
+                    }
+                }
+
+                if (atcObj["CommandEvents"] is JsonArray cmdEventsArr)
+                {
+                    ImportWardenEvents(cmdEventsArr, wardenEvent.AddTerminalCommand.CommandEvents, context);
+                }
+            }
+
+            // HideTerminalCommand object
+            if (evObj["HideTerminalCommand"] is JsonObject htcObj)
+            {
+                wardenEvent.HideTerminalCommand.TerminalIndex = htcObj["TerminalIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.HideTerminalCommand.CommandNumber = htcObj["CommandNumber"]?.GetValue<int>() ?? 0;
+                wardenEvent.HideTerminalCommand.DeleteCommand = htcObj["DeleteCommand"]?.GetValue<bool>() ?? false;
+
+                if (htcObj["CommandEnum"] != null)
+                {
+                    string ceStr = htcObj["CommandEnum"]!.ToString();
+                    if (Enum.TryParse<TERM_Command>(ceStr, true, out var parsedCe))
+                    {
+                        wardenEvent.HideTerminalCommand.CommandEnum = parsedCe;
+                    }
+                    else if (uint.TryParse(ceStr, out uint ceUint) && Enum.IsDefined(typeof(TERM_Command), ceUint))
+                    {
+                        wardenEvent.HideTerminalCommand.CommandEnum = (TERM_Command)ceUint;
+                    }
+                }
+                wardenEvent.HideTerminalCommand.IsAwoCommand = wardenEvent.HideTerminalCommand.CommandNumber > 0;
+            }
+
+            // UnhideTerminalCommand object
+            if (evObj["UnhideTerminalCommand"] is JsonObject uhtcObj)
+            {
+                wardenEvent.UnhideTerminalCommand.TerminalIndex = uhtcObj["TerminalIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.UnhideTerminalCommand.CommandNumber = uhtcObj["CommandNumber"]?.GetValue<int>() ?? 0;
+
+                if (uhtcObj["CommandEnum"] != null)
+                {
+                    string ceStr = uhtcObj["CommandEnum"]!.ToString();
+                    if (Enum.TryParse<TERM_Command>(ceStr, true, out var parsedCe))
+                    {
+                        wardenEvent.UnhideTerminalCommand.CommandEnum = parsedCe;
+                    }
+                    else if (uint.TryParse(ceStr, out uint ceUint) && Enum.IsDefined(typeof(TERM_Command), ceUint))
+                    {
+                        wardenEvent.UnhideTerminalCommand.CommandEnum = (TERM_Command)ceUint;
+                    }
+                }
+                wardenEvent.UnhideTerminalCommand.IsAwoCommand = wardenEvent.UnhideTerminalCommand.CommandNumber > 0;
+            }
+
+            // ActiveEnemyWave object
+            if (evObj["ActiveEnemyWave"] is JsonObject aewObj)
+            {
+                wardenEvent.ActiveEnemyWave.HasActiveEnemyWave = aewObj["HasActiveEnemyWave"]?.GetValue<bool>() ?? false;
+                wardenEvent.ActiveEnemyWave.EnemyGroupInfrontOfDoor = aewObj["EnemyGroupInfrontOfDoor"]?.GetValue<uint>() ?? 0;
+                wardenEvent.ActiveEnemyWave.EnemyGroupInArea = aewObj["EnemyGroupInArea"]?.GetValue<uint>() ?? 0;
+                wardenEvent.ActiveEnemyWave.EnemyGroupsInArea = aewObj["EnemyGroupsInArea"]?.GetValue<uint>() ?? 0;
+            }
+
+            // GiveResource object
+            if (evObj["GiveResource"] is JsonObject grObj)
+            {
+                wardenEvent.GiveResource.Health = grObj["Health"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.GiveResource.MainAmmo = grObj["MainAmmo"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.GiveResource.SpecialAmmo = grObj["SpecialAmmo"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.GiveResource.ToolAmmo = grObj["ToolAmmo"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.GiveResource.FullTeamOverflow = grObj["FullTeamOverflow"]?.GetValue<bool>() ?? true;
+                wardenEvent.GiveResource.UseLocation = grObj["UseLocation"]?.GetValue<bool>() ?? false;
+                wardenEvent.GiveResource.IncludeSupplyEfficiency = grObj["IncludeSupplyEfficiency"]?.GetValue<bool>() ?? false;
+
+                if (grObj["PlayerFilter"] is JsonArray pfArr)
+                {
+                    var pList = new List<int>();
+                    foreach (var item in pfArr)
+                    {
+                        pList.Add(item?.GetValue<int>() ?? 0);
+                    }
+                    wardenEvent.GiveResource.SetPlayerFilter(pList);
+                }
+            }
+
+            // NestedEvent object
+            if (evObj["NestedEvent"] is JsonObject nestedObj)
+            {
+                string nTypeStr = nestedObj["Type"]?.ToString() ?? "ActivateAll";
+                Enum.TryParse<AwoNestedEventType>(nTypeStr, true, out var nType);
+                wardenEvent.NestedEvent.Type = nType;
+                wardenEvent.NestedEvent.MaxRandomEvents = nestedObj["MaxRandomEvents"]?.GetValue<int>() ?? 1;
+                wardenEvent.NestedEvent.AllowRepeatsInRandom = nestedObj["AllowRepeatsInRandom"]?.GetValue<bool>() ?? false;
+
+                if (nestedObj["PlayerFilter"] is JsonArray pfArr)
+                {
+                    var pList = new List<int>();
+                    foreach (var item in pfArr) pList.Add(item?.GetValue<int>() ?? 0);
+                    wardenEvent.NestedEvent.SetPlayerFilter(pList);
+                }
+
+                if (nestedObj["EventsToActivate"] is JsonArray eaArr)
+                {
+                    ImportWardenEvents(eaArr, wardenEvent.NestedEvent.EventsToActivate, context);
+                }
+
+                if (nestedObj["WheelOfEvents"] is JsonArray wheelArr)
+                {
+                    wardenEvent.NestedEvent.WheelOfEvents.Clear();
+                    foreach (var wNode in wheelArr)
+                    {
+                        if (wNode is not JsonObject wObj) continue;
+                        var wItem = new AwoWheelOfEventItem
+                        {
+                            DebugName = wObj["DebugName"]?.ToString() ?? string.Empty,
+                            Weight = wObj["Weight"]?.GetValue<double>() ?? 0.0,
+                            RepeatCount = wObj["RepeatCount"]?.GetValue<int>() ?? 1,
+                            IsInfinite = wObj["IsInfinite"]?.GetValue<bool>() ?? false
+                        };
+                        if (wObj["Events"] is JsonArray weArr)
+                        {
+                            ImportWardenEvents(weArr, wItem.Events, context);
+                        }
+                        wardenEvent.NestedEvent.WheelOfEvents.Add(wItem);
+                    }
+                }
+            }
+
+            // EventLoop object
+            if (evObj["EventLoop"] is JsonObject elObj)
+            {
+                wardenEvent.EventLoop.LoopIndex = elObj["LoopIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.EventLoop.LoopDelay = elObj["LoopDelay"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.EventLoop.LoopCount = elObj["LoopCount"]?.GetValue<int>() ?? -1;
+                if (elObj["EventsToActivate"] is JsonArray elaArr)
+                {
+                    ImportWardenEvents(elaArr, wardenEvent.EventLoop.EventsToActivate, context);
+                }
+            }
+
+            // TeleportPlayer object
+            if (evObj["TeleportPlayer"] is JsonObject tpObj)
+            {
+                wardenEvent.TeleportPlayer.FlashTeleport = tpObj["FlashTeleport"]?.GetValue<bool>() ?? false;
+                wardenEvent.TeleportPlayer.WarpSentries = tpObj["WarpSentries"]?.GetValue<bool>() ?? true;
+                wardenEvent.TeleportPlayer.WarpBigPickups = tpObj["WarpBigPickups"]?.GetValue<bool>() ?? true;
+                wardenEvent.TeleportPlayer.SendBigPickupsToHost = tpObj["SendBigPickupsToHost"]?.GetValue<bool>() ?? false;
+                wardenEvent.TeleportPlayer.FullTeamOverflow = tpObj["FullTeamOverflow"]?.GetValue<bool>() ?? false;
+
+                if (tpObj["FromLocation"] is JsonObject flObj)
+                {
+                    wardenEvent.TeleportPlayer.FromLocation.Enabled = flObj["Enabled"]?.GetValue<bool>() ?? false;
+                    wardenEvent.TeleportPlayer.FromLocation.DimensionIndex = flObj["DimensionIndex"]?.GetValue<int>() ?? 0;
+                    int layerInt = flObj["Layer"]?.GetValue<int>() ?? 0;
+                    wardenEvent.TeleportPlayer.FromLocation.Layer = (SectorType)layerInt;
+                    wardenEvent.TeleportPlayer.FromLocation.LocalIndex = flObj["LocalIndex"]?.GetValue<int>() ?? 0;
+                }
+
+                if (tpObj["TPData"] is JsonArray tpdArr)
+                {
+                    wardenEvent.TeleportPlayer.TPData.Clear();
+                    foreach (var tNode in tpdArr)
+                    {
+                        if (tNode is not JsonObject tObj) continue;
+                        var tItem = new AwoTPDataItem
+                        {
+                            PlayerIndex = tObj["PlayerIndex"]?.GetValue<int>() ?? 0,
+                            DimensionIndex = tObj["DimensionIndex"]?.GetValue<int>() ?? 0,
+                            WorldEventObjectFilter = tObj["WorldEventObjectFilter"]?.ToString() ?? string.Empty,
+                            PlayWarpAnimation = tObj["PlayWarpAnimation"]?.GetValue<bool>() ?? false,
+                            FlashDuration = tObj["FlashDuration"]?.GetValue<double>() ?? 0.0
+                        };
+                        if (tObj["Position"] is JsonObject tPos)
+                        {
+                            tItem.Position = new Vector3Data(
+                                tPos["x"]?.GetValue<double>() ?? 0,
+                                tPos["y"]?.GetValue<double>() ?? 0,
+                                tPos["z"]?.GetValue<double>() ?? 0);
+                        }
+                        if (tObj["LookDirectionV3"] is JsonObject ldPos)
+                        {
+                            tItem.UseLookDirectionVector = true;
+                            tItem.LookDirectionV3 = new Vector3Data(
+                                ldPos["x"]?.GetValue<double>() ?? 0,
+                                ldPos["y"]?.GetValue<double>() ?? 0,
+                                ldPos["z"]?.GetValue<double>() ?? 0);
+                        }
+                        else if (tObj["LookDirection"] != null)
+                        {
+                            tItem.UseLookDirectionVector = false;
+                            int ldInt = tObj["LookDirection"]?.GetValue<int>() ?? 0;
+                            tItem.LookDirection = (AwoTeleportLookDirection)ldInt;
+                        }
+                        wardenEvent.TeleportPlayer.TPData.Add(tItem);
+                    }
+                }
+            }
+
+            // InfectPlayer object
+            if (evObj["InfectPlayer"] is JsonObject infObj)
+            {
+                wardenEvent.InfectPlayer.FullTeamOverflow = infObj["FullTeamOverflow"]?.GetValue<bool>() ?? true;
+                wardenEvent.InfectPlayer.InfectionAmount = infObj["InfectionAmount"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.InfectPlayer.InfectOverTime = infObj["InfectOverTime"]?.GetValue<bool>() ?? false;
+                wardenEvent.InfectPlayer.Interval = infObj["Interval"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.InfectPlayer.UseZone = infObj["UseZone"]?.GetValue<bool>() ?? false;
+
+                if (infObj["PlayerFilter"] is JsonArray pfArr)
+                {
+                    var pList = new List<int>();
+                    foreach (var item in pfArr) pList.Add(item?.GetValue<int>() ?? 0);
+                    wardenEvent.InfectPlayer.SetPlayerFilter(pList);
+                }
+            }
+
+            // DamagePlayer object
+            if (evObj["DamagePlayer"] is JsonObject dmgObj)
+            {
+                wardenEvent.DamagePlayer.FullTeamOverflow = dmgObj["FullTeamOverflow"]?.GetValue<bool>() ?? true;
+                wardenEvent.DamagePlayer.DamageAmount = dmgObj["DamageAmount"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.DamagePlayer.DealPercentageDamage = dmgObj["DealPercentageDamage"]?.GetValue<bool>() ?? false;
+                wardenEvent.DamagePlayer.DamageOverTime = dmgObj["DamageOverTime"]?.GetValue<bool>() ?? false;
+                wardenEvent.DamagePlayer.Interval = dmgObj["Interval"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.DamagePlayer.UseZone = dmgObj["UseZone"]?.GetValue<bool>() ?? false;
+
+                if (dmgObj["PlayerFilter"] is JsonArray pfArr)
+                {
+                    var pList = new List<int>();
+                    foreach (var item in pfArr) pList.Add(item?.GetValue<int>() ?? 0);
+                    wardenEvent.DamagePlayer.SetPlayerFilter(pList);
+                }
+            }
+
+            // RevivePlayer object
+            if (evObj["RevivePlayer"] is JsonObject revObj)
+            {
+                wardenEvent.RevivePlayer.FullTeamOverflow = revObj["FullTeamOverflow"]?.GetValue<bool>() ?? true;
+                if (revObj["PlayerFilter"] is JsonArray pfArr)
+                {
+                    var pList = new List<int>();
+                    foreach (var item in pfArr) pList.Add(item?.GetValue<int>() ?? 0);
+                    wardenEvent.RevivePlayer.SetPlayerFilter(pList);
+                }
+            }
+
+            // AdjustTimer object
+            if (evObj["AdjustTimer"] is JsonObject adjObj)
+            {
+                wardenEvent.AdjustTimer.Duration = adjObj["Duration"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.AdjustTimer.Speed = adjObj["Speed"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.AdjustTimer.UpdateTitleText = adjObj["UpdateTitleText"]?.GetValue<bool>() ?? false;
+                wardenEvent.AdjustTimer.TitleText = context.ResolveText(GetUintValue(adjObj["TitleText"]));
+                wardenEvent.AdjustTimer.UpdateBodyText = adjObj["UpdateBodyText"]?.GetValue<bool>() ?? false;
+                wardenEvent.AdjustTimer.BodyText = context.ResolveText(GetUintValue(adjObj["BodyText"]));
+                wardenEvent.AdjustTimer.UpdateColor = adjObj["UpdateColor"]?.GetValue<bool>() ?? false;
+                wardenEvent.AdjustTimer.TimerColor = adjObj["TimerColor"]?.ToString() ?? "red";
+                wardenEvent.AdjustTimer.UpdateSpecialHud = adjObj["UpdateSpecialHud"]?.GetValue<bool>() ?? false;
+                wardenEvent.AdjustTimer.SpecialHudIndex = adjObj["SpecialHudIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.AdjustTimer.SpecialHudTimeModifier = adjObj["SpecialHudTimeModifier"]?.GetValue<double>() ?? 0.0;
+            }
+
+            // Countup object
+            if (evObj["Countup"] is JsonObject cntObj)
+            {
+                wardenEvent.Countup.StartValue = cntObj["StartValue"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.Countup.Speed = cntObj["Speed"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.Countup.TitleText = context.ResolveText(GetUintValue(cntObj["TitleText"]));
+                wardenEvent.Countup.BodyText = cntObj["BodyText"]?.ToString() ?? "[COUNTUP]";
+                wardenEvent.Countup.TimerColor = cntObj["TimerColor"]?.ToString() ?? "red";
+                wardenEvent.Countup.DecimalPoints = cntObj["DecimalPoints"]?.GetValue<int>() ?? 0;
+
+                if (cntObj["EventsOnProgress"] is JsonArray progressArr)
+                {
+                    wardenEvent.Countup.EventsOnProgress.Clear();
+                    foreach (var pNode in progressArr)
+                    {
+                        if (pNode is not JsonObject pObj) continue;
+                        var pItem = new AwoCountdownProgressEvent
+                        {
+                            Progress = pObj["Progress"]?.GetValue<double>() ?? 0.0
+                        };
+                        if (pObj["Events"] is JsonArray peArr)
+                        {
+                            ImportWardenEvents(peArr, pItem.Events, context);
+                        }
+                        wardenEvent.Countup.EventsOnProgress.Add(pItem);
+                    }
+                }
+
+                if (cntObj["EventsOnDone"] is JsonArray doneArr)
+                {
+                    ImportWardenEvents(doneArr, wardenEvent.Countup.EventsOnDone, context);
+                }
+            }
+
+            // NavMarker object
+            if (evObj["NavMarker"] is JsonObject nmObj)
+            {
+                wardenEvent.NavMarker.Index = nmObj["Index"]?.GetValue<int>() ?? 0;
+                wardenEvent.NavMarker.Style = nmObj["Style"]?.GetValue<int>() ?? 10;
+                wardenEvent.NavMarker.Title = context.ResolveText(GetUintValue(nmObj["Title"]));
+                wardenEvent.NavMarker.Color = nmObj["Color"]?.ToString() ?? "#B36FF6";
+                wardenEvent.NavMarker.UsePin = nmObj["UsePin"]?.GetValue<bool>() ?? true;
+            }
+
+            // Portal object
+            if (evObj["Portal"] is JsonObject portObj)
+            {
+                wardenEvent.Portal.TargetDimension = portObj["TargetDimension"]?.GetValue<int>() ?? 1;
+                wardenEvent.Portal.TeleportDelay = portObj["TeleportDelay"]?.GetValue<double>() ?? 5.0;
+                wardenEvent.Portal.PreventPortalWarpTeamEvent = portObj["PreventPortalWarpTeamEvent"]?.GetValue<bool>() ?? false;
+            }
+
+            // SuccessScreen object
+            if (evObj["SuccessScreen"] is JsonObject ssObj)
+            {
+                wardenEvent.SuccessScreen.HasSuccessScreen = true;
+                string ssTypeStr = ssObj["Type"]?.ToString() ?? "SetSuccessScreen";
+                Enum.TryParse<AwoSuccessScreenType>(ssTypeStr, true, out var ssType);
+                wardenEvent.SuccessScreen.Type = ssType;
+                wardenEvent.SuccessScreen.CustomSuccessScreen = ssObj["CustomSuccessScreen"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SuccessScreen.OverrideMusic = ssObj["OverrideMusic"]?.GetValue<uint>() ?? 0;
+            }
+
+            // CameraShake object
+            if (evObj["CameraShake"] is JsonObject csObj)
+            {
+                wardenEvent.CameraShake.Radius = csObj["Radius"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.CameraShake.Amplitude = csObj["Amplitude"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.CameraShake.Frequency = csObj["Frequency"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.CameraShake.Directional = csObj["Directional"]?.GetValue<bool>() ?? true;
+            }
+
+            // MultiProgression object
+            if (evObj["MultiProgression"] is JsonArray mpArr)
+            {
+                wardenEvent.MultiProgression.Items.Clear();
+                foreach (var itemNode in mpArr)
+                {
+                    if (itemNode is not JsonObject itemObj) continue;
+                    int layerInt = itemObj["Layer"]?.GetValue<int>() ?? 0;
+                    wardenEvent.MultiProgression.Items.Add(new AwoMultiProgressionItem
+                    {
+                        CustomSubObjectiveHeader = context.ResolveText(GetUintValue(itemObj["CustomSubObjectiveHeader"])),
+                        CustomSubObjective = context.ResolveText(GetUintValue(itemObj["CustomSubObjective"])),
+                        Index = itemObj["Index"]?.GetValue<int>() ?? 0,
+                        Priority = itemObj["Priority"]?.GetValue<int>() ?? 1,
+                        Layer = (SectorType)layerInt,
+                        IsLayerIndependent = itemObj["IsLayerIndependent"]?.GetValue<bool>() ?? true,
+                        OverrideTag = itemObj["OverrideTag"]?.GetValue<uint>() ?? 0
+                    });
+                }
+            }
+
+            // WaveRoarSound object
+            if (evObj["WaveRoarSound"] is JsonObject wrsObj)
+            {
+                string rSoundStr = wrsObj["RoarSound"]?.ToString() ?? "Striker";
+                Enum.TryParse<AwoRoarSound>(rSoundStr, true, out var rSound);
+                string rSizeStr = wrsObj["RoarSize"]?.ToString() ?? "Small";
+                Enum.TryParse<AwoRoarSize>(rSizeStr, true, out var rSize);
+                wardenEvent.WaveRoarSound.RoarSound = rSound;
+                wardenEvent.WaveRoarSound.RoarSize = rSize;
+                wardenEvent.WaveRoarSound.IsOutside = wrsObj["IsOutside"]?.GetValue<bool>() ?? false;
+            }
+
+            // CustomHud object
+            if (evObj["CustomHud"] is JsonObject chObj)
+            {
+                wardenEvent.CustomHud.TitleText = context.ResolveText(GetUintValue(chObj["TitleText"]));
+                wardenEvent.CustomHud.BodyText = context.ResolveText(GetUintValue(chObj["BodyText"]));
+            }
+
+            // SpecialHud object
+            if (evObj["SpecialHud"] is JsonObject shObj)
+            {
+                string shTypeStr = shObj["Type"]?.ToString() ?? "StartTimer";
+                Enum.TryParse<AwoSpecialHudType>(shTypeStr, true, out var shType);
+                string shStyleStr = shObj["Style"]?.ToString() ?? "Default";
+                Enum.TryParse<AwoSpecialHudStyle>(shStyleStr, true, out var shStyle);
+                wardenEvent.SpecialHud.Type = shType;
+                wardenEvent.SpecialHud.Index = shObj["Index"]?.GetValue<int>() ?? 0;
+                wardenEvent.SpecialHud.Message = context.ResolveText(GetUintValue(shObj["Message"]));
+                wardenEvent.SpecialHud.Style = shStyle;
+                wardenEvent.SpecialHud.Priority = shObj["Priority"]?.GetValue<int>() ?? -2;
+                wardenEvent.SpecialHud.ShowTimeInProgressBar = shObj["ShowTimeInProgressBar"]?.GetValue<bool>() ?? true;
+                wardenEvent.SpecialHud.InvertProgress = shObj["InvertProgress"]?.GetValue<bool>() ?? false;
+
+                if (shObj["EventsOnProgress"] is JsonArray progressArr)
+                {
+                    wardenEvent.SpecialHud.EventsOnProgress.Clear();
+                    foreach (var pNode in progressArr)
+                    {
+                        if (pNode is not JsonObject pObj) continue;
+                        var pItem = new AwoCountdownProgressEvent
+                        {
+                            Progress = pObj["Progress"]?.GetValue<double>() ?? 0.0
+                        };
+                        if (pObj["Events"] is JsonArray peArr)
+                        {
+                            ImportWardenEvents(peArr, pItem.Events, context);
+                        }
+                        wardenEvent.SpecialHud.EventsOnProgress.Add(pItem);
+                    }
+                }
+
+                if (shObj["EventsOnDone"] is JsonArray doneArr)
+                {
+                    ImportWardenEvents(doneArr, wardenEvent.SpecialHud.EventsOnDone, context);
+                }
+            }
+
+            // PlayerDialogue object
+            if (evObj["PlayerDialogue"] is JsonObject pdObj)
+            {
+                string pdTypeStr = pdObj["Type"]?.ToString() ?? "Closest";
+                Enum.TryParse<AwoPlayerDialogueType>(pdTypeStr, true, out var pdType);
+                string pdIntStr = pdObj["IntensityState"]?.ToString() ?? "Exploration";
+                Enum.TryParse<AwoDialogueIntensityState>(pdIntStr, true, out var pdInt);
+                wardenEvent.PlayerDialogue.Type = pdType;
+                wardenEvent.PlayerDialogue.CharacterID = pdObj["CharacterID"]?.GetValue<int>() ?? 0;
+                wardenEvent.PlayerDialogue.IntensityState = pdInt;
+            }
+
+            // SetTerminalLog object
+            if (evObj["SetTerminalLog"] is JsonObject stlObj)
+            {
+                wardenEvent.SetTerminalLog.TerminalIndex = stlObj["TerminalIndex"]?.GetValue<int>() ?? 0;
+                string tlTypeStr = stlObj["Type"]?.ToString() ?? "Add";
+                Enum.TryParse<AwoTerminalLogType>(tlTypeStr, true, out var tlType);
+                wardenEvent.SetTerminalLog.Type = tlType;
+                wardenEvent.SetTerminalLog.FileName = stlObj["FileName"]?.ToString() ?? string.Empty;
+                wardenEvent.SetTerminalLog.FileContent = context.ResolveText(GetUintValue(stlObj["FileContent"]));
+                wardenEvent.SetTerminalLog.FileContentOriginalLanguage = stlObj["FileContentOriginalLanguage"]?.GetValue<int>() ?? 1;
+                wardenEvent.SetTerminalLog.AttachedAudioFile = stlObj["AttachedAudioFile"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SetTerminalLog.AttachedAudioByteSize = stlObj["AttachedAudioByteSize"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SetTerminalLog.PlayerDialogToTriggerAfterAudio = stlObj["PlayerDialogToTriggerAfterAudio"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SetTerminalLog.TargetDimensionIndex = stlObj["TargetDimensionIndex"]?.GetValue<int>() ?? 0;
+                int tLayerInt = stlObj["TargetLayer"]?.GetValue<int>() ?? 0;
+                wardenEvent.SetTerminalLog.TargetLayer = (SectorType)tLayerInt;
+                wardenEvent.SetTerminalLog.TargetLocalIndex = stlObj["TargetLocalIndex"]?.GetValue<int>() ?? 0;
+                wardenEvent.SetTerminalLog.TargetTerminalIndex = stlObj["TargetTerminalIndex"]?.GetValue<int>() ?? 0;
+
+                if (stlObj["EventsOnFileRead"] is JsonArray efrArr)
+                {
+                    ImportWardenEvents(efrArr, wardenEvent.SetTerminalLog.EventsOnFileRead, context);
+                }
+            }
+
+            // ObjectiveItems object
+            if (evObj["ObjectiveItems"] is JsonArray objItemsArr)
+            {
+                wardenEvent.ObjectiveItems.Items.Clear();
+                foreach (var itemNode in objItemsArr)
+                {
+                    if (itemNode is not JsonObject itemObj) continue;
+                    string tagTypeStr = itemObj["TagType"]?.ToString() ?? "Custom";
+                    Enum.TryParse<AwoPocketItemTagType>(tagTypeStr, true, out var tagType);
+                    wardenEvent.ObjectiveItems.Items.Add(new AwoPocketItem
+                    {
+                        Index = itemObj["Index"]?.GetValue<int>() ?? 0,
+                        Count = itemObj["Count"]?.GetValue<int>() ?? 1,
+                        IsOnTop = itemObj["IsOnTop"]?.GetValue<bool>() ?? true,
+                        ItemName = context.ResolveText(GetUintValue(itemObj["ItemName"])),
+                        TagType = tagType,
+                        PlayerIndex = itemObj["PlayerIndex"]?.GetValue<int>() ?? 0,
+                        CustomTag = itemObj["CustomTag"]?.ToString() ?? string.Empty
+                    });
+                }
+            }
+
+            // EnvironmentData object
+            if (evObj["EnvironmentData"] is JsonObject envObj)
+            {
+                wardenEvent.EnvironmentData.EnvironmentWetness = ParseEnvironmentValue(envObj["EnvironmentWetness"]);
+                wardenEvent.EnvironmentData.UpdateColor = envObj["UpdateColor"]?.GetValue<bool>() ?? false;
+                wardenEvent.EnvironmentData.DustColor = envObj["DustColor"]?.ToString() ?? "white";
+                wardenEvent.EnvironmentData.DustAlphaBoost = ParseEnvironmentValue(envObj["DustAlphaBoost"]);
+                wardenEvent.EnvironmentData.DustTurbulence = ParseEnvironmentValue(envObj["DustTurbulence"]);
+            }
+
+            // FadeScreen object
+            if (evObj["FadeScreen"] is JsonObject fsObj)
+            {
+                wardenEvent.FadeScreen.FadeColor = fsObj["FadeColor"]?.ToString() ?? "black";
+                wardenEvent.FadeScreen.CurveTimeStart = fsObj["CurveTimeStart"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.FadeScreen.CurveValueStart = fsObj["CurveValueStart"]?.GetValue<double>() ?? 0.0;
+                wardenEvent.FadeScreen.CurveTimeEnd = fsObj["CurveTimeEnd"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.FadeScreen.CurveValueEnd = fsObj["CurveValueEnd"]?.GetValue<double>() ?? 1.0;
+                wardenEvent.FadeScreen.FadeSpeed = fsObj["FadeSpeed"]?.GetValue<double>() ?? 1.0;
+            }
+
+            target.Add(wardenEvent);
         }
     }
 
@@ -2753,5 +3474,24 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
 
         return settings;
+    }
+
+    private static string ParseEnvironmentValue(JsonNode? node)
+    {
+        if (node == null) return "Unchanged";
+
+        if (node is JsonValue val)
+        {
+            if (val.TryGetValue<double>(out double dVal))
+            {
+                return dVal.ToString(CultureInfo.InvariantCulture);
+            }
+            if (val.TryGetValue<string>(out string? sVal))
+            {
+                return string.IsNullOrWhiteSpace(sVal) ? "Unchanged" : sVal;
+            }
+        }
+
+        return node.ToString() ?? "Unchanged";
     }
 }

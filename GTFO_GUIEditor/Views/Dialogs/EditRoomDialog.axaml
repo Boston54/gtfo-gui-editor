@@ -155,7 +155,7 @@
                                                                     <Border BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,2,0,4" Background="#252526">
                                                                         <StackPanel Spacing="6">
                                                                             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" RowDefinitions="Auto">
-                                                                                <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy group to use for this zone's enemy spawns." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                                 <ComboBox Grid.Column="1"
                                                                                           ItemsSource="{Binding #EditRoomDialogRoot.DataContext.AvailableEnemySpawningOptions}"
                                                                                           SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
@@ -168,7 +168,7 @@
                                                                                     </ComboBox.ItemTemplate>
                                                                                 </ComboBox>
 
-                                                                                <TextBlock Grid.Column="2" Text="Distribution:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <TextBlock Grid.Column="2" Text="Distribution:" ToolTip.Tip="The behaviour of this enemy group's spawning." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                                 <ComboBox Grid.Column="3"
                                                                                           ItemsSource="{Binding #EditRoomDialogRoot.DataContext.AvailableEnemyZoneDistributions}"
                                                                                           SelectedItem="{Binding Distribution, Mode=TwoWay}"
@@ -178,7 +178,7 @@
                                                                             </Grid>
 
                                                                             <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsRelValue}">
-                                                                                <TextBlock Grid.Column="0" Text="Distribution Value:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <TextBlock Grid.Column="0" Text="Distribution Value:" ToolTip.Tip="A value that acts as a multiplier, affecting how many of these enemies to spawn. This is influenced by the cost of the enemies. It is recommended to see how many of your enemies will spawn with this being set to 1, and then modify it from there. Note that when there are multiple different kinds of enemies in your group, the quantities of each enemy will not be consistent." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                                 <TextBox Grid.Column="1" Text="{Binding DistributionValue, Mode=TwoWay}"/>
                                                                             </Grid>
 

@@ -54,6 +54,7 @@ public class MainWindowViewModel : ViewModelBase
     public FogSettingsViewModel FogSettings { get; }
     public LevelLayoutViewModel LevelLayout { get; }
     public RundownViewModel Rundown { get; }
+    public ModdedViewModel Modded { get; }
 
     public ObservableCollection<RecentFileItem> RecentFiles
     {
@@ -300,6 +301,7 @@ public class MainWindowViewModel : ViewModelBase
             defaultRundown.TierA.Add(EditorDefaultsService.CreateDefaultExpedition("A", 1, LevelLayout.Levels.FirstOrDefault()?.PersistentId ?? 1));
         }
         Rundown = new RundownViewModel(defaultRundown, LevelLayout.Levels);
+        Modded = new ModdedViewModel();
         Settings.General.PropertyChanged += OnGeneralSettingsPropertyChanged;
 
         Documentation.PropertyChanged += OnProjectPropertyChanged;
@@ -311,6 +313,7 @@ public class MainWindowViewModel : ViewModelBase
         FogSettings.PropertyChanged += OnProjectPropertyChanged;
         LevelLayout.PropertyChanged += OnProjectPropertyChanged;
         Rundown.PropertyChanged += OnProjectPropertyChanged;
+        Modded.PropertyChanged += OnProjectPropertyChanged;
 
         _autosaveTimer = new System.Threading.Timer(
             _ => _ = RunAutosaveAsync(),
@@ -702,6 +705,8 @@ public class MainWindowViewModel : ViewModelBase
             freshRundown.TierA.Add(EditorDefaultsService.CreateDefaultExpedition("A", 1, defaultLevel.PersistentId));
         }
         Rundown.SelectedRundown = freshRundown;
+
+        Modded.Reset();
 
         MarkProjectClean();
         StatusMessage = "Created new rundown.";

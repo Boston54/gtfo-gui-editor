@@ -285,7 +285,7 @@ public enum EventType
     SetNavMarker = 17,
     StepProgressionObjective = 18,
     SetWorldEventCondition = 19,
-    LockSecurityDoor = 20,
+    LockSecurityDoor_Vanilla = 20,
     SetTerminalCommand = 21,
     ActivateChainedPuzzle = 22,
     LightOnWorldEventObject = 23,
@@ -297,7 +297,66 @@ public enum EventType
     GetAchievement = 29,
     ClearDimension = 30,
     StartRepeatingFog = 31,
-    StopSustainedEvent = 32
+    StopSustainedEvent = 32,
+    CloseSecurityDoor = 10000,
+    LockSecurityDoor = 10001,
+    SetDoorInteraction = 10002,
+    TriggerSecurityDoorAlarm = 10003,
+    SolveSecurityDoorAlarm = 10004,
+    StartReactor = 10005,
+    ModifyReactorWaveState = 10006,
+    ForceCompleteReactor = 10007,
+    ForceCompleteLevel = 10008,
+    ForceFailLevel = 10009,
+    Countdown = 10010,
+    SetLevelFailCheckEnabled = 10011,
+    SetLevelFailWhenAnyPlayerDowned = 10012,
+    KillAllPlayers = 10013,
+    KillPlayersInZone = 10014,
+    SetLightDataInZone = 10015,
+    AlertEnemiesInZone = 10017,
+    CleanUpEnemiesInZone = 10018,
+    SpawnHibernateInZone = 10019,
+    SpawnScoutInZone = 10020,
+    SaveCheckpoint = 10021,
+    MoveExtractionWorldPosition = 10022,
+    SetBlackoutEnabled = 10023,
+    AddTerminalCommand = 10024,
+    HideTerminalCommand = 10025,
+    UnhideTerminalCommand = 10026,
+    AddChainPuzzleToSecurityDoor = 10027,
+    SetActiveEnemyWave = 10028,
+    GiveResource = 10029,
+    ForceResetChainPuzzle = 10030,
+    NestedEvent = 20000,
+    StartEventLoop = 20001,
+    StopEventLoop = 20002,
+    TeleportPlayer = 20003,
+    InfectPlayer = 20004,
+    DamagePlayer = 20005,
+    RevivePlayer = 20006,
+    AdjustAWOTimer = 20007,
+    Countup = 20008,
+    ForceCompleteChainPuzzle = 20009,
+    SpawnNavMarker = 20010,
+    ShakeScreen = 20011,
+    StartPortalMachine = 20012,
+    SetSuccessScreen = 20013,
+    PlaySubtitles = 20014,
+    MultiProgression = 20015,
+    PlayWaveRoarSound = 20016,
+    CustomHudText = 20017,
+    SpecialHudTimer = 20018,
+    ForcePlayPlayerDialogue = 20019,
+    SetTerminalLog = 20020,
+    SetPocketItem = 20021,
+    DoInteractWeakDoorsInZone = 20022,
+    ToggleInteractWeakDoorsInZone = 20023,
+    PickupSentries = 20024,
+    SetExpeditionEnvironment = 20026,
+    ClearWardenIntelQueue = 20027,
+    ResetOnDoorApproach = 20028,
+    FadeScreenInOut = 20029
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
@@ -400,6 +459,108 @@ public enum AlarmSoundStop : uint
     Standard = 42633153,
     Error = 1190355274,
     Error_Start = 2200133294
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum TERM_Command : uint
+{
+    None = 0,
+    Help = 1,
+    Commands = 2,
+    Cls = 3,
+    Exit = 4,
+    Open = 5,
+    Close = 6,
+    Activate = 7,
+    Deactivate = 8,
+    EmptyLine = 9,
+    InvalidCommand = 10,
+    DownloadData = 11,
+    ViewSecurityLog = 12,
+    Override = 13,
+    DisableAlarm = 14,
+    Locate = 15,
+    ActivateBeacon = 16,
+    Find = 17,
+    ShowList = 18,
+    Query = 19,
+    Ping = 20,
+    ReactorStartup = 21,
+    ReactorVerify = 22,
+    ReactorShutdown = 23,
+    WardenObjectiveSpecialCommand = 24,
+    TerminalUplinkConnect = 25,
+    TerminalUplinkVerify = 26,
+    TerminalUplinkConfirm = 27,
+    ListLogs = 28,
+    ReadLog = 29,
+    Start = 30,
+    TryUnlockingTerminal = 31,
+    WardenObjectiveGatherCommand = 32,
+    TerminalCorruptedUplinkConnect = 33,
+    TerminalCorruptedUplinkVerify = 34,
+    TimedConnectionSend = 35,
+    TimedConnectionVerify = 36,
+    UsedCommand = 37,
+    UniqueCommand1 = 38,
+    UniqueCommand2 = 39,
+    UniqueCommand3 = 40,
+    UniqueCommand4 = 41,
+    UniqueCommand5 = 42,
+    Info = 43,
+    MAX_COUNT = 44
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ScoutType
+{
+    Scout = 0,
+    Charger_Scout = 1,
+    Shadow_Scout = 2,
+    Zoomer_Scout = 3,
+    Nightmare_Scout = 4
+}
+
+public static class ScoutTypeExtensions
+{
+    public static (int GroupType, int Difficulty) ToGroupTypeAndDifficulty(this ScoutType type) => type switch
+    {
+        ScoutType.Scout => (3, 0),
+        ScoutType.Charger_Scout => (3, 3),
+        ScoutType.Shadow_Scout => (3, 4),
+        ScoutType.Zoomer_Scout => (3, 5),
+        ScoutType.Nightmare_Scout => (3, 6),
+        _ => (3, 0)
+    };
+
+    public static ScoutType FromGroupTypeAndDifficulty(int groupType, int difficulty) => (groupType, difficulty) switch
+    {
+        (3, 0) => ScoutType.Scout,
+        (3, 3) => ScoutType.Charger_Scout,
+        (3, 4) => ScoutType.Shadow_Scout,
+        (3, 5) => ScoutType.Zoomer_Scout,
+        (3, 6) => ScoutType.Nightmare_Scout,
+        (_, 3) => ScoutType.Charger_Scout,
+        (_, 4) => ScoutType.Shadow_Scout,
+        (_, 5) => ScoutType.Zoomer_Scout,
+        (_, 6) => ScoutType.Nightmare_Scout,
+        _ => ScoutType.Scout
+    };
+}
+
+public class ScoutTypeOption
+{
+    public ScoutType Type { get; set; }
+    public string DisplayName { get; set; } = string.Empty;
+
+    public ScoutTypeOption() { }
+    public ScoutTypeOption(ScoutType type, string displayName)
+    {
+        Type = type;
+        DisplayName = displayName;
+    }
+
+    public override string ToString() => DisplayName;
 }
 
 public class AlarmSoundStartJsonConverter : JsonConverter<AlarmSoundStart>

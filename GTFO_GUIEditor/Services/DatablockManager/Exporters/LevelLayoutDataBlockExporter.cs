@@ -1239,6 +1239,10 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                 }
 
                 cmdObj["PostCommandOutputs"] = postOutputs;
+                cmdObj["CommandEvents"] = WardenObjectiveDataBlockExporter.SerializeWardenEvents(
+                    uc.CommandEvents,
+                    (t, c) => context.SynthesizeText(t, c),
+                    isTerminalCommand: true);
                 uniqueCommands.Add(cmdObj);
             }
 

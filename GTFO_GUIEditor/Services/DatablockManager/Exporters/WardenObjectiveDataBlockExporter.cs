@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text.Json.Nodes;
 using GTFO_GUIEditor.Models;
@@ -372,7 +373,8 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
     }
 
     public static JsonArray SerializeWardenEvents(IEnumerable<WardenEvent>? events,
-        Func<string?, string, uint> textSynth)
+        Func<string?, string, uint> textSynth,
+        bool isTerminalCommand = false)
     {
         var array = new JsonArray();
         if (events == null) return array;
@@ -387,7 +389,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 _ => "MainLayer"
             };
 
-            array.Add(new JsonObject
+            var evObj = new JsonObject
             {
                 ["Type"] = ev.Type.ToString(),
                 ["Condition"] = new JsonObject
@@ -417,7 +419,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 ["SoundSubtitle"] = string.IsNullOrWhiteSpace(ev.SoundSubtitle)
                     ? 0
                     : textSynth(ev.SoundSubtitle, "Sound Subtitle"),
-                ["DialogueID"] = 0,
+                ["DialogueID"] = ev.DialogueID,
                 ["FogSetting"] = ev.FogSetting,
                 ["FogTransitionDuration"] = (double)ev.FogTransitionDuration,
                 ["EnemyWaveData"] = new JsonObject
@@ -445,7 +447,601 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 ["SustainedEventStateDuration"] = 0.0,
                 ["SustainedEventDelay"] = 0.0,
                 ["WorldEventObjectFilter"] = ev.WorldEventObjectFilter ?? string.Empty
-            });
+            };
+
+            // Handling SpecialNumber vs ChainPuzzle when inside a terminal command
+            if (isTerminalCommand && (ev.Type == EventType.AddChainPuzzleToSecurityDoor || ev.Type == EventType.ForceResetChainPuzzle || ev.Type == EventType.ForceCompleteChainPuzzle))
+            {
+                evObj["SpecialNumber"] = (int)ev.ChainPuzzle;
+                evObj["ChainPuzzle"] = 0;
+            }
+
+            // AWO Custom Payloads
+            switch (ev.Type)
+            {
+                case EventType.CloseSecurityDoor:
+                    evObj["CleanUpEnemiesBehind"] = ev.CleanUpEnemiesBehind;
+                    break;
+
+                case EventType.LockSecurityDoor:
+                case EventType.SetDoorInteraction:
+                case EventType.SetSuccessScreen:
+                    evObj["SpecialText"] = string.IsNullOrWhiteSpace(ev.SpecialText)
+                        ? 0
+                        : textSynth(ev.SpecialText, "Special Text");
+                    if (ev.Type == EventType.SetSuccessScreen && ev.SuccessScreen.HasSuccessScreen)
+                    {
+                        evObj["SuccessScreen"] = new JsonObject
+                        {
+                            ["Type"] = ev.SuccessScreen.Type.ToString(),
+                            ["CustomSuccessScreen"] = ev.SuccessScreen.CustomSuccessScreen,
+                            ["OverrideMusic"] = ev.SuccessScreen.OverrideMusic
+                        };
+                    }
+                    break;
+
+                case EventType.ModifyReactorWaveState:
+                    evObj["Reactor"] = new JsonObject
+                    {
+                        ["State"] = ev.Reactor.State.ToString(),
+                        ["Wave"] = ev.Reactor.Wave,
+                        ["Progress"] = ev.Reactor.Progress
+                    };
+                    break;
+
+                case EventType.Countdown:
+                    var progressArr = new JsonArray();
+                    foreach (var p in ev.Countdown.EventsOnProgress)
+                    {
+                        if (p == null) continue;
+                        progressArr.Add(new JsonObject
+                        {
+                            ["Progress"] = p.Progress,
+                            ["Events"] = SerializeWardenEvents(p.Events, textSynth, isTerminalCommand)
+                        });
+                    }
+
+                    evObj["Countdown"] = new JsonObject
+                    {
+                        ["CanShowHours"] = ev.Countdown.CanShowHours,
+                        ["TitleText"] = string.IsNullOrWhiteSpace(ev.Countdown.TitleText)
+                            ? 0
+                            : textSynth(ev.Countdown.TitleText, "Countdown Title"),
+                        ["TimerColor"] = ev.Countdown.TimerColor ?? "red",
+                        ["EventsOnProgress"] = progressArr,
+                        ["EventsOnDone"] = SerializeWardenEvents(ev.Countdown.EventsOnDone, textSynth, isTerminalCommand)
+                    };
+                    break;
+
+                case EventType.SetLightDataInZone:
+                    evObj["SetZoneLight"] = new JsonObject
+                    {
+                        ["Type"] = ev.SetZoneLight.Type.ToString(),
+                        ["LightDataID"] = ev.SetZoneLight.LightDataID,
+                        ["TransitionDuration"] = ev.SetZoneLight.TransitionDuration,
+                        ["Seed"] = ev.SetZoneLight.Seed
+                    };
+                    break;
+
+                case EventType.AlertEnemiesInZone:
+                    evObj["SpecialNumber"] = ev.SpecialNumber;
+                    break;
+
+                case EventType.CleanUpEnemiesInZone:
+                    var cleanBlacklist = new JsonArray();
+                    foreach (var bl in ev.CleanupEnemies.AreaBlacklist) cleanBlacklist.Add(bl.AreaIndex);
+
+                    var excludeEnemies = new JsonArray();
+                    foreach (var ex in ev.CleanupEnemies.ExcludeEnemyIDs) excludeEnemies.Add(ex.EnemyID);
+
+                    var includeOnlyEnemies = new JsonArray();
+                    foreach (var inc in ev.CleanupEnemies.IncludeOnlyIDs) includeOnlyEnemies.Add(inc.EnemyID);
+
+                    evObj["CleanupEnemies"] = new JsonObject
+                    {
+                        ["Type"] = ev.CleanupEnemies.Type.ToString(),
+                        ["AreaIndex"] = ev.CleanupEnemies.AreaIndex,
+                        ["AreaBlacklist"] = cleanBlacklist,
+                        ["IncludeHibernate"] = ev.CleanupEnemies.IncludeHibernate,
+                        ["IncludeAggressive"] = ev.CleanupEnemies.IncludeAggressive,
+                        ["IncludeScout"] = ev.CleanupEnemies.IncludeScout,
+                        ["ExcludeEnemyID"] = excludeEnemies,
+                        ["IncludeOnlyID"] = includeOnlyEnemies
+                    };
+                    break;
+
+                case EventType.SpawnHibernateInZone:
+                    var hibBlacklist = new JsonArray();
+                    foreach (var bl in ev.SpawnHibernates.AreaBlacklist) hibBlacklist.Add(bl.AreaIndex);
+
+                    evObj["SpawnHibernates"] = new JsonObject
+                    {
+                        ["AreaIndex"] = ev.SpawnHibernates.AreaIndex,
+                        ["AreaBlacklist"] = hibBlacklist,
+                        ["EnemyID"] = ev.SpawnHibernates.EnemyID,
+                        ["PlacementRandomWeight"] = ev.SpawnHibernates.PlacementRandomWeight,
+                        ["PlacementScore"] = ev.SpawnHibernates.PlacementScore,
+                        ["ResetPlacementInfo"] = ev.SpawnHibernates.ResetPlacementInfo,
+                        ["Position"] = new JsonObject
+                        {
+                            ["x"] = ev.SpawnHibernates.Position.X,
+                            ["y"] = ev.SpawnHibernates.Position.Y,
+                            ["z"] = ev.SpawnHibernates.Position.Z
+                        },
+                        ["Rotation"] = new JsonObject
+                        {
+                            ["x"] = ev.SpawnHibernates.Rotation.X,
+                            ["y"] = ev.SpawnHibernates.Rotation.Y,
+                            ["z"] = ev.SpawnHibernates.Rotation.Z
+                        },
+                        ["RandomizeRotation"] = ev.SpawnHibernates.RandomizeRotation
+                    };
+                    break;
+
+                case EventType.SpawnScoutInZone:
+                    var scoutBlacklist = new JsonArray();
+                    foreach (var bl in ev.SpawnScouts.AreaBlacklist) scoutBlacklist.Add(bl.AreaIndex);
+
+                    evObj["SpawnScouts"] = new JsonObject
+                    {
+                        ["AreaIndex"] = ev.SpawnScouts.AreaIndex,
+                        ["AreaBlacklist"] = scoutBlacklist,
+                        ["GroupType"] = (int)ev.SpawnScouts.GroupType,
+                        ["Difficulty"] = ev.SpawnScouts.Difficulty
+                    };
+                    break;
+
+                case EventType.AddTerminalCommand:
+                    var cmdOutputs = new JsonArray();
+                    foreach (var po in ev.AddTerminalCommand.PostCommandOutputs)
+                    {
+                        if (po == null) continue;
+                        cmdOutputs.Add(new JsonObject
+                        {
+                            ["LineType"] = po.LineType.ToString(),
+                            ["Time"] = po.Time,
+                            ["Output"] = textSynth(po.Output, "Post Command Output")
+                        });
+                    }
+
+                    evObj["AddTerminalCommand"] = new JsonObject
+                    {
+                        ["TerminalIndex"] = ev.AddTerminalCommand.TerminalIndex,
+                        ["CommandNumber"] = ev.AddTerminalCommand.CommandNumber,
+                        ["Command"] = ev.AddTerminalCommand.Command ?? string.Empty,
+                        ["CommandDesc"] = string.IsNullOrWhiteSpace(ev.AddTerminalCommand.CommandDesc)
+                            ? 0
+                            : textSynth(ev.AddTerminalCommand.CommandDesc, "Terminal Command Desc"),
+                        ["AutoIndentCommandDesc"] = ev.AddTerminalCommand.AutoIndentCommandDesc,
+                        ["PostCommandOutputs"] = cmdOutputs,
+                        ["CommandEvents"] = SerializeWardenEvents(ev.AddTerminalCommand.CommandEvents, textSynth, isTerminalCommand: true),
+                        ["ProgressWaitBeforeEvents"] = ev.AddTerminalCommand.ProgressWaitBeforeEvents,
+                        ["SpecialCommandRule"] = (int)ev.AddTerminalCommand.SpecialCommandRule
+                    };
+                    break;
+
+                case EventType.HideTerminalCommand:
+                    evObj["HideTerminalCommand"] = new JsonObject
+                    {
+                        ["TerminalIndex"] = ev.HideTerminalCommand.TerminalIndex,
+                        ["CommandEnum"] = (uint)ev.HideTerminalCommand.CommandEnum,
+                        ["CommandNumber"] = ev.HideTerminalCommand.CommandNumber,
+                        ["DeleteCommand"] = ev.HideTerminalCommand.DeleteCommand
+                    };
+                    break;
+
+                case EventType.UnhideTerminalCommand:
+                    evObj["UnhideTerminalCommand"] = new JsonObject
+                    {
+                        ["TerminalIndex"] = ev.UnhideTerminalCommand.TerminalIndex,
+                        ["CommandNumber"] = ev.UnhideTerminalCommand.CommandNumber,
+                        ["CommandEnum"] = (uint)ev.UnhideTerminalCommand.CommandEnum
+                    };
+                    break;
+
+                case EventType.SetActiveEnemyWave:
+                    evObj["ActiveEnemyWave"] = new JsonObject
+                    {
+                        ["HasActiveEnemyWave"] = ev.ActiveEnemyWave.HasActiveEnemyWave,
+                        ["EnemyGroupInfrontOfDoor"] = ev.ActiveEnemyWave.EnemyGroupInfrontOfDoor,
+                        ["EnemyGroupInArea"] = ev.ActiveEnemyWave.EnemyGroupInArea,
+                        ["EnemyGroupsInArea"] = ev.ActiveEnemyWave.EnemyGroupsInArea
+                    };
+                    break;
+
+                case EventType.GiveResource:
+                    var playerFilter = new JsonArray();
+                    foreach (int pIdx in ev.GiveResource.GetPlayerFilter()) playerFilter.Add(pIdx);
+
+                    evObj["GiveResource"] = new JsonObject
+                    {
+                        ["Health"] = ev.GiveResource.Health,
+                        ["MainAmmo"] = ev.GiveResource.MainAmmo,
+                        ["SpecialAmmo"] = ev.GiveResource.SpecialAmmo,
+                        ["ToolAmmo"] = ev.GiveResource.ToolAmmo,
+                        ["PlayerFilter"] = playerFilter,
+                        ["FullTeamOverflow"] = ev.GiveResource.FullTeamOverflow,
+                        ["UseLocation"] = ev.GiveResource.UseLocation,
+                        ["IncludeSupplyEfficiency"] = ev.GiveResource.IncludeSupplyEfficiency
+                    };
+                    break;
+
+                case EventType.NestedEvent:
+                    var nestedObj = new JsonObject
+                    {
+                        ["Type"] = ev.NestedEvent.Type.ToString()
+                    };
+                    if (ev.NestedEvent.Type == AwoNestedEventType.RandomAny || ev.NestedEvent.Type == AwoNestedEventType.RandomWeighted)
+                    {
+                        nestedObj["MaxRandomEvents"] = ev.NestedEvent.MaxRandomEvents;
+                        nestedObj["AllowRepeatsInRandom"] = ev.NestedEvent.AllowRepeatsInRandom;
+                    }
+                    var nFilter = new JsonArray();
+                    foreach (int p in ev.NestedEvent.GetPlayerFilter()) nFilter.Add(p);
+                    nestedObj["PlayerFilter"] = nFilter;
+                    nestedObj["EventsToActivate"] = SerializeWardenEvents(ev.NestedEvent.EventsToActivate, textSynth, isTerminalCommand);
+
+                    if (ev.NestedEvent.Type == AwoNestedEventType.RandomWeighted)
+                    {
+                        var wheelArr = new JsonArray();
+                        foreach (var wheel in ev.NestedEvent.WheelOfEvents)
+                        {
+                            if (wheel == null) continue;
+                            wheelArr.Add(new JsonObject
+                            {
+                                ["DebugName"] = wheel.DebugName ?? string.Empty,
+                                ["Weight"] = wheel.Weight,
+                                ["RepeatCount"] = wheel.RepeatCount,
+                                ["IsInfinite"] = wheel.IsInfinite,
+                                ["Events"] = SerializeWardenEvents(wheel.Events, textSynth, isTerminalCommand)
+                            });
+                        }
+                        nestedObj["WheelOfEvents"] = wheelArr;
+                    }
+                    evObj["NestedEvent"] = nestedObj;
+                    break;
+
+                case EventType.StartEventLoop:
+                    evObj["EventLoop"] = new JsonObject
+                    {
+                        ["LoopIndex"] = ev.EventLoop.LoopIndex,
+                        ["LoopDelay"] = ev.EventLoop.LoopDelay,
+                        ["LoopCount"] = ev.EventLoop.LoopCount,
+                        ["EventsToActivate"] = SerializeWardenEvents(ev.EventLoop.EventsToActivate, textSynth, isTerminalCommand)
+                    };
+                    break;
+
+                case EventType.TeleportPlayer:
+                    var tpDataArr = new JsonArray();
+                    foreach (var tp in ev.TeleportPlayer.TPData)
+                    {
+                        if (tp == null) continue;
+                        var tpItem = new JsonObject
+                        {
+                            ["PlayerIndex"] = tp.PlayerIndex,
+                            ["DimensionIndex"] = tp.DimensionIndex,
+                            ["Position"] = new JsonObject
+                            {
+                                ["x"] = tp.Position.X,
+                                ["y"] = tp.Position.Y,
+                                ["z"] = tp.Position.Z
+                            },
+                            ["WorldEventObjectFilter"] = tp.WorldEventObjectFilter ?? string.Empty,
+                            ["PlayWarpAnimation"] = tp.PlayWarpAnimation,
+                            ["FlashDuration"] = tp.FlashDuration
+                        };
+                        if (tp.UseLookDirectionVector)
+                        {
+                            tpItem["LookDirectionV3"] = new JsonObject
+                            {
+                                ["x"] = tp.LookDirectionV3.X,
+                                ["y"] = tp.LookDirectionV3.Y,
+                                ["z"] = tp.LookDirectionV3.Z
+                            };
+                        }
+                        else
+                        {
+                            tpItem["LookDirection"] = (int)tp.LookDirection;
+                        }
+                        tpDataArr.Add(tpItem);
+                    }
+
+                    evObj["TeleportPlayer"] = new JsonObject
+                    {
+                        ["FlashTeleport"] = ev.TeleportPlayer.FlashTeleport,
+                        ["WarpSentries"] = ev.TeleportPlayer.WarpSentries,
+                        ["WarpBigPickups"] = ev.TeleportPlayer.WarpBigPickups,
+                        ["SendBigPickupsToHost"] = ev.TeleportPlayer.SendBigPickupsToHost,
+                        ["FullTeamOverflow"] = ev.TeleportPlayer.FullTeamOverflow,
+                        ["FromLocation"] = new JsonObject
+                        {
+                            ["Enabled"] = ev.TeleportPlayer.FromLocation.Enabled,
+                            ["DimensionIndex"] = ev.TeleportPlayer.FromLocation.DimensionIndex,
+                            ["Layer"] = (int)ev.TeleportPlayer.FromLocation.Layer,
+                            ["LocalIndex"] = ev.TeleportPlayer.FromLocation.LocalIndex
+                        },
+                        ["TPData"] = tpDataArr
+                    };
+                    break;
+
+                case EventType.InfectPlayer:
+                    var infFilter = new JsonArray();
+                    foreach (int p in ev.InfectPlayer.GetPlayerFilter()) infFilter.Add(p);
+                    evObj["InfectPlayer"] = new JsonObject
+                    {
+                        ["PlayerFilter"] = infFilter,
+                        ["FullTeamOverflow"] = ev.InfectPlayer.FullTeamOverflow,
+                        ["InfectionAmount"] = ev.InfectPlayer.InfectionAmount,
+                        ["InfectOverTime"] = ev.InfectPlayer.InfectOverTime,
+                        ["Interval"] = ev.InfectPlayer.Interval,
+                        ["UseZone"] = ev.InfectPlayer.UseZone
+                    };
+                    break;
+
+                case EventType.DamagePlayer:
+                    var dmgFilter = new JsonArray();
+                    foreach (int p in ev.DamagePlayer.GetPlayerFilter()) dmgFilter.Add(p);
+                    evObj["DamagePlayer"] = new JsonObject
+                    {
+                        ["PlayerFilter"] = dmgFilter,
+                        ["FullTeamOverflow"] = ev.DamagePlayer.FullTeamOverflow,
+                        ["DamageAmount"] = ev.DamagePlayer.DamageAmount,
+                        ["DealPercentageDamage"] = ev.DamagePlayer.DealPercentageDamage,
+                        ["DamageOverTime"] = ev.DamagePlayer.DamageOverTime,
+                        ["Interval"] = ev.DamagePlayer.Interval,
+                        ["UseZone"] = ev.DamagePlayer.UseZone
+                    };
+                    break;
+
+                case EventType.RevivePlayer:
+                    var revFilter = new JsonArray();
+                    foreach (int p in ev.RevivePlayer.GetPlayerFilter()) revFilter.Add(p);
+                    evObj["RevivePlayer"] = new JsonObject
+                    {
+                        ["PlayerFilter"] = revFilter,
+                        ["FullTeamOverflow"] = ev.RevivePlayer.FullTeamOverflow
+                    };
+                    break;
+
+                case EventType.AdjustAWOTimer:
+                    evObj["AdjustTimer"] = new JsonObject
+                    {
+                        ["Duration"] = ev.AdjustTimer.Duration,
+                        ["Speed"] = ev.AdjustTimer.Speed,
+                        ["UpdateTitleText"] = ev.AdjustTimer.UpdateTitleText,
+                        ["TitleText"] = string.IsNullOrWhiteSpace(ev.AdjustTimer.TitleText)
+                            ? 0
+                            : textSynth(ev.AdjustTimer.TitleText, "Adjust Timer Title"),
+                        ["UpdateBodyText"] = ev.AdjustTimer.UpdateBodyText,
+                        ["BodyText"] = string.IsNullOrWhiteSpace(ev.AdjustTimer.BodyText)
+                            ? 0
+                            : textSynth(ev.AdjustTimer.BodyText, "Adjust Timer Body"),
+                        ["UpdateColor"] = ev.AdjustTimer.UpdateColor,
+                        ["TimerColor"] = ev.AdjustTimer.TimerColor ?? "red",
+                        ["UpdateSpecialHud"] = ev.AdjustTimer.UpdateSpecialHud,
+                        ["SpecialHudIndex"] = ev.AdjustTimer.SpecialHudIndex,
+                        ["SpecialHudTimeModifier"] = ev.AdjustTimer.SpecialHudTimeModifier
+                    };
+                    break;
+
+                case EventType.Countup:
+                    var countupProgressArr = new JsonArray();
+                    foreach (var p in ev.Countup.EventsOnProgress)
+                    {
+                        if (p == null) continue;
+                        countupProgressArr.Add(new JsonObject
+                        {
+                            ["Progress"] = p.Progress,
+                            ["Events"] = SerializeWardenEvents(p.Events, textSynth, isTerminalCommand)
+                        });
+                    }
+
+                    evObj["Countup"] = new JsonObject
+                    {
+                        ["StartValue"] = ev.Countup.StartValue,
+                        ["Speed"] = ev.Countup.Speed,
+                        ["TitleText"] = string.IsNullOrWhiteSpace(ev.Countup.TitleText)
+                            ? 0
+                            : textSynth(ev.Countup.TitleText, "Countup Title"),
+                        ["BodyText"] = ev.Countup.BodyText ?? "[COUNTUP]",
+                        ["TimerColor"] = ev.Countup.TimerColor ?? "red",
+                        ["DecimalPoints"] = ev.Countup.DecimalPoints,
+                        ["EventsOnProgress"] = countupProgressArr,
+                        ["EventsOnDone"] = SerializeWardenEvents(ev.Countup.EventsOnDone, textSynth, isTerminalCommand)
+                    };
+                    break;
+
+                case EventType.SpawnNavMarker:
+                    evObj["NavMarker"] = new JsonObject
+                    {
+                        ["Index"] = ev.NavMarker.Index,
+                        ["Style"] = ev.NavMarker.Style,
+                        ["Title"] = string.IsNullOrWhiteSpace(ev.NavMarker.Title)
+                            ? 0
+                            : textSynth(ev.NavMarker.Title, "Nav Marker Title"),
+                        ["Color"] = ev.NavMarker.Color ?? "#B36FF6",
+                        ["UsePin"] = ev.NavMarker.UsePin
+                    };
+                    break;
+
+                case EventType.ShakeScreen:
+                    evObj["CameraShake"] = new JsonObject
+                    {
+                        ["Radius"] = ev.CameraShake.Radius,
+                        ["Amplitude"] = ev.CameraShake.Amplitude,
+                        ["Frequency"] = ev.CameraShake.Frequency,
+                        ["Directional"] = ev.CameraShake.Directional
+                    };
+                    break;
+
+                case EventType.StartPortalMachine:
+                    evObj["Portal"] = new JsonObject
+                    {
+                        ["TargetDimension"] = ev.Portal.TargetDimension,
+                        ["TeleportDelay"] = ev.Portal.TeleportDelay,
+                        ["PreventPortalWarpTeamEvent"] = ev.Portal.PreventPortalWarpTeamEvent
+                    };
+                    break;
+
+                case EventType.MultiProgression:
+                    var mpArr = new JsonArray();
+                    foreach (var item in ev.MultiProgression.Items)
+                    {
+                        if (item == null) continue;
+                        mpArr.Add(new JsonObject
+                        {
+                            ["CustomSubObjectiveHeader"] = string.IsNullOrWhiteSpace(item.CustomSubObjectiveHeader)
+                                ? 0
+                                : textSynth(item.CustomSubObjectiveHeader, "MP Header"),
+                            ["CustomSubObjective"] = string.IsNullOrWhiteSpace(item.CustomSubObjective)
+                                ? 0
+                                : textSynth(item.CustomSubObjective, "MP SubObjective"),
+                            ["Index"] = item.Index,
+                            ["Priority"] = item.Priority,
+                            ["Layer"] = (int)item.Layer,
+                            ["IsLayerIndependent"] = item.IsLayerIndependent,
+                            ["OverrideTag"] = item.OverrideTag
+                        });
+                    }
+                    evObj["MultiProgression"] = mpArr;
+                    break;
+
+                case EventType.PlayWaveRoarSound:
+                    evObj["WaveRoarSound"] = new JsonObject
+                    {
+                        ["RoarSound"] = ev.WaveRoarSound.RoarSound.ToString(),
+                        ["RoarSize"] = ev.WaveRoarSound.RoarSize.ToString(),
+                        ["IsOutside"] = ev.WaveRoarSound.IsOutside
+                    };
+                    break;
+
+                case EventType.CustomHudText:
+                    evObj["CustomHud"] = new JsonObject
+                    {
+                        ["TitleText"] = string.IsNullOrWhiteSpace(ev.CustomHud.TitleText)
+                            ? 0
+                            : textSynth(ev.CustomHud.TitleText, "Custom Hud Title"),
+                        ["BodyText"] = string.IsNullOrWhiteSpace(ev.CustomHud.BodyText)
+                            ? 0
+                            : textSynth(ev.CustomHud.BodyText, "Custom Hud Body")
+                    };
+                    break;
+
+                case EventType.SpecialHudTimer:
+                    var hudProgressArr = new JsonArray();
+                    foreach (var p in ev.SpecialHud.EventsOnProgress)
+                    {
+                        if (p == null) continue;
+                        hudProgressArr.Add(new JsonObject
+                        {
+                            ["Progress"] = p.Progress,
+                            ["Events"] = SerializeWardenEvents(p.Events, textSynth, isTerminalCommand)
+                        });
+                    }
+
+                    evObj["SpecialHud"] = new JsonObject
+                    {
+                        ["Type"] = ev.SpecialHud.Type.ToString(),
+                        ["Index"] = ev.SpecialHud.Index,
+                        ["Message"] = string.IsNullOrWhiteSpace(ev.SpecialHud.Message)
+                            ? 0
+                            : textSynth(ev.SpecialHud.Message, "Special Hud Message"),
+                        ["Style"] = ev.SpecialHud.Style.ToString(),
+                        ["Priority"] = ev.SpecialHud.Priority,
+                        ["ShowTimeInProgressBar"] = ev.SpecialHud.ShowTimeInProgressBar,
+                        ["InvertProgress"] = ev.SpecialHud.InvertProgress,
+                        ["EventsOnProgress"] = hudProgressArr,
+                        ["EventsOnDone"] = SerializeWardenEvents(ev.SpecialHud.EventsOnDone, textSynth, isTerminalCommand)
+                    };
+                    break;
+
+                case EventType.ForcePlayPlayerDialogue:
+                    evObj["PlayerDialogue"] = new JsonObject
+                    {
+                        ["Type"] = ev.PlayerDialogue.Type.ToString(),
+                        ["CharacterID"] = ev.PlayerDialogue.CharacterID,
+                        ["IntensityState"] = ev.PlayerDialogue.IntensityState.ToString()
+                    };
+                    break;
+
+                case EventType.SetTerminalLog:
+                    var stlObj = new JsonObject
+                    {
+                        ["TerminalIndex"] = ev.SetTerminalLog.TerminalIndex,
+                        ["Type"] = ev.SetTerminalLog.Type.ToString(),
+                        ["FileName"] = ev.SetTerminalLog.FileName ?? string.Empty
+                    };
+                    if (ev.SetTerminalLog.Type == AwoTerminalLogType.Add)
+                    {
+                        stlObj["FileContent"] = string.IsNullOrWhiteSpace(ev.SetTerminalLog.FileContent)
+                            ? 0
+                            : textSynth(ev.SetTerminalLog.FileContent, "Terminal Log Content");
+                        stlObj["FileContentOriginalLanguage"] = ev.SetTerminalLog.FileContentOriginalLanguage;
+                        stlObj["AttachedAudioFile"] = ev.SetTerminalLog.AttachedAudioFile;
+                        stlObj["AttachedAudioByteSize"] = ev.SetTerminalLog.AttachedAudioByteSize;
+                        stlObj["PlayerDialogToTriggerAfterAudio"] = ev.SetTerminalLog.PlayerDialogToTriggerAfterAudio;
+                        stlObj["EventsOnFileRead"] = SerializeWardenEvents(ev.SetTerminalLog.EventsOnFileRead, textSynth, isTerminalCommand);
+                    }
+                    else if (ev.SetTerminalLog.Type == AwoTerminalLogType.Move)
+                    {
+                        stlObj["TargetDimensionIndex"] = ev.SetTerminalLog.TargetDimensionIndex;
+                        stlObj["TargetLayer"] = (int)ev.SetTerminalLog.TargetLayer;
+                        stlObj["TargetLocalIndex"] = ev.SetTerminalLog.TargetLocalIndex;
+                        stlObj["TargetTerminalIndex"] = ev.SetTerminalLog.TargetTerminalIndex;
+                    }
+                    evObj["SetTerminalLog"] = stlObj;
+                    break;
+
+                case EventType.SetPocketItem:
+                    var itemsArr = new JsonArray();
+                    foreach (var item in ev.ObjectiveItems.Items)
+                    {
+                        if (item == null) continue;
+                        itemsArr.Add(new JsonObject
+                        {
+                            ["Index"] = item.Index,
+                            ["Count"] = item.Count,
+                            ["IsOnTop"] = item.IsOnTop,
+                            ["ItemName"] = string.IsNullOrWhiteSpace(item.ItemName)
+                                ? 0
+                                : textSynth(item.ItemName, "Pocket Item Name"),
+                            ["TagType"] = item.TagType.ToString(),
+                            ["PlayerIndex"] = item.PlayerIndex,
+                            ["CustomTag"] = item.CustomTag ?? string.Empty
+                        });
+                    }
+                    evObj["ObjectiveItems"] = itemsArr;
+                    break;
+
+                case EventType.SetExpeditionEnvironment:
+                    evObj["EnvironmentData"] = new JsonObject
+                    {
+                        ["EnvironmentWetness"] = SerializeEnvironmentValue(ev.EnvironmentData.EnvironmentWetness),
+                        ["UpdateColor"] = ev.EnvironmentData.UpdateColor,
+                        ["DustColor"] = ev.EnvironmentData.DustColor ?? "white",
+                        ["DustAlphaBoost"] = SerializeEnvironmentValue(ev.EnvironmentData.DustAlphaBoost),
+                        ["DustTurbulence"] = SerializeEnvironmentValue(ev.EnvironmentData.DustTurbulence)
+                    };
+                    break;
+
+                case EventType.ClearWardenIntelQueue:
+                    evObj["SpecialBool"] = ev.SpecialBool;
+                    break;
+
+                case EventType.FadeScreenInOut:
+                    evObj["FadeScreen"] = new JsonObject
+                    {
+                        ["FadeColor"] = ev.FadeScreen.FadeColor ?? "black",
+                        ["CurveTimeStart"] = ev.FadeScreen.CurveTimeStart,
+                        ["CurveValueStart"] = ev.FadeScreen.CurveValueStart,
+                        ["CurveTimeEnd"] = ev.FadeScreen.CurveTimeEnd,
+                        ["CurveValueEnd"] = ev.FadeScreen.CurveValueEnd,
+                        ["FadeSpeed"] = ev.FadeScreen.FadeSpeed
+                    };
+                    break;
+            }
+
+            array.Add(evObj);
         }
 
         return array;
@@ -524,5 +1120,21 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
         };
         array.Add(waveEntry);
         return array;
+    }
+
+    private static JsonNode SerializeEnvironmentValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+        {
+            return JsonValue.Create("Unchanged")!;
+        }
+
+        string trimmed = value.Trim();
+        if (double.TryParse(trimmed, NumberStyles.Float, CultureInfo.InvariantCulture, out double dVal))
+        {
+            return JsonValue.Create(dVal)!;
+        }
+
+        return JsonValue.Create(trimmed)!;
     }
 }
