@@ -442,6 +442,18 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                         ? zoneSettings.Lighting
                         : (context.MainVm.Lighting.Blocks.FirstOrDefault()?.PersistentId ?? 1);
 
+                    var enemySpawningArray = new JsonArray();
+                    foreach (var esItem in zoneSettings.EnemySpawningInZone)
+                    {
+                        enemySpawningArray.Add(new JsonObject
+                        {
+                            ["GroupType"] = esItem.GroupType,
+                            ["Difficulty"] = esItem.Difficulty,
+                            ["Distribution"] = esItem.Distribution.ToString(),
+                            ["DistributionValue"] = esItem.DistributionValue
+                        });
+                    }
+
                     var zoneObj = new JsonObject
                     {
                         ["LocalIndex"] = $"Zone_{zoneNumber}",
@@ -506,7 +518,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                             ? WardenObjectiveDataBlockExporter.SerializeWardenEvents(enteringDoor.EventsOnTerminalDeactivateAlarm, (t, c) => context.SynthesizeText(t, c))
                             : new JsonArray(),
                         ["ActiveEnemyWave"] = activeEnemyWaveObj,
-                        ["EnemySpawningInZone"] = new JsonArray(),
+                        ["EnemySpawningInZone"] = enemySpawningArray,
                         ["EnemyRespawning"] = zoneSettings.EnemyRespawning,
                         ["EnemyRespawnRequireOtherZone"] = zoneSettings.RequireOtherZone,
                         ["EnemyRespawnRoomDistance"] = zoneSettings.RoomDistance,

@@ -14,6 +14,13 @@ public enum ProgressionPuzzleType
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
+public enum EnemyZoneDistribution
+{
+    Rel_Value,
+    Force_One
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ComplexType
 {
     Mining,

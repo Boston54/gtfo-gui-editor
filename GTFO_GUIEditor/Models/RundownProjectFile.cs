@@ -201,6 +201,8 @@ public class ZoneSettingsData
     [JsonPropertyName("dcScanSeed")] public int DcScanSeed { get; set; }
     [JsonPropertyName("playScannerVoiceAudio")] public bool PlayScannerVoiceAudio { get; set; } = true;
 
+    [JsonPropertyName("enemySpawningInZone")] public List<EnemySpawningInZoneItem> EnemySpawningInZone { get; set; } = new();
+
     [JsonPropertyName("enemyRespawning")] public bool EnemyRespawning { get; set; }
     [JsonPropertyName("requireOtherZone")] public bool RequireOtherZone { get; set; } = true;
     [JsonPropertyName("roomDistance")] public int RoomDistance { get; set; } = 2;

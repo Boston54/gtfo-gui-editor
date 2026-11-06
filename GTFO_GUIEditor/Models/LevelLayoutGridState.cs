@@ -2284,6 +2284,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 LightingSubSeed = zs.LightingSubSeed,
                 DcScanSeed = zs.DcScanSeed,
                 PlayScannerVoiceAudio = zs.PlayScannerVoiceAudio,
+                EnemySpawningInZone = zs.EnemySpawningInZone.Select(e => e.Clone()).ToList(),
                 EnemyRespawning = zs.EnemyRespawning,
                 RequireOtherZone = zs.RequireOtherZone,
                 RoomDistance = zs.RoomDistance,
@@ -2361,6 +2362,13 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 zs.LightingSubSeed = zsData.LightingSubSeed;
                 zs.DcScanSeed = zsData.DcScanSeed;
                 zs.PlayScannerVoiceAudio = zsData.PlayScannerVoiceAudio;
+                zs.EnemySpawningInZone.Clear();
+                if (zsData.EnemySpawningInZone != null)
+                {
+                    foreach (var item in zsData.EnemySpawningInZone)
+                        zs.EnemySpawningInZone.Add(item.Clone());
+                }
+
                 zs.EnemyRespawning = zsData.EnemyRespawning;
                 zs.RequireOtherZone = zsData.RequireOtherZone;
                 zs.RoomDistance = zsData.RoomDistance;

@@ -88,6 +88,9 @@ public class ZoneSettingsDefaults
     [JsonPropertyName("ExpansionAndAltitude")]
     public ExpansionAndAltitudeDefaults ExpansionAndAltitude { get; set; } = new();
 
+    [JsonPropertyName("EnemySpawningInZone")]
+    public List<EnemySpawningInZoneItem> EnemySpawningInZone { get; set; } = new();
+
     [JsonPropertyName("EnemyRespawning")]
     public EnemyRespawningDefaults EnemyRespawning { get; set; } = new();
 

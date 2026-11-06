@@ -187,6 +187,9 @@ public static class EditorDefaultsService
         zone.DcScanSeed = d.GeneralAndSeeds.DcScanSeed;
         zone.PlayScannerVoiceAudio = d.GeneralAndSeeds.PlayScannerVoiceAudio;
 
+        // Enemy Spawning
+        zone.EnemySpawningInZone = new ObservableCollection<EnemySpawningInZoneItem>(d.EnemySpawningInZone?.Select(e => e.Clone()) ?? Enumerable.Empty<EnemySpawningInZoneItem>());
+
         // Enemy Respawning
         zone.EnemyRespawning = d.EnemyRespawning.EnemyRespawning;
         zone.RequireOtherZone = d.EnemyRespawning.RequireOtherZone;

@@ -47,6 +47,9 @@ public class ZoneSettings : INotifyPropertyChanged
     private int _dcScanSeed;
     private bool _playScannerVoiceAudio = true;
 
+    // Enemy Spawning
+    private ObservableCollection<EnemySpawningInZoneItem> _enemySpawningInZone = new();
+
     // Enemy Respawning
     private bool _enemyRespawning;
     private bool _requireOtherZone = true;
@@ -108,6 +111,12 @@ public class ZoneSettings : INotifyPropertyChanged
     {
         get => _playScannerVoiceAudio;
         set => SetField(ref _playScannerVoiceAudio, value);
+    }
+
+    public ObservableCollection<EnemySpawningInZoneItem> EnemySpawningInZone
+    {
+        get => _enemySpawningInZone;
+        set => SetField(ref _enemySpawningInZone, value ?? new ObservableCollection<EnemySpawningInZoneItem>());
     }
 
     public bool EnemyRespawning

@@ -95,10 +95,13 @@ public class LevelLayoutViewModel : ViewModelBase
     public static TerminalLineType[] AvailableTerminalLineTypes { get; } = (TerminalLineType[])Enum.GetValues(typeof(TerminalLineType));
     public static TerminalStartingState[] AvailableTerminalStartingStates { get; } = (TerminalStartingState[])Enum.GetValues(typeof(TerminalStartingState));
     public static ProgressionPuzzleType[] AvailableProgressionPuzzleTypes { get; } = (ProgressionPuzzleType[])Enum.GetValues(typeof(ProgressionPuzzleType));
+    public static EnemyZoneDistribution[] AvailableEnemyZoneDistributions { get; } = (EnemyZoneDistribution[])Enum.GetValues(typeof(EnemyZoneDistribution));
+    public static IReadOnlyList<EnemySpawningOption> AvailableEnemySpawningOptions => EnemySpawningService.AvailableOptions;
 
     public ICommand RemoveWardenEventCommand { get; }
     public ICommand CopyWardenEventCommand { get; }
     public ICommand RemoveEnemyExcludeItemCommand { get; }
+    public ICommand RemoveEnemySpawningInZoneItemCommand { get; }
     public ICommand RemoveBigPickupDistributionItemCommand { get; }
     public ICommand RemoveDisinfectionStationPlacementCommand { get; }
     public ICommand RemoveTerminalPlacementCommand { get; }
@@ -387,6 +390,7 @@ public class LevelLayoutViewModel : ViewModelBase
         RemoveWardenEventCommand = new RelayCommand<WardenEvent>(RemoveWardenEvent);
         CopyWardenEventCommand = new RelayCommand<WardenEvent>(ev => _ = CopyWardenEventAsync(ev));
         RemoveEnemyExcludeItemCommand = new RelayCommand<EnemyExcludeItem>(RemoveEnemyExcludeItem);
+        RemoveEnemySpawningInZoneItemCommand = new RelayCommand<EnemySpawningInZoneItem>(RemoveEnemySpawningInZoneItem);
         RemoveBigPickupDistributionItemCommand = new RelayCommand<BigPickupDistributionItem>(RemoveBigPickupDistributionItem);
         RemoveDisinfectionStationPlacementCommand = new RelayCommand<DisinfectionStationPlacement>(RemoveDisinfectionStationPlacement);
         RemoveTerminalPlacementCommand = new RelayCommand<TerminalPlacement>(RemoveTerminalPlacement);
@@ -1987,6 +1991,9 @@ public class LevelLayoutViewModel : ViewModelBase
         get => _editingDimension;
         set => SetField(ref _editingDimension, value);
     }
+
+    public void AddEnemySpawningInZoneItem() => ActiveZoneSettings?.EnemySpawningInZone.Add(new EnemySpawningInZoneItem());
+    public void RemoveEnemySpawningInZoneItem(EnemySpawningInZoneItem? item) { if (item != null) ActiveZoneSettings?.EnemySpawningInZone.Remove(item); }
 
     public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
     public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }

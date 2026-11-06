@@ -141,6 +141,61 @@
                                                     </StackPanel>
                                                 </Border>
 
+                                                <!-- Enemy Spawning Section -->
+                                                <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
+                                                    <StackPanel Spacing="8">
+                                                        <Grid ColumnDefinitions="*,Auto">
+                                                            <TextBlock Grid.Column="0" Text="Enemy Spawning" FontWeight="SemiBold" FontSize="13" Foreground="#E0E0E0" VerticalAlignment="Center"/>
+                                                            <Button Grid.Column="1" Content="+ Add Enemy Spawning" Command="{Binding AddEnemySpawningInZoneItem}" Background="#2D5A27" Foreground="White" Padding="8,3"/>
+                                                        </Grid>
+
+                                                        <ItemsControl ItemsSource="{Binding ActiveZoneSettings.EnemySpawningInZone}" Margin="0,4,0,0">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate x:DataType="models:EnemySpawningInZoneItem" x:CompileBindings="False">
+                                                                    <Border BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,2,0,4" Background="#252526">
+                                                                        <StackPanel Spacing="6">
+                                                                            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" RowDefinitions="Auto">
+                                                                                <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <ComboBox Grid.Column="1"
+                                                                                          ItemsSource="{Binding #EditRoomDialogRoot.DataContext.AvailableEnemySpawningOptions}"
+                                                                                          SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
+                                                                                          HorizontalAlignment="Stretch"
+                                                                                          Margin="0,0,8,0">
+                                                                                    <ComboBox.ItemTemplate>
+                                                                                        <DataTemplate x:DataType="models:EnemySpawningOption">
+                                                                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                                        </DataTemplate>
+                                                                                    </ComboBox.ItemTemplate>
+                                                                                </ComboBox>
+
+                                                                                <TextBlock Grid.Column="2" Text="Distribution:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <ComboBox Grid.Column="3"
+                                                                                          ItemsSource="{Binding #EditRoomDialogRoot.DataContext.AvailableEnemyZoneDistributions}"
+                                                                                          SelectedItem="{Binding Distribution, Mode=TwoWay}"
+                                                                                          Margin="0,0,8,0"/>
+
+                                                                                <Button Grid.Column="4" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveEnemySpawningInZoneItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                            </Grid>
+
+                                                                            <Grid ColumnDefinitions="Auto,*" IsVisible="{Binding IsRelValue}">
+                                                                                <TextBlock Grid.Column="0" Text="Distribution Value:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <TextBox Grid.Column="1" Text="{Binding DistributionValue, Mode=TwoWay}"/>
+                                                                            </Grid>
+
+                                                                            <TextBlock Text="{Binding DistributionText}"
+                                                                                       IsVisible="{Binding HasDistributionText}"
+                                                                                       FontSize="11"
+                                                                                       Foreground="#888888"
+                                                                                       FontStyle="Italic"
+                                                                                       Margin="0,2,0,0"/>
+                                                                        </StackPanel>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </StackPanel>
+                                                </Border>
+
                                                 <!-- Enemy Respawning Section -->
                                                 <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10">
                                                     <StackPanel Spacing="8">

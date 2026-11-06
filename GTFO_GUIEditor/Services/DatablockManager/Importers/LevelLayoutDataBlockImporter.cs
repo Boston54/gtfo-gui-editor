@@ -1280,6 +1280,27 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             zs.DcScanSeed = zoneObj["BulkheadDCScanSeed"]?.GetValue<int>() ?? 0;
             zs.Lighting = zoneObj["LightSettings"]?.GetValue<uint>() ?? 0;
             zs.ConsumableDistributionInZone = zoneObj["ConsumableDistributionInZone"]?.GetValue<uint>() ?? 0;
+
+            // Enemy Spawning
+            if (zoneObj["EnemySpawningInZone"] is JsonArray esArr)
+            {
+                zs.EnemySpawningInZone.Clear();
+                foreach (var esNode in esArr)
+                {
+                    if (esNode is not JsonObject esObj) continue;
+                    var esItem = new EnemySpawningInZoneItem();
+                    esItem.GroupType = esObj["GroupType"]?.GetValue<string>() ?? "Hibernate";
+                    esItem.Difficulty = esObj["Difficulty"]?.GetValue<string>() ?? "Easy";
+                    string distStr = esObj["Distribution"]?.GetValue<string>() ?? "Rel_Value";
+                    if (Enum.TryParse<EnemyZoneDistribution>(distStr, true, out var distEnum))
+                    {
+                        esItem.Distribution = distEnum;
+                    }
+                    esItem.DistributionValue = esObj["DistributionValue"]?.GetValue<double>() ?? 0.0;
+                    zs.EnemySpawningInZone.Add(esItem);
+                }
+            }
+
             zs.EnemyRespawning = zoneObj["EnemyRespawning"]?.GetValue<bool>() ?? false;
             zs.RequireOtherZone = zoneObj["EnemyRespawnRequireOtherZone"]?.GetValue<bool>() ?? true;
             zs.RoomDistance = zoneObj["EnemyRespawnRoomDistance"]?.GetValue<int>() ?? 2;
