@@ -133,6 +133,9 @@
                 <TabItem Header="Fog">
                     <views:FogSettingsView DataContext="{Binding FogSettings}"/>
                 </TabItem>
+                <TabItem Header="Enemies">
+                    <views:EnemiesView DataContext="{Binding Enemies}"/>
+                </TabItem>
                 <TabItem Header="Geomorphs">
                     <views:GeomorphsView DataContext="{Binding Geomorphs}"/>
                 </TabItem>

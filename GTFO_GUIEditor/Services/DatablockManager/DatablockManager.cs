@@ -49,6 +49,7 @@ public class DatablockManager : IDatablockManager
         _exporters.Add(new FogSettingsDataBlockExporter());
         _exporters.Add(new ConsumableDistributionDataBlockExporter());
         _exporters.Add(new SurvivalWaveDataBlockExporter());
+        _exporters.Add(new EnemyDataBlocksExporter());
         _exporters.Add(new RundownDataBlockExporter());
         _exporters.Add(new GameSetupDataBlockExporter());
         _exporters.Add(new TextDataBlockExporter()); // Text exporter runs last to capture all synthesized strings

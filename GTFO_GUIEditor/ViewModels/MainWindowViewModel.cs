@@ -52,6 +52,7 @@ public class MainWindowViewModel : ViewModelBase
     public ConsumablesViewModel Consumables { get; }
     public LightingViewModel Lighting { get; }
     public FogSettingsViewModel FogSettings { get; }
+    public EnemiesViewModel Enemies { get; }
     public LevelLayoutViewModel LevelLayout { get; }
     public RundownViewModel Rundown { get; }
     public ModdedViewModel Modded { get; }
@@ -294,6 +295,7 @@ public class MainWindowViewModel : ViewModelBase
         Consumables = new ConsumablesViewModel();
         Lighting = new LightingViewModel();
         FogSettings = new FogSettingsViewModel();
+        Enemies = new EnemiesViewModel();
         LevelLayout = new LevelLayoutViewModel(null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks, Consumables.Blocks);
         var defaultRundown = Services.RundownService.CreateFreshBlock(1, "New Rundown");
         if (defaultRundown.TierA.Count == 0)
@@ -311,6 +313,7 @@ public class MainWindowViewModel : ViewModelBase
         Consumables.PropertyChanged += OnProjectPropertyChanged;
         Lighting.PropertyChanged += OnProjectPropertyChanged;
         FogSettings.PropertyChanged += OnProjectPropertyChanged;
+        Enemies.PropertyChanged += OnProjectPropertyChanged;
         LevelLayout.PropertyChanged += OnProjectPropertyChanged;
         Rundown.PropertyChanged += OnProjectPropertyChanged;
         Modded.PropertyChanged += OnProjectPropertyChanged;

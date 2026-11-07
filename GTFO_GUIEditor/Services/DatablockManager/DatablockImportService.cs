@@ -11,6 +11,9 @@ public class DatablockImportService
 {
     private readonly List<IDatablockImporter> _importers = new()
     {
+        new EnemyDataBlockImporter(),
+        new EnemyPopulationDataBlockImporter(),
+        new EnemyGroupDataBlockImporter(),
         new LightSettingsDataBlockImporter(),
         new FogSettingsDataBlockImporter(),
         new ConsumableDistributionDataBlockImporter(),

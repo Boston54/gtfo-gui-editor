@@ -1,0 +1,121 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             x:Class="GTFO_GUIEditor.Views.EnemiesView"
+             x:DataType="vm:EnemiesViewModel">
+  <TabControl Margin="10">
+    <TabItem Header="Population">
+      <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+          <TextBox Watermark="Search population..." Text="{Binding PopulationSearchText, Mode=TwoWay}" />
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl ItemsSource="{Binding PopulationBlocks}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="models:EnemyPopulationBlock">
+                <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="10">
+                  <StackPanel Spacing="8">
+                  <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Role Datas" FontWeight="Bold" FontSize="14"/>
+                    <Button Grid.Column="1" Content="+ Add Role" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).AddRoleDataCommand}" Padding="8,4"/>
+                  </Grid>
+                  <ItemsControl ItemsSource="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).PopulationSearchResults}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="models:EnemyRoleData">
+                        <Border BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,4">
+                          <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                            <TextBlock Grid.Column="0" Text="Role:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <ComboBox Grid.Column="1" ItemsSource="{x:Static vm:EnemiesViewModel.RoleNames}" SelectedItem="{Binding Role, Mode=TwoWay}" MinWidth="90"/>
+                            <TextBlock Grid.Column="2" Text="Difficulty:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="8,0,6,0"/>
+                            <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:EnemiesViewModel.Difficulties}" SelectedItem="{Binding Difficulty, Mode=TwoWay}" MinWidth="90"/>
+                            <TextBlock Grid.Column="4" Text="Enemy:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="8,0,6,0"/>
+                            <ComboBox Grid.Column="5" ItemsSource="{Binding EnemyEntries}" SelectedItem="{Binding SelectedEnemy, Mode=TwoWay}" IsTextSearchEnabled="True" MinWidth="160">
+                              <ComboBox.ItemTemplate><DataTemplate x:DataType="models:EnemyEntry"><TextBlock Text="{Binding DisplayText}"/></DataTemplate></ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <TextBlock Grid.Row="1" Text="Cost:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,8,6,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Cost, Mode=TwoWay}" MinWidth="60" Margin="0,8,0,0"/>
+                            <TextBlock Grid.Row="1" Grid.Column="2" Text="Weight:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="8,8,6,0"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Weight, Mode=TwoWay}" MinWidth="60" Margin="0,8,0,0"/>
+                            <Button Grid.Row="1" Grid.Column="5" Content="Remove" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).RemoveRoleDataCommand}" CommandParameter="{Binding}" HorizontalAlignment="Right" Margin="8,8,0,0"/>
+                          </Grid>
+                        </Border>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+      </Grid>
+    </TabItem>
+    <TabItem Header="Group">
+      <Grid RowDefinitions="Auto,*">
+        <Border Grid.Row="0" Background="#252526" Padding="10" Margin="0,0,0,10" CornerRadius="4">
+          <Grid ColumnDefinitions="*,Auto">
+            <TextBox Watermark="Search groups..." Text="{Binding GroupSearchText, Mode=TwoWay}" Margin="0,0,10,0"/>
+            <Button Grid.Column="1" Content="+ Create New Group" Command="{Binding AddGroupCommand}" HorizontalAlignment="Right" Padding="12,6"/>
+          </Grid>
+        </Border>
+        <ScrollViewer Grid.Row="1">
+          <ItemsControl ItemsSource="{Binding GroupSearchResults}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="models:EnemyGroupBlock">
+                <Border Background="#252526" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                  <StackPanel Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto">
+                      <Button Grid.Column="0" Content="{Binding DisplayText}" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).ToggleGroupCommand}" CommandParameter="{Binding}" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left"/>
+                      <Button Grid.Column="1" Content="Duplicate" IsEnabled="False" Margin="8,0,0,0"/>
+                      <Button Grid.Column="2" Content="Delete" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).RemoveGroupCommand}" CommandParameter="{Binding}" Margin="6,0,0,0"/>
+                    </Grid>
+                    <StackPanel IsVisible="{Binding IsExpanded}" Spacing="10">
+                      <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                        <TextBlock Text="Name:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                        <TextBox Grid.Column="1" Text="{Binding Name, Mode=TwoWay}" Margin="0,0,16,8"/>
+                        <TextBlock Grid.Column="2" Text="Difficulty:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                        <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:EnemiesViewModel.Difficulties}" SelectedItem="{Binding Difficulty, Mode=TwoWay}" Margin="0,0,16,8"/>
+                        <TextBlock Grid.Row="1" Text="Spawn Placement:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding SpawnPlacementType, Mode=TwoWay}" Margin="0,0,16,0"/>
+                      </Grid>
+                      <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                        <TextBlock Text="Max Score:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Grid.Column="1" Text="{Binding MaxScore, Mode=TwoWay}" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="2" Text="Score Padding:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Grid.Column="3" Text="{Binding ScoreInAreaPaddingMulti, Mode=TwoWay}" Margin="0,0,16,0"/>
+                        <TextBlock Grid.Column="4" Text="Relative Weight:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <TextBox Grid.Column="5" Text="{Binding RelativeWeight, Mode=TwoWay}"/>
+                      </Grid>
+                      <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8">
+                        <StackPanel Spacing="6">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="Roles" FontWeight="SemiBold"/>
+                            <Button Grid.Column="1" Content="+ Add" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).AddGroupRoleCommand}" CommandParameter="{Binding}" Padding="8,3"/>
+                          </Grid>
+                          <ItemsControl ItemsSource="{Binding Roles}">
+                            <ItemsControl.ItemTemplate>
+                              <DataTemplate x:DataType="models:EnemyGroupRole">
+                                <Grid ColumnDefinitions="Auto,*,Auto,* ,Auto">
+                                  <TextBlock Text="Role:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                  <ComboBox Grid.Column="1" ItemsSource="{Binding AvailableRoles}" SelectedItem="{Binding Role, Mode=TwoWay}" MinWidth="140"/>
+                                  <TextBlock Grid.Column="2" Text="Distribution:" ToolTip.Tip="#TODO" VerticalAlignment="Center" Margin="8,0,8,0"/>
+                                  <ComboBox Grid.Column="3" ItemsSource="{x:Static vm:EnemiesViewModel.Distributions}" SelectedItem="{Binding Distribution, Mode=TwoWay}" MinWidth="140"/>
+                                  <Button Grid.Column="4" Content="Remove" Command="{Binding $parent[UserControl].((vm:EnemiesViewModel)DataContext).RemoveGroupRoleCommand}" CommandParameter="{Binding}" Margin="8,0,0,0"/>
+                                </Grid>
+                              </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                          </ItemsControl>
+                        </StackPanel>
+                      </Border>
+                    </StackPanel>
+                  </StackPanel>
+                </Border>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </ScrollViewer>
+      </Grid>
+    </TabItem>
+  </TabControl>
+</UserControl>

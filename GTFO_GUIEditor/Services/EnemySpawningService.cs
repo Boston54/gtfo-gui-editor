@@ -12,8 +12,76 @@ namespace GTFO_GUIEditor.Services;
 public static class EnemySpawningService
 {
     private static readonly Lazy<List<EnemySpawningOption>> _lazyOptions = new(LoadVanillaOptions);
+    private static List<EnemySpawningOption> _optionsOverride = new();
 
-    public static IReadOnlyList<EnemySpawningOption> AvailableOptions => _lazyOptions.Value;
+    public static IReadOnlyList<EnemySpawningOption> AvailableOptions =>
+        _optionsOverride.Count > 0 ? _optionsOverride : _lazyOptions.Value;
+
+    public static void RefreshOptions(
+        IEnumerable<EnemyGroupBlock> groups,
+        IEnumerable<EnemyRoleData> populationRoles,
+        IEnumerable<EnemyEntry>? enemies = null)
+    {
+        var result = new List<EnemySpawningOption>();
+        var enemyList = enemies?.Where(e => e.PersistentId != 0).ToDictionary(e => e.PersistentId, e => e.Name) ??
+                        new Dictionary<uint, string>();
+        var population = populationRoles.ToList();
+
+        foreach (var group in groups.Where(g => g.InternalEnabled))
+        {
+            var mapping = new Dictionary<string, double>(StringComparer.OrdinalIgnoreCase);
+            foreach (var role in group.Roles)
+            {
+                if (!TryDistribution(role.Distribution, out double roleWeight)) continue;
+                var candidates = population
+                    .Where(r => string.Equals(r.Role, role.Role, StringComparison.OrdinalIgnoreCase) &&
+                                string.Equals(r.Difficulty, group.Difficulty, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+                double totalWeight = candidates.Sum(c => c.Weight);
+                if (candidates.Count == 0 || totalWeight <= 0) continue;
+
+                foreach (var candidate in candidates)
+                {
+                    string name = enemyList.TryGetValue(candidate.Enemy, out var enemyName)
+                        ? enemyName.Replace(" (Hibernate)", "", StringComparison.OrdinalIgnoreCase)
+                            .Replace("(Hibernate)", "", StringComparison.OrdinalIgnoreCase).Trim()
+                        : candidate.Enemy.ToString();
+                    double weight = group.RelativeWeight * roleWeight * (candidate.Weight / totalWeight);
+                    mapping[name] = mapping.TryGetValue(name, out var current) ? current + weight : weight;
+                }
+            }
+
+            double total = mapping.Values.Sum();
+            if (mapping.Count == 0) continue;
+            result.Add(new EnemySpawningOption
+            {
+                GroupType = group.Type,
+                Difficulty = group.Difficulty,
+                Enemies = mapping.Select(kvp => new EnemyDistributionEntry
+                {
+                    Name = kvp.Key,
+                    Weight = kvp.Value,
+                    Proportion = total > 0 ? kvp.Value / total : 0
+                }).ToList()
+            });
+        }
+
+        _optionsOverride = result;
+    }
+
+    private static bool TryDistribution(string distribution, out double weight)
+    {
+        weight = 0;
+        if (string.Equals(distribution, "Force_One", StringComparison.OrdinalIgnoreCase))
+        {
+            weight = 1;
+            return true;
+        }
+        const string prefix = "Rel_";
+        if (!distribution.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return false;
+        return double.TryParse(distribution.Substring(prefix.Length), NumberStyles.Any, CultureInfo.InvariantCulture,
+            out weight) && (weight /= 100) >= 0;
+    }
 
     public static string GetDatablocksDirectory()
     {

@@ -29,6 +29,7 @@ public class ImportContext
     public Dictionary<uint, JsonObject> SurvivalWavePopulationBlocks { get; } = new();
     public Dictionary<uint, JsonObject> EnemyGroupBlocks { get; } = new();
     public Dictionary<uint, JsonObject> EnemyBlocks { get; } = new();
+    public List<JsonObject> EnemyPopulationBlocks { get; } = new();
     public Dictionary<uint, JsonObject> WardenObjectiveBlocks { get; } = new();
     public Dictionary<uint, JsonObject> ExpeditionBalanceBlocks { get; } = new();
     public Dictionary<uint, JsonObject> ComplexResourceSetBlocks { get; } = new();
@@ -65,6 +66,7 @@ public class ImportContext
         LoadBlocks("GameData_SurvivalWavePopulationDataBlock_bin.json", "SurvivalWavePopulationDataBlock.json", SurvivalWavePopulationBlocks);
         LoadBlocks("GameData_EnemyGroupDataBlock_bin.json", "EnemyGroupDataBlock.json", EnemyGroupBlocks);
         LoadBlocks("GameData_EnemyDataBlock_bin.json", "EnemyDataBlock.json", EnemyBlocks);
+        LoadPopulationBlocks();
         LoadBlocks("GameData_WardenObjectiveDataBlock_bin.json", "WardenObjectiveDataBlock.json", WardenObjectiveBlocks);
         LoadBlocks("GameData_ExpeditionBalanceDataBlock_bin.json", "ExpeditionBalanceDataBlock.json", ExpeditionBalanceBlocks);
         LoadBlocks("GameData_ComplexResourceSetDataBlock_bin.json", "ComplexResourceSetDataBlock.json", ComplexResourceSetBlocks);
@@ -73,6 +75,33 @@ public class ImportContext
         LoadBlocks("GameData_AtmosphereDataBlock_bin.json", "AtmosphereDataBlock.json", AtmosphereBlocks);
         LoadBlocks("GameData_RundownDataBlock_bin.json", "RundownDataBlock.json", RundownBlocks);
         LoadBlocks("GameData_GameSetupDataBlock_bin.json", "GameSetupDataBlock.json", GameSetupBlocks);
+    }
+
+    private void LoadPopulationBlocks()
+    {
+        var candidatePaths = new[]
+        {
+            Path.Combine(ImportRootPath, "GameData_EnemyPopulationDataBlock_bin.json"),
+            Path.Combine(ImportRootPath, "EnemyPopulationDataBlock.json"),
+            Path.Combine(ImportRootPath, "Datablocks", "GameData_EnemyPopulationDataBlock_bin.json"),
+            Path.Combine(ImportRootPath, "Datablocks", "EnemyPopulationDataBlock.json")
+        };
+        string? path = candidatePaths.FirstOrDefault(File.Exists);
+        if (path == null) return;
+
+        try
+        {
+            if (JsonNode.Parse(File.ReadAllText(path)) is JsonObject obj &&
+                obj["Blocks"] is JsonArray blocks)
+            {
+                EnemyPopulationBlocks.AddRange(blocks.OfType<JsonObject>());
+                DatablocksImportedCount++;
+            }
+        }
+        catch (Exception ex)
+        {
+            Warnings.Add($"Failed to parse {path}: {ex.Message}");
+        }
     }
 
     private void LoadBlocks(string fileName, string vanillaFileName, Dictionary<uint, JsonObject> targetDict)
