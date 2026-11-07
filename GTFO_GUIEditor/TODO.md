@@ -1,6 +1,5 @@
 ﻿# TODO List:
 ## Features
-* **Tampered Data Cube events**
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
 * **Legacy Geomorphs tab**
