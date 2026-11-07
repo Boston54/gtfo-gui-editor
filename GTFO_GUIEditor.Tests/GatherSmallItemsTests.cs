@@ -250,4 +250,272 @@ public class GatherSmallItemsTests
             }
         }
     }
+
+    [Fact]
+    public void GatherPickupEventStep_DisplayTitle_AndCloning()
+    {
+        var step1 = new GatherPickupEventStep { PickupNumber = 1 };
+        Assert.Equal("Pickup #1 (1st Item) - 0 Events", step1.DisplayTitle);
+
+        step1.Events.Add(new WardenEvent { Type = EventType.SpawnEnemyWave });
+        Assert.Equal("Pickup #1 (1st Item) - 1 Event", step1.DisplayTitle);
+
+        step1.Events.Add(new WardenEvent { Type = EventType.DimensionFlashTeam });
+        Assert.Equal("Pickup #1 (1st Item) - 2 Events", step1.DisplayTitle);
+
+        var step2 = new GatherPickupEventStep { PickupNumber = 2 };
+        Assert.Equal("Pickup #2 (2nd Item) - 0 Events", step2.DisplayTitle);
+
+        var step3 = new GatherPickupEventStep { PickupNumber = 3 };
+        Assert.Equal("Pickup #3 (3rd Item) - 0 Events", step3.DisplayTitle);
+
+        var step11 = new GatherPickupEventStep { PickupNumber = 11 };
+        Assert.Equal("Pickup #11 (11th Item) - 0 Events", step11.DisplayTitle);
+
+        var cloned = step1.Clone();
+        Assert.Equal(1, cloned.PickupNumber);
+        Assert.Equal(2, cloned.Events.Count);
+        Assert.Equal(EventType.SpawnEnemyWave, cloned.Events[0].Type);
+        Assert.Equal(EventType.DimensionFlashTeam, cloned.Events[1].Type);
+
+        // Independent clone
+        cloned.Events.Clear();
+        Assert.Equal(2, step1.Events.Count);
+    }
+
+    [Fact]
+    public void WardenEvent_AvailableEventTypes_ExcludesEventBreak()
+    {
+        var ev = new WardenEvent();
+        Assert.DoesNotContain(EventType.EventBreak, ev.AvailableEventTypes);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_GatherSmallItems_PickupEvents_Management()
+    {
+        var vm = new LevelLayoutViewModel();
+        vm.OpenMainSectorSettings();
+        vm.SelectedSectorObjectiveType = ObjectiveType.GatherSmallItems;
+
+        Assert.True(vm.IsGatherSmallItemsObjective);
+        Assert.Equal("Events On Activate (Locked for Gather Small Items)", vm.EventsOnActivateHeaderTitle);
+
+        Assert.Single(vm.EditingSectorSettings!.GatherPickupEvents);
+        Assert.NotNull(vm.SelectedGatherPickupEvent);
+        Assert.Equal(1, vm.SelectedGatherPickupEvent.PickupNumber);
+
+        // Add second pickup step
+        vm.AddGatherPickupEvent();
+        Assert.Equal(2, vm.EditingSectorSettings.GatherPickupEvents.Count);
+        Assert.Equal(2, vm.SelectedGatherPickupEvent.PickupNumber);
+
+        // Add event to 2nd pickup
+        vm.AddEventOnGatherPickup();
+        Assert.Single(vm.SelectedGatherPickupEvent.Events);
+
+        // Add 3rd pickup step
+        vm.AddGatherPickupEvent();
+        Assert.Equal(3, vm.EditingSectorSettings.GatherPickupEvents.Count);
+        Assert.Equal(3, vm.SelectedGatherPickupEvent.PickupNumber);
+
+        // Remove 2nd step
+        var secondStep = vm.EditingSectorSettings.GatherPickupEvents[1];
+        vm.RemoveGatherPickupEvent(secondStep);
+        Assert.Equal(2, vm.EditingSectorSettings.GatherPickupEvents.Count);
+        Assert.Equal(1, vm.EditingSectorSettings.GatherPickupEvents[0].PickupNumber);
+        Assert.Equal(2, vm.EditingSectorSettings.GatherPickupEvents[1].PickupNumber);
+    }
+
+    [Fact]
+    public void WardenObjectiveDataBlockExporter_GatherSmallItems_PickupEventsExport()
+    {
+        var sector = new SectorSettings
+        {
+            ObjectiveType = ObjectiveType.GatherSmallItems,
+            GatherItem = GatherSmallItemType.DataCubeTampered
+        };
+
+        // Pickup 1 has 2 events
+        var step1 = new GatherPickupEventStep { PickupNumber = 1 };
+        step1.Events.Add(new WardenEvent { Type = EventType.DimensionFlashTeam });
+        step1.Events.Add(new WardenEvent { Type = EventType.SpawnEnemyWave });
+
+        // Pickup 2 has 1 event
+        var step2 = new GatherPickupEventStep { PickupNumber = 2 };
+        step2.Events.Add(new WardenEvent { Type = EventType.UnlockSecurityDoor });
+
+        // Pickup 3 has 0 events
+        var step3 = new GatherPickupEventStep { PickupNumber = 3 };
+
+        // Pickup 4 has 1 event
+        var step4 = new GatherPickupEventStep { PickupNumber = 4 };
+        step4.Events.Add(new WardenEvent { Type = EventType.UpdateCustomSubObjective });
+
+        sector.GatherPickupEvents.Clear();
+        sector.GatherPickupEvents.Add(step1);
+        sector.GatherPickupEvents.Add(step2);
+        sector.GatherPickupEvents.Add(step3);
+        sector.GatherPickupEvents.Add(step4);
+
+        var waveSettingsAlloc = new DatablockAllocator();
+        var wavePopAlloc = new DatablockAllocator();
+        var waveSettingsBlocks = new System.Text.Json.Nodes.JsonArray();
+        var wavePopBlocks = new System.Text.Json.Nodes.JsonArray();
+
+        var exported = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+            sector,
+            100,
+            (k, v) => 1,
+            waveSettingsAlloc,
+            wavePopAlloc,
+            waveSettingsBlocks,
+            wavePopBlocks);
+
+        Assert.True(exported["OnActivateOnSolveItem"]?.GetValue<bool>());
+
+        var eventsArray = exported["EventsOnActivate"] as System.Text.Json.Nodes.JsonArray;
+        Assert.NotNull(eventsArray);
+
+        // Expected sequence:
+        // 0: DimensionFlashTeam (Pickup 1)
+        // 1: SpawnEnemyWave (Pickup 1)
+        // 2: EventBreak (Separator after Pickup 1)
+        // 3: UnlockSecurityDoor (Pickup 2)
+        // 4: EventBreak (Separator after Pickup 2)
+        // 5: EventBreak (Separator after Pickup 3)
+        // 6: UpdateCustomSubObjective (Pickup 4)
+        Assert.Equal(7, eventsArray.Count);
+
+        Assert.Equal("DimensionFlashTeam", eventsArray[0]?["Type"]?.ToString());
+        Assert.Equal("SpawnEnemyWave", eventsArray[1]?["Type"]?.ToString());
+        Assert.Equal("EventBreak", eventsArray[2]?["Type"]?.ToString());
+        Assert.Equal("UnlockSecurityDoor", eventsArray[3]?["Type"]?.ToString());
+        Assert.Equal("EventBreak", eventsArray[4]?["Type"]?.ToString());
+        Assert.Equal("EventBreak", eventsArray[5]?["Type"]?.ToString());
+        Assert.Equal("UpdateCustomSubObjective", eventsArray[6]?["Type"]?.ToString());
+    }
+
+    [Fact]
+    public void LevelLayoutDataBlockImporter_GatherSmallItems_PickupEventsImport()
+    {
+        var rawJson = new System.Text.Json.Nodes.JsonObject
+        {
+            ["Type"] = "GatherSmallItems",
+            ["Gather_RequiredCount"] = 3,
+            ["Gather_SpawnCount"] = 3,
+            ["Gather_ItemId"] = 168,
+            ["EventsOnActivate"] = new System.Text.Json.Nodes.JsonArray
+            {
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "DimensionFlashTeam", ["Trigger"] = "OnStart" },
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "EventBreak", ["Trigger"] = "None" },
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "SpawnEnemyWave", ["Trigger"] = "OnStart" },
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "EventBreak", ["Trigger"] = "None" },
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "EventBreak", ["Trigger"] = "None" },
+                new System.Text.Json.Nodes.JsonObject { ["Type"] = "UnlockSecurityDoor", ["Trigger"] = "OnStart" }
+            }
+        };
+
+        var context = new GTFO_GUIEditor.Services.DatablockManager.Importers.ImportContext();
+        var objective = new WardenObjective();
+        GTFO_GUIEditor.Services.DatablockManager.Importers.LevelLayoutDataBlockImporter.ImportWardenObjective(rawJson, objective, context);
+
+        Assert.Equal(ObjectiveType.GatherSmallItems, objective.ObjectiveType);
+        Assert.Empty(objective.EventsOnActivate);
+        Assert.Equal(4, objective.GatherPickupEvents.Count);
+
+        // Pickup 1 has 1 event (DimensionFlashTeam)
+        Assert.Equal(1, objective.GatherPickupEvents[0].PickupNumber);
+        Assert.Single(objective.GatherPickupEvents[0].Events);
+        Assert.Equal(EventType.DimensionFlashTeam, objective.GatherPickupEvents[0].Events[0].Type);
+
+        // Pickup 2 has 1 event (SpawnEnemyWave)
+        Assert.Equal(2, objective.GatherPickupEvents[1].PickupNumber);
+        Assert.Single(objective.GatherPickupEvents[1].Events);
+        Assert.Equal(EventType.SpawnEnemyWave, objective.GatherPickupEvents[1].Events[0].Type);
+
+        // Pickup 3 has 0 events
+        Assert.Equal(3, objective.GatherPickupEvents[2].PickupNumber);
+        Assert.Empty(objective.GatherPickupEvents[2].Events);
+
+        // Pickup 4 has 1 event (UnlockSecurityDoor)
+        Assert.Equal(4, objective.GatherPickupEvents[3].PickupNumber);
+        Assert.Single(objective.GatherPickupEvents[3].Events);
+        Assert.Equal(EventType.UnlockSecurityDoor, objective.GatherPickupEvents[3].Events[0].Type);
+    }
+
+    [Fact]
+    public void EventsOnActivate_PreservedWhenSwappingToAndFromGatherSmallItems_AndLockedDuringGatherSmallItems()
+    {
+        var vm = new LevelLayoutViewModel();
+        vm.OpenMainSectorSettings();
+
+        // 1. Start with HSU_FindTakeSample, add an event to EventsOnActivate
+        vm.SelectedSectorObjectiveType = ObjectiveType.HSU_FindTakeSample;
+        Assert.False(vm.IsGatherSmallItemsObjective);
+
+        vm.AddEventOnActivate();
+        Assert.Single(vm.EditingSectorSettings!.EventsOnActivate);
+        vm.EditingSectorSettings.EventsOnActivate[0].Type = EventType.CloseSecurityDoor;
+
+        // 2. Swap to GatherSmallItems
+        vm.SelectedSectorObjectiveType = ObjectiveType.GatherSmallItems;
+        Assert.True(vm.IsGatherSmallItemsObjective);
+
+        // Verify EventsOnActivate was NOT deleted and still contains the event
+        Assert.Single(vm.EditingSectorSettings.EventsOnActivate);
+        Assert.Equal(EventType.CloseSecurityDoor, vm.EditingSectorSettings.EventsOnActivate[0].Type);
+
+        // Verify users cannot add events to EventsOnActivate while in GatherSmallItems mode
+        vm.AddEventOnActivate();
+        Assert.Single(vm.EditingSectorSettings.EventsOnActivate);
+
+        // Verify datablock exporter ignores manual EventsOnActivate and exports GatherPickupEvents
+        var waveSettingsAlloc = new DatablockAllocator();
+        var wavePopAlloc = new DatablockAllocator();
+        var waveSettingsBlocks = new System.Text.Json.Nodes.JsonArray();
+        var wavePopBlocks = new System.Text.Json.Nodes.JsonArray();
+
+        var exportedGather = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+            vm.EditingSectorSettings,
+            100,
+            (k, v) => 1,
+            waveSettingsAlloc,
+            wavePopAlloc,
+            waveSettingsBlocks,
+            wavePopBlocks);
+
+        Assert.True(exportedGather["OnActivateOnSolveItem"]?.GetValue<bool>());
+        var eventsGather = exportedGather["EventsOnActivate"] as System.Text.Json.Nodes.JsonArray;
+        Assert.NotNull(eventsGather);
+        // GatherPickupEvents has 1 step with 0 events, so exported array is empty (no CloseSecurityDoor)
+        Assert.Empty(eventsGather);
+
+        // 3. Swap back to HSU_FindTakeSample
+        vm.SelectedSectorObjectiveType = ObjectiveType.HSU_FindTakeSample;
+        Assert.False(vm.IsGatherSmallItemsObjective);
+
+        // Verify EventsOnActivate is still intact
+        Assert.Single(vm.EditingSectorSettings.EventsOnActivate);
+        Assert.Equal(EventType.CloseSecurityDoor, vm.EditingSectorSettings.EventsOnActivate[0].Type);
+
+        // Verify adding events to EventsOnActivate works again
+        vm.AddEventOnActivate();
+        Assert.Equal(2, vm.EditingSectorSettings.EventsOnActivate.Count);
+
+        // Verify exporter exports EventsOnActivate now
+        var exportedHsu = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+            vm.EditingSectorSettings,
+            101,
+            (k, v) => 1,
+            waveSettingsAlloc,
+            wavePopAlloc,
+            waveSettingsBlocks,
+            wavePopBlocks);
+
+        Assert.False(exportedHsu["OnActivateOnSolveItem"]?.GetValue<bool>());
+        var eventsHsu = exportedHsu["EventsOnActivate"] as System.Text.Json.Nodes.JsonArray;
+        Assert.NotNull(eventsHsu);
+        Assert.Equal(2, eventsHsu.Count);
+        Assert.Equal("CloseSecurityDoor", eventsHsu[0]?["Type"]?.ToString());
+    }
 }

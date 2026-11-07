@@ -2591,7 +2591,36 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             objective.EventsOnElevatorLand = remainingEvents;
         }
 
-        ImportWardenEvents(obj["EventsOnActivate"] as JsonArray, objective.EventsOnActivate, context);
+        if (objective.ObjectiveType == ObjectiveType.GatherSmallItems)
+        {
+            objective.GatherPickupEvents.Clear();
+            if (obj["EventsOnActivate"] is JsonArray actArr && actArr.Count > 0)
+            {
+                var allEvents = new ObservableCollection<WardenEvent>();
+                ImportWardenEvents(actArr, allEvents, context);
+
+                var currentStep = new GatherPickupEventStep { PickupNumber = 1 };
+                objective.GatherPickupEvents.Add(currentStep);
+
+                foreach (var ev in allEvents)
+                {
+                    if (ev.Type == EventType.EventBreak)
+                    {
+                        currentStep = new GatherPickupEventStep { PickupNumber = objective.GatherPickupEvents.Count + 1 };
+                        objective.GatherPickupEvents.Add(currentStep);
+                    }
+                    else
+                    {
+                        currentStep.Events.Add(ev);
+                    }
+                }
+            }
+            objective.EventsOnActivate.Clear();
+        }
+        else
+        {
+            ImportWardenEvents(obj["EventsOnActivate"] as JsonArray, objective.EventsOnActivate, context);
+        }
         ImportWardenEvents(obj["EventsOnGotoWin"] as JsonArray, objective.EventsOnGotoWin, context);
         ImportWardenEvents(obj["TimedTerminalSequence_EventsOnSequenceStart"] as JsonArray, objective.EventsOnSequenceStart, context);
         ImportWardenEvents(obj["TimedTerminalSequence_EventsOnSequenceDone"] as JsonArray, objective.EventsOnSequenceDone, context);

@@ -252,10 +252,11 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             ["WaveOnElevatorWardenIntel"] = 0,
             ["FogTransitionDataOnElevatorLand"] = 0,
             ["FogTransitionDurationOnElevatorLand"] = 0.0,
-            ["OnActivateOnSolveItem"] = false,
+            ["OnActivateOnSolveItem"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems,
             ["WavesOnActivate"] = SerializeGenericWaveList(sector.WavesOnActivate, $"Obj_{persistentId}_Activate", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
-            ["EventsOnActivate"] =
-                SerializeWardenEvents(
+            ["EventsOnActivate"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems
+                ? CompileGatherSmallItemsPickupEvents(sector.GatherPickupEvents, textSynth)
+                : SerializeWardenEvents(
                     sector.EventsOnActivate.Count > 0 ? sector.EventsOnActivate : sector.EventsOnActivation, textSynth),
             ["StopAllWavesBeforeGotoWin"] = sector.StopAllWavesBeforeGotoWin,
             ["WavesOnGotoWin"] = SerializeGenericWaveList(sector.WavesOnGotoWin, $"Obj_{persistentId}_GotoWin", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
@@ -391,6 +392,61 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             ["internalEnabled"] = true,
             ["persistentID"] = persistentId
         };
+    }
+
+    public static JsonArray CompileGatherSmallItemsPickupEvents(
+        IEnumerable<GatherPickupEventStep>? pickupSteps,
+        Func<string?, string, uint> textSynth)
+    {
+        var array = new JsonArray();
+        if (pickupSteps == null) return array;
+
+        var stepsList = pickupSteps.OrderBy(s => s.PickupNumber).ToList();
+        if (stepsList.Count == 0) return array;
+
+        int lastIndexWithEvents = -1;
+        for (int i = 0; i < stepsList.Count; i++)
+        {
+            if (stepsList[i].Events != null && stepsList[i].Events.Count > 0)
+            {
+                lastIndexWithEvents = i;
+            }
+        }
+
+        if (lastIndexWithEvents == -1) return array;
+
+        for (int i = 0; i <= lastIndexWithEvents; i++)
+        {
+            var step = stepsList[i];
+            if (step.Events != null)
+            {
+                foreach (var ev in step.Events)
+                {
+                    if (ev == null || ev.Type == EventType.EventBreak) continue;
+                    var serialized = SerializeWardenEvents(new[] { ev }, textSynth);
+                    if (serialized.Count > 0 && serialized[0] is JsonObject evObj)
+                    {
+                        array.Add(evObj);
+                    }
+                }
+            }
+
+            if (i < lastIndexWithEvents)
+            {
+                var eventBreak = new WardenEvent
+                {
+                    Type = EventType.EventBreak,
+                    Trigger = EventTrigger.None
+                };
+                var breakArray = SerializeWardenEvents(new[] { eventBreak }, textSynth);
+                if (breakArray.Count > 0 && breakArray[0] is JsonObject breakObj)
+                {
+                    array.Add(breakObj);
+                }
+            }
+        }
+
+        return array;
     }
 
     public static JsonArray SerializeWardenEvents(IEnumerable<WardenEvent>? events,

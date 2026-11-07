@@ -144,6 +144,7 @@ public class WardenObjective : INotifyPropertyChanged
     private ObservableCollection<WardenEvent> _eventsOnElevatorLand = new();
     private ObservableCollection<WardenEvent> _eventsOnGotoWin = new();
     private ObservableCollection<WardenEvent> _eventsOnActivate = new();
+    private ObservableCollection<GatherPickupEventStep> _gatherPickupEvents = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -838,6 +839,13 @@ public class WardenObjective : INotifyPropertyChanged
         set => SetField(ref _eventsOnActivate, value ?? new ObservableCollection<WardenEvent>());
     }
 
+    [JsonPropertyName("GatherPickupEvents")]
+    public ObservableCollection<GatherPickupEventStep> GatherPickupEvents
+    {
+        get => _gatherPickupEvents;
+        set => SetField(ref _gatherPickupEvents, value ?? new ObservableCollection<GatherPickupEventStep>());
+    }
+
     public void ApplyDefaultsForObjectiveType(ObjectiveType type)
     {
         var defaults = ObjectiveDefaultsService.GetDefaults(type);
@@ -1037,6 +1045,12 @@ public class WardenObjective : INotifyPropertyChanged
         foreach (var ev in EventsOnActivate)
         {
             clone.EventsOnActivate.Add(ev.Clone());
+        }
+
+        clone.GatherPickupEvents.Clear();
+        foreach (var step in GatherPickupEvents)
+        {
+            clone.GatherPickupEvents.Add(step.Clone());
         }
 
         return clone;

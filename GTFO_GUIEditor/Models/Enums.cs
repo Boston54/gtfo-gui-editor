@@ -298,6 +298,7 @@ public enum EventType
     ClearDimension = 30,
     StartRepeatingFog = 31,
     StopSustainedEvent = 32,
+    EventBreak = 999,
     CloseSecurityDoor = 10000,
     LockSecurityDoor = 10001,
     SetDoorInteraction = 10002,

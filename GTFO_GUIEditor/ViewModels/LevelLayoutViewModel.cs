@@ -2029,8 +2029,14 @@ public class LevelLayoutViewModel : ViewModelBase
     public async Task AddEventOnElevatorLandFromClipboardCommand() =>
         await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnElevatorLand);
 
-    public async Task AddEventOnActivateFromClipboardCommand() =>
+    public async Task AddEventOnActivateFromClipboardCommand()
+    {
+        if (IsGatherSmallItemsObjective) return;
         await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnActivate);
+    }
+
+    public async Task AddEventOnGatherPickupFromClipboardCommand() =>
+        await AddWardenEventsToCollectionFromClipboardAsync(SelectedGatherPickupEvent?.Events);
 
     public async Task AddEventOnGotoWinFromClipboardCommand() =>
         await AddWardenEventsToCollectionFromClipboardAsync(CurrentObjective?.EventsOnGotoWin);
@@ -2125,8 +2131,15 @@ public class LevelLayoutViewModel : ViewModelBase
     public void AddEventOnGotoWin() => CurrentObjective?.EventsOnGotoWin.Add(new WardenEvent());
     public void RemoveEventOnGotoWin(WardenEvent? ev) { if (ev != null) CurrentObjective?.EventsOnGotoWin.Remove(ev); }
 
-    public void AddEventOnActivate() => CurrentObjective?.EventsOnActivate.Add(new WardenEvent());
+    public void AddEventOnActivate()
+    {
+        if (IsGatherSmallItemsObjective) return;
+        CurrentObjective?.EventsOnActivate.Add(new WardenEvent());
+    }
     public void RemoveEventOnActivate(WardenEvent? ev) { if (ev != null) CurrentObjective?.EventsOnActivate.Remove(ev); }
+
+    public void AddEventOnGatherPickup() => SelectedGatherPickupEvent?.Events.Add(new WardenEvent());
+    public void RemoveEventOnGatherPickup(WardenEvent? ev) { if (ev != null) SelectedGatherPickupEvent?.Events.Remove(ev); }
 
     public void RemoveWardenEvent(WardenEvent? ev)
     {
@@ -2184,13 +2197,23 @@ public class LevelLayoutViewModel : ViewModelBase
 
     private static bool TryRemoveEventFromObjective(WardenObjective objective, WardenEvent ev)
     {
-        return TryRemoveEventFromCollection(objective.EventsOnActivation, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnSequenceStart, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnSequenceDone, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnSequenceFail, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnElevatorLand, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnGotoWin, ev) ||
-               TryRemoveEventFromCollection(objective.EventsOnActivate, ev);
+        if (TryRemoveEventFromCollection(objective.EventsOnActivation, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnSequenceStart, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnSequenceDone, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnSequenceFail, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnElevatorLand, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnGotoWin, ev) ||
+            TryRemoveEventFromCollection(objective.EventsOnActivate, ev))
+        {
+            return true;
+        }
+
+        foreach (var pickupStep in objective.GatherPickupEvents)
+        {
+            if (TryRemoveEventFromCollection(pickupStep.Events, ev)) return true;
+        }
+
+        return false;
     }
 
     private static bool TryRemoveEventFromZoneSettings(ZoneSettings zoneSettings, WardenEvent ev)
@@ -4175,6 +4198,16 @@ public class LevelLayoutViewModel : ViewModelBase
             RenumberGatherItemPlacements();
             SelectedGatherItemPlacement = obj.GatherItemPlacements.FirstOrDefault();
 
+            if (obj.ObjectiveType == ObjectiveType.GatherSmallItems && obj.GatherPickupEvents.Count == 0)
+            {
+                obj.GatherPickupEvents.Add(new GatherPickupEventStep { PickupNumber = 1 });
+            }
+            RenumberGatherPickupEvents();
+            if (SelectedGatherPickupEvent == null || !obj.GatherPickupEvents.Contains(SelectedGatherPickupEvent))
+            {
+                SelectedGatherPickupEvent = obj.GatherPickupEvents.FirstOrDefault();
+            }
+
             if (obj.ObjectiveType == ObjectiveType.RetrieveBigItems && obj.RetrieveItemPlacements.Count == 0)
             {
                 obj.RetrieveItemPlacements.Add(new GatherItemPlacement());
@@ -4262,6 +4295,7 @@ public class LevelLayoutViewModel : ViewModelBase
     private ReactorStartupStage? _copiedReactorStage;
     private GatherItemPlacement? _selectedGatherItemPlacement;
     private CandidateZonePlacement? _selectedGatherCandidateZonePlacement;
+    private GatherPickupEventStep? _selectedGatherPickupEvent;
     private GatherItemPlacement? _selectedRetrieveItemPlacement;
     private CandidateZonePlacement? _selectedRetrieveCandidateZonePlacement;
     private DistributeGeneratorPlacement? _selectedDistributeGeneratorPlacement;
@@ -4326,6 +4360,7 @@ public class LevelLayoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsGatherTerminalObjective));
         OnPropertyChanged(nameof(IsCorruptedTerminalUplinkObjective));
         OnPropertyChanged(nameof(IsTimedTerminalSequenceObjective));
+        OnPropertyChanged(nameof(EventsOnActivateHeaderTitle));
     }
 
     public WinCondition SelectedSectorWinCondition
@@ -4380,6 +4415,17 @@ public class LevelLayoutViewModel : ViewModelBase
                     if (SelectedGatherItemPlacement == null)
                     {
                         SelectedGatherItemPlacement = CurrentObjective.GatherItemPlacements.FirstOrDefault();
+                    }
+
+                    if (CurrentObjective.GatherPickupEvents.Count == 0)
+                    {
+                        CurrentObjective.GatherPickupEvents.Add(new GatherPickupEventStep { PickupNumber = 1 });
+                    }
+
+                    RenumberGatherPickupEvents();
+                    if (SelectedGatherPickupEvent == null)
+                    {
+                        SelectedGatherPickupEvent = CurrentObjective.GatherPickupEvents.FirstOrDefault();
                     }
                 }
                 else if (value == ObjectiveType.RetrieveBigItems)
@@ -4513,6 +4559,10 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public bool IsGatherSmallItemsObjective =>
         (CurrentObjective?.ObjectiveType ?? ObjectiveType.HSU_FindTakeSample) == ObjectiveType.GatherSmallItems;
+
+    public string EventsOnActivateHeaderTitle => IsGatherSmallItemsObjective
+        ? "Events On Activate (Locked by Gather Small Items)"
+        : "Events On Activate";
 
     public bool IsClearAPathObjective => (CurrentObjective?.ObjectiveType ?? ObjectiveType.HSU_FindTakeSample) ==
                                          ObjectiveType.ClearAPath;
@@ -6362,6 +6412,62 @@ public class LevelLayoutViewModel : ViewModelBase
         }
 
         OnPropertyChanged(nameof(GatherSpawnCount));
+    }
+
+    public GatherPickupEventStep? SelectedGatherPickupEvent
+    {
+        get => _selectedGatherPickupEvent;
+        set
+        {
+            if (SetField(ref _selectedGatherPickupEvent, value))
+            {
+                OnPropertyChanged(nameof(HasSelectedGatherPickupEvent));
+            }
+        }
+    }
+
+    public bool HasSelectedGatherPickupEvent => _selectedGatherPickupEvent != null;
+
+    public void RenumberGatherPickupEvents()
+    {
+        if (CurrentObjective == null) return;
+        for (int i = 0; i < CurrentObjective.GatherPickupEvents.Count; i++)
+        {
+            CurrentObjective.GatherPickupEvents[i].PickupNumber = i + 1;
+        }
+    }
+
+    public void AddGatherPickupEvent()
+    {
+        if (CurrentObjective == null) return;
+        int nextNum = CurrentObjective.GatherPickupEvents.Count + 1;
+        var newStep = new GatherPickupEventStep
+        {
+            PickupNumber = nextNum
+        };
+        CurrentObjective.GatherPickupEvents.Add(newStep);
+        SelectedGatherPickupEvent = newStep;
+    }
+
+    public void RemoveGatherPickupEvent(GatherPickupEventStep? step = null)
+    {
+        if (CurrentObjective == null || CurrentObjective.GatherPickupEvents.Count <= 1) return;
+        step ??= SelectedGatherPickupEvent;
+        if (step == null) return;
+
+        int index = CurrentObjective.GatherPickupEvents.IndexOf(step);
+        CurrentObjective.GatherPickupEvents.Remove(step);
+        RenumberGatherPickupEvents();
+
+        if (CurrentObjective.GatherPickupEvents.Count > 0)
+        {
+            int newIndex = Math.Clamp(index, 0, CurrentObjective.GatherPickupEvents.Count - 1);
+            SelectedGatherPickupEvent = CurrentObjective.GatherPickupEvents[newIndex];
+        }
+        else
+        {
+            SelectedGatherPickupEvent = null;
+        }
     }
 
     public static List<RetrieveBigItemOption> AvailableRetrieveBigItemOptionsList { get; } = new()

@@ -541,9 +541,9 @@ public class WardenEvent : INotifyPropertyChanged
         {
             if (ModManager.Instance.AdvancedWardenObjective)
             {
-                return Enum.GetValues<EventType>();
+                return Enum.GetValues<EventType>().Where(t => t != EventType.EventBreak);
             }
-            return Enum.GetValues<EventType>().Where(t => (int)t < 10000);
+            return Enum.GetValues<EventType>().Where(t => (int)t < 10000 && t != EventType.EventBreak);
         }
     }
 

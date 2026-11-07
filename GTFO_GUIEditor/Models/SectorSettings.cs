@@ -287,6 +287,13 @@ public class SectorSettings : INotifyPropertyChanged
         set => PrimaryObjective.GatherItemPlacements = value;
     }
 
+    [JsonPropertyName("GatherPickupEvents")]
+    public ObservableCollection<GatherPickupEventStep> GatherPickupEvents
+    {
+        get => PrimaryObjective.GatherPickupEvents;
+        set => PrimaryObjective.GatherPickupEvents = value;
+    }
+
     [JsonPropertyName("RetrieveItemPlacements")]
     public ObservableCollection<GatherItemPlacement> RetrieveItemPlacements
     {
