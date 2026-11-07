@@ -134,6 +134,20 @@ public class PlacedGeomorphNodeData
     [JsonPropertyName("roomZones")] public Dictionary<int, int> RoomZones { get; set; } = new();
 
     [JsonPropertyName("roomSectors")] public Dictionary<int, SectorType> RoomSectors { get; set; } = new();
+
+    [JsonPropertyName("roomEnemies")] public Dictionary<int, List<RoomEnemySpawningItemData>> RoomEnemies { get; set; } = new();
+}
+
+public class RoomEnemySpawningItemData
+{
+    [JsonPropertyName("enemyId")] public uint EnemyId { get; set; } = 28;
+    [JsonPropertyName("count")] public int Count { get; set; } = 1;
+    [JsonPropertyName("placementRandomWeight")] public double PlacementRandomWeight { get; set; } = 0.25;
+    [JsonPropertyName("placementScore")] public double PlacementScore { get; set; } = 3.0;
+    [JsonPropertyName("resetPlacementInfo")] public bool ResetPlacementInfo { get; set; }
+    [JsonPropertyName("position")] public Vector3Data Position { get; set; } = new();
+    [JsonPropertyName("rotation")] public Vector3Data Rotation { get; set; } = new();
+    [JsonPropertyName("randomizeRotation")] public bool RandomizeRotation { get; set; }
 }
 
 public class PlacedDoorNodeData

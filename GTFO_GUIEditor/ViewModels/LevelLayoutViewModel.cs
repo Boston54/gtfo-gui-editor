@@ -113,6 +113,8 @@ public class LevelLayoutViewModel : ViewModelBase
     public ICommand RemoveEnemyGroupInAreaItemCommand { get; }
     public ICommand RemoveEnemyGroupInFrontOfDoorItemCommand { get; }
     public ICommand RemoveDoorCandidateZoneCommand { get; }
+    public ICommand AddRoomEnemyCommand { get; }
+    public ICommand RemoveRoomEnemyCommand { get; }
 
     // Edit Door modal state
     private bool _isEditingDoor;
@@ -437,6 +439,8 @@ public class LevelLayoutViewModel : ViewModelBase
         RemoveEnemyGroupInAreaItemCommand = new RelayCommand<EnemyGroupItem>(RemoveEnemyGroupInAreaItem);
         RemoveEnemyGroupInFrontOfDoorItemCommand = new RelayCommand<EnemyGroupItem>(RemoveEnemyGroupInFrontOfDoorItem);
         RemoveDoorCandidateZoneCommand = new RelayCommand<CandidateZonePlacement>(RemoveDoorCandidateZone);
+        AddRoomEnemyCommand = new RelayCommand(AddRoomEnemy);
+        RemoveRoomEnemyCommand = new RelayCommand<RoomEnemySpawningItem>(RemoveRoomEnemy);
 
         ModManager.Instance.RegisterFeature(
             ModManager.AdvancedWardenObjectiveModId,
@@ -449,11 +453,14 @@ public class LevelLayoutViewModel : ViewModelBase
                 e.PropertyName == nameof(ModManager.AdvancedWardenObjective) ||
                 e.PropertyName == ModManager.AdvancedWardenObjectiveModId)
             {
+                OnPropertyChanged(nameof(IsAwoEnabled));
                 OnPropertyChanged(nameof(AvailableEventTypes));
                 OnPropertyChanged(nameof(InstanceAvailableEventTypes));
             }
         };
     }
+
+    public bool IsAwoEnabled => ModManager.Instance.AdvancedWardenObjective;
 
     public bool HasAnyAwoEventsInUse()
     {
@@ -495,6 +502,11 @@ public class LevelLayoutViewModel : ViewModelBase
     private static bool CheckGridStateEvents(LevelLayoutGridState? grid)
     {
         if (grid == null) return false;
+        foreach (var room in grid.PlacedRooms)
+        {
+            if (room != null && room.Enemies.Count > 0) return true;
+        }
+
         foreach (var door in grid.PlacedDoors)
         {
             if (door == null) continue;
@@ -2329,6 +2341,24 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public void AddEnemySpawningInZoneItem() => ActiveZoneSettings?.EnemySpawningInZone.Add(new EnemySpawningInZoneItem());
     public void RemoveEnemySpawningInZoneItem(EnemySpawningInZoneItem? item) { if (item != null) ActiveZoneSettings?.EnemySpawningInZone.Remove(item); }
+
+    public void AddRoomEnemy()
+    {
+        if (EditingRoom == null) return;
+        EditingRoom.Enemies.Add(new RoomEnemySpawningItem
+        {
+            EnemyId = Enemies.FirstOrDefault()?.PersistentId ?? 28,
+            Count = 1
+        });
+    }
+
+    public void RemoveRoomEnemy(RoomEnemySpawningItem? item)
+    {
+        if (item != null && EditingRoom != null)
+        {
+            EditingRoom.Enemies.Remove(item);
+        }
+    }
 
     public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
     public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }

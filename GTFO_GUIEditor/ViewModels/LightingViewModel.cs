@@ -521,14 +521,11 @@ public class LightingViewModel : ViewModelBase
         var source = block ?? _selectedBlock ?? _blocks.FirstOrDefault();
         if (source == null) return;
 
-        var copy = source.Clone();
-        copy.PersistentId = GenerateRandomPersistentId();
-        copy.Name = $"{source.Name}_copy";
-        _blocks.Add(copy);
-        SelectedBlock = copy;
-        copy.IsExpanded = true;
-        RefreshFilteredBlocks();
-        StatusText = $"Duplicated lighting config [{source.PersistentId}] {source.Name}";
+        OpenCreateBlockDialog();
+        IsCreatingFromExisting = true;
+        SelectedExistingBlock = source;
+        NewBlockName = $"{source.Name}_Copy";
+        NewBlockPersistentId = GenerateRandomPersistentId();
     }
 
     public bool ConfirmCreateBlock()

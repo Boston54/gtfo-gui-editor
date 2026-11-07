@@ -20,6 +20,19 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             uint mainObjId = context.WardenObjectiveAlloc.Allocate();
             var mainChainedIds = new List<uint> { mainObjId };
 
+            var roomEnemyEvents = new List<WardenEvent>();
+            roomEnemyEvents.AddRange(GenerateRoomEnemyEvents(level.GridState, "Reality"));
+            if (level.Dimensions != null)
+            {
+                foreach (var dim in level.Dimensions)
+                {
+                    if (dim?.GridState != null)
+                    {
+                        roomEnemyEvents.AddRange(GenerateRoomEnemyEvents(dim.GridState, dim.DimensionIndex));
+                    }
+                }
+            }
+
             var mainObj = CompileWardenObjective(
                 level.MainSector.PrimaryObjective,
                 mainObjId,
@@ -27,7 +40,8 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 context.SurvivalWaveSettingsAlloc,
                 context.SurvivalWavePopulationAlloc,
                 context.SurvivalWaveSettingsBlocks,
-                context.SurvivalWavePopulationBlocks);
+                context.SurvivalWavePopulationBlocks,
+                additionalElevatorLandEvents: roomEnemyEvents);
             wardenObjectiveBlocks.Add(mainObj);
 
             if (level.MainSector.Objectives.Count > 1)
@@ -141,7 +155,8 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
         PersistentIdAllocator? waveSettingsAlloc = null,
         PersistentIdAllocator? wavePopAlloc = null,
         List<JsonObject>? waveSettingsBlocks = null,
-        List<JsonObject>? wavePopBlocks = null)
+        List<JsonObject>? wavePopBlocks = null,
+        IEnumerable<WardenEvent>? additionalElevatorLandEvents = null)
     {
         var retrieveItemsArray = new JsonArray();
         if (sector.ObjectiveType == ObjectiveType.RetrieveBigItems)
@@ -202,6 +217,12 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             }
         }
 
+        var allElevatorLandEvents = new List<WardenEvent>(sector.EventsOnElevatorLand);
+        if (additionalElevatorLandEvents != null)
+        {
+            allElevatorLandEvents.AddRange(additionalElevatorLandEvents);
+        }
+
         return new JsonObject
         {
             ["Type"] = sector.ObjectiveType.ToString(),
@@ -227,7 +248,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             ["GoToWinConditionHelp_ToMainLayer"] = 0,
             ["ShowHelpDelay"] = 180.0,
             ["WavesOnElevatorLand"] = SerializeGenericWaveList(sector.WavesOnElevatorLand, $"Obj_{persistentId}_ElevatorLand", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
-            ["EventsOnElevatorLand"] = SerializeWardenEvents(sector.EventsOnElevatorLand, textSynth),
+            ["EventsOnElevatorLand"] = SerializeWardenEvents(allElevatorLandEvents, textSynth),
             ["WaveOnElevatorWardenIntel"] = 0,
             ["FogTransitionDataOnElevatorLand"] = 0,
             ["FogTransitionDurationOnElevatorLand"] = 0.0,
@@ -1136,5 +1157,68 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
         }
 
         return JsonValue.Create(trimmed)!;
+    }
+
+    public static List<WardenEvent> GenerateRoomEnemyEvents(LevelLayoutGridState? gridState, string dimension = "Reality")
+    {
+        var list = new List<WardenEvent>();
+        if (gridState == null) return list;
+
+        foreach (var room in gridState.PlacedRooms)
+        {
+            if (room == null || room.Enemies.Count == 0) continue;
+
+            foreach (var enemyItem in room.Enemies)
+            {
+                if (enemyItem == null) continue;
+
+                if (RoomEnemySpawningItem.IsScoutId(enemyItem.EnemyId))
+                {
+                    var scoutEv = new WardenEvent
+                    {
+                        Type = EventType.SpawnScoutInZone,
+                        Layer = room.Sector,
+                        Zone = room.Zone,
+                        Dimension = dimension,
+                        Count = enemyItem.Count > 0 ? enemyItem.Count : 1,
+                        Enabled = true,
+                        Position = enemyItem.Position.Clone(),
+                        SpawnScouts = new AwoSpawnScoutsData
+                        {
+                            AreaIndex = room.RoomNumber,
+                            ScoutType = RoomEnemySpawningItem.GetScoutTypeFromEnemyId(enemyItem.EnemyId)
+                        }
+                    };
+                    list.Add(scoutEv);
+                }
+                else
+                {
+                    var hibEv = new WardenEvent
+                    {
+                        Type = EventType.SpawnHibernateInZone,
+                        Layer = room.Sector,
+                        Zone = room.Zone,
+                        Dimension = dimension,
+                        Count = enemyItem.Count > 0 ? enemyItem.Count : 1,
+                        Enabled = true,
+                        Position = enemyItem.Position.Clone(),
+                        SpawnHibernates = new AwoSpawnHibernatesData
+                        {
+                            AreaIndex = room.RoomNumber,
+                            EnemyID = enemyItem.EnemyId,
+                            PlacementRandomWeight = enemyItem.PlacementRandomWeight,
+                            PlacementScore = enemyItem.PlacementScore,
+                            ResetPlacementInfo = enemyItem.ResetPlacementInfo,
+                            Position = enemyItem.Position.Clone(),
+                            Rotation = enemyItem.Rotation.Clone(),
+                            RandomizeRotation = enemyItem.RandomizeRotation
+                        }
+                    };
+                    list.Add(hibEv);
+                }
+            }
+        }
+
+        return list;
     }
 }

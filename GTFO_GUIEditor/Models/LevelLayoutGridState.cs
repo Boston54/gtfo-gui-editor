@@ -1697,7 +1697,8 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             BoundsMinY = bounds.MinY,
             BoundsMaxX = bounds.MaxX,
             BoundsMaxY = bounds.MaxY,
-            Area = area
+            Area = area,
+            Enemies = geoNode.GetRoomEnemies(areaIdx)
         };
         roomNode.UpdateFillBrush();
 
@@ -2217,7 +2218,10 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 Lighting = geo.Lighting,
                 GeneratedRooms = geo.GeneratedRooms.ToList(),
                 RoomZones = new Dictionary<int, int>(geo.RoomZones),
-                RoomSectors = new Dictionary<int, SectorType>(geo.RoomSectors)
+                RoomSectors = new Dictionary<int, SectorType>(geo.RoomSectors),
+                RoomEnemies = geo.RoomEnemies.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Select(e => e.ToData()).ToList())
             });
         }
 
@@ -2501,6 +2505,14 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 }
 
                 geoNode.UpdateWorldPosition();
+
+                if (gData.RoomEnemies != null)
+                {
+                    foreach (var kvp in gData.RoomEnemies)
+                    {
+                        geoNode.SetRoomEnemies(kvp.Key, kvp.Value.Select(d => RoomEnemySpawningItem.FromData(d)));
+                    }
+                }
 
                 if (gData.GeneratedRooms != null)
                 {

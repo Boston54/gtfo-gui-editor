@@ -71,6 +71,78 @@
                                                             HorizontalAlignment="Right"
                                                             Padding="14,6"
                                                             Margin="0,6,0,0"/>
+
+                                                    <!-- Room Enemies (AWO) Section -->
+                                                    <Border BorderBrush="#2D2D2D" BorderThickness="1" CornerRadius="4" Padding="10" Margin="0,6,0,0" IsVisible="{Binding IsAwoEnabled}">
+                                                        <StackPanel Spacing="8">
+                                                            <Grid ColumnDefinitions="*,Auto">
+                                                                <TextBlock Grid.Column="0" Text="Enemies in this Room (AWO)"
+                                                                           ToolTip.Tip="#todo"
+                                                                           FontWeight="SemiBold"
+                                                                           FontSize="13"
+                                                                           Foreground="#87CEEB"
+                                                                           VerticalAlignment="Center"/>
+                                                                <Button Grid.Column="1"
+                                                                        Content="+ Add Enemy"
+                                                                        ToolTip.Tip="#todo"
+                                                                        Command="{Binding AddRoomEnemyCommand}"
+                                                                        Background="#2D5A27"
+                                                                        Foreground="White"
+                                                                        Padding="8,3"/>
+                                                            </Grid>
+
+                                                            <ItemsControl ItemsSource="{Binding EditingRoom.Enemies}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate x:DataType="models:RoomEnemySpawningItem" x:CompileBindings="False">
+                                                                        <Border Background="#141414" BorderBrush="#3A3A3C" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                                                                            <StackPanel Spacing="6">
+                                                                                <Grid ColumnDefinitions="*,Auto">
+                                                                                    <TextBlock Grid.Column="0" Text="Enemy Entry" FontWeight="SemiBold" FontSize="11" Foreground="#87CEEB" VerticalAlignment="Center"/>
+                                                                                    <Button Grid.Column="1" Content="✕ Remove"
+                                                                                            Command="{Binding #EditRoomDialogRoot.DataContext.RemoveRoomEnemyCommand}"
+                                                                                            CommandParameter="{Binding}"
+                                                                                            Background="#4A1C1C"
+                                                                                            Foreground="#FF6B6B"
+                                                                                            Padding="8,2"
+                                                                                            FontSize="11"/>
+                                                                                </Grid>
+
+                                                                                <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                                                                                    <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
+                                                                                    <ComboBox Grid.Column="1"
+                                                                                              ItemsSource="{Binding #EditRoomDialogRoot.DataContext.Enemies}"
+                                                                                              SelectedValue="{Binding EnemyId, Mode=TwoWay}"
+                                                                                              SelectedValueBinding="{Binding PersistentId}"
+                                                                                              HorizontalAlignment="Stretch"
+                                                                                              Margin="0,0,8,0">
+                                                                                        <ComboBox.ItemTemplate>
+                                                                                            <DataTemplate x:DataType="models:EnemyEntry">
+                                                                                                <TextBlock Text="{Binding DisplayText}" Foreground="#E0E0E0"/>
+                                                                                            </DataTemplate>
+                                                                                        </ComboBox.ItemTemplate>
+                                                                                    </ComboBox>
+
+                                                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                                                                    <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="50"/>
+                                                                                </Grid>
+
+                                                                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
+                                                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Random Weight:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PlacementRandomWeight, Mode=TwoWay}" Margin="0,0,8,4" IsVisible="{Binding !IsScout}"/>
+
+                                                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Score:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding PlacementScore, Mode=TwoWay}" Margin="0,0,0,4" IsVisible="{Binding !IsScout}"/>
+
+                                                                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Reset Placement Info" ToolTip.Tip="#todo" IsChecked="{Binding ResetPlacementInfo, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Randomize Rotation" ToolTip.Tip="#todo" IsChecked="{Binding RandomizeRotation, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                </Grid>
+                                                                            </StackPanel>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </StackPanel>
+                                                    </Border>
                                                 </StackPanel>
                                             </Border>
                                         </ScrollViewer>

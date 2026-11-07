@@ -1748,4 +1748,185 @@ public class AwoEventTests
         Assert.Equal("0", imp2.EnvironmentData.DustAlphaBoost);
         Assert.Equal("Unchanged", imp2.EnvironmentData.DustTurbulence);
     }
+
+    [Fact]
+    public void RoomEnemySpawningItem_DetectsScouts_AndMapsScoutTypes()
+    {
+        var hib = new RoomEnemySpawningItem { EnemyId = 28 }; // Striker
+        Assert.False(hib.IsScout);
+        Assert.Equal(ScoutType.Scout, hib.ScoutType);
+
+        var scout = new RoomEnemySpawningItem { EnemyId = 20 }; // Scout
+        Assert.True(scout.IsScout);
+        Assert.Equal(ScoutType.Scout, scout.ScoutType);
+
+        var chargerScout = new RoomEnemySpawningItem { EnemyId = 41 }; // Charger Scout
+        Assert.True(chargerScout.IsScout);
+        Assert.Equal(ScoutType.Charger_Scout, chargerScout.ScoutType);
+
+        var shadowScout = new RoomEnemySpawningItem { EnemyId = 40 }; // Shadow Scout
+        Assert.True(shadowScout.IsScout);
+        Assert.Equal(ScoutType.Shadow_Scout, shadowScout.ScoutType);
+
+        var zoomerScout = new RoomEnemySpawningItem { EnemyId = 54 }; // Zoomer Scout
+        Assert.True(zoomerScout.IsScout);
+        Assert.Equal(ScoutType.Zoomer_Scout, zoomerScout.ScoutType);
+
+        var nightmareScout = new RoomEnemySpawningItem { EnemyId = 56 }; // Nightmare Scout
+        Assert.True(nightmareScout.IsScout);
+        Assert.Equal(ScoutType.Nightmare_Scout, nightmareScout.ScoutType);
+
+        // Test clone and serialization data
+        var clone = chargerScout.Clone();
+        Assert.NotSame(chargerScout, clone);
+        Assert.Equal(41u, clone.EnemyId);
+        Assert.True(clone.IsScout);
+
+        var data = chargerScout.ToData();
+        var fromData = RoomEnemySpawningItem.FromData(data);
+        Assert.Equal(41u, fromData.EnemyId);
+        Assert.True(fromData.IsScout);
+    }
+
+    [Fact]
+    public void GridState_RoomEnemies_ExportAndImportStateData_RoundTrip()
+    {
+        var grid = new LevelLayoutGridState();
+        var geo = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab", 0, 0, initialAreaIndex: 0);
+        grid.PlacedGeomorphs.Add(geo);
+        geo.GenerateRoom(0);
+        geo.SetRoomZone(0, 1);
+
+        var enemies = geo.GetRoomEnemies(0);
+        enemies.Add(new RoomEnemySpawningItem { EnemyId = 28, Count = 5, PlacementRandomWeight = 0.5 });
+        enemies.Add(new RoomEnemySpawningItem { EnemyId = 41, Count = 2 }); // Charger Scout
+
+        grid.CreateRoomNode(geo, 0);
+
+        var stateData = grid.ExportStateData();
+        Assert.NotNull(stateData);
+
+        var restoredGrid = new LevelLayoutGridState();
+        restoredGrid.ImportStateData(stateData);
+
+        Assert.Single(restoredGrid.PlacedGeomorphs);
+        var restoredGeo = restoredGrid.PlacedGeomorphs[0];
+        var restoredEnemies = restoredGeo.GetRoomEnemies(0);
+        Assert.Equal(2, restoredEnemies.Count);
+        Assert.Equal(28u, restoredEnemies[0].EnemyId);
+        Assert.Equal(5, restoredEnemies[0].Count);
+        Assert.Equal(0.5, restoredEnemies[0].PlacementRandomWeight);
+        Assert.Equal(41u, restoredEnemies[1].EnemyId);
+        Assert.Equal(2, restoredEnemies[1].Count);
+
+        Assert.Single(restoredGrid.PlacedRooms);
+        Assert.Equal(2, restoredGrid.PlacedRooms[0].Enemies.Count);
+    }
+
+    [Fact]
+    public void RoomEnemies_GenerateRoomEnemyEvents_CreatesCorrectHibernateAndScoutEvents()
+    {
+        var grid = new LevelLayoutGridState();
+        var geo = grid.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_64x64_tech_data_center_HA_01.prefab", 0, 0);
+        grid.PlacedGeomorphs.Add(geo);
+        geo.GenerateRoom(0);
+        geo.SetRoomSector(0, SectorType.Main);
+        geo.SetRoomZone(0, 2);
+
+        grid.CreateRoomNode(geo, 0);
+        grid.UpdateRoomNumbers(); // Sets room.RoomNumber
+
+        var room = grid.PlacedRooms.First();
+        room.Enemies.Add(new RoomEnemySpawningItem
+        {
+            EnemyId = 28, // Striker (Hibernate)
+            Count = 4,
+            PlacementRandomWeight = 0.35,
+            PlacementScore = 2.5,
+            ResetPlacementInfo = true,
+            RandomizeRotation = true
+        });
+
+        room.Enemies.Add(new RoomEnemySpawningItem
+        {
+            EnemyId = 40, // Shadow Scout
+            Count = 1
+        });
+
+        var generatedEvents = WardenObjectiveDataBlockExporter.GenerateRoomEnemyEvents(grid, "Reality");
+        Assert.Equal(2, generatedEvents.Count);
+
+        var hibEvent = generatedEvents[0];
+        Assert.Equal(EventType.SpawnHibernateInZone, hibEvent.Type);
+        Assert.Equal(SectorType.Main, hibEvent.Layer);
+        Assert.Equal(2, hibEvent.Zone);
+        Assert.Equal(4, hibEvent.Count);
+        Assert.Equal(room.RoomNumber, hibEvent.SpawnHibernates.AreaIndex);
+        Assert.Equal(28u, hibEvent.SpawnHibernates.EnemyID);
+        Assert.Equal(0.35, hibEvent.SpawnHibernates.PlacementRandomWeight);
+        Assert.Equal(2.5, hibEvent.SpawnHibernates.PlacementScore);
+        Assert.True(hibEvent.SpawnHibernates.ResetPlacementInfo);
+        Assert.True(hibEvent.SpawnHibernates.RandomizeRotation);
+
+        var scoutEvent = generatedEvents[1];
+        Assert.Equal(EventType.SpawnScoutInZone, scoutEvent.Type);
+        Assert.Equal(SectorType.Main, scoutEvent.Layer);
+        Assert.Equal(2, scoutEvent.Zone);
+        Assert.Equal(1, scoutEvent.Count);
+        Assert.Equal(room.RoomNumber, scoutEvent.SpawnScouts.AreaIndex);
+        Assert.Equal(ScoutType.Shadow_Scout, scoutEvent.SpawnScouts.ScoutType);
+    }
+
+    [Fact]
+    public void ModManager_HasAnyAwoEventsInUse_LocksWhenRoomEnemiesExist()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        vm.LevelLayout.Levels.Clear();
+
+        var level = new LevelLayoutBlock
+        {
+            PersistentId = 501,
+            Name = "AWO_Room_Enemies_Level",
+            ComplexType = ComplexType.Tech,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/ElevatorShaft_01.prefab"
+        };
+        vm.LevelLayout.Levels.Add(level);
+        level.GridState.InitializeStartingTile(level.ElevatorTile, 0, 0);
+
+        Assert.False(vm.LevelLayout.HasAnyAwoEventsInUse());
+
+        // Add a room with enemy
+        var geo = level.GridState.CreateGeomorphNode("Assets/AssetPrefabs/Complex/Tech/Geomorphs/geo_tech_room_02.prefab", 1, 0);
+        level.GridState.PlacedGeomorphs.Add(geo);
+        geo.GenerateRoom(0);
+        geo.SetRoomZone(0, 0);
+        var room = new PlacedRoomNode
+        {
+            Geomorph = geo,
+            AreaIndex = 0,
+            Sector = SectorType.Main,
+            Zone = 0,
+            Enemies = geo.GetRoomEnemies(0)
+        };
+        level.GridState.PlacedRooms.Add(room);
+
+        var enemyItem = new RoomEnemySpawningItem { EnemyId = 28, Count = 2 };
+        room.Enemies.Add(enemyItem);
+
+        Assert.True(vm.LevelLayout.HasAnyAwoEventsInUse());
+
+        // Enable AWO
+        ModManager.Instance.AdvancedWardenObjective = true;
+        Assert.True(ModManager.Instance.AdvancedWardenObjective);
+
+        // Attempting to disable AWO should throw InvalidOperationException while room enemy is present
+        Assert.Throws<InvalidOperationException>(() => ModManager.Instance.AdvancedWardenObjective = false);
+        Assert.True(ModManager.Instance.AdvancedWardenObjective); // Remains true
+
+        // Remove enemy and disable AWO
+        room.Enemies.Clear();
+        Assert.False(vm.LevelLayout.HasAnyAwoEventsInUse());
+        ModManager.Instance.AdvancedWardenObjective = false;
+        Assert.False(ModManager.Instance.AdvancedWardenObjective);
+    }
 }

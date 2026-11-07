@@ -1003,6 +1003,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     private readonly HashSet<int> _generatedRooms = new();
     private readonly Dictionary<int, int> _roomZones = new();
     private readonly Dictionary<int, SectorType> _roomSectors = new();
+    private readonly Dictionary<int, ObservableCollection<RoomEnemySpawningItem>> _roomEnemies = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -1065,6 +1066,27 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     public IReadOnlyCollection<int> GeneratedRooms => _generatedRooms;
     public IReadOnlyDictionary<int, int> RoomZones => _roomZones;
     public IReadOnlyDictionary<int, SectorType> RoomSectors => _roomSectors;
+    public IReadOnlyDictionary<int, ObservableCollection<RoomEnemySpawningItem>> RoomEnemies => _roomEnemies;
+
+    public ObservableCollection<RoomEnemySpawningItem> GetRoomEnemies(int areaIndex)
+    {
+        if (!_roomEnemies.TryGetValue(areaIndex, out var collection))
+        {
+            collection = new ObservableCollection<RoomEnemySpawningItem>();
+            _roomEnemies[areaIndex] = collection;
+        }
+        return collection;
+    }
+
+    public void SetRoomEnemies(int areaIndex, IEnumerable<RoomEnemySpawningItem> enemies)
+    {
+        var collection = GetRoomEnemies(areaIndex);
+        collection.Clear();
+        foreach (var e in enemies)
+        {
+            collection.Add(e);
+        }
+    }
 
     public bool IsRoomGenerated(int areaIndex) => _generatedRooms.Contains(areaIndex);
 
@@ -1077,6 +1099,7 @@ public class PlacedGeomorphNode : INotifyPropertyChanged
     {
         _roomZones.Remove(areaIndex);
         _roomSectors.Remove(areaIndex);
+        _roomEnemies.Remove(areaIndex);
         var room = _rooms.FirstOrDefault(r => r.AreaIndex == areaIndex);
         if (room != null)
         {
@@ -1409,8 +1432,15 @@ public class PlacedRoomNode : INotifyPropertyChanged
     private double _boundsMaxY;
     private List<Triangle2D> _triangles2D = new();
     private double _meshHeight;
+    private ObservableCollection<RoomEnemySpawningItem> _enemies = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    public ObservableCollection<RoomEnemySpawningItem> Enemies
+    {
+        get => _enemies;
+        set => SetField(ref _enemies, value ?? new ObservableCollection<RoomEnemySpawningItem>());
+    }
 
     public double MeshHeight
     {

@@ -1,6 +1,5 @@
 ﻿# TODO List:
 ## Features
-* **Enemy spawning in specific rooms (AWO)**
 * **Tampered Data Cube events**
 * **Forced Plugs**
   * fields in LGTA are NorthPlug, EastPlug, SouthPlug, WestPlug. empty for no override
@@ -16,7 +15,7 @@
 * **Imports should automatically detect what mods the datablocks are relying on and enable them**
 * **Export as Thunderstore Profile**
   * Will need to integrate quite a bit for this - thunderstore API for downloading the rundown's dependencies, etc
-  * Could even add a way for users to specify what other mods they want to be part of their rundown (outside of datablocks/configs), like TheArchive sorta thing
+  * Could even add a way for users to specify what other mods they want to be part of their rundown (outside of datablocks/configs), like "i want TheArchive" sorta thing
 * **Desktop App Integration**
   * An installer, automatic update handling, and the ability to open .rundown files by double-clicking them
 

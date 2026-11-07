@@ -1752,12 +1752,16 @@ public class DatablockImportTests : IDisposable
     [Fact]
     public void ExportAndImport_MultipleChainedObjectives_CorrectlyExportedAndImported()
     {
-        var originalVm = new MainWindowViewModel();
-        var level = originalVm.LevelLayout.Levels[0];
-        level.PersistentId = 901;
-        level.Name = "Test_Chained_Objectives";
-        level.ComplexType = ComplexType.Tech;
-        level.ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/ElevatorShaft_01.prefab";
+        var originalVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        originalVm.LevelLayout.Levels.Clear();
+        var level = new LevelLayoutBlock
+        {
+            PersistentId = 901,
+            Name = "Test_Chained_Objectives",
+            ComplexType = ComplexType.Tech,
+            ElevatorTile = "Assets/AssetPrefabs/Complex/Tech/Geomorphs/ElevatorShaft_01.prefab"
+        };
+        originalVm.LevelLayout.Levels.Add(level);
 
         var grid = level.GridState;
         grid.PlacedGeomorphs.Clear();

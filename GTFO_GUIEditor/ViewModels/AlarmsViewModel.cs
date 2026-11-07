@@ -396,14 +396,11 @@ public class AlarmsViewModel : ViewModelBase
         var source = alarm ?? _selectedAlarm ?? _alarms.FirstOrDefault();
         if (source == null) return;
 
-        var copy = source.Clone();
-        copy.PersistentId = GenerateUniquePersistentId();
-        copy.Name = $"{source.Name}_copy";
-        _alarms.Add(copy);
-        SelectedAlarm = copy;
-        copy.IsExpanded = true;
-        RefreshFilteredAlarms();
-        StatusText = $"Duplicated alarm [{source.PersistentId}] {source.Name}";
+        OpenCreateAlarmDialog();
+        IsCreatingFromExisting = true;
+        SelectedExistingAlarm = source;
+        NewAlarmName = $"{source.Name}_Copy";
+        NewAlarmPersistentId = GenerateUniquePersistentId();
     }
 
     private uint GenerateUniquePersistentId()

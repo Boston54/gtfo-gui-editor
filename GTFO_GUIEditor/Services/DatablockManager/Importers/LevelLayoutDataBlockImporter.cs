@@ -50,18 +50,6 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
                 }
             }
 
-            // Fallback: If layout ID was from a stale template or mismatched, check if there is an unused LevelLayoutBlock in context
-            if (mainLgTunerFile == null && !context.LevelLayoutBlocks.ContainsKey(mainLayoutId))
-            {
-                var matchingFallbackKvp = context.LevelLayoutBlocks.FirstOrDefault(kvp => context.FindLgTunerConfigFile(kvp.Key.ToString()) != null);
-                if (matchingFallbackKvp.Value != null)
-                {
-                    mainLayoutId = matchingFallbackKvp.Key;
-                    exp.LevelLayoutData = mainLayoutId;
-                    mainLgTunerFile = context.FindLgTunerConfigFile(mainLayoutId.ToString());
-                }
-            }
-
             if (mainLgTunerFile == null || !File.Exists(mainLgTunerFile))
             {
                 missingConfigs.Add($"Main Sector (Layout ID: {mainLayoutId})");
@@ -124,11 +112,33 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             }
         }
 
+        var handledLayoutIds = new HashSet<uint>(importedLayoutIds);
+        foreach (var failure in context.FailedLevels)
+        {
+            handledLayoutIds.Add(failure.MainLayoutId);
+        }
+        foreach (var exp in expeditionsToProcess)
+        {
+            if (exp.LevelLayoutData > 0) handledLayoutIds.Add(exp.LevelLayoutData);
+        }
+
+        var subSectorLayoutIds = new HashSet<uint>();
+        foreach (var exp in expeditionsToProcess)
+        {
+            if (exp.SecondaryLayout > 0) subSectorLayoutIds.Add(exp.SecondaryLayout);
+            if (exp.ThirdLayout > 0) subSectorLayoutIds.Add(exp.ThirdLayout);
+            var dimDatas = GetDimensionDatasFromExpedition(exp, context);
+            foreach (var dim in dimDatas)
+            {
+                if (dim.LevelLayoutData > 0) subSectorLayoutIds.Add(dim.LevelLayoutData);
+            }
+        }
+
         // LevelLayout datablocks may be imported without a rundown/GameSetup reference.
         // In that case, import each layout that has a matching LevelGen_<layout ID>.json file.
         foreach (var layout in context.LevelLayoutBlocks)
         {
-            if (importedLayoutIds.Contains(layout.Key)) continue;
+            if (handledLayoutIds.Contains(layout.Key) || subSectorLayoutIds.Contains(layout.Key)) continue;
 
             string? lgTunerFile = context.FindLgTunerConfigFile(layout.Key.ToString());
             if (lgTunerFile == null && layout.Value?["name"] != null)
@@ -266,45 +276,48 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             }
         }
 
-        // Also check if there are LevelLayoutBlocks not covered by the expeditions (or if no active rundown)
-        foreach (var kvp in context.LevelLayoutBlocks)
+        // Also check if there are LevelLayoutBlocks not covered by the expeditions (if no active rundown)
+        if (activeRundownObj == null)
         {
-            if (processedLayoutIds.Contains(kvp.Key)) continue;
-
-            // Check if this layout ID is a secondary/third layout or dimension layout of an existing expedition
-            bool isSubSector = result.Any(e => e.SecondaryLayout == kvp.Key || e.ThirdLayout == kvp.Key ||
-                GetDimensionDatasFromExpedition(e, context).Any(d => d.LevelLayoutData == kvp.Key));
-            if (isSubSector) continue;
-
-            // Check if this layout ID is referenced by any DimensionDataBlock
-            bool isDimBlock = context.DimensionBlocks.Values.Any(dObj =>
+            foreach (var kvp in context.LevelLayoutBlocks)
             {
-                var inner = dObj?["DimensionData"] as JsonObject;
-                uint dimLayId = inner?["LevelLayoutData"]?.GetValue<uint>() ?? dObj?["LevelLayoutData"]?.GetValue<uint>() ?? 0;
-                return dimLayId == kvp.Key;
-            });
-            if (isDimBlock) continue;
+                if (processedLayoutIds.Contains(kvp.Key)) continue;
 
-            // Only add if an LGTuner config file actually exists for this layout!
-            string? cfgFile = context.FindLgTunerConfigFile(kvp.Key.ToString());
-            if (cfgFile == null && kvp.Value?["name"] != null)
-            {
-                cfgFile = context.FindLgTunerConfigFile(kvp.Value["name"]!.ToString());
-            }
+                // Check if this layout ID is a secondary/third layout or dimension layout of an existing expedition
+                bool isSubSector = result.Any(e => e.SecondaryLayout == kvp.Key || e.ThirdLayout == kvp.Key ||
+                    GetDimensionDatasFromExpedition(e, context).Any(d => d.LevelLayoutData == kvp.Key));
+                if (isSubSector) continue;
 
-            if (cfgFile != null)
-            {
-                result.Add(new ExpeditionBlock
+                // Check if this layout ID is referenced by any DimensionDataBlock
+                bool isDimBlock = context.DimensionBlocks.Values.Any(dObj =>
                 {
-                    Enabled = true,
-                    LevelLayoutData = kvp.Key,
-                    Descriptive = new ExpeditionDescriptiveData
-                    {
-                        Prefix = "EXP",
-                        PublicName = kvp.Value?["name"]?.ToString() ?? $"Level_{kvp.Key}"
-                    }
+                    var inner = dObj?["DimensionData"] as JsonObject;
+                    uint dimLayId = inner?["LevelLayoutData"]?.GetValue<uint>() ?? dObj?["LevelLayoutData"]?.GetValue<uint>() ?? 0;
+                    return dimLayId == kvp.Key;
                 });
-                processedLayoutIds.Add(kvp.Key);
+                if (isDimBlock) continue;
+
+                // Only add if an LGTuner config file actually exists for this layout!
+                string? cfgFile = context.FindLgTunerConfigFile(kvp.Key.ToString());
+                if (cfgFile == null && kvp.Value?["name"] != null)
+                {
+                    cfgFile = context.FindLgTunerConfigFile(kvp.Value["name"]!.ToString());
+                }
+
+                if (cfgFile != null)
+                {
+                    result.Add(new ExpeditionBlock
+                    {
+                        Enabled = true,
+                        LevelLayoutData = kvp.Key,
+                        Descriptive = new ExpeditionDescriptiveData
+                        {
+                            Prefix = "EXP",
+                            PublicName = kvp.Value?["name"]?.ToString() ?? $"Level_{kvp.Key}"
+                        }
+                    });
+                    processedLayoutIds.Add(kvp.Key);
+                }
             }
         }
 
@@ -537,9 +550,6 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             level.Dimensions.Add(dimItem);
         }
 
-        // 4. Objectives
-        ImportObjectives(level, exp, context);
-
         // 5. Grid State & Geomorphs
         var gridState = level.GridState;
         gridState.ImportStateData(new LevelLayoutGridStateData());
@@ -681,6 +691,9 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         gridState.UpdateRoomNumbers();
         gridState.RecalculateSecurityDoorConstraints();
         gridState.UpdateRoomHighlightStates();
+
+        // 14. Objectives (imported after all rooms and dimensions are constructed)
+        ImportObjectives(level, exp, context);
 
         return level;
     }
@@ -2250,7 +2263,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         if (mainObjId > 0 && context.WardenObjectiveBlocks.TryGetValue(mainObjId, out var mainObjJson) && mainObjJson != null)
         {
             level.MainSector.Objectives.Clear();
-            var mainObj = DeserializeWardenObjective(mainObjJson, context);
+            var mainObj = DeserializeWardenObjective(mainObjJson, context, level, isMainElevatorLand: true);
             mainObj.ObjectiveNumber = 1;
             level.MainSector.Objectives.Add(mainObj);
         }
@@ -2301,7 +2314,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
     }
 
-    private WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext context)
+    private WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext context, LevelLayoutBlock? level = null, bool isMainElevatorLand = false)
     {
         var objective = new WardenObjective();
 
@@ -2523,6 +2536,61 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         ImportGenericWave(obj["WavesOnGotoWin"] as JsonArray, objective.WavesOnGotoWin, context);
 
         ImportWardenEvents(obj["EventsOnElevatorLand"] as JsonArray, objective.EventsOnElevatorLand, context);
+
+        if (level != null && isMainElevatorLand)
+        {
+            var remainingEvents = new ObservableCollection<WardenEvent>();
+            foreach (var ev in objective.EventsOnElevatorLand)
+            {
+                if (ev.Type == EventType.SpawnHibernateInZone && ev.SpawnHibernates != null && ev.SpawnHibernates.AreaIndex >= 0)
+                {
+                    string dimIdx = ev.Dimension;
+                    var targetGrid = string.Equals(dimIdx, "Reality", StringComparison.OrdinalIgnoreCase) || dimIdx == "0"
+                        ? level.GridState
+                        : level.Dimensions?.FirstOrDefault(d => string.Equals(d.DimensionIndex, dimIdx, StringComparison.OrdinalIgnoreCase))?.GridState;
+                    var room = targetGrid?.PlacedRooms.FirstOrDefault(r => r.Sector == ev.Layer && r.Zone == ev.Zone && r.RoomNumber == ev.SpawnHibernates.AreaIndex);
+                    if (room != null)
+                    {
+                        room.Enemies.Add(new RoomEnemySpawningItem
+                        {
+                            EnemyId = ev.SpawnHibernates.EnemyID,
+                            Count = ev.Count > 0 ? ev.Count : 1,
+                            PlacementRandomWeight = ev.SpawnHibernates.PlacementRandomWeight,
+                            PlacementScore = ev.SpawnHibernates.PlacementScore,
+                            ResetPlacementInfo = ev.SpawnHibernates.ResetPlacementInfo,
+                            Position = ev.Position?.Clone() ?? new Vector3Data(),
+                            Rotation = ev.SpawnHibernates.Rotation?.Clone() ?? new Vector3Data(),
+                            RandomizeRotation = ev.SpawnHibernates.RandomizeRotation
+                        });
+                        continue;
+                    }
+                }
+                else if (ev.Type == EventType.SpawnScoutInZone && ev.SpawnScouts != null && ev.SpawnScouts.AreaIndex >= 0)
+                {
+                    string dimIdx = ev.Dimension;
+                    var targetGrid = string.Equals(dimIdx, "Reality", StringComparison.OrdinalIgnoreCase) || dimIdx == "0"
+                        ? level.GridState
+                        : level.Dimensions?.FirstOrDefault(d => string.Equals(d.DimensionIndex, dimIdx, StringComparison.OrdinalIgnoreCase))?.GridState;
+                    var room = targetGrid?.PlacedRooms.FirstOrDefault(r => r.Sector == ev.Layer && r.Zone == ev.Zone && r.RoomNumber == ev.SpawnScouts.AreaIndex);
+                    if (room != null)
+                    {
+                        uint enemyId = RoomEnemySpawningItem.GetEnemyIdFromScoutType(ev.SpawnScouts.ScoutType);
+                        room.Enemies.Add(new RoomEnemySpawningItem
+                        {
+                            EnemyId = enemyId,
+                            Count = ev.Count > 0 ? ev.Count : 1,
+                            Position = ev.Position?.Clone() ?? new Vector3Data()
+                        });
+                        continue;
+                    }
+                }
+
+                remainingEvents.Add(ev);
+            }
+
+            objective.EventsOnElevatorLand = remainingEvents;
+        }
+
         ImportWardenEvents(obj["EventsOnActivate"] as JsonArray, objective.EventsOnActivate, context);
         ImportWardenEvents(obj["EventsOnGotoWin"] as JsonArray, objective.EventsOnGotoWin, context);
         ImportWardenEvents(obj["TimedTerminalSequence_EventsOnSequenceStart"] as JsonArray, objective.EventsOnSequenceStart, context);
