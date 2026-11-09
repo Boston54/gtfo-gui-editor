@@ -143,7 +143,7 @@ public class LightingTests
         // Change ID to match another block
         vm.SelectedBlock.PersistentId = otherBlock.PersistentId;
         Assert.True(vm.HasDuplicatePersistentId);
-        Assert.Contains("used by", vm.DuplicatePersistentIdWarning);
+        Assert.Contains("duplicated", vm.DuplicatePersistentIdWarning);
 
         // Revert
         vm.SelectedBlock.PersistentId = originalId;

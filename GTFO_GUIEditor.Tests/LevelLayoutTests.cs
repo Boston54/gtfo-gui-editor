@@ -44,7 +44,7 @@ public class LevelLayoutTests
             PersistentId = 100
         };
 
-        Assert.Equal("Level 100", block.DisplayText);
+        Assert.Equal("Unnamed Level", block.DisplayText);
     }
 
     [Fact]
@@ -193,7 +193,7 @@ public class LevelLayoutTests
         level2.PersistentId = 10;
 
         Assert.True(vm.HasDuplicatePersistentId);
-        Assert.Contains("Warning: Persistent ID 10 is shared", vm.DuplicatePersistentIdWarning);
+        Assert.Contains("duplicated", vm.DuplicatePersistentIdWarning);
     }
 
     [Fact]

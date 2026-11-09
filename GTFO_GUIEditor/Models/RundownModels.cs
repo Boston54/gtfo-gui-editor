@@ -1795,9 +1795,7 @@ public class RundownBlock : INotifyPropertyChanged
     public List<ExpeditionBlock> GetAllExpeditions() => Expeditions.ToList();
 
     [JsonIgnore]
-    public string DisplayText => string.IsNullOrWhiteSpace(Name)
-        ? $"[{PersistentId}]"
-        : $"{Name} [{PersistentId}]";
+    public string DisplayText => Name;
 
     public List<ExpeditionBlock> GetTierList(string tier)
     {

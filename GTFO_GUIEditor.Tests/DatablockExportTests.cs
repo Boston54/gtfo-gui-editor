@@ -499,7 +499,7 @@ public class DatablockExportTests
 
             var fog1 = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 1);
             Assert.NotNull(fog1);
-            Assert.Equal("Fog_medium_white_alt", fog1["name"]?.GetValue<string>());
+            Assert.Equal("FOG_ELEVATOR", fog1["name"]?.GetValue<string>());
             Assert.True(fog1["Enabled"]?.GetValue<bool>());
 
             var fog21 = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 21);
@@ -549,7 +549,7 @@ public class DatablockExportTests
 
             var fog1 = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 1);
             Assert.NotNull(fog1);
-            Assert.Equal("Fog_medium_white_alt", fog1["name"]?.GetValue<string>());
+            Assert.Equal("FOG_ELEVATOR", fog1["name"]?.GetValue<string>());
 
             var fog21 = blocks.FirstOrDefault(b => b?["persistentID"]?.GetValue<uint>() == 21);
             Assert.NotNull(fog21);

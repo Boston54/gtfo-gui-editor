@@ -752,8 +752,7 @@ public class LevelLayoutViewModel : ViewModelBase
             int count = _levels.Count(l => l.PersistentId == _selectedLevel.PersistentId);
             if (count > 1)
             {
-                return
-                    $"Warning: Persistent ID {_selectedLevel.PersistentId} is shared by {count} levels. IDs must be unique.";
+                return $"Warning: This level is duplicated {count} times.";
             }
 
             return string.Empty;
@@ -777,8 +776,7 @@ public class LevelLayoutViewModel : ViewModelBase
             string dimInfo = _activeDimensionIndex == "Reality"
                 ? "Reality"
                 : (_selectedDimension?.DisplayName ?? _activeDimensionIndex);
-            StatusText =
-                $"Selected [{_selectedLevel.PersistentId}] {_selectedLevel.Name} - {dimInfo} ({_levels.Count} total)";
+            StatusText = $"Selected {_selectedLevel.Name} - {dimInfo} ({_levels.Count} total)";
         }
         else
         {
@@ -3322,7 +3320,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         UpdateActiveDimensionView();
         UpdateStatusText();
-        StatusText = $"Removed {deletedName} from [{_selectedLevel.PersistentId}] {_selectedLevel.Name}";
+        StatusText = $"Removed {deletedName} from {_selectedLevel.Name}";
 
         IsConfirmingDeleteDimension = false;
         _dimensionIndexToDelete = null;
@@ -3698,7 +3696,7 @@ public class LevelLayoutViewModel : ViewModelBase
         UpdateActiveDimensionView();
         UpdateStatusText();
         StatusText =
-            $"Configured {ActiveDimensionDisplayName} for [{_selectedLevel.PersistentId}] {_selectedLevel.Name}";
+            $"Configured {ActiveDimensionDisplayName} for {_selectedLevel.Name}";
         return true;
     }
 
@@ -3882,7 +3880,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (NewLevelPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this level.";
             return false;
         }
 
@@ -3890,7 +3888,7 @@ public class LevelLayoutViewModel : ViewModelBase
         {
             if (_levels.Any(l => l != _selectedLevel && l.PersistentId == NewLevelPersistentId))
             {
-                CreationErrorMessage = $"A level with Persistent ID {NewLevelPersistentId} already exists.";
+                CreationErrorMessage = "A level with this internal identifier already exists.";
                 return false;
             }
 
@@ -3920,7 +3918,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
                 OnPropertyChanged(nameof(SelectedLevel));
                 UpdateStatusText();
-                StatusText = $"Updated level [{_selectedLevel.PersistentId}] {_selectedLevel.Name}";
+                StatusText = $"Updated level {_selectedLevel.Name}";
             }
 
             IsCreatingLevel = false;
@@ -3930,7 +3928,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         if (_levels.Any(l => l.PersistentId == NewLevelPersistentId))
         {
-            CreationErrorMessage = $"A level with Persistent ID {NewLevelPersistentId} already exists.";
+            CreationErrorMessage = "A level with this internal identifier already exists.";
             return false;
         }
 
@@ -3956,7 +3954,7 @@ public class LevelLayoutViewModel : ViewModelBase
         IsCreatingLevel = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created level [{newLevel.PersistentId}] {newLevel.Name}";
+        StatusText = $"Created level {newLevel.Name}";
         return true;
     }
 
@@ -3992,7 +3990,7 @@ public class LevelLayoutViewModel : ViewModelBase
         {
             var target = _levelToDelete ?? _selectedLevel;
             if (target == null) return "Are you sure you want to delete this level?";
-            return $"Are you sure you want to delete level [{target.PersistentId}] \"{target.Name}\"?";
+            return $"Are you sure you want to delete level \"{target.Name}\"?";
         }
     }
 
@@ -4028,7 +4026,7 @@ public class LevelLayoutViewModel : ViewModelBase
         IsConfirmingDelete = false;
         LevelToDelete = null;
         UpdateStatusText();
-        StatusText = $"Deleted level [{target.PersistentId}] \"{target.Name}\"";
+        StatusText = $"Deleted level \"{target.Name}\"";
         return true;
     }
 

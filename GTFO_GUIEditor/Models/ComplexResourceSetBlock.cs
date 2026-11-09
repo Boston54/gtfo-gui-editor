@@ -223,7 +223,7 @@ public class ComplexResourceSetBlock : INotifyPropertyChanged
     [JsonExtensionData]
     public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 
-    public string DisplayText => $"[{PersistentId}] {Name}";
+    public string DisplayText => Name;
 
     public static readonly string[] CategoryNames =
     {

@@ -141,8 +141,11 @@ public class DatablockImportTests : IDisposable
         Assert.Single(importedVm.Lighting.Blocks);
         Assert.Equal((uint)505, importedVm.Lighting.Blocks[0].PersistentId);
 
-        Assert.Single(importedVm.FogSettings.Blocks);
-        Assert.Equal((uint)606, importedVm.FogSettings.Blocks[0].PersistentId);
+        Assert.Equal(2, importedVm.FogSettings.Blocks.Count);
+        Assert.Contains(importedVm.FogSettings.Blocks, block =>
+            block.PersistentId == 606 && block.Name == "Test Custom Fog");
+        Assert.Contains(importedVm.FogSettings.Blocks, block =>
+            block.PersistentId == 1 && block.Name == "FOG_ELEVATOR");
     }
 
     [Fact]

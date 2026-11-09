@@ -191,7 +191,7 @@ public class AlarmsViewModel : ViewModelBase
         {
             if (!HasDuplicatePersistentId || _selectedAlarm == null) return string.Empty;
             int count = _alarms.Count(a => a.PersistentId == _selectedAlarm.PersistentId);
-            return $"Warning: Persistent ID {_selectedAlarm.PersistentId} is used by {count} alarms in this project. Persistent IDs should be unique.";
+            return $"Warning: This alarm is duplicated {count} times in this project.";
         }
     }
 
@@ -375,7 +375,7 @@ public class AlarmsViewModel : ViewModelBase
     {
         uint randomId = GenerateUniquePersistentId();
         NewAlarmPersistentId = randomId;
-        NewAlarmName = $"Alarm_Custom_{randomId}";
+        NewAlarmName = "Alarm_Custom";
         NewAlarmPublicAlarmName = string.Empty;
         IsCreatingFresh = true;
         _isCreatingFromExisting = false;
@@ -427,13 +427,13 @@ public class AlarmsViewModel : ViewModelBase
 
         if (NewAlarmPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this alarm.";
             return false;
         }
 
         if (_alarms.Any(a => a.PersistentId == NewAlarmPersistentId))
         {
-            CreationErrorMessage = $"An alarm with Persistent ID {NewAlarmPersistentId} already exists.";
+            CreationErrorMessage = "An alarm with this internal identifier already exists.";
             return false;
         }
 
@@ -469,7 +469,7 @@ public class AlarmsViewModel : ViewModelBase
         IsCreatingAlarm = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created alarm [{newAlarm.PersistentId}] {newAlarm.Name}";
+        StatusText = $"Created alarm {newAlarm.Name}";
         return true;
     }
 
@@ -505,7 +505,7 @@ public class AlarmsViewModel : ViewModelBase
         {
             var target = _alarmToDelete ?? _selectedAlarm;
             if (target == null) return "Are you sure you want to delete this alarm?";
-            return $"Are you sure you want to delete alarm [{target.PersistentId}] \"{target.Name}\"?";
+            return $"Are you sure you want to delete alarm \"{target.Name}\"?";
         }
     }
 
@@ -551,7 +551,6 @@ public class AlarmsViewModel : ViewModelBase
         if (index < 0) return false;
 
         string deletedName = alarm.Name;
-        uint deletedId = alarm.PersistentId;
 
         _alarms.RemoveAt(index);
 
@@ -569,7 +568,7 @@ public class AlarmsViewModel : ViewModelBase
         }
 
         UpdateStatusText();
-        StatusText = $"Deleted alarm [{deletedId}] {deletedName}. {_alarms.Count:N0} alarms remaining.";
+        StatusText = $"Deleted alarm {deletedName}. {_alarms.Count:N0} alarms remaining.";
         return true;
     }
 

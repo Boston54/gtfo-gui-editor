@@ -180,7 +180,7 @@ public class EnemyGroupBlock : INotifyPropertyChanged
     }
 
     [JsonIgnore]
-    public string DisplayText => string.IsNullOrWhiteSpace(Name) ? $"Enemy Group ({PersistentId})" : Name;
+    public string DisplayText => string.IsNullOrWhiteSpace(Name) ? "Enemy Group" : Name;
 
     public EnemyGroupBlock Clone()
     {

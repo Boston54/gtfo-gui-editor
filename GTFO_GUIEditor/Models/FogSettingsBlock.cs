@@ -99,7 +99,8 @@ public class FogSettingsBlock : INotifyPropertyChanged
         get => _name;
         set
         {
-            if (SetField(ref _name, value))
+            string normalizedName = IsElevatorFogConfig ? FogSettingsService.ElevatorFogName : value;
+            if (SetField(ref _name, normalizedName))
             {
                 OnPropertyChanged(nameof(DisplayText));
             }
@@ -114,7 +115,16 @@ public class FogSettingsBlock : INotifyPropertyChanged
         {
             if (SetField(ref _persistentId, value))
             {
+                if (IsElevatorFogConfig)
+                {
+                    if (SetField(ref _name, FogSettingsService.ElevatorFogName, nameof(Name)))
+                    {
+                        OnPropertyChanged(nameof(DisplayText));
+                    }
+                }
                 OnPropertyChanged(nameof(DisplayText));
+                OnPropertyChanged(nameof(IsElevatorFogConfig));
+                OnPropertyChanged(nameof(CanDelete));
             }
         }
     }
@@ -204,7 +214,13 @@ public class FogSettingsBlock : INotifyPropertyChanged
     }
 
     [JsonIgnore]
-    public string DisplayText => $"[{PersistentId}] {Name}";
+    public string DisplayText => Name;
+
+    [JsonIgnore]
+    public bool IsElevatorFogConfig => PersistentId == FogSettingsService.ElevatorFogPersistentId;
+
+    [JsonIgnore]
+    public bool CanDelete => !IsElevatorFogConfig;
 
     [JsonIgnore]
     public bool IsExpanded

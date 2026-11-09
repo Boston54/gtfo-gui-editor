@@ -298,7 +298,7 @@ public class GatherSmallItemsTests
         vm.SelectedSectorObjectiveType = ObjectiveType.GatherSmallItems;
 
         Assert.True(vm.IsGatherSmallItemsObjective);
-        Assert.Equal("Events On Activate (Locked for Gather Small Items)", vm.EventsOnActivateHeaderTitle);
+        Assert.Equal("Events On Activate (Locked by Gather Small Items)", vm.EventsOnActivateHeaderTitle);
 
         Assert.Single(vm.EditingSectorSettings!.GatherPickupEvents);
         Assert.NotNull(vm.SelectedGatherPickupEvent);
@@ -329,7 +329,7 @@ public class GatherSmallItemsTests
     [Fact]
     public void WardenObjectiveDataBlockExporter_GatherSmallItems_PickupEventsExport()
     {
-        var sector = new SectorSettings
+        var sector = new WardenObjective
         {
             ObjectiveType = ObjectiveType.GatherSmallItems,
             GatherItem = GatherSmallItemType.DataCubeTampered
@@ -359,10 +359,10 @@ public class GatherSmallItemsTests
 
         var waveSettingsAlloc = new DatablockAllocator();
         var wavePopAlloc = new DatablockAllocator();
-        var waveSettingsBlocks = new System.Text.Json.Nodes.JsonArray();
-        var wavePopBlocks = new System.Text.Json.Nodes.JsonArray();
+        var waveSettingsBlocks = new List<System.Text.Json.Nodes.JsonObject>();
+        var wavePopBlocks = new List<System.Text.Json.Nodes.JsonObject>();
 
-        var exported = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+        var exported = GTFO_GUIEditor.Services.WardenObjectiveDataBlockExporter.CompileWardenObjective(
             sector,
             100,
             (k, v) => 1,
@@ -415,9 +415,8 @@ public class GatherSmallItemsTests
             }
         };
 
-        var context = new GTFO_GUIEditor.Services.DatablockManager.Importers.ImportContext();
-        var objective = new WardenObjective();
-        GTFO_GUIEditor.Services.DatablockManager.Importers.LevelLayoutDataBlockImporter.ImportWardenObjective(rawJson, objective, context);
+        var context = new GTFO_GUIEditor.Services.ImportContext(new MainWindowViewModel(), AppContext.BaseDirectory);
+        var objective = new GTFO_GUIEditor.Services.LevelLayoutDataBlockImporter().DeserializeWardenObjective(rawJson, context);
 
         Assert.Equal(ObjectiveType.GatherSmallItems, objective.ObjectiveType);
         Assert.Empty(objective.EventsOnActivate);
@@ -472,11 +471,11 @@ public class GatherSmallItemsTests
         // Verify datablock exporter ignores manual EventsOnActivate and exports GatherPickupEvents
         var waveSettingsAlloc = new DatablockAllocator();
         var wavePopAlloc = new DatablockAllocator();
-        var waveSettingsBlocks = new System.Text.Json.Nodes.JsonArray();
-        var wavePopBlocks = new System.Text.Json.Nodes.JsonArray();
+        var waveSettingsBlocks = new List<System.Text.Json.Nodes.JsonObject>();
+        var wavePopBlocks = new List<System.Text.Json.Nodes.JsonObject>();
 
-        var exportedGather = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
-            vm.EditingSectorSettings,
+        var exportedGather = GTFO_GUIEditor.Services.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+            vm.EditingSectorSettings!.PrimaryObjective,
             100,
             (k, v) => 1,
             waveSettingsAlloc,
@@ -503,8 +502,8 @@ public class GatherSmallItemsTests
         Assert.Equal(2, vm.EditingSectorSettings.EventsOnActivate.Count);
 
         // Verify exporter exports EventsOnActivate now
-        var exportedHsu = GTFO_GUIEditor.Services.DatablockManager.Exporters.WardenObjectiveDataBlockExporter.CompileWardenObjective(
-            vm.EditingSectorSettings,
+        var exportedHsu = GTFO_GUIEditor.Services.WardenObjectiveDataBlockExporter.CompileWardenObjective(
+            vm.EditingSectorSettings!.PrimaryObjective,
             101,
             (k, v) => 1,
             waveSettingsAlloc,

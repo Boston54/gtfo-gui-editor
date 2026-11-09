@@ -153,24 +153,6 @@
             <Grid IsVisible="{Binding HasSelectedLevel}" RowDefinitions="Auto,*">
                 <!-- Warnings StackPanel -->
                 <StackPanel Grid.Row="0" Spacing="6" Margin="0,0,0,10">
-                    <!-- Duplicate ID Warning Banner (if any) -->
-                    <Border Background="#3A1C1C"
-                            BorderBrush="#FF6B6B"
-                            BorderThickness="1"
-                            CornerRadius="4"
-                            Padding="10,8"
-                            IsVisible="{Binding HasDuplicatePersistentId}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <TextBlock Text="⚠" Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center"/>
-                            <TextBlock Text="{Binding DuplicatePersistentIdWarning}"
-                                       Foreground="#FF6B6B"
-                                       FontWeight="SemiBold"
-                                       FontSize="12"
-                                       TextWrapping="Wrap"
-                                       VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Border>
-
                     <!-- Grid Size Warning Banner (if layout exceeds grid size) -->
                     <Border Background="#3A281C"
                             BorderBrush="#FFA726"

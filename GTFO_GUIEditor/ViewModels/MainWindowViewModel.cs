@@ -695,7 +695,8 @@ public class MainWindowViewModel : ViewModelBase
         Lighting.SelectedBlock = null;
 
         FogSettings.Blocks.Clear();
-        FogSettings.SelectedBlock = null;
+        FogSettings.EnsureElevatorFogConfig();
+        FogSettings.SelectedBlock = FogSettings.Blocks.FirstOrDefault();
 
         LevelLayout.Levels.Clear();
         var defaultLevel = EditorDefaultsService.CreateDefaultLevel(1);

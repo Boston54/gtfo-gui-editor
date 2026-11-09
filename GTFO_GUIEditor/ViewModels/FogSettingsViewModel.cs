@@ -52,6 +52,7 @@ public class FogSettingsViewModel : ViewModelBase
     {
         var blockList = initialBlocks.ToList();
         _vanillaTemplates = FogSettingsService.LoadVanillaBlocks();
+        EnsureElevatorFogConfig(blockList);
         _blocks = new ObservableCollection<FogSettingsBlock>(blockList);
         _blocks.CollectionChanged += (s, e) =>
         {
@@ -172,8 +173,7 @@ public class FogSettingsViewModel : ViewModelBase
             int count = _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
             if (count > 1)
             {
-                return
-                    $"Warning: Persistent ID {SelectedBlock.PersistentId} is shared by {count} fog configs. Each config should have a unique ID.";
+                return $"Warning: This identifier is shared by {count} fog configs.";
             }
 
             return string.Empty;
@@ -184,8 +184,7 @@ public class FogSettingsViewModel : ViewModelBase
     {
         if (SelectedBlock != null)
         {
-            StatusText =
-                $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({_blocks.Count} configs loaded)";
+            StatusText = $"Selected: {SelectedBlock.Name} ({_blocks.Count} configs loaded)";
         }
         else
         {
@@ -347,6 +346,42 @@ public class FogSettingsViewModel : ViewModelBase
         set => SetField(ref _newBlockPersistentId, value);
     }
 
+    public void EnsureElevatorFogConfig()
+    {
+        EnsureElevatorFogConfig(_blocks);
+    }
+
+    private void EnsureElevatorFogConfig(IList<FogSettingsBlock> blocks)
+    {
+        var elevatorFog = blocks.FirstOrDefault(block =>
+            block.PersistentId == FogSettingsService.ElevatorFogPersistentId);
+        if (elevatorFog == null)
+        {
+            var template = _vanillaTemplates.FirstOrDefault(block =>
+                string.Equals(block.Name, "Fog_ELEVATOR", StringComparison.OrdinalIgnoreCase));
+            elevatorFog = template?.Clone() ??
+                          EditorDefaultsService.CreateDefaultFogBlock(FogSettingsService.ElevatorFogPersistentId);
+            elevatorFog.PersistentId = FogSettingsService.ElevatorFogPersistentId;
+            elevatorFog.Name = FogSettingsService.ElevatorFogName;
+            blocks.Insert(0, elevatorFog);
+        }
+
+        elevatorFog.Name = FogSettingsService.ElevatorFogName;
+
+        var usedIds = new HashSet<uint>(blocks.Where(block => block != elevatorFog).Select(block => block.PersistentId));
+        foreach (var duplicate in blocks.Where(block => block != elevatorFog &&
+                                                        block.PersistentId == FogSettingsService.ElevatorFogPersistentId))
+        {
+            uint replacementId;
+            do
+            {
+                replacementId = (uint)Random.Shared.Next(1000, 100000000);
+            } while (replacementId == FogSettingsService.ElevatorFogPersistentId || !usedIds.Add(replacementId));
+
+            duplicate.PersistentId = replacementId;
+        }
+    }
+
     public string CreationErrorMessage
     {
         get => _creationErrorMessage;
@@ -376,7 +411,7 @@ public class FogSettingsViewModel : ViewModelBase
     public void OpenCreateBlockDialog()
     {
         NewBlockPersistentId = GenerateRandomPersistentId();
-        NewBlockName = $"Custom_Fog_{NewBlockPersistentId}";
+        NewBlockName = "Custom_Fog";
         IsCreatingFresh = true;
         _isCreatingFromExisting = false;
         _isCreatingFromVanilla = false;
@@ -413,13 +448,13 @@ public class FogSettingsViewModel : ViewModelBase
 
         if (NewBlockPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this config.";
             return false;
         }
 
         if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
-            CreationErrorMessage = $"A config with Persistent ID {NewBlockPersistentId} already exists.";
+            CreationErrorMessage = "A config with this internal identifier already exists.";
             return false;
         }
 
@@ -456,7 +491,7 @@ public class FogSettingsViewModel : ViewModelBase
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created config [{newBlock.PersistentId}] {newBlock.Name}";
+        StatusText = $"Created config {newBlock.Name}";
         return true;
     }
 
@@ -485,26 +520,26 @@ public class FogSettingsViewModel : ViewModelBase
     }
 
     public string DeleteConfirmationMessage => BlockToDelete != null
-        ? $"Are you sure you want to delete fog config '{BlockToDelete.Name}' ({BlockToDelete.PersistentId})?\n\nThis action cannot be undone."
+        ? $"Are you sure you want to delete fog config '{BlockToDelete.Name}'?\n\nThis action cannot be undone."
         : string.Empty;
 
     public void RequestDeleteSelectedBlock()
     {
-        if (SelectedBlock == null) return;
+        if (SelectedBlock == null || !SelectedBlock.CanDelete) return;
         BlockToDelete = SelectedBlock;
         IsConfirmingDelete = true;
     }
 
     public void RequestDeleteBlock(FogSettingsBlock? block)
     {
-        if (block == null) return;
+        if (block == null || !block.CanDelete) return;
         BlockToDelete = block;
         IsConfirmingDelete = true;
     }
 
     public void ConfirmDeleteBlock()
     {
-        if (BlockToDelete == null) return;
+        if (BlockToDelete == null || !BlockToDelete.CanDelete) return;
 
         var blockToRemove = BlockToDelete;
         int index = _blocks.IndexOf(blockToRemove);
@@ -526,7 +561,7 @@ public class FogSettingsViewModel : ViewModelBase
         IsConfirmingDelete = false;
         BlockToDelete = null;
         UpdateStatusText();
-        StatusText = $"Deleted config [{blockToRemove.PersistentId}] {blockToRemove.Name}";
+        StatusText = $"Deleted config {blockToRemove.Name}";
     }
 
     public void CancelDeleteBlock()

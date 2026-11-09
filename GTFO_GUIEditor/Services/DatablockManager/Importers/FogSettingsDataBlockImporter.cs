@@ -74,6 +74,7 @@ public class FogSettingsDataBlockImporter : IDatablockImporter
         {
             context.MainVm.FogSettings.Blocks.Add(b);
         }
+        context.MainVm.FogSettings.EnsureElevatorFogConfig();
         if (context.MainVm.FogSettings.Blocks.Count > 0)
         {
             context.MainVm.FogSettings.SelectedBlock = context.MainVm.FogSettings.Blocks[0];

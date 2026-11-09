@@ -21,13 +21,6 @@
                 <Grid IsVisible="{Binding IsExpanded}">
                   <ScrollViewer Margin="0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Disabled">
                     <StackPanel Spacing="14">
-                      <!-- Duplicate ID Warning Banner -->
-                      <Border Background="#3A1C1C" BorderBrush="#FF6B6B" BorderThickness="1" CornerRadius="4" Padding="10,8" IsVisible="{Binding $parent[UserControl].((vm:LightingViewModel)DataContext).HasDuplicatePersistentId}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                          <TextBlock Text="âš " Foreground="#FF6B6B" FontWeight="Bold" VerticalAlignment="Center" />
-                          <TextBlock Text="{Binding $parent[UserControl].((vm:LightingViewModel)DataContext).DuplicatePersistentIdWarning}" Foreground="#FF6B6B" FontWeight="SemiBold" FontSize="12" TextWrapping="Wrap" VerticalAlignment="Center" />
-                        </StackPanel>
-                      </Border>
                       <!-- Missing Categories Warning Banner -->
                       <Border Background="#3A281C" BorderBrush="#FFA726" BorderThickness="1" CornerRadius="4" Padding="10,8" IsVisible="{Binding $parent[UserControl].((vm:LightingViewModel)DataContext).HasMissingCategories}">
                         <StackPanel Orientation="Horizontal" Spacing="8">
@@ -39,11 +32,9 @@
                       <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
                         <StackPanel Spacing="10">
                           <TextBlock Text="General Identification" FontWeight="Bold" FontSize="14" />
-                          <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
+                          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" Margin="0,5,0,0">
                             <TextBlock Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the lighting setting. This is not visible to the player, but is used for identifying the lighting setting within the editor." VerticalAlignment="Center" Margin="0,0,8,0" />
                             <TextBox Grid.Column="1" Text="{Binding Name, Mode=TwoWay}" Margin="0,0,16,0" />
-                            <TextBlock Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this lighting setting. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,0" />
-                            <TextBox Grid.Column="3" Text="{Binding PersistentId, Mode=TwoWay}" />
                           </Grid>
                         </StackPanel>
                       </Border>
@@ -172,12 +163,9 @@
               </StackPanel>
             </StackPanel>
           </Border>
-          <!-- Name and PersistentID -->
-          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" Margin="0,4,0,0">
+          <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto" Margin="0,4,0,0">
             <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the lighting setting." VerticalAlignment="Center" Margin="0,0,10,8" />
             <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewBlockName, Mode=TwoWay}" Margin="0,0,0,8" Watermark="Enter config name..." />
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this lighting setting." VerticalAlignment="Center" Margin="0,0,10,0" />
-            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewBlockPersistentId, Mode=TwoWay}" Watermark="Enter integer ID..." />
           </Grid>
           <!-- Error Message Banner -->
           <TextBlock Text="{Binding CreationErrorMessage}" Foreground="#FF6B6B" IsVisible="{Binding HasCreationErrorMessage}" FontSize="12" />

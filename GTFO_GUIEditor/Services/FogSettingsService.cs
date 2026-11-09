@@ -9,6 +9,9 @@ namespace GTFO_GUIEditor.Services;
 
 public static class FogSettingsService
 {
+    public const uint ElevatorFogPersistentId = 1;
+    public const string ElevatorFogName = "FOG_ELEVATOR";
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,

@@ -63,7 +63,7 @@ public class LightSettingsBlock : INotifyPropertyChanged
     }
 
     [JsonIgnore]
-    public string DisplayText => $"[{PersistentId}] {Name}";
+    public string DisplayText => Name;
 
     [JsonIgnore]
     public bool IsExpanded

@@ -167,7 +167,7 @@ public class ConsumablesViewModel : ViewModelBase
         _blocks.Add(copy);
         SelectedBlock = copy;
         copy.IsExpanded = true;
-        StatusText = $"Duplicated distribution [{source.PersistentId}] {source.Name}";
+        StatusText = $"Duplicated distribution {source.Name}";
     }
 
     public string StatusText
@@ -193,7 +193,7 @@ public class ConsumablesViewModel : ViewModelBase
             int count = _blocks.Count(b => b.PersistentId == SelectedBlock.PersistentId);
             if (count > 1)
             {
-                return $"Warning: Persistent ID {SelectedBlock.PersistentId} is shared by {count} consumable distributions. Each distribution should have a unique ID.";
+                return $"Warning: This identifier is shared by {count} consumable distributions.";
             }
             return string.Empty;
         }
@@ -203,7 +203,7 @@ public class ConsumablesViewModel : ViewModelBase
     {
         if (SelectedBlock != null)
         {
-            StatusText = $"Selected: [{SelectedBlock.PersistentId}] {SelectedBlock.Name} ({_blocks.Count} distributions loaded)";
+            StatusText = $"Selected: {SelectedBlock.Name} ({_blocks.Count} distributions loaded)";
         }
         else
         {
@@ -303,7 +303,7 @@ public class ConsumablesViewModel : ViewModelBase
     public void OpenCreateBlockDialog()
     {
         NewBlockPersistentId = GenerateRandomPersistentId();
-        NewBlockName = $"Custom_ConsumableDistribution_{NewBlockPersistentId}";
+        NewBlockName = "Custom_ConsumableDistribution";
         IsCreatingFresh = true;
         IsCreatingFromTemplate = false;
         SelectedTemplate = AvailableTemplates.FirstOrDefault();
@@ -321,13 +321,13 @@ public class ConsumablesViewModel : ViewModelBase
 
         if (NewBlockPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this distribution.";
             return false;
         }
 
         if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
-            CreationErrorMessage = $"A distribution with Persistent ID {NewBlockPersistentId} already exists.";
+            CreationErrorMessage = "A distribution with this internal identifier already exists.";
             return false;
         }
 
@@ -346,7 +346,7 @@ public class ConsumablesViewModel : ViewModelBase
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created distribution [{newBlock.PersistentId}] {newBlock.Name}";
+        StatusText = $"Created distribution {newBlock.Name}";
         return true;
     }
 
@@ -375,7 +375,7 @@ public class ConsumablesViewModel : ViewModelBase
     }
 
     public string DeleteConfirmationMessage => BlockToDelete != null
-        ? $"Are you sure you want to delete consumable distribution '{BlockToDelete.Name}' ({BlockToDelete.PersistentId})?\n\nThis action cannot be undone."
+        ? $"Are you sure you want to delete consumable distribution '{BlockToDelete.Name}'?\n\nThis action cannot be undone."
         : string.Empty;
 
     public void RequestDeleteSelectedBlock()
@@ -416,7 +416,7 @@ public class ConsumablesViewModel : ViewModelBase
         IsConfirmingDelete = false;
         BlockToDelete = null;
         UpdateStatusText();
-        StatusText = $"Deleted distribution [{blockToRemove.PersistentId}] {blockToRemove.Name}";
+        StatusText = $"Deleted distribution {blockToRemove.Name}";
     }
 
     public void CancelDeleteBlock()

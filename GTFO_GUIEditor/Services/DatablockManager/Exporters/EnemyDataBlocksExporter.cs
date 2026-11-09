@@ -10,6 +10,16 @@ public class EnemyDataBlocksExporter : IDatablockExporter
     public void Export(ExportContext context)
     {
         var groupBlocks = SerializeGroups(context, context.MainVm.Enemies.Groups);
+        foreach (var synthesized in context.EnemyGroupBlocks)
+        {
+            uint id = synthesized["persistentID"]?.GetValue<uint>() ?? 0;
+            if (id > 0 && !groupBlocks.Any(b => b["persistentID"]?.GetValue<uint>() == id))
+            {
+                var clone = JsonNode.Parse(synthesized.ToJsonString());
+                if (clone is JsonObject cloneObj) groupBlocks.Add(cloneObj);
+            }
+        }
+
         foreach (var vanilla in context.VanillaEnemyGroupBlocks)
         {
             uint id = vanilla["persistentID"]?.GetValue<uint>() ?? 0;
@@ -24,28 +34,11 @@ public class EnemyDataBlocksExporter : IDatablockExporter
         ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyGroupDataBlock_bin.json",
             context.EnemyGroupBlocks);
 
-        var population = context.MainVm.Enemies.Population;
-        var populationObj = new JsonObject
-        {
-            ["RoleDatas"] = new JsonArray(population.RoleDatas.Select(r => new JsonObject
-            {
-                ["Role"] = r.Role,
-                ["Difficulty"] = r.Difficulty,
-                ["Enemy"] = r.Enemy,
-                ["Cost"] = r.Cost,
-                ["Weight"] = r.Weight
-            }).ToArray())
-        };
-        context.EnemyPopulationBlocks.Clear();
-        context.EnemyPopulationBlocks.Add(populationObj);
-        ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyPopulationDataBlock_bin.json",
-            context.EnemyPopulationBlocks);
-
         // EnemyDataBlock is imported but intentionally exported as a stub.
         ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyDataBlock_bin.json",
             new List<JsonObject>());
 
-        context.DatablocksExportedCount += 3;
+        context.DatablocksExportedCount += 2;
     }
 
     private static List<JsonObject> SerializeGroups(ExportContext context, IEnumerable<EnemyGroupBlock> groups)

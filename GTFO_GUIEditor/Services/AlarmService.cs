@@ -330,7 +330,7 @@ public static class AlarmService
                         EditorDefaultsService.ApplyAlarmDefaults(alarm);
 
                         alarm.PersistentId = puzzleBlock.PersistentId;
-                        alarm.Name = puzzleBlock.Name ?? $"ChainedPuzzle_{puzzleBlock.PersistentId}";
+                        alarm.Name = string.IsNullOrWhiteSpace(puzzleBlock.Name) ? "ChainedPuzzle" : puzzleBlock.Name;
                         alarm.PublicAlarmName = puzzleBlock.PublicAlarmName ?? string.Empty;
                         alarm.InternalEnabled = puzzleBlock.InternalEnabled;
                         alarm.SpawnsEnemies = puzzleBlock.TriggerAlarmOnActivate;

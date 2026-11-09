@@ -460,7 +460,7 @@ public class AlarmBlock : INotifyPropertyChanged
     public Dictionary<string, JsonElement>? ExtensionData { get; set; }
 
     [JsonIgnore]
-    public string DisplayText => $"[{PersistentId}] {Name}";
+    public string DisplayText => Name;
     [JsonIgnore]
     public bool IsExpanded
     {

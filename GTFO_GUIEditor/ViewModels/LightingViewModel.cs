@@ -261,7 +261,7 @@ public class LightingViewModel : ViewModelBase
             if (_selectedBlock == null || !HasDuplicatePersistentId) return string.Empty;
             int count = _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
             return
-                $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
+                $"Warning: This config is duplicated {count} times in this datablock.";
         }
     }
 
@@ -276,7 +276,7 @@ public class LightingViewModel : ViewModelBase
         if (_selectedBlock != null)
         {
             StatusText =
-                $"{_blocks.Count} configs loaded. Editing: [{_selectedBlock.PersistentId}] {_selectedBlock.Name}";
+                $"{_blocks.Count} configs loaded. Editing: {_selectedBlock.Name}";
         }
         else
         {
@@ -501,7 +501,7 @@ public class LightingViewModel : ViewModelBase
     public void OpenCreateBlockDialog()
     {
         NewBlockPersistentId = GenerateRandomPersistentId();
-        NewBlockName = $"Custom_Lighting_{NewBlockPersistentId}";
+        NewBlockName = "Custom_Lighting";
         IsCreatingFresh = true;
         _isCreatingFromExisting = false;
         _isCreatingFromVanilla = false;
@@ -538,13 +538,13 @@ public class LightingViewModel : ViewModelBase
 
         if (NewBlockPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this config.";
             return false;
         }
 
         if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
-            CreationErrorMessage = $"A config with Persistent ID {NewBlockPersistentId} already exists.";
+            CreationErrorMessage = "A config with this internal identifier already exists.";
             return false;
         }
 
@@ -581,7 +581,7 @@ public class LightingViewModel : ViewModelBase
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created config [{newBlock.PersistentId}] {newBlock.Name}";
+        StatusText = $"Created config {newBlock.Name}";
         return true;
     }
 
@@ -615,7 +615,7 @@ public class LightingViewModel : ViewModelBase
         {
             var target = _blockToDelete ?? _selectedBlock;
             if (target == null) return "Are you sure you want to delete this config?";
-            return $"Are you sure you want to delete config [{target.PersistentId}] \"{target.Name}\"?";
+            return $"Are you sure you want to delete config \"{target.Name}\"?";
         }
     }
 
@@ -669,7 +669,7 @@ public class LightingViewModel : ViewModelBase
         }
 
         UpdateStatusText();
-        StatusText = $"Deleted config [{block.PersistentId}] {block.Name}";
+        StatusText = $"Deleted config {block.Name}";
         return true;
     }
 }

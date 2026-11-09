@@ -708,9 +708,6 @@
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" ToolTip.Tip="Internal name for the rundown. This is not visible to the player, but is used for identifying the rundown within the editor." VerticalAlignment="Center" Margin="0,0,8,8"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedRundown.Name, Mode=TwoWay}" Margin="0,0,16,8"/>
 
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Persistent ID:" ToolTip.Tip="Internal unique identifier for this rundown. You will want to leave this as a random integer." VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding SelectedRundown.PersistentId, Mode=TwoWay}" Margin="0,0,0,8"/>
-
                                     <TextBlock Grid.Row="1" Grid.Column="0" Text="Enabled:" ToolTip.Tip="Whether this rundown is loaded. You'll likely want to leave this checked." VerticalAlignment="Center" Margin="0,0,8,0"/>
                                     <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding SelectedRundown.InternalEnabled, Mode=TwoWay}" Margin="0,0,16,0"/>
 

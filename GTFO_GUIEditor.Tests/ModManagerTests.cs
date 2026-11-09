@@ -87,6 +87,17 @@ public class ModManagerTests
     }
 
     [Fact]
+    public void FeatureRegistration_ReplacesExistingRegistrationWithSameName()
+    {
+        var manager = ModManager.Instance;
+        manager.AdvancedWardenObjective = true;
+        manager.RegisterFeature(ModManager.AdvancedWardenObjectiveModId, "Editor", () => true);
+        manager.RegisterFeature(ModManager.AdvancedWardenObjectiveModId, "editor", () => false);
+
+        Assert.True(manager.CanDisableMod(ModManager.AdvancedWardenObjectiveModId));
+    }
+
+    [Fact]
     public void ModdedViewModel_ReflectsAndGuardsModState()
     {
         var manager = ModManager.Instance;

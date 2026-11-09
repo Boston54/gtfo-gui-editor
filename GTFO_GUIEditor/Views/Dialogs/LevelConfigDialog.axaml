@@ -44,25 +44,21 @@
                                            FontWeight="Bold"
                                            Foreground="#FFFFFF"/>
 
-                                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                                <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                                     <!-- Level Name -->
                                     <TextBlock Grid.Row="0" Grid.Column="0" Text="Level Name:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding NewLevelName, Mode=TwoWay}" Watermark="Enter level name..." Margin="0,4"/>
 
-                                    <!-- Persistent ID -->
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Persistent ID:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewLevelPersistentId, Mode=TwoWay}" Watermark="Enter persistent ID..." Margin="0,4"/>
-
                                     <!-- Tileset -->
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tileset:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
-                                    <ComboBox Grid.Row="2" Grid.Column="1"
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Tileset:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="1" Grid.Column="1"
                                               ItemsSource="{Binding AvailableComplexTypes}"
                                               SelectedItem="{Binding SelectedComplexType, Mode=TwoWay}"
                                               HorizontalAlignment="Stretch" Margin="0,4"/>
 
                                     <!-- Starting Elevator Tile -->
-                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Starting Elevator Tile:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
-                                    <ComboBox Grid.Row="3" Grid.Column="1"
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Starting Elevator Tile:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="2" Grid.Column="1"
                                               ItemsSource="{Binding AvailableElevatorTiles}"
                                               SelectedItem="{Binding SelectedElevatorTile, Mode=TwoWay}"
                                               HorizontalAlignment="Stretch" Margin="0,4">
@@ -74,8 +70,8 @@
                                     </ComboBox>
 
                                     <!-- Fog Setting -->
-                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Fog Setting:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
-                                    <ComboBox Grid.Row="4" Grid.Column="1"
+                                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Fog Setting:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <ComboBox Grid.Row="3" Grid.Column="1"
                                               ItemsSource="{Binding AvailableFogSettings}"
                                               SelectedItem="{Binding SelectedFogSetting, Mode=TwoWay}"
                                               HorizontalAlignment="Stretch" Margin="0,4">
@@ -87,8 +83,8 @@
                                     </ComboBox>
 
                                     <!-- Snatcher Boxes -->
-                                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Snatcher Boxes:" ToolTip.Tip="If a level contains snatchers, this adds the 'Snatcher Boxes' dimension required to make snatchers function properly." FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
-                                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding NewLevelSnatcherBoxes, Mode=TwoWay}" Margin="0,4"/>
+                                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Snatcher Boxes:" ToolTip.Tip="If a level contains snatchers, this adds the 'Snatcher Boxes' dimension required to make snatchers function properly." FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
+                                    <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding NewLevelSnatcherBoxes, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
                         </Border>

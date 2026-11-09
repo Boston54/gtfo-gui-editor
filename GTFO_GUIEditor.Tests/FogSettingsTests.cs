@@ -1,4 +1,6 @@
+using System.IO;
 using System.Linq;
+using System.Text.Json.Nodes;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
 using GTFO_GUIEditor.ViewModels;
@@ -60,13 +62,23 @@ public class FogSettingsTests
     }
 
     [Fact]
-    public void FogSettingsViewModel_InitializesEmptyByDefault()
+    public void FogSettingsViewModel_AlwaysInitializesPermanentElevatorConfig()
     {
         var vm = new FogSettingsViewModel();
-        Assert.Empty(vm.Blocks);
-        Assert.Null(vm.SelectedBlock);
-        Assert.False(vm.HasSelectedBlock);
-        Assert.Contains("0 configs loaded", vm.StatusText);
+        var elevatorFog = Assert.Single(vm.Blocks);
+        Assert.Equal(FogSettingsService.ElevatorFogPersistentId, elevatorFog.PersistentId);
+        Assert.Equal(FogSettingsService.ElevatorFogName, elevatorFog.Name);
+        Assert.False(elevatorFog.CanDelete);
+        Assert.True(elevatorFog.IsElevatorFogConfig);
+        Assert.Same(elevatorFog, vm.SelectedBlock);
+        Assert.True(vm.HasSelectedBlock);
+        Assert.Contains("1 configs loaded", vm.StatusText);
+
+        elevatorFog.Name = "Renamed";
+        Assert.Equal(FogSettingsService.ElevatorFogName, elevatorFog.Name);
+        vm.RequestDeleteBlock(elevatorFog);
+        Assert.False(vm.IsConfirmingDelete);
+        Assert.Contains(elevatorFog, vm.Blocks);
     }
 
     [Fact]
@@ -152,7 +164,32 @@ public class FogSettingsTests
         vm.SelectedBlock = block1;
 
         Assert.True(vm.HasDuplicatePersistentId);
-        Assert.Contains("55555", vm.DuplicatePersistentIdWarning);
+        Assert.Contains("shared", vm.DuplicatePersistentIdWarning);
+    }
+
+    [Fact]
+    public void FogSettingsExporter_AlwaysExportsElevatorConfigWithRequiredIdentity()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "GTFO_Fog_Export_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            var context = new ExportContext(new MainWindowViewModel(), tempDir);
+            new FogSettingsDataBlockExporter().Export(context);
+
+            var elevatorFog = Assert.Single(context.FogSettingsBlocks.Where(block =>
+                block["persistentID"]?.GetValue<uint>() == FogSettingsService.ElevatorFogPersistentId));
+            Assert.Equal(FogSettingsService.ElevatorFogName, elevatorFog["name"]?.GetValue<string>());
+
+            var exported = JsonNode.Parse(File.ReadAllText(Path.Combine(tempDir, "GameData_FogSettingsDataBlock_bin.json")));
+            var exportedElevator = Assert.Single(exported!["Blocks"]!.AsArray().OfType<JsonObject>().Where(block =>
+                block["persistentID"]?.GetValue<uint>() == FogSettingsService.ElevatorFogPersistentId));
+            Assert.Equal(FogSettingsService.ElevatorFogName, exportedElevator["name"]?.GetValue<string>());
+        }
+        finally
+        {
+            Directory.Delete(tempDir, true);
+        }
     }
 
     [Fact]
@@ -197,9 +234,9 @@ public class FogSettingsTests
 
         // Next items are the fog blocks
         Assert.Equal((uint)101, vm.AvailableFogTransitionOptions[1].PersistentId);
-        Assert.Equal("[101] Test_Fog_1", vm.AvailableFogTransitionOptions[1].DisplayText);
+        Assert.Equal("Test_Fog_1", vm.AvailableFogTransitionOptions[1].DisplayText);
         Assert.Equal((uint)102, vm.AvailableFogTransitionOptions[2].PersistentId);
-        Assert.Equal("[102] Test_Fog_2", vm.AvailableFogTransitionOptions[2].DisplayText);
+        Assert.Equal("Test_Fog_2", vm.AvailableFogTransitionOptions[2].DisplayText);
 
         // When a new fog block is added, options update
         fogBlocks.Add(FogSettingsService.CreateFreshBlock(103, "Test_Fog_3"));

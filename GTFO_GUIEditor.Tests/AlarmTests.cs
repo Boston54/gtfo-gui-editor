@@ -20,7 +20,7 @@ public class AlarmTests
         Assert.NotNull(striker);
         Assert.Equal("Striker (Wave)", striker.Name);
         Assert.Equal("Standard", striker.EnemyType);
-        Assert.Contains("[13] Striker (Wave)", striker.DisplayText);
+        Assert.Equal("Striker (Wave) (Standard)", striker.DisplayText);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public class AlarmTests
         vm.SelectedAlarm = alarm2;
 
         Assert.True(vm.HasDuplicatePersistentId);
-        Assert.Contains("Warning: Persistent ID 100 is used by 2 alarms", vm.DuplicatePersistentIdWarning);
+        Assert.Contains("duplicated 2 times", vm.DuplicatePersistentIdWarning);
     }
 
     [Fact]

@@ -202,7 +202,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         {
             if (_selectedBlock == null || !HasDuplicatePersistentId) return string.Empty;
             int count = _blocks.Count(b => b.PersistentId == _selectedBlock.PersistentId);
-            return $"Warning: Persistent ID {_selectedBlock.PersistentId} is used by {count} blocks in this datablock! IDs must be unique.";
+            return $"Warning: This block is duplicated {count} times in this datablock.";
         }
     }
 
@@ -354,7 +354,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
     public void OpenCreateBlockDialog()
     {
         NewBlockPersistentId = GenerateRandomPersistentId();
-        NewBlockName = $"Custom_Complex_{NewBlockPersistentId}";
+        NewBlockName = "Custom_Complex";
         IsCreatingFresh = true;
         IsCreatingFromTemplate = false;
         SelectedTemplate = AvailableTemplates.FirstOrDefault();
@@ -372,13 +372,13 @@ public class ComplexResourceSetsViewModel : ViewModelBase
 
         if (NewBlockPersistentId == 0)
         {
-            CreationErrorMessage = "Persistent ID must be greater than 0.";
+            CreationErrorMessage = "Unable to assign an internal identifier to this block.";
             return false;
         }
 
         if (_blocks.Any(b => b.PersistentId == NewBlockPersistentId))
         {
-            CreationErrorMessage = $"A block with Persistent ID {NewBlockPersistentId} already exists.";
+            CreationErrorMessage = "A block with this internal identifier already exists.";
             return false;
         }
 
@@ -397,7 +397,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         IsCreatingBlock = false;
         CreationErrorMessage = string.Empty;
         UpdateStatusText();
-        StatusText = $"Created block [{newBlock.PersistentId}] {newBlock.Name}";
+        StatusText = $"Created block {newBlock.Name}";
         return true;
     }
 
@@ -431,7 +431,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         {
             var target = _blockToDelete ?? _selectedBlock;
             if (target == null) return "Are you sure you want to delete this block?";
-            return $"Are you sure you want to delete block [{target.PersistentId}] \"{target.Name}\"?";
+            return $"Are you sure you want to delete block \"{target.Name}\"?";
         }
     }
 
@@ -477,7 +477,6 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         if (index < 0) return false;
 
         string deletedName = block.Name;
-        uint deletedId = block.PersistentId;
 
         _blocks.RemoveAt(index);
 
@@ -495,7 +494,7 @@ public class ComplexResourceSetsViewModel : ViewModelBase
         }
 
         UpdateStatusText();
-        StatusText = $"Deleted block [{deletedId}] {deletedName}. {_blocks.Count:N0} blocks remaining.";
+        StatusText = $"Deleted block {deletedName}. {_blocks.Count:N0} blocks remaining.";
         return true;
     }
 

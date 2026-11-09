@@ -378,9 +378,11 @@ public class RundownFileTests : IDisposable
         Assert.Empty(vm.Lighting.Blocks);
         Assert.Null(vm.Lighting.SelectedBlock);
 
-        // Fog: empty collection
-        Assert.Empty(vm.FogSettings.Blocks);
-        Assert.Null(vm.FogSettings.SelectedBlock);
+        // Fog: only the required elevator config is present.
+        Assert.Single(vm.FogSettings.Blocks);
+        Assert.Equal((uint)1, vm.FogSettings.Blocks[0].PersistentId);
+        Assert.Equal("FOG_ELEVATOR", vm.FogSettings.Blocks[0].Name);
+        Assert.Same(vm.FogSettings.Blocks[0], vm.FogSettings.SelectedBlock);
 
         // Rundown: clean fresh default rundown, not loaded from vanilla datablocks
         Assert.NotNull(vm.Rundown.SelectedRundown);
@@ -397,8 +399,10 @@ public class RundownFileTests : IDisposable
         Assert.Empty(vm.Lighting.Blocks);
         Assert.Null(vm.Lighting.SelectedBlock);
 
-        Assert.Empty(vm.FogSettings.Blocks);
-        Assert.Null(vm.FogSettings.SelectedBlock);
+        Assert.Single(vm.FogSettings.Blocks);
+        Assert.Equal((uint)1, vm.FogSettings.Blocks[0].PersistentId);
+        Assert.Equal("FOG_ELEVATOR", vm.FogSettings.Blocks[0].Name);
+        Assert.Same(vm.FogSettings.Blocks[0], vm.FogSettings.SelectedBlock);
 
         Assert.NotNull(vm.Rundown.SelectedRundown);
         Assert.Equal("New Rundown", vm.Rundown.SelectedRundown?.Name);

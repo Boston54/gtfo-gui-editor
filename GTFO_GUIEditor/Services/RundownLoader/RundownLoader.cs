@@ -197,6 +197,7 @@ public class RundownLoader : IRundownLoader
                 vm.FogSettings.Blocks.Add(fog.Clone());
             }
         }
+        vm.FogSettings.EnsureElevatorFogConfig();
         vm.FogSettings.SelectedBlock = vm.FogSettings.Blocks.FirstOrDefault();
 
         // Apply Consumables

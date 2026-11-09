@@ -166,7 +166,7 @@ public class RundownTests
             Descriptive = new ExpeditionDescriptiveData { Prefix = "A1", PublicName = "The Fall" }
         });
 
-        Assert.Equal("Sector Zeta [99]", rundown.DisplayText);
+        Assert.Equal("Sector Zeta", rundown.DisplayText);
 
         var clone = rundown.Clone();
         Assert.Equal(rundown.Name, clone.Name);

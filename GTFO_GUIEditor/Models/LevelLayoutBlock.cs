@@ -226,9 +226,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     public bool HasOverloadDoor => GridState.HasOverloadDoor;
 
     [JsonIgnore]
-    public string DisplayText => string.IsNullOrWhiteSpace(Name)
-        ? $"Level {PersistentId}"
-        : Name;
+    public string DisplayText => string.IsNullOrWhiteSpace(Name) ? "Unnamed Level" : Name;
 
     public LevelLayoutGridState GetGridState(string? dimensionIndex = null)
     {

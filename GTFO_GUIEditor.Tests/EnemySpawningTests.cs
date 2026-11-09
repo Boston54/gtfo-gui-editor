@@ -14,6 +14,85 @@ namespace GTFO_GUIEditor.Tests;
 public class EnemySpawningTests
 {
     [Fact]
+    public void EnemySpawningService_RefreshOptions_WeightsAndFiltersCandidates()
+    {
+        var group = new EnemyGroupBlock
+        {
+            Type = "Hibernate",
+            Difficulty = "Easy",
+            RelativeWeight = 2
+        };
+        group.Roles.Add(new EnemyGroupRole { Role = "Striker", Distribution = "Rel_50" });
+        group.Roles.Add(new EnemyGroupRole { Role = "Shooter", Distribution = "Force_One" });
+        group.Roles.Add(new EnemyGroupRole { Role = "Ignored", Distribution = "Invalid" });
+
+        var disabledGroup = new EnemyGroupBlock
+        {
+            Type = "Disabled",
+            Difficulty = "Easy",
+            InternalEnabled = false
+        };
+        disabledGroup.Roles.Add(new EnemyGroupRole { Role = "Striker", Distribution = "Rel_100" });
+
+        var roles = new[]
+        {
+            new EnemyRoleData { Role = "striker", Difficulty = "easy", Enemy = 1, Weight = 1 },
+            new EnemyRoleData { Role = "Striker", Difficulty = "Easy", Enemy = 2, Weight = 3 },
+            new EnemyRoleData { Role = "Shooter", Difficulty = "Easy", Enemy = 2, Weight = 2 },
+            new EnemyRoleData { Role = "Striker", Difficulty = "Hard", Enemy = 3, Weight = 1 },
+            new EnemyRoleData { Role = "Ignored", Difficulty = "Easy", Enemy = 4, Weight = 1 }
+        };
+        var enemies = new[]
+        {
+            new EnemyEntry { PersistentId = 1, Name = "Striker (Hibernate)" },
+            new EnemyEntry { PersistentId = 2, Name = "Shooter" },
+            new EnemyEntry { PersistentId = 3, Name = "Hard Enemy" },
+            new EnemyEntry { PersistentId = 4, Name = "Ignored Enemy" },
+            new EnemyEntry { PersistentId = 0, Name = "None" }
+        };
+
+        try
+        {
+            EnemySpawningService.RefreshOptions(new[] { group, disabledGroup }, roles, enemies);
+
+            var option = Assert.Single(EnemySpawningService.AvailableOptions);
+            Assert.Equal("Hibernate", option.GroupType);
+            Assert.Equal("Easy", option.Difficulty);
+            var striker = Assert.Single(option.Enemies.Where(e => e.Name == "Striker"));
+            var shooter = Assert.Single(option.Enemies.Where(e => e.Name == "Shooter"));
+            Assert.Equal(0.25, striker.Weight, 6);
+            Assert.Equal(2.75, shooter.Weight, 6);
+            Assert.Equal(1.0 / 12, striker.Proportion, 6);
+            Assert.Equal(11.0 / 12, shooter.Proportion, 6);
+        }
+        finally
+        {
+            EnemySpawningService.RefreshOptions(Array.Empty<EnemyGroupBlock>(), Array.Empty<EnemyRoleData>());
+        }
+    }
+
+    [Fact]
+    public void EnemySpawningService_GetOption_MatchesCaseInsensitivelyAndHandlesMissingValues()
+    {
+        var group = new EnemyGroupBlock { Type = "Hibernate", Difficulty = "Easy" };
+        group.Roles.Add(new EnemyGroupRole { Role = "Striker", Distribution = "Rel_100" });
+        var role = new EnemyRoleData { Role = "Striker", Difficulty = "Easy", Enemy = 1, Weight = 1 };
+
+        try
+        {
+            EnemySpawningService.RefreshOptions(new[] { group }, new[] { role });
+
+            Assert.Same(EnemySpawningService.AvailableOptions[0], EnemySpawningService.GetOption("hibernate", "easy"));
+            Assert.Null(EnemySpawningService.GetOption("Missing", "Easy"));
+            Assert.Same(EnemySpawningService.AvailableOptions[0], EnemySpawningService.GetOption(null, "Easy"));
+        }
+        finally
+        {
+            EnemySpawningService.RefreshOptions(Array.Empty<EnemyGroupBlock>(), Array.Empty<EnemyRoleData>());
+        }
+    }
+
+    [Fact]
     public void EnemySpawningService_LoadsOptionsCorrectly()
     {
         var options = EnemySpawningService.AvailableOptions;

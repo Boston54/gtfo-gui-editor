@@ -17,12 +17,29 @@ public class FogSettingsDataBlockExporter : IDatablockExporter
             var vanillaFog = ExportContext.LoadVanillaBlocksArray("FogSettingsDataBlock.json");
             var vanillaFog1 = vanillaFog.FirstOrDefault(b =>
                 b.TryGetPropertyValue("persistentID", out var pid) && pid != null &&
-                uint.TryParse(pid.ToString(), out uint id) && id == 1);
+                uint.TryParse(pid.ToString(), out uint id) &&
+                (id == FogSettingsService.ElevatorFogPersistentId ||
+                 string.Equals(b["name"]?.ToString(), "Fog_ELEVATOR", System.StringComparison.OrdinalIgnoreCase)));
             if (vanillaFog1 != null)
             {
+                vanillaFog1["name"] = FogSettingsService.ElevatorFogName;
+                vanillaFog1["persistentID"] = FogSettingsService.ElevatorFogPersistentId;
                 fogBlocks.Insert(0, vanillaFog1);
             }
+            else
+            {
+                fogBlocks.Insert(0, SerializeFogBlocks(new[]
+                {
+                    EditorDefaultsService.CreateDefaultFogBlock(
+                        FogSettingsService.ElevatorFogPersistentId,
+                        FogSettingsService.ElevatorFogName)
+                })[0]);
+            }
         }
+
+        var elevatorFog = fogBlocks.First(b =>
+            b["persistentID"]?.GetValue<uint>() == FogSettingsService.ElevatorFogPersistentId);
+        elevatorFog["name"] = FogSettingsService.ElevatorFogName;
 
         if (!fogBlocks.Any(b =>
                 b.TryGetPropertyValue("persistentID", out var pid) && pid != null &&

@@ -2314,7 +2314,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
     }
 
-    private WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext context, LevelLayoutBlock? level = null, bool isMainElevatorLand = false)
+    public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext context, LevelLayoutBlock? level = null, bool isMainElevatorLand = false)
     {
         var objective = new WardenObjective();
 

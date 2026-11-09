@@ -18,7 +18,7 @@ public class ChainedPuzzleTypeEntry
     [JsonPropertyName("Prefab")]
     public string Prefab { get; set; } = string.Empty;
 
-    public string DisplayText => !string.IsNullOrEmpty(Name) ? $"{Name} (ID: {PersistentId})" : $"ID: {PersistentId}";
+    public string DisplayText => Name;
 }
 
 [JsonConverter(typeof(ChainedPuzzleItemJsonConverter))]

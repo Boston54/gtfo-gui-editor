@@ -137,7 +137,7 @@ public class ModManager : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Registers a feature usage checker predicate for a given mod.
+    /// Registers or replaces a named feature usage checker for a given mod.
     /// </summary>
     public void RegisterFeature(string modId, string featureName, Func<bool> isInUsePredicate)
     {
@@ -153,7 +153,19 @@ public class ModManager : INotifyPropertyChanged
             _featureUsageChecks[modId] = checks;
         }
 
-        checks.Add(new ModFeatureUsageCheck(featureName, isInUsePredicate));
+        var registration = new ModFeatureUsageCheck(featureName, isInUsePredicate);
+        int existingIndex = string.IsNullOrWhiteSpace(featureName)
+            ? -1
+            : checks.FindIndex(check =>
+                string.Equals(check.FeatureName, featureName, StringComparison.OrdinalIgnoreCase));
+        if (existingIndex >= 0)
+        {
+            checks[existingIndex] = registration;
+        }
+        else
+        {
+            checks.Add(registration);
+        }
     }
 
     /// <summary>

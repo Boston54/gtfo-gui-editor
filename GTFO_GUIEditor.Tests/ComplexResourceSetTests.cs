@@ -155,7 +155,7 @@ public class ComplexResourceSetTests
 
         Assert.True(vm.HasDuplicatePersistentId);
         Assert.Contains("Warning", vm.DuplicatePersistentIdWarning);
-        Assert.Contains(otherBlock.PersistentId.ToString(), vm.DuplicatePersistentIdWarning);
+        Assert.Contains("duplicated", vm.DuplicatePersistentIdWarning);
 
         // Change back to unique ID
         vm.SelectedBlock.PersistentId = 999999;
@@ -222,7 +222,7 @@ public class ComplexResourceSetTests
         Assert.Equal((uint)5001, vm.SelectedBlock.PersistentId);
         Assert.Equal("Brand_New_Set", vm.SelectedBlock.Name);
         Assert.Empty(vm.SelectedBlock.GeomorphTiles_1x1);
-        Assert.Contains("Created block [5001] Brand_New_Set", vm.StatusText);
+        Assert.Equal("Created block Brand_New_Set", vm.StatusText);
     }
 
     [Fact]
@@ -246,7 +246,7 @@ public class ComplexResourceSetTests
         Assert.Equal((uint)5002, vm.SelectedBlock.PersistentId);
         Assert.Equal("Template_Derived_Set", vm.SelectedBlock.Name);
         Assert.NotEmpty(vm.SelectedBlock.GeomorphTiles_1x1);
-        Assert.Contains("Created block [5002] Template_Derived_Set", vm.StatusText);
+        Assert.Equal("Created block Template_Derived_Set", vm.StatusText);
     }
 
     [Fact]
@@ -266,7 +266,7 @@ public class ComplexResourceSetTests
         vm.NewBlockPersistentId = 0;
         Assert.False(vm.ConfirmCreateBlock());
         Assert.True(vm.HasCreationErrorMessage);
-        Assert.Contains("greater than 0", vm.CreationErrorMessage);
+        Assert.Contains("internal identifier", vm.CreationErrorMessage);
 
         // Duplicate ID
         vm.NewBlockPersistentId = 1; // existing block
@@ -302,7 +302,7 @@ public class ComplexResourceSetTests
         Assert.Equal(initialCount - 1, vm.Blocks.Count);
         Assert.DoesNotContain(firstBlock, vm.Blocks);
         Assert.Equal(secondBlock, vm.SelectedBlock);
-        Assert.Contains("Deleted block [1]", vm.StatusText);
+        Assert.Contains("Deleted block Complex_Mining", vm.StatusText);
     }
 
     [Fact]
@@ -344,7 +344,7 @@ public class ComplexResourceSetTests
 
         Assert.True(vm.IsConfirmingDelete);
         Assert.Equal(selected, vm.BlockToDelete);
-        Assert.Contains(selected.PersistentId.ToString(), vm.DeleteConfirmationMessage);
+        Assert.DoesNotContain(selected.PersistentId.ToString(), vm.DeleteConfirmationMessage);
         Assert.Contains(selected.Name, vm.DeleteConfirmationMessage);
     }
 
