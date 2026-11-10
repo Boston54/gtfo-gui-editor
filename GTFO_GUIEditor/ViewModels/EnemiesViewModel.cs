@@ -12,6 +12,10 @@ namespace GTFO_GUIEditor.ViewModels;
 
 public class EnemiesViewModel : ViewModelBase
 {
+    // Enemy datablocks are not edited in the UI, but imported custom records must
+    // survive a subsequent export with all of their game-specific fields intact.
+    internal Dictionary<uint, JsonObject> ImportedEnemyDataBlocks { get; } = new();
+
     public ObservableCollection<EnemyPopulationBlock> PopulationBlocks { get; } = new();
     public ObservableCollection<EnemyGroupBlock> Groups { get; } = new();
     public ObservableCollection<EnemyRoleData> PopulationSearchResults { get; } = new();

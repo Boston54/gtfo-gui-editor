@@ -58,6 +58,7 @@ public class ExportContext
 
     // Export output containers
     public List<JsonObject> TextBlocks { get; } = new();
+    public List<JsonObject> EnemyBlocks { get; } = new();
     public List<JsonObject> EnemyGroupBlocks { get; } = new();
     public List<JsonObject> EnemyPopulationBlocks { get; } = new();
     public List<JsonObject> SurvivalWaveSettingsBlocks { get; } = new();

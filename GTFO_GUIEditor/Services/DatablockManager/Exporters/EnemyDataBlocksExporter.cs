@@ -34,9 +34,36 @@ public class EnemyDataBlocksExporter : IDatablockExporter
         ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyGroupDataBlock_bin.json",
             context.EnemyGroupBlocks);
 
-        // EnemyDataBlock is imported but intentionally exported as a stub.
+        var enemyBlocks = new List<JsonObject>();
+        foreach (var vanilla in context.VanillaEnemyBlocks)
+        {
+            var clone = JsonNode.Parse(vanilla.ToJsonString())?.AsObject();
+            if (clone != null) enemyBlocks.Add(clone);
+        }
+
+        // Imported enemy records are not exposed for editing, but must be carried
+        // through so custom enemy definitions retain their complete schema.
+        foreach (var imported in context.MainVm.Enemies.ImportedEnemyDataBlocks.Values)
+        {
+            uint id = imported["persistentID"]?.GetValue<uint>() ?? 0;
+            if (id == 0) continue;
+
+            int existingIndex = enemyBlocks.FindIndex(block =>
+                block["persistentID"]?.GetValue<uint>() == id);
+            var clone = JsonNode.Parse(imported.ToJsonString())?.AsObject();
+            if (clone == null) continue;
+
+            if (existingIndex >= 0)
+                enemyBlocks[existingIndex] = clone;
+            else
+                enemyBlocks.Add(clone);
+        }
+
+        context.EnemyBlocks.Clear();
+        context.EnemyBlocks.AddRange(enemyBlocks);
         ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyDataBlock_bin.json",
-            new List<JsonObject>());
+            context.EnemyBlocks,
+            ExportContext.LoadVanillaHeadersArray("EnemyDataBlock.json"));
 
         context.DatablocksExportedCount += 2;
     }
