@@ -41,6 +41,15 @@ public class MeshData
 
 public class VertexPosition
 {
+    public VertexPosition() { }
+
+    public VertexPosition(double x, double y, double z)
+    {
+        X = x;
+        Y = y;
+        Z = z;
+    }
+
     [JsonPropertyName("x")]
     public double X { get; set; }
 

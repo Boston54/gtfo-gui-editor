@@ -16,8 +16,8 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                Width="720"
-                MaxHeight="720"
+                Width="920"
+                MaxHeight="800"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 BoxShadow="0 4 20 #80000000">
@@ -212,22 +212,24 @@
                                             <ItemsControl ItemsSource="{Binding EditingDimension.StaticBigPickupDistributionInZone}" Margin="0,8,0,0">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate x:DataType="models:BigPickupDistributionItem" x:CompileBindings="False">
-                                                        <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,2">
-                                                            <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="Item to place in the zone" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
-                                                            <ComboBox Grid.Column="1"
-                                                                      ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
-                                                                      SelectedValue="{Binding ItemType, Mode=TwoWay}"
-                                                                      SelectedValueBinding="{Binding Type}"
-                                                                      HorizontalAlignment="Stretch"
-                                                                      Margin="0,0,8,0">
-                                                                <ComboBox.ItemTemplate>
-                                                                    <DataTemplate x:DataType="models:RetrieveBigItemOption">
-                                                                        <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
-                                                                    </DataTemplate>
-                                                                </ComboBox.ItemTemplate>
-                                                            </ComboBox>
-                                                            <Button Grid.Column="2" Content="✕" Command="{Binding #DimensionConfigDialogRoot.DataContext.RemoveDimensionBigPickupDistributionItem}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
-                                                        </Grid>
+                                                        <Border Background="#181818" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                                                            <Grid ColumnDefinitions="Auto,*,Auto">
+                                                                <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                <ComboBox Grid.Column="1"
+                                                                          ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
+                                                                          SelectedValue="{Binding ItemType, Mode=TwoWay}"
+                                                                          SelectedValueBinding="{Binding Type}"
+                                                                          HorizontalAlignment="Stretch"
+                                                                          Margin="0,0,8,0">
+                                                                    <ComboBox.ItemTemplate>
+                                                                        <DataTemplate x:DataType="models:RetrieveBigItemOption">
+                                                                            <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                        </DataTemplate>
+                                                                    </ComboBox.ItemTemplate>
+                                                                </ComboBox>
+                                                                <Button Grid.Column="2" Content="✕" Command="{Binding #DimensionConfigDialogRoot.DataContext.RemoveDimensionBigPickupDistributionItem}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                            </Grid>
+                                                        </Border>
                                                     </DataTemplate>
                                                 </ItemsControl.ItemTemplate>
                                             </ItemsControl>

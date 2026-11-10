@@ -463,6 +463,26 @@ public enum AlarmSoundStop : uint
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
+public enum ARA_CustomWorldEventObjectOptions
+{
+    PowerCell = 131,
+    FogTurbine = 133,
+    HSUNeonateStage1 = 137,
+    HSUNeonateStage2 = 141,
+    HSUNeonateStage3 = 143,
+    HSUNeonateStage4 = 145,
+    HSUNeonateStage5 = 170,
+    MWP = 164,
+    DataSphere = 151,
+    PortalKey = 166,
+    CargoCrate = 138,
+    CryoHardcase = 148,
+    CargoCrateHighSecurity = 154,
+    CargoCrateHighSecurityOpen = 155,
+    SedativesCase = 173
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TERM_Command : uint
 {
     None = 0,

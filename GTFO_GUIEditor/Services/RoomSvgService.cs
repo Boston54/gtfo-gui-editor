@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 using Avalonia;
 using Avalonia.Media;
@@ -131,10 +132,57 @@ public static class RoomSvgService
             return (string.Empty, string.Empty, null);
         }
 
-        var fillColor = GetColorForHeight(totalHeight, altitudeOffset);
-        string fillHex = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
-        string svgContent = GenerateSvgContent(mesh, pathData, fillHex, stroke: "none", strokeWidth: 0.0, rotationAngle: rotationAngle);
+        var (triangles, bounds, _) = Extract2DTriangles(mesh, rotationAngle);
         var geometry = CreateGeometry(mesh, rotationAngle);
+
+        string svgContent;
+        if (triangles.Count > 0)
+        {
+            var groups = new Dictionary<double, List<Triangle2D>>();
+            foreach (var tri in triangles)
+            {
+                double quantHeight = Math.Round(tri.AvgZ, 1);
+                if (!groups.TryGetValue(quantHeight, out var list))
+                {
+                    list = new List<Triangle2D>();
+                    groups[quantHeight] = list;
+                }
+                list.Add(tri);
+            }
+
+            double width = Math.Max(0.1, bounds.MaxX - bounds.MinX);
+            double height = Math.Max(0.1, bounds.MaxY - bounds.MinY);
+
+            var sb = new StringBuilder();
+            sb.Append(CultureInfo.InvariantCulture,
+                $"<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"{bounds.MinX:G9} {bounds.MinY:G9} {width:G9} {height:G9}\">\n");
+
+            foreach (var kvp in groups.OrderBy(g => g.Key))
+            {
+                var groupPathSb = new StringBuilder();
+                foreach (var tri in kvp.Value)
+                {
+                    groupPathSb.Append(CultureInfo.InvariantCulture,
+                        $"M {tri.X0:G9},{tri.Y0:G9} L {tri.X1:G9},{tri.Y1:G9} L {tri.X2:G9},{tri.Y2:G9} Z ");
+                }
+
+                double avgHeight = kvp.Value.Average(t => t.AvgZ);
+                var color = GetColorForHeight(altitudeOffset + avgHeight, altitudeOffset);
+                string fillHex = $"#{color.R:X2}{color.G:X2}{color.B:X2}";
+
+                sb.Append(CultureInfo.InvariantCulture,
+                    $"  <path d=\"{groupPathSb.ToString().TrimEnd()}\" fill=\"{fillHex}\" fill-rule=\"nonzero\" stroke=\"none\" stroke-width=\"0\" />\n");
+            }
+
+            sb.Append("</svg>");
+            svgContent = sb.ToString();
+        }
+        else
+        {
+            var fillColor = GetColorForHeight(totalHeight, altitudeOffset);
+            string fillHex = $"#{fillColor.R:X2}{fillColor.G:X2}{fillColor.B:X2}";
+            svgContent = GenerateSvgContent(mesh, pathData, fillHex, stroke: "none", strokeWidth: 0.0, rotationAngle: rotationAngle);
+        }
 
         return (svgContent, pathData, geometry);
     }
@@ -333,6 +381,8 @@ public static class RoomSvgService
             var geometry = new StreamGeometry();
             using (var ctx = geometry.Open())
             {
+                ctx.SetFillRule(FillRule.NonZero);
+
                 for (int i = 0; i < allTriangles.Count; i++)
                 {
                     var tri = allTriangles[i];
@@ -386,6 +436,10 @@ public static class RoomSvgService
             var (x1, y1) = RotatePoint(v1.X, -v1.Z, rotationAngle);
             var (x2, y2) = RotatePoint(v2.X, -v2.Z, rotationAngle);
 
+            double z0 = v0.Y;
+            double z1 = v1.Y;
+            double z2 = v2.Y;
+
             // Enforce consistent Counter-Clockwise (CCW) winding in 2D
             double cross = (x1 - x0) * (y2 - y0) - (y1 - y0) * (x2 - x0);
             if (Math.Abs(cross) < 1e-9)
@@ -397,6 +451,7 @@ public static class RoomSvgService
             {
                 (x1, x2) = (x2, x1);
                 (y1, y2) = (y2, y1);
+                (z1, z2) = (z2, z1);
             }
 
             double triArea = 0.5 * Math.Abs(cross);
@@ -407,7 +462,7 @@ public static class RoomSvgService
             minY = Math.Min(minY, Math.Min(y0, Math.Min(y1, y2)));
             maxY = Math.Max(maxY, Math.Max(y0, Math.Max(y1, y2)));
 
-            triangles.Add(new Triangle2D(x0, y0, x1, y1, x2, y2));
+            triangles.Add(new Triangle2D(x0, y0, x1, y1, x2, y2, z0, z1, z2));
         }
 
         var bounds = triangles.Count > 0
@@ -452,11 +507,85 @@ public static class RoomSvgService
         return ($"#{pair.Fill.A:X2}{pair.Fill.R:X2}{pair.Fill.G:X2}{pair.Fill.B:X2}",
                 $"#{pair.Stroke.A:X2}{pair.Stroke.R:X2}{pair.Stroke.G:X2}{pair.Stroke.B:X2}");
     }
+
+    public static List<RoomHeightLayer> BuildHeightLayers(List<Triangle2D>? triangles, double altitudeOffset = 6.0, bool isHovered = false, bool isZoneHighlighted = false)
+    {
+        var layers = new List<RoomHeightLayer>();
+        if (triangles == null || triangles.Count == 0)
+        {
+            return layers;
+        }
+
+        var groups = new Dictionary<double, List<Triangle2D>>();
+        foreach (var tri in triangles)
+        {
+            double quantHeight = Math.Round(tri.AvgZ, 1);
+            if (!groups.TryGetValue(quantHeight, out var list))
+            {
+                list = new List<Triangle2D>();
+                groups[quantHeight] = list;
+            }
+            list.Add(tri);
+        }
+
+        foreach (var kvp in groups.OrderBy(g => g.Key))
+        {
+            StreamGeometry? geom = null;
+            try
+            {
+                geom = new StreamGeometry();
+                using (var ctx = geom.Open())
+                {
+                    ctx.SetFillRule(FillRule.NonZero);
+
+                    for (int i = 0; i < kvp.Value.Count; i++)
+                    {
+                        var tri = kvp.Value[i];
+                        ctx.BeginFigure(new Point(tri.X0, tri.Y0), isFilled: true);
+                        ctx.LineTo(new Point(tri.X1, tri.Y1));
+                        ctx.LineTo(new Point(tri.X2, tri.Y2));
+                        ctx.EndFigure(isClosed: true);
+                    }
+                }
+            }
+            catch
+            {
+                geom = null;
+            }
+
+            double avgHeight = kvp.Value.Average(t => t.AvgZ);
+            var layer = new RoomHeightLayer
+            {
+                Geometry = geom,
+                LocalHeight = avgHeight
+            };
+            layer.UpdateFillBrush(altitudeOffset, isHovered, isZoneHighlighted);
+            layers.Add(layer);
+        }
+
+        return layers;
+    }
 }
 
-public readonly record struct Triangle2D(double X0, double Y0, double X1, double Y1, double X2, double Y2)
+public readonly record struct Triangle2D(double X0, double Y0, double X1, double Y1, double X2, double Y2, double Z0 = 0.0, double Z1 = 0.0, double Z2 = 0.0)
 {
     public double Area => 0.5 * Math.Abs((X1 - X0) * (Y2 - Y0) - (Y1 - Y0) * (X2 - X0));
+    public double AvgZ => (Z0 + Z1 + Z2) / 3.0;
+
+    public double GetHeightAt(double px, double py)
+    {
+        double denom = (Y1 - Y2) * (X0 - X2) + (X2 - X1) * (Y0 - Y2);
+        if (Math.Abs(denom) < 1e-9)
+        {
+            return AvgZ;
+        }
+
+        double w0 = ((Y1 - Y2) * (px - X2) + (X2 - X1) * (py - Y2)) / denom;
+        double w1 = ((Y2 - Y0) * (px - X2) + (X0 - X2) * (py - Y2)) / denom;
+        double w2 = 1.0 - w0 - w1;
+
+        return (w0 * Z0) + (w1 * Z1) + (w2 * Z2);
+    }
 }
 
 public readonly record struct Rect2D(double MinX, double MinY, double MaxX, double MaxY);

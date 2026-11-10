@@ -39,12 +39,16 @@ public class ModdedSettingsData
     [JsonPropertyName("advancedWardenObjective")]
     public bool AdvancedWardenObjective { get; set; }
 
+    [JsonPropertyName("additionalRundownAdvancements")]
+    public bool AdditionalRundownAdvancements { get; set; }
+
     [JsonPropertyName("enabledMods")]
     public HashSet<string> EnabledMods { get; set; } = new(StringComparer.OrdinalIgnoreCase);
 
     public ModdedSettingsData Clone() => new()
     {
         AdvancedWardenObjective = AdvancedWardenObjective,
+        AdditionalRundownAdvancements = AdditionalRundownAdvancements,
         EnabledMods = new HashSet<string>(EnabledMods, StringComparer.OrdinalIgnoreCase)
     };
 }
@@ -105,6 +109,8 @@ public class LevelLayoutGridStateData
     [JsonPropertyName("placedGeomorphs")] public List<PlacedGeomorphNodeData> PlacedGeomorphs { get; set; } = new();
 
     [JsonPropertyName("placedDoors")] public List<PlacedDoorNodeData> PlacedDoors { get; set; } = new();
+
+    [JsonPropertyName("placedTriggers")] public List<PlacedTriggerNodeData> PlacedTriggers { get; set; } = new();
 
     [JsonPropertyName("zoneSettings")] public List<ZoneSettingsData> ZoneSettings { get; set; } = new();
 }

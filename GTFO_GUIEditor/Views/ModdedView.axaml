@@ -78,6 +78,40 @@
                                 </TextBlock>
                             </StackPanel>
                         </Expander>
+
+                        <!-- AdditionalRundownAdvancements Expander Item -->
+                        <Expander Background="#1E1E1E" BorderBrush="#333333" BorderThickness="1" CornerRadius="4" HorizontalAlignment="Stretch">
+                            <Expander.Header>
+                                <Grid ColumnDefinitions="Auto,*" Margin="0,4">
+                                    <CheckBox Grid.Column="0"
+                                              IsChecked="{Binding AdditionalRundownAdvancements, Mode=TwoWay}"
+                                              VerticalAlignment="Center"
+                                              Margin="0,0,8,0"/>
+                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                        <TextBlock Text="Additional Rundown Advancements"
+                                                   FontWeight="SemiBold"
+                                                   FontSize="13"
+                                                   Foreground="#FFFFFF"/>
+                                        <TextBlock Text="by Amorously"
+                                                   Foreground="#888888"
+                                                   FontSize="11"
+                                                   TextWrapping="Wrap"/>
+
+                                        <!-- In-use notice -->
+                                        <TextBlock Text="⚠ This mod is actively used by features in this rundown and cannot be disabled."
+                                                   Foreground="#E5A93C"
+                                                   FontSize="11"
+                                                   IsVisible="{Binding IsAdditionalRundownAdvancementsInUse}"/>
+                                    </StackPanel>
+                                </Grid>
+                            </Expander.Header>
+
+                            <StackPanel Margin="0,8,0,0" Spacing="6">
+                                <TextBlock Foreground="#AAAAAA" FontSize="12" TextWrapping="Wrap">
+                                    Adds custom World Event triggers (Box, Sphere, and Capsule colliders) and World Event Object placements (such as Big Pickups) into level layouts with custom interaction and collision event handling.
+                                </TextBlock>
+                            </StackPanel>
+                        </Expander>
                     </StackPanel>
                 </Border>
             </StackPanel>

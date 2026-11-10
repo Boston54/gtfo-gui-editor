@@ -1,0 +1,706 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GTFO_GUIEditor.ViewModels;assembly=GTFO_GUIEditor"
+             xmlns:models="clr-namespace:GTFO_GUIEditor.Models;assembly=GTFO_GUIEditor"
+             mc:Ignorable="d" d:DesignWidth="1000" d:DesignHeight="800"
+             x:Class="GTFO_GUIEditor.Views.Dialogs.TriggerConfigDialog"
+             x:Name="TriggerConfigDialogRoot"
+             x:DataType="vm:LevelLayoutViewModel">
+    <Border Background="#80000000"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch">
+        <Border Background="#252526"
+                BorderBrush="#444444"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Width="920"
+                MaxHeight="800"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                BoxShadow="0 4 20 #80000000">
+            <StackPanel Spacing="14">
+                <!-- Header -->
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Grid.Column="0"
+                               Text="{Binding EditingTriggerTitle}"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Foreground="#FFFFFF"
+                               VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+                    <Button Grid.Column="1"
+                            Content="✕"
+                            Command="{Binding CloseTriggerConfigDialog}"
+                            ToolTip.Tip="#todo"
+                            Padding="8,4"
+                            Background="Transparent" />
+                </Grid>
+
+                <ScrollViewer MaxHeight="620" Padding="0,0,10,0" HorizontalScrollBarVisibility="Disabled"
+                              VerticalScrollBarVisibility="Auto">
+                    <StackPanel Spacing="14">
+                        <!-- BIG PICKUP SECTIONS (Visible when IsBigPickup == True) -->
+                        <!-- Big Pickup General Settings -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsBigPickup}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="General Settings"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#00F2FF" />
+
+                                <!-- Pickup Type Selection -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Pickup To Spawn:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding AvailableWorldEventObjectOptions}"
+                                              SelectedItem="{Binding EditingTrigger.PickupToSpawn, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo"
+                                              HorizontalAlignment="Stretch" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Big Pickup Transform (Position, Rotation, Scale) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsBigPickup}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Transform"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#00F2FF" />
+
+                                <!-- Position -->
+                                <TextBlock Text="3D Position:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Center.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.Center.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z (Height):" ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold" Foreground="#E0E0E0" VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.Center.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+
+                                <!-- Rotation -->
+                                <TextBlock Text="3D Rotation:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0"
+                                           Margin="0,4,0,0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Rotation.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.Rotation.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.Rotation.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+
+                                <!-- Scale -->
+                                <TextBlock Text="3D Scale:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0"
+                                           Margin="0,4,0,0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Scale.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.Scale.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.Scale.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2" />
+                                </Grid>
+
+                                <!-- Use Random Position (Big Pickups) -->
+                                <Grid ColumnDefinitions="160,*" IsVisible="{Binding EditingTrigger.IsBigPickup}" Margin="0,4,0,0">
+                                    <TextBlock Grid.Column="0" Text="Use Random Position:" ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold" Foreground="#E0E0E0" VerticalAlignment="Center" />
+                                    <CheckBox Grid.Column="1"
+                                              IsChecked="{Binding EditingTrigger.UseRandomPosition, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Big Pickup Events on Pickup -->
+                        <Expander Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                  HorizontalAlignment="Stretch" IsExpanded="True"
+                                  IsVisible="{Binding EditingTrigger.IsBigPickup}">
+                            <Expander.Header>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="Events on Pickup" FontWeight="SemiBold"
+                                               FontSize="13" ToolTip.Tip="#todo"
+                                               Foreground="#03C700" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                        <Button Content="+ Add Event" Command="{Binding AddEditingTriggerEvent}"
+                                                ToolTip.Tip="#todo"
+                                                Background="#2D5A27" Foreground="White" Padding="10,4" />
+                                        <Button Content="+ Add from Clipboard"
+                                                Command="{Binding AddEditingTriggerEventFromClipboardCommand}"
+                                                ToolTip.Tip="#todo" Background="#2E5B88"
+                                                Foreground="White" Padding="10,4" />
+                                    </StackPanel>
+                                </Grid>
+                            </Expander.Header>
+                            <StackPanel Spacing="8" Margin="0,8,0,0">
+                                <ItemsControl ItemsSource="{Binding EditingTrigger.Events}"
+                                              ItemTemplate="{StaticResource WardenEventTemplate}" />
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- TRIGGER SECTIONS (Visible when IsBigPickup == False) -->
+                        <!-- General Settings Section -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding !EditingTrigger.IsBigPickup}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="General Settings"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#00F2FF" />
+
+                                <!-- Shape Selector -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Trigger Shape:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding AvailableTriggerShapes}"
+                                              SelectedItem="{Binding EditingTrigger.Shape, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo"
+                                              HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <!-- Trigger Type Selector -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Trigger Type:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding AvailableTriggerTypes}"
+                                              SelectedItem="{Binding EditingTrigger.Type, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo"
+                                              HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <!-- Is Toggle Checkbox -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Is Toggle:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <CheckBox Grid.Column="1"
+                                              IsChecked="{Binding EditingTrigger.IsToggle, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Transform (Center 3D Coordinates) Section -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding !EditingTrigger.IsBigPickup}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="3D Center Position"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#00F2FF" />
+                                <TextBlock
+                                    Text="Center of elevator tile is (0,0). Depth (Z) corresponds to tile height."
+                                    FontSize="11"
+                                    ToolTip.Tip="#todo"
+                                    Foreground="#9E9E9E" />
+
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" Margin="0,4,0,0">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Center.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.Center.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z (Height):" ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold" Foreground="#E0E0E0" VerticalAlignment="Center"
+                                               Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.Center.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Box Collider Dimensions (Visible when Shape == Box) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsBox}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Box Collider Dimensions"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#FFA726" />
+
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*" Margin="0,4,0,0">
+                                    <TextBlock Grid.Column="0" Text="Size X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Size.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Size Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.Size.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Size Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.Size.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Sphere Collider Dimensions (Visible when Shape == Sphere) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsSphere}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Sphere Collider Dimensions"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#81C784" />
+
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Radius:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Radius, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Capsule Collider Dimensions (Visible when Shape == Capsule) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsCapsule}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Capsule Collider Dimensions"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#BA68C8" />
+
+                                <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0"
+                                               Text="Radius:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,0,10" />
+                                    <NumericUpDown Grid.Row="0" Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Radius, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,0,10" />
+
+                                    <TextBlock Grid.Row="1" Grid.Column="0"
+                                               Text="Height:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <NumericUpDown Grid.Row="1" Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.Height, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Minimum="0.1"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Interaction Settings Section (Visible when Type == Interaction) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.IsInteraction}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Interaction Settings"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#4DD0E1" />
+
+                                <!-- Interaction Text -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Interaction Text:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <TextBox Grid.Column="1"
+                                             Text="{Binding EditingTrigger.InteractionText, Mode=TwoWay}"
+                                             ToolTip.Tip="#todo"
+                                             Watermark="e.g. Insert Cell" />
+                                </Grid>
+
+                                <!-- Carry Item Insert Type -->
+                                <Grid ColumnDefinitions="140,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Carry Item Insert:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding AvailableCarryItemInsertTypes}"
+                                              SelectedItem="{Binding EditingTrigger.CarryItemInsertType, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo"
+                                              HorizontalAlignment="Stretch" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Carry Item Configuration Section (Visible when Type == Interaction AND CarryItemInsertType != None) -->
+                        <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                Padding="14"
+                                IsVisible="{Binding EditingTrigger.HasCarryItem}">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Carry Item Configuration"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="Bold"
+                                           FontSize="14"
+                                           Foreground="#80CBC4" />
+
+                                <!-- Remove Item On Insert -->
+                                <Grid ColumnDefinitions="160,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Remove Item On Insert:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <CheckBox Grid.Column="1"
+                                              IsChecked="{Binding EditingTrigger.RemoveItemOnInsert, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo" />
+                                </Grid>
+
+                                <!-- Item State After Insert -->
+                                <Grid ColumnDefinitions="160,*">
+                                    <TextBlock Grid.Column="0"
+                                               Text="Item State After Insert:"
+                                               ToolTip.Tip="#todo"
+                                               FontWeight="SemiBold"
+                                               Foreground="#E0E0E0"
+                                               VerticalAlignment="Center" />
+                                    <ComboBox Grid.Column="1"
+                                              ItemsSource="{Binding AvailableItemStatesAfterInsert}"
+                                              SelectedItem="{Binding EditingTrigger.ItemStateAfterInsert, Mode=TwoWay}"
+                                              ToolTip.Tip="#todo"
+                                              HorizontalAlignment="Stretch" />
+                                </Grid>
+
+                                <!-- Transform: Position -->
+                                <TextBlock Text="Item Position Offset:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0"
+                                           Margin="0,4,0,0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Position.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Position.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Position.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+
+                                <!-- Transform: Rotation -->
+                                <TextBlock Text="Item Rotation:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0"
+                                           Margin="0,4,0,0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Rotation.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Rotation.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Rotation.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="1"
+                                                   FormatString="F2" />
+                                </Grid>
+
+                                <!-- Transform: Scale -->
+                                <TextBlock Text="Item Scale:"
+                                           ToolTip.Tip="#todo"
+                                           FontWeight="SemiBold"
+                                           Foreground="#E0E0E0"
+                                           Margin="0,4,0,0" />
+                                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto,*">
+                                    <TextBlock Grid.Column="0" Text="X:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="1"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Scale.X, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="2" Text="Y:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="3"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Scale.Y, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2"
+                                                   Margin="0,0,10,0" />
+
+                                    <TextBlock Grid.Column="4" Text="Z:" ToolTip.Tip="#todo" FontWeight="SemiBold"
+                                               Foreground="#E0E0E0" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <NumericUpDown Grid.Column="5"
+                                                   Value="{Binding EditingTrigger.CarryItemTransform.Scale.Z, Mode=TwoWay}"
+                                                   ToolTip.Tip="#todo"
+                                                   ShowButtonSpinner="False"
+                                                   Increment="0.1"
+                                                   FormatString="F2" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Trigger Events Section (Warden Events) -->
+                        <Expander Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6"
+                                  HorizontalAlignment="Stretch" IsExpanded="True"
+                                  IsVisible="{Binding !EditingTrigger.IsBigPickup}">
+                            <Expander.Header>
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Grid.Column="0" Text="Trigger Events" FontWeight="SemiBold"
+                                               FontSize="13" ToolTip.Tip="#todo"
+                                               Foreground="#03C700" VerticalAlignment="Center" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">
+                                        <Button Content="+ Add Event" Command="{Binding AddEditingTriggerEvent}"
+                                                ToolTip.Tip="#todo"
+                                                Background="#2D5A27" Foreground="White" Padding="10,4" />
+                                        <Button Content="+ Add from Clipboard"
+                                                Command="{Binding AddEditingTriggerEventFromClipboardCommand}"
+                                                ToolTip.Tip="#todo" Background="#2E5B88"
+                                                Foreground="White" Padding="10,4" />
+                                    </StackPanel>
+                                </Grid>
+                            </Expander.Header>
+                            <StackPanel Spacing="8" Margin="0,8,0,0">
+                                <ItemsControl ItemsSource="{Binding EditingTrigger.Events}"
+                                              ItemTemplate="{StaticResource WardenEventTemplate}" />
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Actions / Buttons Footer -->
+                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,6,0,0">
+                    <Button Grid.Column="0"
+                            Content="Delete"
+                            Command="{Binding RequestDeleteEditingTrigger}"
+                            ToolTip.Tip="#todo"
+                            Background="#D9534F"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="14,6" />
+
+                    <Button Grid.Column="2"
+                            Content="Done"
+                            Command="{Binding CloseTriggerConfigDialog}"
+                            ToolTip.Tip="#todo"
+                            Background="#2D5A27"
+                            Foreground="White"
+                            FontWeight="SemiBold"
+                            Padding="20,6" />
+                </Grid>
+            </StackPanel>
+        </Border>
+    </Border>
+</UserControl>

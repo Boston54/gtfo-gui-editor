@@ -17,6 +17,7 @@ public class ModManager : INotifyPropertyChanged
     public static ModManager Instance => _lazyInstance.Value;
 
     public const string AdvancedWardenObjectiveModId = "AdvancedWardenObjective";
+    public const string AdditionalRundownAdvancementsModId = "AdditionalRundownAdvancements";
 
     private readonly HashSet<string> _enabledMods = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, List<ModFeatureUsageCheck>> _featureUsageChecks = new(StringComparer.OrdinalIgnoreCase);
@@ -32,6 +33,16 @@ public class ModManager : INotifyPropertyChanged
     {
         get => IsModEnabled(AdvancedWardenObjectiveModId);
         set => SetModEnabled(AdvancedWardenObjectiveModId, value);
+    }
+
+    /// <summary>
+    /// Gets or sets whether Additional Rundown Advancements support is enabled.
+    /// Throws InvalidOperationException if set to false while associated features are actively in use.
+    /// </summary>
+    public bool AdditionalRundownAdvancements
+    {
+        get => IsModEnabled(AdditionalRundownAdvancementsModId);
+        set => SetModEnabled(AdditionalRundownAdvancementsModId, value);
     }
 
     /// <summary>
@@ -119,6 +130,10 @@ public class ModManager : INotifyPropertyChanged
             {
                 OnPropertyChanged(nameof(AdvancedWardenObjective));
             }
+            if (string.Equals(modId, AdditionalRundownAdvancementsModId, StringComparison.OrdinalIgnoreCase))
+            {
+                OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+            }
             ModStateChanged?.Invoke(modId, enabled);
         }
 
@@ -194,6 +209,7 @@ public class ModManager : INotifyPropertyChanged
     {
         _enabledMods.Clear();
         OnPropertyChanged(nameof(AdvancedWardenObjective));
+        OnPropertyChanged(nameof(AdditionalRundownAdvancements));
         OnPropertyChanged(string.Empty);
     }
 
@@ -209,6 +225,10 @@ public class ModManager : INotifyPropertyChanged
             {
                 _enabledMods.Add(AdvancedWardenObjectiveModId);
             }
+            if (data.AdditionalRundownAdvancements)
+            {
+                _enabledMods.Add(AdditionalRundownAdvancementsModId);
+            }
 
             if (data.EnabledMods != null)
             {
@@ -223,6 +243,7 @@ public class ModManager : INotifyPropertyChanged
         }
 
         OnPropertyChanged(nameof(AdvancedWardenObjective));
+        OnPropertyChanged(nameof(AdditionalRundownAdvancements));
         OnPropertyChanged(string.Empty);
     }
 
@@ -234,6 +255,7 @@ public class ModManager : INotifyPropertyChanged
         return new ModdedSettingsData
         {
             AdvancedWardenObjective = IsModEnabled(AdvancedWardenObjectiveModId),
+            AdditionalRundownAdvancements = IsModEnabled(AdditionalRundownAdvancementsModId),
             EnabledMods = new HashSet<string>(_enabledMods, StringComparer.OrdinalIgnoreCase)
         };
     }

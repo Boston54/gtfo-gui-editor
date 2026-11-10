@@ -41,6 +41,36 @@ public class ModdedViewModel : ViewModelBase
 
     public bool CanDisableAdvancedWardenObjective => ModManager.Instance.CanDisableMod(ModManager.AdvancedWardenObjectiveModId);
 
+    public bool AdditionalRundownAdvancements
+    {
+        get => ModManager.Instance.AdditionalRundownAdvancements;
+        set
+        {
+            if (ModManager.Instance.AdditionalRundownAdvancements == value)
+            {
+                return;
+            }
+
+            if (!ModManager.Instance.TrySetModEnabled(ModManager.AdditionalRundownAdvancementsModId, value, out var error))
+            {
+                ErrorMessage = error ?? "Cannot disable mod because one or more associated features are actively in use.";
+                OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+                OnPropertyChanged(nameof(IsAdditionalRundownAdvancementsInUse));
+                OnPropertyChanged(nameof(CanDisableAdditionalRundownAdvancements));
+                return;
+            }
+
+            ErrorMessage = string.Empty;
+            OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+            OnPropertyChanged(nameof(IsAdditionalRundownAdvancementsInUse));
+            OnPropertyChanged(nameof(CanDisableAdditionalRundownAdvancements));
+        }
+    }
+
+    public bool IsAdditionalRundownAdvancementsInUse => ModManager.Instance.IsModInUse(ModManager.AdditionalRundownAdvancementsModId);
+
+    public bool CanDisableAdditionalRundownAdvancements => ModManager.Instance.CanDisableMod(ModManager.AdditionalRundownAdvancementsModId);
+
     public string ErrorMessage
     {
         get => _errorMessage;
@@ -70,6 +100,15 @@ public class ModdedViewModel : ViewModelBase
             OnPropertyChanged(nameof(IsAdvancedWardenObjectiveInUse));
             OnPropertyChanged(nameof(CanDisableAdvancedWardenObjective));
         }
+
+        if (string.IsNullOrEmpty(e.PropertyName) ||
+            e.PropertyName == nameof(ModManager.AdditionalRundownAdvancements) ||
+            e.PropertyName == ModManager.AdditionalRundownAdvancementsModId)
+        {
+            OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+            OnPropertyChanged(nameof(IsAdditionalRundownAdvancementsInUse));
+            OnPropertyChanged(nameof(CanDisableAdditionalRundownAdvancements));
+        }
     }
 
     public void Reset()
@@ -79,6 +118,9 @@ public class ModdedViewModel : ViewModelBase
         OnPropertyChanged(nameof(AdvancedWardenObjective));
         OnPropertyChanged(nameof(IsAdvancedWardenObjectiveInUse));
         OnPropertyChanged(nameof(CanDisableAdvancedWardenObjective));
+        OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+        OnPropertyChanged(nameof(IsAdditionalRundownAdvancementsInUse));
+        OnPropertyChanged(nameof(CanDisableAdditionalRundownAdvancements));
     }
 
     public void ApplyData(ModdedSettingsData? data)
@@ -88,6 +130,9 @@ public class ModdedViewModel : ViewModelBase
         OnPropertyChanged(nameof(AdvancedWardenObjective));
         OnPropertyChanged(nameof(IsAdvancedWardenObjectiveInUse));
         OnPropertyChanged(nameof(CanDisableAdvancedWardenObjective));
+        OnPropertyChanged(nameof(AdditionalRundownAdvancements));
+        OnPropertyChanged(nameof(IsAdditionalRundownAdvancementsInUse));
+        OnPropertyChanged(nameof(CanDisableAdditionalRundownAdvancements));
     }
 
     public ModdedSettingsData ExportData()

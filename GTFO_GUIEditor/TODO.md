@@ -40,6 +40,7 @@
   * Zones should be assigned the index in order of creation, not based on where they are in the level.
 * The margins in the user docs are slightly too far out and text can get cut off. Both vertical and horizontal
 * The AWO events that use ChainedPuzzles by index are currently using the Alarm types as inputs, so are not working properly.
+* The name of an expedition should not be synthesised into a TextDB object; the field expects a raw string input.
 
 ## Modded Support
 Support for mods should be implemented as its own tab with toggles for each mod. If a mod is enabled, it can only be disabled if the things that are dependent on it are never used. The fields added by a mod in the editor should be coloured differently to make it obvious that it is a mod requirement (different colour for each mod)

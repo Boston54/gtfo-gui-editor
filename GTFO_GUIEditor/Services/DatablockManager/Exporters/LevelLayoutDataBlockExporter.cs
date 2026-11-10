@@ -571,7 +571,9 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                             ["Middle"] = zoneSettings.DisinfectKitPlacementMiddle,
                             ["End"] = zoneSettings.DisinfectKitPlacementEnd
                         },
-                        ["StaticSpawnDataContainers"] = new JsonArray()
+                        ["StaticSpawnDataContainers"] = new JsonArray(),
+                        ["EventsOnTrigger"] = ModManager.Instance.AdditionalRundownAdvancements ? AraLevelLayoutService.ExportEventsOnTriggerForZone(context, gridState, sectorCfg.Sector, zoneNumber) : new JsonArray(),
+                        ["SpecificPickupSpawningDatas"] = ModManager.Instance.AdditionalRundownAdvancements ? AraLevelLayoutService.ExportSpecificPickupSpawningDatasForZone(context, gridState, sectorCfg.Sector, zoneNumber) : new JsonArray()
                     };
 
                     zonesArray.Add(zoneObj);
@@ -875,6 +877,12 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     ["persistentID"] = dimId
                 };
                 dimensionBlocks.Add(dimObj);
+            }
+
+            if (ModManager.Instance.AdditionalRundownAdvancements)
+            {
+                var exp = context.MainVm.Rundown.SelectedRundown?.Expeditions.FirstOrDefault(e => e.LevelLayoutData == level.PersistentId);
+                AraLevelLayoutService.ExportAraLevelLayout(context, level, exp);
             }
         }
 
