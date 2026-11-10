@@ -14,18 +14,24 @@ public class AutoReopenLastRundownTests : IDisposable
 {
     private readonly string _tempDir;
     private readonly string _recentFilesPath;
+    private readonly string _settingsPath;
 
     public AutoReopenLastRundownTests()
     {
         _tempDir = Path.Combine(Path.GetTempPath(), $"AutoReopenTests_{Guid.NewGuid():N}");
         Directory.CreateDirectory(_tempDir);
         _recentFilesPath = Path.Combine(_tempDir, "recent_files.json");
+        _settingsPath = Path.Combine(_tempDir, "settings.json");
         RundownProjectService.CustomRecentFilesConfigPath = _recentFilesPath;
+        EditorSettingsManager.CustomSettingsConfigPath = _settingsPath;
+        EditorSettingsManager.Instance.ReloadSettings();
     }
 
     public void Dispose()
     {
         RundownProjectService.CustomRecentFilesConfigPath = null;
+        EditorSettingsManager.CustomSettingsConfigPath = null;
+        EditorSettingsManager.Instance.ReloadSettings();
         try
         {
             if (Directory.Exists(_tempDir))
@@ -72,6 +78,8 @@ public class AutoReopenLastRundownTests : IDisposable
         Assert.Single(newVm.LevelLayout.Levels);
         Assert.Equal("L1_Special_Level", newVm.LevelLayout.SelectedLevel?.Name);
         Assert.Contains("Reopened", newVm.StatusMessage);
+        Assert.False(newVm.IsDirty);
+        Assert.False(newVm.HasUnsavedChanges);
     }
 
     [Fact]
@@ -165,5 +173,32 @@ public class AutoReopenLastRundownTests : IDisposable
         Assert.True(success);
         Assert.Equal(file2, vmTest.CurrentFilePath);
         Assert.Equal("Newer Project", vmTest.Rundown.SelectedRundown?.Name);
+    }
+
+    [Fact]
+    public async Task ReopenPreviousProject_UsesLastOpenedFileInsteadOfOlderRecentFile()
+    {
+        string olderFile = Path.Combine(_tempDir, "Older.rundown");
+        string latestFile = Path.Combine(_tempDir, "Latest.rundown");
+
+        var olderVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        olderVm.Rundown.SelectedRundown!.Name = "Older Project";
+        RundownProjectService.SaveProject(olderVm, olderFile);
+        RundownProjectService.AddRecentFile(olderFile);
+
+        var latestVm = new MainWindowViewModel(autoReopenLastRundown: false);
+        latestVm.Rundown.SelectedRundown!.Name = "Latest Project";
+        RundownProjectService.SaveProject(latestVm, latestFile);
+
+        await latestVm.OpenFileDirectAsync(latestFile);
+        Assert.Equal(Path.GetFullPath(latestFile), latestVm.Settings.General.LastOpenedRundownPath);
+        Assert.Equal(Path.GetFullPath(latestFile), RundownProjectService.LoadRecentFiles()[0].FilePath);
+
+        var reopenedVm = new MainWindowViewModel(autoReopenLastRundown: true);
+
+        Assert.Equal(Path.GetFullPath(latestFile), reopenedVm.CurrentFilePath);
+        Assert.Equal("Latest Project", reopenedVm.Rundown.SelectedRundown?.Name);
+        Assert.False(reopenedVm.IsDirty);
+        Assert.False(reopenedVm.HasUnsavedChanges);
     }
 }

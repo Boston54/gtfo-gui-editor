@@ -249,31 +249,6 @@ public class MainWindowViewModel : ViewModelBase
         }
     }
 
-    private void OnProjectPropertyChanged(object? sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName is "SelectedAlarm"
-            or "SelectedBlock"
-            or "IsExpanded"
-            or "SearchText"
-            or "HasSelectedAlarm"
-            or "HasSelectedBlock"
-            or "StatusText"
-            or "DisplayText"
-            or "SelectedCategory"
-            or "CurrentCategorySettings"
-            or "HasCurrentCategorySettings"
-            or "FilteredAlarms"
-            or "FilteredBlocks")
-        {
-            return;
-        }
-
-        if (sender != Settings && sender != Settings.General && sender != Settings.Appearance)
-        {
-            MarkProjectEdited();
-        }
-    }
-
     public MainWindowViewModel()
         : this(new AvaloniaFileDialogService(), autoReopenLastRundown: false)
     {
@@ -297,6 +272,7 @@ public class MainWindowViewModel : ViewModelBase
         FogSettings = new FogSettingsViewModel();
         Enemies = new EnemiesViewModel();
         LevelLayout = new LevelLayoutViewModel(null, Lighting.Blocks, Alarms.Alarms, FogSettings.Blocks, Consumables.Blocks);
+        LevelLayout.ProjectModelCreated += AttachDirtyTracking;
         var defaultRundown = Services.RundownService.CreateFreshBlock(1, "New Rundown");
         if (defaultRundown.TierA.Count == 0)
         {
@@ -305,18 +281,6 @@ public class MainWindowViewModel : ViewModelBase
         Rundown = new RundownViewModel(defaultRundown, LevelLayout.Levels);
         Modded = new ModdedViewModel();
         Settings.General.PropertyChanged += OnGeneralSettingsPropertyChanged;
-
-        Documentation.PropertyChanged += OnProjectPropertyChanged;
-        Sounds.PropertyChanged += OnProjectPropertyChanged;
-        Geomorphs.PropertyChanged += OnProjectPropertyChanged;
-        Alarms.PropertyChanged += OnProjectPropertyChanged;
-        Consumables.PropertyChanged += OnProjectPropertyChanged;
-        Lighting.PropertyChanged += OnProjectPropertyChanged;
-        FogSettings.PropertyChanged += OnProjectPropertyChanged;
-        Enemies.PropertyChanged += OnProjectPropertyChanged;
-        LevelLayout.PropertyChanged += OnProjectPropertyChanged;
-        Rundown.PropertyChanged += OnProjectPropertyChanged;
-        Modded.PropertyChanged += OnProjectPropertyChanged;
 
         _autosaveTimer = new System.Threading.Timer(
             _ => _ = RunAutosaveAsync(),
@@ -355,6 +319,7 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         if (value is INotifyPropertyChanged notifyPropertyChanged &&
+            value is not ViewModelBase &&
             _dirtyPropertySubscribers.Add(notifyPropertyChanged))
         {
             if (value is not MainWindowViewModel)
@@ -372,7 +337,14 @@ public class MainWindowViewModel : ViewModelBase
             }
         }
 
-        if (value is IEnumerable enumerable)
+        if (value is IReadOnlyDictionary<(SectorType Sector, int ZoneIndex), ZoneSettings> zoneSettings)
+        {
+            foreach (ZoneSettings settings in zoneSettings.Values)
+            {
+                TraverseDirtyObject(settings, visited);
+            }
+        }
+        else if (value is IEnumerable enumerable)
         {
             foreach (object? item in enumerable)
             {
@@ -392,7 +364,10 @@ public class MainWindowViewModel : ViewModelBase
         foreach (PropertyInfo property in type.GetProperties(BindingFlags.Instance | BindingFlags.Public))
         {
             if (property.GetIndexParameters().Length != 0 ||
-                !IsProjectObject(property.PropertyType))
+                (!IsProjectObject(property.PropertyType) &&
+                 !IsDirtyTrackedCollectionProperty(type, property) &&
+                 !(type == typeof(LevelLayoutGridState) &&
+                   property.Name == nameof(LevelLayoutGridState.ZoneSettingsMap))))
             {
                 continue;
             }
@@ -411,26 +386,53 @@ public class MainWindowViewModel : ViewModelBase
     private static bool IsProjectObject(Type type) =>
         type.Namespace?.StartsWith("GTFO_GUIEditor", StringComparison.Ordinal) == true;
 
+    private static bool IsDirtyTrackedCollectionProperty(Type ownerType, PropertyInfo property)
+    {
+        if (!typeof(INotifyCollectionChanged).IsAssignableFrom(property.PropertyType))
+        {
+            return false;
+        }
+
+        Type? itemType = property.PropertyType.IsGenericType
+            ? property.PropertyType.GetGenericArguments().FirstOrDefault()
+            : null;
+        if (itemType?.Namespace?.EndsWith(".Models", StringComparison.Ordinal) != true ||
+            typeof(ViewModelBase).IsAssignableFrom(itemType))
+        {
+            return false;
+        }
+
+        if (ownerType.Namespace?.EndsWith(".Models", StringComparison.Ordinal) == true)
+        {
+            return true;
+        }
+
+        return ownerType.Namespace?.EndsWith(".ViewModels", StringComparison.Ordinal) == true &&
+               !property.Name.StartsWith("Available", StringComparison.Ordinal) &&
+               !property.Name.StartsWith("Filtered", StringComparison.Ordinal) &&
+               !property.Name.Contains("Search", StringComparison.Ordinal) &&
+               !property.Name.Contains("Result", StringComparison.Ordinal) &&
+               property.Name is not ("Enemies" or "ChainedPuzzleTypes" or "Sections" or "DisplayTabs"
+                   or "RecentFiles" or "ImportFailedLevels");
+    }
+
     private void DirtyPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (sender is EditorSettings || sender is GeneralSettings)
+        if (_isLoadingProject || sender is ViewModelBase || sender is EditorSettings || sender is GeneralSettings)
         {
             return;
         }
 
-        if (e.PropertyName is "SelectedAlarm"
-            or "SelectedBlock"
-            or "IsExpanded"
-            or "SearchText"
-            or "HasSelectedAlarm"
-            or "HasSelectedBlock"
-            or "StatusText"
-            or "DisplayText"
-            or "SelectedCategory"
-            or "CurrentCategorySettings"
-            or "HasCurrentCategorySettings"
-            or "FilteredAlarms"
-            or "FilteredBlocks")
+        if (sender is PlacedRoomNode &&
+            e.PropertyName is nameof(PlacedRoomNode.IsHovered)
+                or nameof(PlacedRoomNode.IsZoneHighlighted)
+                or nameof(PlacedRoomNode.FillBrush)
+                or nameof(PlacedRoomNode.ZIndex))
+        {
+            return;
+        }
+
+        if (e.PropertyName is "IsExpanded" or "DisplayText")
         {
             return;
         }
@@ -449,21 +451,33 @@ public class MainWindowViewModel : ViewModelBase
 
         if (sender != null)
         {
-            AttachDirtyTracking(sender);
+            PropertyInfo? changedProperty = e.PropertyName == null
+                ? null
+                : sender.GetType().GetProperty(e.PropertyName, BindingFlags.Instance | BindingFlags.Public);
+            if (changedProperty != null &&
+                (IsProjectObject(changedProperty.PropertyType) ||
+                 IsDirtyTrackedCollectionProperty(sender.GetType(), changedProperty)))
+            {
+                try
+                {
+                    AttachDirtyTracking(changedProperty.GetValue(sender));
+                }
+                catch (Exception ex)
+                {
+                    StatusMessage = $"Unable to track changes to {e.PropertyName}: {ex.Message}";
+                }
+            }
         }
         MarkProjectEdited();
     }
 
     private void DirtyCollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        if (sender == Alarms.FilteredAlarms ||
-            sender == Consumables.FilteredBlocks ||
-            sender == Lighting.FilteredBlocks ||
-            sender == FogSettings.FilteredBlocks)
+        if (_isLoadingProject)
         {
             return;
         }
-
+        MarkProjectEdited();
         MarkProjectEdited();
         if (e.NewItems != null)
         {
@@ -631,19 +645,27 @@ public class MainWindowViewModel : ViewModelBase
                 return false;
             }
 
-            var recentFiles = RundownProjectService.LoadRecentFiles();
-            var lastFile = recentFiles.FirstOrDefault(f => !f.IsPlaceholder && !string.IsNullOrWhiteSpace(f.FilePath) && File.Exists(f.FilePath));
-            if (lastFile == null)
+            string? lastOpenedPath = Settings.General.LastOpenedRundownPath;
+            string? lastFilePath = !string.IsNullOrWhiteSpace(lastOpenedPath) && File.Exists(lastOpenedPath)
+                ? lastOpenedPath
+                : RundownProjectService.LoadRecentFiles()
+                    .FirstOrDefault(f => !f.IsPlaceholder &&
+                        !string.IsNullOrWhiteSpace(f.FilePath) &&
+                        File.Exists(f.FilePath))?.FilePath;
+            if (string.IsNullOrWhiteSpace(lastFilePath))
             {
                 return false;
             }
 
             try
             {
-                var project = RundownProjectService.LoadProject(lastFile.FilePath);
-                RundownProjectService.ApplyProject(this, project, lastFile.FilePath);
+                var project = RundownProjectService.LoadProject(lastFilePath);
+                RundownProjectService.ApplyProject(this, project, lastFilePath);
+                Settings.General.LastOpenedRundownPath = lastFilePath;
+                EditorSettingsManager.Instance.SaveSettings();
+                RundownProjectService.AddRecentFile(lastFilePath);
                 RefreshRecentFiles();
-                StatusMessage = $"Reopened: {Path.GetFileName(lastFile.FilePath)}";
+                StatusMessage = $"Reopened: {Path.GetFileName(lastFilePath)}";
                 return true;
             }
             catch (Exception ex)
@@ -900,9 +922,11 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             var project = RundownProjectService.LoadProject(filePath);
-            RundownProjectService.ApplyProject(this, project, filePath);
-            Settings.General.LastOpenedRundownPath = filePath;
+            string fullPath = Path.GetFullPath(filePath);
+            RundownProjectService.ApplyProject(this, project, fullPath);
+            Settings.General.LastOpenedRundownPath = fullPath;
             EditorSettingsManager.Instance.SaveSettings();
+            RundownProjectService.AddRecentFile(fullPath);
             RefreshRecentFiles();
             AttachDirtyTracking(this);
             MarkProjectClean();

@@ -115,6 +115,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public ICommand RemoveDoorCandidateZoneCommand { get; }
     public ICommand AddRoomEnemyCommand { get; }
     public ICommand RemoveRoomEnemyCommand { get; }
+    public event Action<object>? ProjectModelCreated;
 
     // Edit Door modal state
     private bool _isEditingDoor;
@@ -2053,11 +2054,12 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public async Task AddTerminalPlacementFromClipboardCommand()
     {
-        if (ActiveZoneSettings == null) return;
+        var zoneSettings = GetOrCreateActiveZoneSettings();
+        if (zoneSettings == null) return;
         var placements = await GetTerminalPlacementsFromClipboardAsync();
         foreach (var p in placements)
         {
-            ActiveZoneSettings.TerminalPlacements.Add(p);
+            zoneSettings.TerminalPlacements.Add(p);
         }
         UpdateAvailableDoorTerminalZones();
     }
@@ -2360,7 +2362,7 @@ public class LevelLayoutViewModel : ViewModelBase
         set => SetField(ref _editingDimension, value);
     }
 
-    public void AddEnemySpawningInZoneItem() => ActiveZoneSettings?.EnemySpawningInZone.Add(new EnemySpawningInZoneItem());
+    public void AddEnemySpawningInZoneItem() => GetOrCreateActiveZoneSettings()?.EnemySpawningInZone.Add(new EnemySpawningInZoneItem());
     public void RemoveEnemySpawningInZoneItem(EnemySpawningInZoneItem? item) { if (item != null) ActiveZoneSettings?.EnemySpawningInZone.Remove(item); }
 
     public void AddRoomEnemy()
@@ -2381,10 +2383,10 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
-    public void AddEnemyExcludeItem() => ActiveZoneSettings?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
+    public void AddEnemyExcludeItem() => GetOrCreateActiveZoneSettings()?.ExcludeList.Add(new EnemyExcludeItem { EnemyId = 38 });
     public void RemoveEnemyExcludeItem(EnemyExcludeItem? item) { if (item != null) ActiveZoneSettings?.ExcludeList.Remove(item); }
 
-    public void AddBigPickupDistributionItem() => ActiveZoneSettings?.BigPickupDistributionInZone.Add(new BigPickupDistributionItem());
+    public void AddBigPickupDistributionItem() => GetOrCreateActiveZoneSettings()?.BigPickupDistributionInZone.Add(new BigPickupDistributionItem());
     public void RemoveBigPickupDistributionItem(BigPickupDistributionItem? item)
     {
         if (item != null)
@@ -2403,12 +2405,12 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
-    public void AddDisinfectionStationPlacement() => ActiveZoneSettings?.DisinfectionStationPlacements.Add(new DisinfectionStationPlacement());
+    public void AddDisinfectionStationPlacement() => GetOrCreateActiveZoneSettings()?.DisinfectionStationPlacements.Add(new DisinfectionStationPlacement());
     public void RemoveDisinfectionStationPlacement(DisinfectionStationPlacement? placement) { if (placement != null) ActiveZoneSettings?.DisinfectionStationPlacements.Remove(placement); }
 
     public void AddTerminalPlacement()
     {
-        ActiveZoneSettings?.TerminalPlacements.Add(new TerminalPlacement());
+        GetOrCreateActiveZoneSettings()?.TerminalPlacements.Add(new TerminalPlacement());
         UpdateAvailableDoorTerminalZones();
     }
 
@@ -2532,12 +2534,6 @@ public class LevelLayoutViewModel : ViewModelBase
         {
             if (SetField(ref _editingRoom, value))
             {
-                if (value?.Geomorph != null && value.Geomorph.Lighting > 0 && ActiveZoneSettings != null &&
-                    ActiveZoneSettings.Lighting == 0)
-                {
-                    ActiveZoneSettings.Lighting = value.Geomorph.Lighting;
-                }
-
                 OnPropertyChanged(nameof(EditingRoomTitle));
                 OnPropertyChanged(nameof(EditingRoomGeomorphName));
                 OnPropertyChanged(nameof(EditingRoomAreaIndex));
@@ -2600,17 +2596,34 @@ public class LevelLayoutViewModel : ViewModelBase
     public string EditingRoomAreaSize => EditingRoom != null ? $"{EditingRoom.Area:F1}" : "0.0";
 
     // --- Zone Settings for Editing Room ---
-    public ZoneSettings? ActiveZoneSettings =>
-        EditingRoom != null ? GridState.GetOrCreateZoneSettings(EditingRoom.Sector, EditingRoom.Zone) : null;
+    public ZoneSettings? ActiveZoneSettings => GetOrCreateActiveZoneSettings();
+
+    private ZoneSettings? GetOrCreateActiveZoneSettings()
+    {
+        if (EditingRoom == null)
+        {
+            return null;
+        }
+
+        var settings = GridState.GetZoneSettings(EditingRoom.Sector, EditingRoom.Zone);
+        if (settings == null)
+        {
+            settings = GridState.GetOrCreateZoneSettings(EditingRoom.Sector, EditingRoom.Zone);
+            ProjectModelCreated?.Invoke(settings);
+        }
+        return settings;
+    }
 
     public LightSettingsBlock? SelectedZoneLightingOption
     {
         get => AvailableLightingConfigs.FirstOrDefault(l => l.PersistentId == (ActiveZoneSettings?.Lighting ?? 0));
         set
         {
-            if (value != null && ActiveZoneSettings != null && ActiveZoneSettings.Lighting != value.PersistentId)
+            if (value != null && EditingRoom != null &&
+                (ActiveZoneSettings?.Lighting ?? 0) != value.PersistentId)
             {
-                ActiveZoneSettings.Lighting = value.PersistentId;
+                var zoneSettings = GetOrCreateActiveZoneSettings()!;
+                zoneSettings.Lighting = value.PersistentId;
                 OnPropertyChanged(nameof(SelectedZoneLightingOption));
                 OnPropertyChanged(nameof(EditingZoneLighting));
             }
@@ -2622,9 +2635,10 @@ public class LevelLayoutViewModel : ViewModelBase
         get => ActiveZoneSettings?.Lighting ?? 0;
         set
         {
-            if (ActiveZoneSettings != null && ActiveZoneSettings.Lighting != value)
+            if (EditingRoom != null && (ActiveZoneSettings?.Lighting ?? 0) != value)
             {
-                ActiveZoneSettings.Lighting = value;
+                var zoneSettings = GetOrCreateActiveZoneSettings()!;
+                zoneSettings.Lighting = value;
                 OnPropertyChanged(nameof(EditingZoneLighting));
                 OnPropertyChanged(nameof(SelectedZoneLightingOption));
             }
@@ -2636,9 +2650,11 @@ public class LevelLayoutViewModel : ViewModelBase
         get => AvailableConsumableDistributions.FirstOrDefault(c => c.PersistentId == (ActiveZoneSettings?.ConsumableDistributionInZone ?? 0));
         set
         {
-            if (value != null && ActiveZoneSettings != null && ActiveZoneSettings.ConsumableDistributionInZone != value.PersistentId)
+            if (value != null && EditingRoom != null &&
+                (ActiveZoneSettings?.ConsumableDistributionInZone ?? 0) != value.PersistentId)
             {
-                ActiveZoneSettings.ConsumableDistributionInZone = value.PersistentId;
+                var zoneSettings = GetOrCreateActiveZoneSettings()!;
+                zoneSettings.ConsumableDistributionInZone = value.PersistentId;
                 OnPropertyChanged(nameof(SelectedZoneConsumableDistributionOption));
             }
         }
@@ -3271,8 +3287,10 @@ public class LevelLayoutViewModel : ViewModelBase
         get
         {
             string targetIndex = _dimensionIndexToDelete ?? _activeDimensionIndex;
-            string displayName = targetIndex;
-            if (_selectedLevel != null)
+            string displayName = string.IsNullOrWhiteSpace(targetIndex) ? "Reality" : targetIndex;
+            if (_selectedLevel != null &&
+                !string.IsNullOrWhiteSpace(targetIndex) &&
+                !string.Equals(targetIndex, "Reality", StringComparison.OrdinalIgnoreCase))
             {
                 var dim = _selectedLevel.GetDimension(targetIndex);
                 if (dim != null && !string.IsNullOrWhiteSpace(dim.Name))

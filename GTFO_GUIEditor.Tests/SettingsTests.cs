@@ -1,5 +1,7 @@
 using System;
 using System.IO;
+using Avalonia;
+using Avalonia.Threading;
 using Avalonia.Media;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.Services;
@@ -154,6 +156,77 @@ public class SettingsTests : IDisposable
     }
 
     [Fact]
+    public void ReopeningDatablocksOnStartup_DoesNotLeaveDatablocksQueuedForSave()
+    {
+        string datablockPath = Path.Combine(Path.GetTempPath(), $"reopen_datablocks_test_{Guid.NewGuid():N}");
+        try
+        {
+            var sourceVm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var exportResult = DatablockManager.Instance.ExportDatablocks(sourceVm, datablockPath);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            sourceVm.Settings.General.DataFlow = DataFlowMode.Datablocks;
+            sourceVm.Settings.General.LastOpenedDatablockPath = datablockPath;
+            EditorSettingsManager.Instance.SaveSettings();
+            DatablockSaveQueue.Instance.Clear();
+
+            var reopenedVm = new MainWindowViewModel(autoReopenLastRundown: true);
+
+            Assert.Equal(DataFlowMode.Datablocks, reopenedVm.Settings.General.DataFlow);
+            Assert.Equal(datablockPath, reopenedVm.CurrentDatablocksPath);
+            Assert.StartsWith("Reopened datablocks:", reopenedVm.StatusMessage, StringComparison.Ordinal);
+            Assert.False(reopenedVm.IsDirty);
+            Assert.False(reopenedVm.HasUnsavedChanges, reopenedVm.StatusMessage);
+            Assert.Empty(reopenedVm.EditedDatablockFiles);
+        }
+        finally
+        {
+            if (Directory.Exists(datablockPath))
+            {
+                Directory.Delete(datablockPath, true);
+            }
+        }
+    }
+
+    [Fact]
+    public void ReopeningDatablocksInMainWindow_DoesNotShowUnsavedChanges()
+    {
+        string datablockPath = Path.Combine(Path.GetTempPath(), $"reopen_datablocks_window_test_{Guid.NewGuid():N}");
+        try
+        {
+            var sourceVm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var exportResult = DatablockManager.Instance.ExportDatablocks(sourceVm, datablockPath);
+            Assert.True(exportResult.Success, exportResult.Message);
+
+            sourceVm.Settings.General.DataFlow = DataFlowMode.Datablocks;
+            sourceVm.Settings.General.LastOpenedDatablockPath = datablockPath;
+            EditorSettingsManager.Instance.SaveSettings();
+            DatablockSaveQueue.Instance.Clear();
+
+            if (Application.Current == null)
+            {
+                AppBuilder.Configure<App>().UsePlatformDetect().SetupWithoutStarting();
+            }
+
+            var window = new MainWindow();
+            window.ApplyTemplate();
+            Dispatcher.UIThread.RunJobs();
+
+            var reopenedVm = Assert.IsType<MainWindowViewModel>(window.DataContext);
+            Assert.False(reopenedVm.StatusMessage.Contains("unsaved changes", StringComparison.OrdinalIgnoreCase));
+            Assert.False(reopenedVm.HasUnsavedChanges);
+            Assert.Empty(reopenedVm.EditedDatablockFiles);
+        }
+        finally
+        {
+            if (Directory.Exists(datablockPath))
+            {
+                Directory.Delete(datablockPath, true);
+            }
+        }
+    }
+
+    [Fact]
     public void LevelLayoutViewState_DoesNotMarkProjectEdited()
     {
         var vm = new MainWindowViewModel(autoReopenLastRundown: false);
@@ -167,6 +240,154 @@ public class SettingsTests : IDisposable
         Assert.False(vm.IsDirty);
         Assert.Empty(vm.EditedDatablockFiles);
         Assert.False(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public async Task ExpandingNonFirstAlarm_DoesNotMarkProjectEdited_ButFieldChangesDo()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), $"expand_alarm_clean_test_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            vm.Alarms.Alarms.Add(new AlarmBlock { Name = "First alarm" });
+            vm.Alarms.Alarms.Add(new AlarmBlock { Name = "Second alarm" });
+
+            vm.CurrentFilePath = filePath;
+            await vm.SaveRundownAsync();
+            Assert.False(vm.IsDirty);
+
+            await vm.OpenFileDirectAsync(filePath);
+            Assert.False(vm.IsDirty);
+            Assert.False(vm.HasUnsavedChanges);
+
+            AlarmBlock secondAlarm = vm.Alarms.Alarms[1];
+            vm.Alarms.ToggleAlarmExpanded(secondAlarm);
+
+            Assert.False(vm.IsDirty);
+            Assert.False(vm.HasUnsavedChanges);
+
+            secondAlarm.PublicAlarmName = "Changed name";
+
+            Assert.True(vm.IsDirty);
+            Assert.True(vm.HasUnsavedChanges);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+    }
+
+    [Fact]
+    public async Task HoveringLevelLayoutRoom_DoesNotMarkProjectEdited()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), $"hover_room_clean_test_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var level = vm.LevelLayout.SelectedLevel!;
+            var room = new PlacedRoomNode();
+            level.GridState.PlacedRooms.Add(room);
+
+            vm.CurrentFilePath = filePath;
+            await vm.SaveRundownAsync();
+            Assert.False(vm.IsDirty);
+
+            level.GridState.HoveredRoom = room;
+
+            Assert.True(room.IsHovered);
+            Assert.False(vm.IsDirty);
+            Assert.False(vm.HasUnsavedChanges);
+
+            level.GridState.HoveredRoom = null;
+            Assert.False(room.IsHovered);
+            Assert.False(vm.IsDirty);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
+    }
+
+    [Fact]
+    public void NavigationSearchAndRoomDialog_DontMarkProjectEdited()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+
+        vm.OpenGeneralSettings();
+        vm.SelectedSettingsTabIndex = 1;
+        vm.CloseSettings();
+        vm.Enemies.PopulationSearchText = "striker";
+        vm.Enemies.GroupSearchText = "group";
+        vm.Geomorphs.SearchText = "mining";
+        vm.Geomorphs.SelectedComplexTabIndex = 1;
+        vm.Sounds.SearchText = "event";
+        if (vm.Documentation.DisplayTabs.Count > 1)
+        {
+            vm.Documentation.SelectedSection = vm.Documentation.DisplayTabs[1];
+        }
+        vm.Rundown.OpenRundownSettings();
+        vm.Rundown.CloseRundownSettings();
+
+        var room = new PlacedRoomNode { Zone = 7 };
+        vm.LevelLayout.OnRoomClicked(room);
+        Assert.True(vm.LevelLayout.IsEditingRoom);
+        Assert.NotNull(vm.LevelLayout.ActiveZoneSettings);
+        vm.LevelLayout.CloseEditRoomDialog();
+
+        Assert.False(vm.IsDirty);
+        Assert.False(vm.HasUnsavedChanges);
+
+        vm.LevelLayout.OnRoomClicked(room);
+        vm.LevelLayout.EditingZoneLighting = 12;
+        Assert.True(vm.IsDirty);
+        Assert.True(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public async Task OpeningAndCancellingRoomExpansion_DoesNotDirtyButGeneratingRoomDoes()
+    {
+        string filePath = Path.Combine(Path.GetTempPath(), $"door_dialog_clean_test_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            vm.LevelLayout.GridState.Clear();
+            vm.LevelLayout.GridState.InitializeStartingTile(
+                "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab",
+                0,
+                0);
+
+            vm.CurrentFilePath = filePath;
+            await vm.SaveRundownAsync();
+            Assert.False(vm.IsDirty);
+
+            var door = vm.LevelLayout.GridState.PlacedDoors.First(d => d.IsInternal && !d.IsConnected);
+            vm.LevelLayout.OnDoorClicked(door);
+
+            Assert.True(vm.LevelLayout.IsExpandingRoom);
+            Assert.False(vm.IsDirty);
+            Assert.False(vm.HasUnsavedChanges);
+
+            vm.LevelLayout.CancelRoomExpansion();
+            Assert.False(vm.IsDirty);
+
+            vm.LevelLayout.OnDoorClicked(door);
+            Assert.True(vm.LevelLayout.ConfirmRoomExpansion());
+            Assert.True(vm.IsDirty);
+            Assert.True(vm.HasUnsavedChanges);
+        }
+        finally
+        {
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+            }
+        }
     }
 
     [Fact]
