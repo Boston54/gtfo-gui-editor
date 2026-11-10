@@ -17,6 +17,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
     private ObservableCollection<PlacedGeomorphNode> _placedGeomorphs = new();
     private ObservableCollection<PlacedDoorNode> _placedDoors = new();
     private ObservableCollection<PlacedRoomNode> _placedRooms = new();
+    private ObservableCollection<PlacedTriggerNode> _placedTriggers = new();
+    private PlacedTriggerNode _dragPreviewTrigger = new();
+    private bool _isDraggingTriggerPreview;
+    private string _hoverCoordinatesText = string.Empty;
+    private bool _hasHoverCoordinates;
     private PlacedRoomNode? _hoveredRoom;
     private double _zoom = 4.0;
     private double _panX = 400.0;
@@ -306,6 +311,47 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
     }
 
+    public ObservableCollection<PlacedTriggerNode> PlacedTriggers
+    {
+        get => _placedTriggers;
+        set => SetField(ref _placedTriggers, value);
+    }
+
+    public PlacedTriggerNode DragPreviewTrigger
+    {
+        get => _dragPreviewTrigger;
+        set => SetField(ref _dragPreviewTrigger, value);
+    }
+
+    public bool IsDraggingTriggerPreview
+    {
+        get => _isDraggingTriggerPreview;
+        set => SetField(ref _isDraggingTriggerPreview, value);
+    }
+
+    public string HoverCoordinatesText
+    {
+        get => _hoverCoordinatesText;
+        set => SetField(ref _hoverCoordinatesText, value);
+    }
+
+    public bool HasHoverCoordinates
+    {
+        get => _hasHoverCoordinates;
+        set => SetField(ref _hasHoverCoordinates, value);
+    }
+
+    public void UpdateHoverCoordinates(double x, double y, double z)
+    {
+        HoverCoordinatesText = $"X: {x:F2}  Y: {y:F2}  Z: {z:F2}";
+        HasHoverCoordinates = true;
+    }
+
+    public void ClearHoverCoordinates()
+    {
+        HasHoverCoordinates = false;
+    }
+
     public void UpdateRoomNumbers()
     {
         var zoneCounters = new Dictionary<(SectorType, int), int>();
@@ -454,6 +500,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         PlacedGeomorphs.Clear();
         PlacedDoors.Clear();
         PlacedRooms.Clear();
+        PlacedTriggers.Clear();
         UpdateRoomNumbers();
         OnPropertyChanged(nameof(HasGridSizeWarning));
         OnPropertyChanged(nameof(GridSizeWarningMessage));
@@ -519,6 +566,92 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         }
 
         return bestRoom;
+    }
+
+    public PlacedRoomNode? GetRoomForPoint(double posX, double posY)
+    {
+        double worldX = posX + 32.0;
+        double worldY = 32.0 - posY;
+
+        // 1. Check if point is directly on top of a room's navmesh
+        var directRoom = GetRoomAt(worldX, worldY);
+        if (directRoom != null)
+        {
+            return directRoom;
+        }
+
+        // 2. Fallback: find the closest room by distance to bounding box
+        PlacedRoomNode? closestRoom = null;
+        double minDistanceSq = double.MaxValue;
+
+        foreach (var room in PlacedRooms.Where(r => r.IsVisible))
+        {
+            double clampedX = Math.Clamp(worldX, room.BoundsMinX, room.BoundsMaxX);
+            double clampedY = Math.Clamp(worldY, room.BoundsMinY, room.BoundsMaxY);
+            double dx = worldX - clampedX;
+            double dy = worldY - clampedY;
+            double distSq = dx * dx + dy * dy;
+
+            if (distSq < minDistanceSq)
+            {
+                minDistanceSq = distSq;
+                closestRoom = room;
+            }
+        }
+
+        return closestRoom;
+    }
+
+    public (SectorType Sector, int Zone, int AreaIndex) GetZoneForPoint(double posX, double posY)
+    {
+        var room = GetRoomForPoint(posX, posY);
+        if (room != null)
+        {
+            return (room.Sector, room.Zone, room.AreaIndex);
+        }
+
+        return (SectorType.Main, 0, 0);
+    }
+
+    public double GetHeightAt(double worldX, double worldY)
+    {
+        double? bestHeight = null;
+        double minArea = double.MaxValue;
+
+        foreach (var room in PlacedRooms)
+        {
+            if (!room.IsVisible) continue;
+            double? h = room.GetHeightAtWorldPoint(worldX, worldY);
+            if (h.HasValue)
+            {
+                if (room.Area < minArea)
+                {
+                    minArea = room.Area;
+                    bestHeight = h.Value;
+                }
+            }
+        }
+
+        if (bestHeight.HasValue)
+        {
+            return bestHeight.Value;
+        }
+
+        var fallbackRoom = GetRoomAt(worldX, worldY);
+        if (fallbackRoom != null)
+        {
+            return fallbackRoom.TotalHeight;
+        }
+
+        int cellX = (int)Math.Floor(worldX / CellDimension);
+        int cellY = (int)Math.Floor(worldY / CellDimension);
+        var geo = GetGeomorphAt(cellX, cellY);
+        if (geo != null)
+        {
+            return geo.AltitudeOffsetValue;
+        }
+
+        return 0.0;
     }
 
     public static (double RotatedX, double RotatedY) RotateLocalOffset(double x, double y, double angleDegrees)
@@ -1677,8 +1810,9 @@ public class LevelLayoutGridState : INotifyPropertyChanged
         double meshHeight = RoomSvgService.CalculateMeshHeight(mesh);
         double totalHeight = geoNode.AltitudeOffsetValue + meshHeight;
         var (svgContent, svgPathData, geometry) =
-            RoomSvgService.LoadRoomSvg(mesh, totalHeight, geoNode.AltitudeOffset, geoNode.RotationAngle);
+            RoomSvgService.LoadRoomSvg(mesh, totalHeight, geoNode.AltitudeOffsetValue, geoNode.RotationAngle);
         var (triangles, bounds, area) = RoomSvgService.Extract2DTriangles(mesh, geoNode.RotationAngle);
+        var heightLayers = RoomSvgService.BuildHeightLayers(triangles, geoNode.AltitudeOffsetValue, false, false);
 
         var roomNode = new PlacedRoomNode
         {
@@ -1693,6 +1827,7 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             SvgPathData = svgPathData,
             Geometry = geometry,
             Triangles2D = triangles,
+            HeightLayers = heightLayers,
             BoundsMinX = bounds.MinX,
             BoundsMinY = bounds.MinY,
             BoundsMaxX = bounds.MaxX,
@@ -2274,6 +2409,11 @@ public class LevelLayoutGridState : INotifyPropertyChanged
             });
         }
 
+        foreach (var trigger in PlacedTriggers)
+        {
+            data.PlacedTriggers.Add(trigger.ToData());
+        }
+
         foreach (var kvp in _zoneSettings)
         {
             var zs = kvp.Value;
@@ -2625,6 +2765,15 @@ public class LevelLayoutGridState : INotifyPropertyChanged
                 {
                     door.ConnectedDoor = connectedDoor;
                 }
+            }
+        }
+
+        PlacedTriggers.Clear();
+        if (data.PlacedTriggers != null)
+        {
+            foreach (var tData in data.PlacedTriggers)
+            {
+                PlacedTriggers.Add(PlacedTriggerNode.FromData(tData));
             }
         }
 

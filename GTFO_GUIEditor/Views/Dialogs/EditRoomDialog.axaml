@@ -16,7 +16,8 @@
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="20"
-                                Width="720"
+                                Width="920"
+                                MaxHeight="800"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 BoxShadow="0 4 20 #80000000">
@@ -39,7 +40,7 @@
                                 <TabControl SelectedIndex="0" Margin="0,2,0,0">
                                     <!-- TAB 1: Room -->
                                     <TabItem Header="Room" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer MaxHeight="620" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
                                                 <StackPanel Spacing="12">
                                                     <TextBlock Text="Room Settings"
@@ -77,14 +78,12 @@
                                                         <StackPanel Spacing="8">
                                                             <Grid ColumnDefinitions="*,Auto">
                                                                 <TextBlock Grid.Column="0" Text="Enemies in this Room (AWO)"
-                                                                           ToolTip.Tip="#todo"
                                                                            FontWeight="SemiBold"
                                                                            FontSize="13"
                                                                            Foreground="#87CEEB"
                                                                            VerticalAlignment="Center"/>
                                                                 <Button Grid.Column="1"
                                                                         Content="+ Add Enemy"
-                                                                        ToolTip.Tip="#todo"
                                                                         Command="{Binding AddRoomEnemyCommand}"
                                                                         Background="#2D5A27"
                                                                         Foreground="White"
@@ -108,7 +107,7 @@
                                                                                 </Grid>
 
                                                                                 <Grid ColumnDefinitions="Auto,*,Auto,Auto">
-                                                                                    <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
+                                                                                    <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy to spawn in this room" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#87CEEB"/>
                                                                                     <ComboBox Grid.Column="1"
                                                                                               ItemsSource="{Binding #EditRoomDialogRoot.DataContext.Enemies}"
                                                                                               SelectedValue="{Binding EnemyId, Mode=TwoWay}"
@@ -122,19 +121,19 @@
                                                                                         </ComboBox.ItemTemplate>
                                                                                     </ComboBox>
 
-                                                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
+                                                                                    <TextBlock Grid.Column="2" Text="Count:" ToolTip.Tip="The number of this enemy to spawn in this room" VerticalAlignment="Center" Margin="0,0,6,0" Foreground="#87CEEB"/>
                                                                                     <TextBox Grid.Column="3" Text="{Binding Count, Mode=TwoWay}" Width="50"/>
                                                                                 </Grid>
 
                                                                                 <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto">
-                                                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Random Weight:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Random Weight:" ToolTip.Tip="Determines how much randomness contributes to the &quot;available room&quot; an area has when finding a spawn area. At 0, it prioritises the most &quot;empty&quot; area. At 1, it picks among areas with equal chance." VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
                                                                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding PlacementRandomWeight, Mode=TwoWay}" Margin="0,0,8,4" IsVisible="{Binding !IsScout}"/>
 
-                                                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Score:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Score:" ToolTip.Tip="Determines how much of the room's enemy score this should take up. Only matters if there are other enemies being spawned naturally in this room." VerticalAlignment="Center" Margin="0,0,6,4" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
                                                                                     <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding PlacementScore, Mode=TwoWay}" Margin="0,0,0,4" IsVisible="{Binding !IsScout}"/>
 
-                                                                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Reset Placement Info" ToolTip.Tip="#todo" IsChecked="{Binding ResetPlacementInfo, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
-                                                                                    <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Randomize Rotation" ToolTip.Tip="#todo" IsChecked="{Binding RandomizeRotation, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <CheckBox Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" Content="Reset Placement Info" ToolTip.Tip="Resets the internal position cycle back to the start. Can be used if you are replacing previous spawns and duplicates with them don't matter, such as when the players have not reached the target area(s)." IsChecked="{Binding ResetPlacementInfo, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
+                                                                                    <CheckBox Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2" Content="Randomize Rotation" ToolTip.Tip="If count = 1 and this field is true, then enemy rotation is random." IsChecked="{Binding RandomizeRotation, Mode=TwoWay}" Foreground="#87CEEB" IsVisible="{Binding !IsScout}"/>
                                                                                 </Grid>
                                                                             </StackPanel>
                                                                         </Border>
@@ -150,7 +149,7 @@
 
                                     <!-- TAB 2: Zone -->
                                     <TabItem Header="Zone" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer MaxHeight="620" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <StackPanel Spacing="12">
                                                 <!-- Seeds & Lighting Section -->
                                                 <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="12">
@@ -432,22 +431,24 @@
                                                     <ItemsControl ItemsSource="{Binding ActiveZoneSettings.BigPickupDistributionInZone}" Margin="0,8,0,0">
                                                         <ItemsControl.ItemTemplate>
                                                             <DataTemplate x:DataType="models:BigPickupDistributionItem" x:CompileBindings="False">
-                                                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="0,2,0,2">
-                                                                    <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="Item to place in the zone" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
-                                                                    <ComboBox Grid.Column="1"
-                                                                              ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
-                                                                              SelectedValue="{Binding ItemType, Mode=TwoWay}"
-                                                                              SelectedValueBinding="{Binding Type}"
-                                                                              HorizontalAlignment="Stretch"
-                                                                              Margin="0,0,8,0">
-                                                                        <ComboBox.ItemTemplate>
-                                                                            <DataTemplate x:DataType="models:RetrieveBigItemOption">
-                                                                                <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
-                                                                            </DataTemplate>
-                                                                        </ComboBox.ItemTemplate>
-                                                                    </ComboBox>
-                                                                    <Button Grid.Column="2" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveBigPickupDistributionItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
-                                                                </Grid>
+                                                                <Border Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
+                                                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                                                        <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                        <ComboBox Grid.Column="1"
+                                                                                  ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
+                                                                                  SelectedValue="{Binding ItemType, Mode=TwoWay}"
+                                                                                  SelectedValueBinding="{Binding Type}"
+                                                                                  HorizontalAlignment="Stretch"
+                                                                                  Margin="0,0,8,0">
+                                                                            <ComboBox.ItemTemplate>
+                                                                                <DataTemplate x:DataType="models:RetrieveBigItemOption">
+                                                                                    <TextBlock Text="{Binding DisplayName}" Foreground="#E0E0E0"/>
+                                                                                </DataTemplate>
+                                                                            </ComboBox.ItemTemplate>
+                                                                        </ComboBox>
+                                                                        <Button Grid.Column="2" Content="✕" Command="{Binding #EditRoomDialogRoot.DataContext.RemoveBigPickupDistributionItemCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="8,3"/>
+                                                                    </Grid>
+                                                                </Border>
                                                             </DataTemplate>
                                                         </ItemsControl.ItemTemplate>
                                                     </ItemsControl>
@@ -832,7 +833,7 @@
 
                                     <!-- TAB 3: Geomorph -->
                                     <TabItem Header="Geomorph" FontSize="13" FontWeight="SemiBold">
-                                        <ScrollViewer MaxHeight="540" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ScrollViewer MaxHeight="620" Margin="0,10,0,0" Padding="0,0,16,0" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                             <Border Background="#1E1E1E" BorderBrush="#3F3F46" BorderThickness="1" CornerRadius="6" Padding="14">
                                                 <StackPanel Spacing="12">
                                                     <TextBlock Text="Geomorph Settings"

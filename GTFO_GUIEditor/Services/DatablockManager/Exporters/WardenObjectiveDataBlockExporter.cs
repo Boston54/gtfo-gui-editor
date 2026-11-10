@@ -426,6 +426,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     var serialized = SerializeWardenEvents(new[] { ev }, textSynth);
                     if (serialized.Count > 0 && serialized[0] is JsonObject evObj)
                     {
+                        serialized.RemoveAt(0);
                         array.Add(JsonNode.Parse(evObj.ToJsonString())!);
                     }
                 }
@@ -441,6 +442,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                 var breakArray = SerializeWardenEvents(new[] { eventBreak }, textSynth);
                 if (breakArray.Count > 0 && breakArray[0] is JsonObject breakObj)
                 {
+                    breakArray.RemoveAt(0);
                     array.Add(JsonNode.Parse(breakObj.ToJsonString())!);
                 }
             }

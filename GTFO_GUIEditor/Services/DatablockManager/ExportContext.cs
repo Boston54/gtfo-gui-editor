@@ -19,6 +19,7 @@ public class ExportContext
     public MainWindowViewModel MainVm { get; }
     public string ExportRootPath { get; }
     public string LgTunerDirectory { get; }
+    public string AraLevelLayoutDirectory { get; }
     public string SchemasDirectory { get; }
 
     public static readonly JsonSerializerOptions JsonOptions = new()
@@ -92,12 +93,14 @@ public class ExportContext
 
     public int DatablocksExportedCount { get; set; }
     public int LevelGenFilesExportedCount { get; set; }
+    public int AraLevelLayoutFilesExportedCount { get; set; }
 
     public ExportContext(MainWindowViewModel mainVm, string exportRootPath)
     {
         MainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         ExportRootPath = exportRootPath ?? throw new ArgumentNullException(nameof(exportRootPath));
         LgTunerDirectory = Path.Combine(exportRootPath, "Custom", "LGTunerAdvanced");
+        AraLevelLayoutDirectory = Path.Combine(exportRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout");
         SchemasDirectory = Path.Combine(exportRootPath, ".schemas");
 
         InitializeVanillaData();

@@ -17,6 +17,7 @@ public class ImportContext
     public MainWindowViewModel MainVm { get; }
     public string ImportRootPath { get; }
     public string LgTunerDirectory { get; }
+    public string AraLevelLayoutDirectory { get; }
     public string SchemasDirectory { get; }
 
     // Loaded datablock dictionaries indexed by persistentID
@@ -50,6 +51,7 @@ public class ImportContext
         MainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         ImportRootPath = importRootPath ?? throw new ArgumentNullException(nameof(importRootPath));
         LgTunerDirectory = Path.Combine(importRootPath, "Custom", "LGTunerAdvanced");
+        AraLevelLayoutDirectory = Path.Combine(importRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout");
         SchemasDirectory = Path.Combine(importRootPath, ".schemas");
 
         LoadAllDatablocks();
@@ -223,18 +225,24 @@ public class ImportContext
             ImportRootPath
         };
 
-        var possibleFileNames = new[]
+        var possibleFileNames = new List<string>
         {
             $"LevelGen_{levelName}.json",
-            $"{levelName}.json",
             $"LevelGen_{levelName}.lgtuner.json"
         };
 
         foreach (var dir in possibleDirNames)
         {
             if (!Directory.Exists(dir)) continue;
+            bool isLgTunerDir = dir.Contains("LGTuner", StringComparison.OrdinalIgnoreCase);
 
-            foreach (var fn in possibleFileNames)
+            var dirFileNames = new List<string>(possibleFileNames);
+            if (isLgTunerDir)
+            {
+                dirFileNames.Add($"{levelName}.json");
+            }
+
+            foreach (var fn in dirFileNames)
             {
                 string p = Path.Combine(dir, fn);
                 if (File.Exists(p)) return p;
@@ -247,7 +255,7 @@ public class ImportContext
                 {
                     string nameOnly = Path.GetFileNameWithoutExtension(file);
                     if (nameOnly.Equals($"LevelGen_{levelName}", StringComparison.OrdinalIgnoreCase) ||
-                        nameOnly.Equals(levelName, StringComparison.OrdinalIgnoreCase))
+                        (isLgTunerDir && nameOnly.Equals(levelName, StringComparison.OrdinalIgnoreCase)))
                     {
                         return file;
                     }
@@ -259,7 +267,7 @@ public class ImportContext
             }
         }
 
-        // Recursive fallback across ImportRootPath
+        // Recursive fallback across ImportRootPath for LGTuner files
         try
         {
             if (Directory.Exists(ImportRootPath))
@@ -267,9 +275,17 @@ public class ImportContext
                 var found = Directory.EnumerateFiles(ImportRootPath, "*.json", SearchOption.AllDirectories)
                     .FirstOrDefault(f =>
                     {
+                        string dirName = Path.GetFileName(Path.GetDirectoryName(f) ?? string.Empty);
+                        if (dirName.Equals("LevelLayout", StringComparison.OrdinalIgnoreCase) ||
+                            f.Contains("AdditionalRundownAdvancements", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return false;
+                        }
+
                         string nameOnly = Path.GetFileNameWithoutExtension(f);
+                        bool isLgDir = f.Contains("LGTuner", StringComparison.OrdinalIgnoreCase);
                         return nameOnly.Equals($"LevelGen_{levelName}", StringComparison.OrdinalIgnoreCase) ||
-                               nameOnly.Equals(levelName, StringComparison.OrdinalIgnoreCase);
+                               (isLgDir && nameOnly.Equals(levelName, StringComparison.OrdinalIgnoreCase));
                     });
                 if (found != null) return found;
             }
@@ -280,5 +296,193 @@ public class ImportContext
         }
 
         return null;
+    }
+
+    public string? FindAraLevelLayoutConfigFile(uint mainLayoutId, string? expeditionPrefix = null, string? publicName = null)
+    {
+        var possibleDirNames = new[]
+        {
+            AraLevelLayoutDirectory,
+            Path.Combine(ImportRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout"),
+            Path.Combine(ImportRootPath, "custom", "additionalrundownadvancements", "levellayout"),
+            Path.Combine(ImportRootPath, "Custom", "AdditionalRundownAdvancements", "levellayout"),
+            Path.Combine(ImportRootPath, "AdditionalRundownAdvancements", "LevelLayout"),
+            Path.Combine(ImportRootPath, "additionalrundownadvancements", "levellayout"),
+            Path.Combine(ImportRootPath, "Custom", "ARA", "LevelLayout"),
+            Path.Combine(ImportRootPath, "ARA", "LevelLayout"),
+            ImportRootPath
+        };
+
+        var nameCandidates = new List<string>();
+        if (!string.IsNullOrWhiteSpace(expeditionPrefix))
+        {
+            nameCandidates.Add(expeditionPrefix);
+        }
+        if (!string.IsNullOrWhiteSpace(publicName))
+        {
+            nameCandidates.Add(publicName);
+        }
+        if (mainLayoutId > 0)
+        {
+            nameCandidates.Add(mainLayoutId.ToString());
+            nameCandidates.Add($"LevelLayout_{mainLayoutId}");
+            nameCandidates.Add($"Level_{mainLayoutId}");
+        }
+
+        // 1. Direct check and MainLevelLayout inspection in known directories
+        foreach (var dir in possibleDirNames)
+        {
+            if (!Directory.Exists(dir)) continue;
+
+            // Direct candidate filename check
+            foreach (var cand in nameCandidates)
+            {
+                string p = Path.Combine(dir, $"{cand}.json");
+                if (File.Exists(p)) return p;
+            }
+
+            // Inspect all json files in dir for MainLevelLayout match
+            try
+            {
+                foreach (var file in Directory.GetFiles(dir, "*.json"))
+                {
+                    if (mainLayoutId > 0 && TryMatchesMainLevelLayout(file, mainLayoutId))
+                    {
+                        return file;
+                    }
+
+                    string nameOnly = Path.GetFileNameWithoutExtension(file);
+                    if (nameCandidates.Any(c => nameOnly.Equals(c, StringComparison.OrdinalIgnoreCase)))
+                    {
+                        return file;
+                    }
+                }
+            }
+            catch
+            {
+                // Ignore enumeration errors
+            }
+        }
+
+        // 2. Recursive fallback in ImportRootPath
+        try
+        {
+            if (Directory.Exists(ImportRootPath))
+            {
+                foreach (var file in Directory.EnumerateFiles(ImportRootPath, "*.json", SearchOption.AllDirectories))
+                {
+                    string dirName = Path.GetFileName(Path.GetDirectoryName(file) ?? string.Empty);
+                    if (dirName.Equals("LevelLayout", StringComparison.OrdinalIgnoreCase) ||
+                        file.Contains("AdditionalRundownAdvancements", StringComparison.OrdinalIgnoreCase) ||
+                        file.Contains("ARA", StringComparison.OrdinalIgnoreCase))
+                    {
+                        if (mainLayoutId > 0 && TryMatchesMainLevelLayout(file, mainLayoutId))
+                        {
+                            return file;
+                        }
+
+                        string nameOnly = Path.GetFileNameWithoutExtension(file);
+                        if (nameCandidates.Any(c => nameOnly.Equals(c, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            return file;
+                        }
+                    }
+                }
+            }
+        }
+        catch
+        {
+            // Ignore enumeration errors
+        }
+
+        return null;
+    }
+
+    public List<string> FindAllAraLevelLayoutConfigFiles(IEnumerable<uint> layoutIds, string? expeditionPrefix = null, string? publicName = null)
+    {
+        var result = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var idList = layoutIds.Where(id => id > 0).Distinct().ToList();
+
+        foreach (var id in idList)
+        {
+            var single = FindAraLevelLayoutConfigFile(id, expeditionPrefix, publicName);
+            if (single != null && File.Exists(single))
+            {
+                result.Add(single);
+            }
+        }
+
+        // Check suffix variants
+        var suffixes = new[] { "", "_Secondary", "_Third", "_Overload", "_Main" };
+        var prefixes = new List<string>();
+        if (!string.IsNullOrWhiteSpace(expeditionPrefix)) prefixes.Add(expeditionPrefix);
+        if (!string.IsNullOrWhiteSpace(publicName)) prefixes.Add(publicName);
+
+        var possibleDirNames = new[]
+        {
+            AraLevelLayoutDirectory,
+            Path.Combine(ImportRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout"),
+            Path.Combine(ImportRootPath, "custom", "additionalrundownadvancements", "levellayout"),
+            Path.Combine(ImportRootPath, "AdditionalRundownAdvancements", "LevelLayout"),
+            Path.Combine(ImportRootPath, "Custom", "ARA", "LevelLayout"),
+            Path.Combine(ImportRootPath, "ARA", "LevelLayout"),
+            ImportRootPath
+        };
+
+        foreach (var dir in possibleDirNames)
+        {
+            if (!Directory.Exists(dir)) continue;
+
+            foreach (var pre in prefixes)
+            {
+                foreach (var suf in suffixes)
+                {
+                    string candidatePath = Path.Combine(dir, $"{pre}{suf}.json");
+                    if (File.Exists(candidatePath))
+                    {
+                        result.Add(candidatePath);
+                    }
+                }
+            }
+
+            try
+            {
+                foreach (var file in Directory.GetFiles(dir, "*.json"))
+                {
+                    foreach (var id in idList)
+                    {
+                        if (TryMatchesMainLevelLayout(file, id))
+                        {
+                            result.Add(file);
+                        }
+                    }
+                }
+            }
+            catch { }
+        }
+
+        return result.ToList();
+    }
+
+    private static bool TryMatchesMainLevelLayout(string filePath, uint expectedLayoutId)
+    {
+        try
+        {
+            string content = File.ReadAllText(filePath);
+            var node = JsonNode.Parse(content);
+            if (node is JsonObject obj && obj.TryGetPropertyValue("MainLevelLayout", out var layoutNode) && layoutNode != null)
+            {
+                if (uint.TryParse(layoutNode.ToString(), out uint id) && id == expectedLayoutId)
+                {
+                    return true;
+                }
+            }
+        }
+        catch
+        {
+            // Ignore parse errors
+        }
+
+        return false;
     }
 }

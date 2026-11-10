@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Serialization;
 
 namespace GTFO_GUIEditor.Models;
 
@@ -8,13 +9,17 @@ public class BigPickupDistributionItem : INotifyPropertyChanged
 {
     private RetrieveBigItemType _itemType = RetrieveBigItemType.PowerCell;
 
+    [JsonPropertyName("itemType")]
     public RetrieveBigItemType ItemType
     {
         get => _itemType;
         set => SetField(ref _itemType, value);
     }
 
-    public BigPickupDistributionItem Clone() => new() { ItemType = ItemType };
+    public BigPickupDistributionItem Clone() => new()
+    {
+        ItemType = ItemType
+    };
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

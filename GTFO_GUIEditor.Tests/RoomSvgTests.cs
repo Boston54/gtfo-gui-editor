@@ -1390,4 +1390,111 @@ public class RoomSvgTests
         Assert.False(vm.ActiveZoneSettings.DcOpensOverload);
         vm.CloseEditRoomDialog();
     }
+
+    [Fact]
+    public void BuildHeightLayers_CreatesValidNonZeroGeometriesForMultiHeightMesh()
+    {
+        var triangles = new List<Triangle2D>
+        {
+            // Floor 1 (height 0)
+            new Triangle2D(0, 0, 10, 0, 0, 10, 0, 0, 0),
+            new Triangle2D(10, 0, 10, 10, 0, 10, 0, 0, 0),
+            // Floor 2 (height 5)
+            new Triangle2D(0, 10, 10, 10, 0, 20, 5, 5, 5),
+            new Triangle2D(10, 10, 10, 20, 0, 20, 5, 5, 5)
+        };
+
+        var layers = RoomSvgService.BuildHeightLayers(triangles, 0.0, false, false);
+        Assert.Equal(2, layers.Count);
+        Assert.All(layers, layer =>
+        {
+            if (layer.Geometry != null)
+            {
+                Assert.True(layer.Geometry.Bounds.Width > 0);
+                Assert.True(layer.Geometry.Bounds.Height > 0);
+            }
+        });
+
+        var roomNode = new PlacedRoomNode
+        {
+            Triangles2D = triangles,
+            HeightLayers = layers
+        };
+
+        Assert.True(roomNode.HasHeightLayers);
+    }
+
+    [Fact]
+    public void LoadRoomSvg_GeneratesMultiColoredPathsForMultiHeightMesh()
+    {
+        var mesh = new MeshData
+        {
+            Vertices = new List<VertexPosition>
+            {
+                // Floor 1 (height 0)
+                new VertexPosition(0, 0, 0),
+                new VertexPosition(10, 0, 0),
+                new VertexPosition(0, 0, 10),
+                // Floor 2 (height 6)
+                new VertexPosition(0, 6, 10),
+                new VertexPosition(10, 6, 10),
+                new VertexPosition(0, 6, 20)
+            },
+            Indices = new List<int> { 0, 1, 2, 3, 4, 5 }
+        };
+
+        var (svgContent, pathData, geometry) = RoomSvgService.LoadRoomSvg(mesh, totalHeight: 0.0, altitudeOffset: 6.0);
+        Assert.NotEmpty(svgContent);
+        Assert.NotEmpty(pathData);
+        if (geometry != null)
+        {
+            Assert.True(geometry.Bounds.Width > 0);
+        }
+
+        // Count <path> elements in generated SVG
+        int pathCount = svgContent.Split("<path ").Length - 1;
+        Assert.Equal(2, pathCount);
+
+        // The two paths should have different fill colors due to different elevations
+        var matches = System.Text.RegularExpressions.Regex.Matches(svgContent, @"fill=""(#\w+)""");
+        Assert.Equal(2, matches.Count);
+        Assert.NotEqual(matches[0].Groups[1].Value, matches[1].Groups[1].Value);
+    }
+
+    [Fact]
+    public void Extract2DTriangles_SpansAllFourQuadrantsAndPreservesFullCellCoverage()
+    {
+        string prefab = "Assets/AssetPrefabs/Complex/Mining/Geomorphs/Digsite/geo_64x64_mining_dig_site_AS_01.prefab";
+        var meta = GeomorphMetadataService.GetMetadata(prefab);
+        Assert.NotNull(meta);
+
+        var allTriangles = new List<Triangle2D>();
+        foreach (var area in meta.AreaDatas)
+        {
+            var (triangles, _, _) = RoomSvgService.Extract2DTriangles(area.Mesh, 0.0);
+            allTriangles.AddRange(triangles);
+        }
+        Assert.NotEmpty(allTriangles);
+
+        // Verify that geomorph meshes span across all 4 quadrants relative to geomorph center (0, 0)
+        bool hasTopLeft = allTriangles.Any(t => (t.X0 < 0 || t.X1 < 0 || t.X2 < 0) && (t.Y0 < 0 || t.Y1 < 0 || t.Y2 < 0));
+        bool hasTopRight = allTriangles.Any(t => (t.X0 > 0 || t.X1 > 0 || t.X2 > 0) && (t.Y0 < 0 || t.Y1 < 0 || t.Y2 < 0));
+        bool hasBottomLeft = allTriangles.Any(t => (t.X0 < 0 || t.X1 < 0 || t.X2 < 0) && (t.Y0 > 0 || t.Y1 > 0 || t.Y2 > 0));
+        bool hasBottomRight = allTriangles.Any(t => (t.X0 > 0 || t.X1 > 0 || t.X2 > 0) && (t.Y0 > 0 || t.Y1 > 0 || t.Y2 > 0));
+
+        Assert.True(hasTopLeft, "Mesh should span into the Top-Left quadrant (negative X, negative Y)");
+        Assert.True(hasTopRight, "Mesh should span into the Top-Right quadrant (positive X, negative Y)");
+        Assert.True(hasBottomLeft, "Mesh should span into the Bottom-Left quadrant (negative X, positive Y)");
+        Assert.True(hasBottomRight, "Mesh should span into the Bottom-Right quadrant (positive X, positive Y)");
+
+        double minX = allTriangles.Min(t => Math.Min(t.X0, Math.Min(t.X1, t.X2)));
+        double maxX = allTriangles.Max(t => Math.Max(t.X0, Math.Max(t.X1, t.X2)));
+        double minY = allTriangles.Min(t => Math.Min(t.Y0, Math.Min(t.Y1, t.Y2)));
+        double maxY = allTriangles.Max(t => Math.Max(t.Y0, Math.Max(t.Y1, t.Y2)));
+
+        Assert.True(minX < -20.0);
+        Assert.True(maxX > 20.0);
+        Assert.True(minY < -20.0);
+        Assert.True(maxY > 20.0);
+    }
 }

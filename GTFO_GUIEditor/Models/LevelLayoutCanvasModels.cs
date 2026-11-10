@@ -1431,6 +1431,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
     private double _boundsMaxX;
     private double _boundsMaxY;
     private List<Triangle2D> _triangles2D = new();
+    private List<RoomHeightLayer> _heightLayers = new();
     private double _meshHeight;
     private ObservableCollection<RoomEnemySpawningItem> _enemies = new();
 
@@ -1678,7 +1679,7 @@ public class PlacedRoomNode : INotifyPropertyChanged
 
     public void UpdateFillBrush()
     {
-        double altOffset = Geomorph?.AltitudeOffset ?? 6.0;
+        double altOffset = Geomorph?.AltitudeOffsetValue ?? 0.0;
         double height = TotalHeight;
 
         if (IsHovered)
@@ -1692,6 +1693,14 @@ public class PlacedRoomNode : INotifyPropertyChanged
         else
         {
             FillBrush = RoomSvgService.GetHeightFillBrush(height, altOffset);
+        }
+
+        if (_heightLayers != null)
+        {
+            foreach (var layer in _heightLayers)
+            {
+                layer.UpdateFillBrush(altOffset, IsHovered, IsZoneHighlighted);
+            }
         }
     }
 
@@ -1731,6 +1740,55 @@ public class PlacedRoomNode : INotifyPropertyChanged
     {
         get => _triangles2D;
         set => SetField(ref _triangles2D, value);
+    }
+
+    public bool HasHeightLayers => _heightLayers != null && _heightLayers.Count > 0;
+
+    public List<RoomHeightLayer> HeightLayers
+    {
+        get => _heightLayers;
+        set
+        {
+            if (SetField(ref _heightLayers, value ?? new List<RoomHeightLayer>()))
+            {
+                OnPropertyChanged(nameof(HasHeightLayers));
+            }
+        }
+    }
+
+    public double? GetHeightAtWorldPoint(double worldX, double worldY)
+    {
+        if (_triangles2D == null || _triangles2D.Count == 0)
+        {
+            return null;
+        }
+
+        double localX = worldX - WorldX;
+        double localY = worldY - WorldY;
+
+        if (localX < BoundsMinX - 0.5 || localX > BoundsMaxX + 0.5 ||
+            localY < BoundsMinY - 0.5 || localY > BoundsMaxY + 0.5)
+        {
+            return null;
+        }
+
+        double altOffset = Geomorph?.AltitudeOffsetValue ?? 0.0;
+        double? bestHeight = null;
+
+        foreach (var tri in _triangles2D)
+        {
+            if (RoomSvgService.IsPointInTriangle(localX, localY, tri.X0, tri.Y0, tri.X1, tri.Y1, tri.X2, tri.Y2))
+            {
+                double localH = tri.GetHeightAt(localX, localY);
+                double totalH = altOffset + localH;
+                if (!bestHeight.HasValue || totalH > bestHeight.Value)
+                {
+                    bestHeight = totalH;
+                }
+            }
+        }
+
+        return bestHeight;
     }
 
     public bool ContainsWorldPoint(double worldX, double worldY)
@@ -1782,4 +1840,59 @@ public class ZoneOption
     public string DisplayName { get; set; } = string.Empty;
 
     public override string ToString() => DisplayName;
+}
+
+public class RoomHeightLayer : INotifyPropertyChanged
+{
+    private Geometry? _geometry;
+    private IBrush _fillBrush = Brushes.Transparent;
+    private double _localHeight;
+
+    public Geometry? Geometry
+    {
+        get => _geometry;
+        set => SetField(ref _geometry, value);
+    }
+
+    public IBrush FillBrush
+    {
+        get => _fillBrush;
+        set => SetField(ref _fillBrush, value);
+    }
+
+    public double LocalHeight
+    {
+        get => _localHeight;
+        set => SetField(ref _localHeight, value);
+    }
+
+    public void UpdateFillBrush(double altitudeOffset, bool isHovered, bool isZoneHighlighted)
+    {
+        double totalHeight = altitudeOffset + LocalHeight;
+        if (isHovered)
+        {
+            FillBrush = RoomSvgService.GetHoveredHeightFillBrush(totalHeight, altitudeOffset);
+        }
+        else if (isZoneHighlighted)
+        {
+            FillBrush = RoomSvgService.GetZoneHighlightHeightFillBrush(totalHeight, altitudeOffset);
+        }
+        else
+        {
+            FillBrush = RoomSvgService.GetHeightFillBrush(totalHeight, altitudeOffset);
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+    protected bool SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        OnPropertyChanged(propertyName);
+        return true;
+    }
 }

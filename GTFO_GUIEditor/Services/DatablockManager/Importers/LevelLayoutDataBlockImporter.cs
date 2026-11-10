@@ -633,13 +633,15 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         // 6. Process Sector Zones & Area Overrides (Room creation & Sector/Zone mapping)
         var sectorZoneList = new List<(SectorType Sector, JsonArray ZonesArray, JsonArray? ZoneOverridesArray)>();
         var zoneEntranceDoorMap = new Dictionary<(SectorType Sector, int ZoneNumber), (int PrevGridX, int PrevGridY, int PrevArea, int ExpanderId, string? TargetGeoId, int TargetArea)>();
+        var zoneEventsByFilter = new Dictionary<string, List<WardenEvent>>(StringComparer.OrdinalIgnoreCase);
+        var specificPickupsByFilter = new Dictionary<string, ARA_CustomWorldEventObjectOptions>(StringComparer.OrdinalIgnoreCase);
 
         if (context.LevelLayoutBlocks.TryGetValue(exp.LevelLayoutData, out var mainLayoutObj) &&
             mainLayoutObj?["Zones"] is JsonArray mainZones)
         {
             level.MainSector.ZoneAliasStart = mainLayoutObj["ZoneAliasStart"]?.GetValue<int>() ?? 0;
             sectorZoneList.Add((SectorType.Main, mainZones, mainZoneOverrides));
-            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Main, mainZones, mainZoneOverrides, generatedRooms, context, zoneEntranceDoorMap);
+            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Main, mainZones, mainZoneOverrides, generatedRooms, context, zoneEntranceDoorMap, zoneEventsByFilter, specificPickupsByFilter);
         }
 
         if (exp.SecondaryLayerEnabled && exp.SecondaryLayout > 0 &&
@@ -648,7 +650,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         {
             level.SecondarySector.ZoneAliasStart = secLayoutObj["ZoneAliasStart"]?.GetValue<int>() ?? 100;
             sectorZoneList.Add((SectorType.Secondary, secZones, secZoneOverrides));
-            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Secondary, secZones, secZoneOverrides, generatedRooms, context, zoneEntranceDoorMap);
+            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Secondary, secZones, secZoneOverrides, generatedRooms, context, zoneEntranceDoorMap, zoneEventsByFilter, specificPickupsByFilter);
         }
 
         if (exp.ThirdLayerEnabled && exp.ThirdLayout > 0 &&
@@ -657,7 +659,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         {
             level.OverloadSector.ZoneAliasStart = thirdLayoutObj["ZoneAliasStart"]?.GetValue<int>() ?? 200;
             sectorZoneList.Add((SectorType.Overload, thirdZones, thirdZoneOverrides));
-            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Overload, thirdZones, thirdZoneOverrides, generatedRooms, context, zoneEntranceDoorMap);
+            ProcessSectorZoneSettingsAndRooms(gridState, SectorType.Overload, thirdZones, thirdZoneOverrides, generatedRooms, context, zoneEntranceDoorMap, zoneEventsByFilter, specificPickupsByFilter);
         }
 
         // 7. Auto-connect adjacent external doors
@@ -694,6 +696,13 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
 
         // 14. Objectives (imported after all rooms and dimensions are constructed)
         ImportObjectives(level, exp, context);
+
+        // 15. Import ARA triggers and world event objects
+        AraLevelLayoutService.ImportAraLevelLayout(context, level, exp, zoneEventsByFilter, specificPickupsByFilter);
+        if (level.GridState?.PlacedTriggers.Count > 0 || (level.Dimensions != null && level.Dimensions.Any(d => d.GridState?.PlacedTriggers.Count > 0)))
+        {
+            ModManager.Instance.AdditionalRundownAdvancements = true;
+        }
 
         return level;
     }
@@ -866,6 +875,11 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             ImportTerminalPlacements(terminalsArray, dim.StaticTerminalPlacements, context);
         }
 
+        if (inner["StaticBigPickupDistributionInZone"] is JsonArray staticBigPickupsArray)
+        {
+            ImportBigPickupDistribution(staticBigPickupsArray, dim.StaticBigPickupDistributionInZone);
+        }
+
         dim.IsOutside = inner["IsOutside"]?.GetValue<bool>() ?? false;
         dim.LightAzimuth = inner["LightAzimuth"]?.GetValue<double>() ?? -92.9;
         dim.LightElevation = inner["LightElevation"]?.GetValue<double>() ?? 30.0;
@@ -909,6 +923,21 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         dim.SandstormEdgeA = inner["SandstormEdgeA"]?.GetValue<double>() ?? 0.4;
         dim.SandstormEdgeB = inner["SandstormEdgeB"]?.GetValue<double>() ?? 0.6;
         dim.SandstormMinFog = inner["SandstormMinFog"]?.GetValue<double>() ?? 0.01;
+    }
+
+    public static void ImportBigPickupDistribution(JsonArray arr, ObservableCollection<BigPickupDistributionItem> targetCollection)
+    {
+        targetCollection.Clear();
+        foreach (var node in arr)
+        {
+            if (node is not JsonObject obj) continue;
+            int itemTypeVal = obj["itemType"]?.GetValue<int>() ?? (int)RetrieveBigItemType.PowerCell;
+            var itemType = Enum.IsDefined(typeof(RetrieveBigItemType), itemTypeVal)
+                ? (RetrieveBigItemType)itemTypeVal
+                : RetrieveBigItemType.PowerCell;
+
+            targetCollection.Add(new BigPickupDistributionItem { ItemType = itemType });
+        }
     }
 
     public static void ImportTerminalPlacements(JsonArray termArr, ObservableCollection<TerminalPlacement> targetCollection, ImportContext context)
@@ -1276,7 +1305,9 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         JsonArray? zoneOverridesArray,
         HashSet<(string geoId, int areaIdx)> generatedRooms,
         ImportContext context,
-        Dictionary<(SectorType Sector, int ZoneNumber), (int PrevGridX, int PrevGridY, int PrevArea, int ExpanderId, string? TargetGeoId, int TargetArea)>? zoneEntranceDoorMap = null)
+        Dictionary<(SectorType Sector, int ZoneNumber), (int PrevGridX, int PrevGridY, int PrevArea, int ExpanderId, string? TargetGeoId, int TargetArea)>? zoneEntranceDoorMap = null,
+        Dictionary<string, List<WardenEvent>>? zoneEventsByFilter = null,
+        Dictionary<string, ARA_CustomWorldEventObjectOptions>? specificPickupsByFilter = null)
     {
         for (int zIdx = 0; zIdx < zonesArray.Count; zIdx++)
         {
@@ -1287,6 +1318,43 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             if (localIndexStr.StartsWith("Zone_") && int.TryParse(localIndexStr.Substring("Zone_".Length), out int zn))
             {
                 zoneNumber = zn;
+            }
+
+            // Extract EventsOnTrigger if present
+            if (zoneObj["EventsOnTrigger"] is JsonArray eotArr)
+            {
+                var eotList = new ObservableCollection<WardenEvent>();
+                ImportWardenEvents(eotArr, eotList, context);
+                for (int i = 0; i < eotArr.Count && i < eotList.Count; i++)
+                {
+                    string filter = eotArr[i]?["WorldEventTriggerObjectFilter"]?.ToString()
+                        ?? eotArr[i]?["WorldEventObjectFilter"]?.ToString()
+                        ?? string.Empty;
+                    if (!string.IsNullOrWhiteSpace(filter) && zoneEventsByFilter != null)
+                    {
+                        if (!zoneEventsByFilter.TryGetValue(filter, out var list))
+                        {
+                            list = new List<WardenEvent>();
+                            zoneEventsByFilter[filter] = list;
+                        }
+                        list.Add(eotList[i]);
+                    }
+                }
+            }
+
+            // Extract SpecificPickupSpawningDatas if present
+            if (zoneObj["SpecificPickupSpawningDatas"] is JsonArray spsdArr && specificPickupsByFilter != null)
+            {
+                foreach (var spsdNode in spsdArr)
+                {
+                    if (spsdNode is not JsonObject spsdObj) continue;
+                    string filter = spsdObj["WorldEventObjectFilter"]?.ToString() ?? string.Empty;
+                    int pickupId = spsdObj["PickupToSpawn"]?.GetValue<int>() ?? 0;
+                    if (!string.IsNullOrWhiteSpace(filter) && pickupId > 0 && Enum.IsDefined(typeof(ARA_CustomWorldEventObjectOptions), pickupId))
+                    {
+                        specificPickupsByFilter[filter] = (ARA_CustomWorldEventObjectOptions)pickupId;
+                    }
+                }
             }
 
             // Populate ZoneSettings
@@ -1391,6 +1459,12 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             if (zoneObj["TerminalPlacements"] is JsonArray termArr)
             {
                 ImportTerminalPlacements(termArr, zs.TerminalPlacements, context);
+            }
+
+            // Big Pickups
+            if (zoneObj["BigPickupDistributionInZone"] is JsonArray bigPickupsArr)
+            {
+                ImportBigPickupDistribution(bigPickupsArr, zs.BigPickupDistributionInZone);
             }
 
             // Disinfection stations
@@ -2314,7 +2388,7 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
     }
 
-    public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext context, LevelLayoutBlock? level = null, bool isMainElevatorLand = false)
+public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext? context = null, LevelLayoutBlock? level = null, bool isMainElevatorLand = false)
     {
         var objective = new WardenObjective();
 
@@ -2324,13 +2398,13 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             objective.ObjectiveType = objType;
         }
 
-        objective.Header = context.ResolveText(obj["Header"]?.GetValue<uint>() ?? 0);
-        objective.MainObjective = context.ResolveText(obj["MainObjective"]?.GetValue<uint>() ?? 0);
-        objective.FindLocationInfo = context.ResolveText(obj["FindLocationInfo"]?.GetValue<uint>() ?? 0);
-        objective.FindLocationInfoHelp = context.ResolveText(obj["FindLocationInfoHelp"]?.GetValue<uint>() ?? 0);
-        objective.GoToZone = context.ResolveText(obj["GoToZone"]?.GetValue<uint>() ?? 0);
-        objective.InZoneFindItem = context.ResolveText(obj["InZoneFindItem"]?.GetValue<uint>() ?? 0);
-        objective.SolveItem = context.ResolveText(obj["SolveItem"]?.GetValue<uint>() ?? 0);
+        objective.Header = context?.ResolveText(obj["Header"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.MainObjective = context?.ResolveText(obj["MainObjective"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.FindLocationInfo = context?.ResolveText(obj["FindLocationInfo"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.FindLocationInfoHelp = context?.ResolveText(obj["FindLocationInfoHelp"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToZone = context?.ResolveText(obj["GoToZone"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.InZoneFindItem = context?.ResolveText(obj["InZoneFindItem"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.SolveItem = context?.ResolveText(obj["SolveItem"]?.GetValue<uint>() ?? 0) ?? string.Empty;
 
         objective.StopAllWavesBeforeGotoWin = obj["StopAllWavesBeforeGotoWin"]?.GetValue<bool>() ?? false;
         string waveTriggerStr = obj["WaveOnGotoWinTrigger"]?.ToString() ?? "OnObjectiveCompleted";

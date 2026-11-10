@@ -246,11 +246,11 @@ The following files will be *exported* by the program, but will have no impact w
 * `GameSetupDataBlock`
 
 # Credits
-**Boston54** - Developer and UI Designer
+**Boston54** - Application Developer
 
 **Tgb03** - Plugin Developer (LGTunerAdvanced) and Game Data Extraction
 
-**MasterBuilderMAC** - Developer
+**MasterBuilderMAC** - Application Developer
 
 ```
 This application is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International (CC BY-NC-SA 4.0) license.

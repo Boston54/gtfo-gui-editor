@@ -174,191 +174,435 @@
 
                 <!-- Level Layout Canvas / Visual View Panel -->
                 <Border Grid.Row="1" Background="#141414" BorderBrush="#333333" BorderThickness="1" CornerRadius="4">
-                    <Grid RowDefinitions="Auto,*">
-                        <!-- Canvas Toolbar -->
-                        <Border Grid.Row="0" Background="#1F1F1F" BorderBrush="#2D2D2D" BorderThickness="0,0,0,1" Padding="10,6">
-                            <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,16,2">
-                                    <Button Content="+" Command="{Binding ZoomIn}" ToolTip.Tip="Zoom In" Width="30" Height="28" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
-                                    <Button Content="−" Command="{Binding ZoomOut}" ToolTip.Tip="Zoom Out" Width="30" Height="28" Margin="0,0,8,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
-                                    <TextBlock Text="{Binding GridState.ZoomPercentage}" VerticalAlignment="Center" Foreground="#B0BEC5" Margin="0,0,12,0" FontWeight="SemiBold" FontSize="12"/>
-                                    <Button Content="Reset View" Click="OnResetViewClicked" ToolTip.Tip="Center view on Starting Elevator" Padding="8,4" FontSize="11" VerticalAlignment="Center"/>
-                                </StackPanel>
-
-                                <!-- Legend / Status info -->
+                    <Grid ColumnDefinitions="*,Auto">
+                        <!-- Left: Canvas Area with toolbar -->
+                        <Grid Grid.Column="0" RowDefinitions="Auto,*">
+                            <!-- Canvas Toolbar -->
+                            <Border Grid.Row="0" Background="#1F1F1F" BorderBrush="#2D2D2D" BorderThickness="0,0,0,1" Padding="10,6">
                                 <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasUnexpandedDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.UnexpandedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Unexpanded" FontSize="11" Foreground="{Binding Appearance.UnexpandedDoorColor}" VerticalAlignment="Center"/>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="0,2,16,2">
+                                        <Button Content="+" Command="{Binding ZoomIn}" ToolTip.Tip="Zoom In" Width="30" Height="28" Margin="0,0,4,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                        <Button Content="−" Command="{Binding ZoomOut}" ToolTip.Tip="Zoom Out" Width="30" Height="28" Margin="0,0,8,0" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontWeight="Bold"/>
+                                        <TextBlock Text="{Binding GridState.ZoomPercentage}" VerticalAlignment="Center" Foreground="#B0BEC5" Margin="0,0,12,0" FontWeight="SemiBold" FontSize="12"/>
+                                        <Button Content="Reset View" Click="OnResetViewClicked" ToolTip.Tip="Center view on Starting Elevator" Padding="8,4" FontSize="11" VerticalAlignment="Center"/>
                                     </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasConnectedDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.ConnectedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Connected" FontSize="11" Foreground="{Binding Appearance.ConnectedDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecurityDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.SecurityDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Security Door" FontSize="11" Foreground="{Binding Appearance.SecurityDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasMainDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.MainDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Main Door" FontSize="11" Foreground="{Binding Appearance.MainDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecondaryDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.SecondaryDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Secondary Door" FontSize="11" Foreground="{Binding Appearance.SecondaryDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasOverloadDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.OverloadDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Overload Door" FontSize="11" Foreground="{Binding Appearance.OverloadDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
-                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasBlockedDoors}">
-                                        <Border Width="10" Height="5" Background="{Binding Appearance.BlockedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
-                                        <TextBlock Text="Blocked" FontSize="11" Foreground="{Binding Appearance.BlockedDoorColor}" VerticalAlignment="Center"/>
-                                    </StackPanel>
+
+                                    <!-- Legend / Status info -->
+                                    <WrapPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasUnexpandedDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.UnexpandedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Unexpanded" FontSize="11" Foreground="{Binding Appearance.UnexpandedDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasConnectedDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.ConnectedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Connected" FontSize="11" Foreground="{Binding Appearance.ConnectedDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecurityDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.SecurityDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Security Door" FontSize="11" Foreground="{Binding Appearance.SecurityDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasMainDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.MainDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Main Door" FontSize="11" Foreground="{Binding Appearance.MainDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasSecondaryDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.SecondaryDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Secondary Door" FontSize="11" Foreground="{Binding Appearance.SecondaryDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasOverloadDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.OverloadDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Overload Door" FontSize="11" Foreground="{Binding Appearance.OverloadDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                        <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,2,10,2" IsVisible="{Binding GridState.HasBlockedDoors}">
+                                            <Border Width="10" Height="5" Background="{Binding Appearance.BlockedDoorColor}" BorderBrush="#FFFFFF" BorderThickness="0.5" CornerRadius="0.5" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Blocked" FontSize="11" Foreground="{Binding Appearance.BlockedDoorColor}" VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </WrapPanel>
                                 </WrapPanel>
-                            </WrapPanel>
-                        </Border>
+                            </Border>
 
-                        <!-- Interactive Pannable & Zoomable Canvas Area -->
-                        <Border x:Name="LevelLayoutCanvasBorder"
-                                Grid.Row="1"
-                                Background="#121212"
-                                ClipToBounds="True"
-                                PointerPressed="OnLevelLayoutPointerPressed"
-                                PointerMoved="OnLevelLayoutPointerMoved"
-                                PointerReleased="OnLevelLayoutPointerReleased"
-                                PointerCaptureLost="OnLevelLayoutPointerCaptureLost"
-                                PointerExited="OnLevelLayoutPointerExited"
-                                PointerWheelChanged="OnLevelLayoutPointerWheelChanged">
-                            <Canvas Background="#121212"
-                                    HorizontalAlignment="Left" VerticalAlignment="Top"
-                                    RenderTransformOrigin="0,0"
-                                    ClipToBounds="False">
-                                <Canvas.RenderTransform>
-                                    <TransformGroup>
-                                        <ScaleTransform ScaleX="{Binding GridState.Zoom}" ScaleY="{Binding GridState.Zoom}"/>
-                                        <TranslateTransform X="{Binding GridState.PanX}" Y="{Binding GridState.PanY}"/>
-                                    </TransformGroup>
-                                </Canvas.RenderTransform>
+                            <!-- Interactive Pannable & Zoomable Canvas Area -->
+                            <Grid Grid.Row="1">
+                                <Border x:Name="LevelLayoutCanvasBorder"
+                                        Background="#121212"
+                                        ClipToBounds="True"
+                                        PointerPressed="OnLevelLayoutPointerPressed"
+                                        PointerMoved="OnLevelLayoutPointerMoved"
+                                        PointerReleased="OnLevelLayoutPointerReleased"
+                                        PointerCaptureLost="OnLevelLayoutPointerCaptureLost"
+                                        PointerExited="OnLevelLayoutPointerExited"
+                                        PointerWheelChanged="OnLevelLayoutPointerWheelChanged">
+                                    <Canvas Background="#121212"
+                                            HorizontalAlignment="Left" VerticalAlignment="Top"
+                                            RenderTransformOrigin="0,0"
+                                            ClipToBounds="False">
+                                    <Canvas.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform ScaleX="{Binding GridState.Zoom}" ScaleY="{Binding GridState.Zoom}"/>
+                                            <TranslateTransform X="{Binding GridState.PanX}" Y="{Binding GridState.PanY}"/>
+                                        </TransformGroup>
+                                    </Canvas.RenderTransform>
 
-                                <!-- Dynamic Grid Background -->
-                                <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
-                                           Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}">
-                                    <Rectangle.Fill>
-                                        <VisualBrush DestinationRect="0,0,64,64" TileMode="Tile" SourceRect="0,0,64,64">
-                                            <VisualBrush.Visual>
-                                                <Border Width="64" Height="64" BorderBrush="#252525" BorderThickness="0,0,1,1" Background="#141414"/>
-                                            </VisualBrush.Visual>
-                                        </VisualBrush>
-                                    </Rectangle.Fill>
-                                </Rectangle>
+                                    <!-- Dynamic Grid Background -->
+                                    <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                               Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}">
+                                        <Rectangle.Fill>
+                                            <VisualBrush DestinationRect="0,0,64,64" TileMode="Tile" SourceRect="0,0,64,64">
+                                                <VisualBrush.Visual>
+                                                    <Border Width="64" Height="64" BorderBrush="#252525" BorderThickness="0,0,1,1" Background="#141414"/>
+                                                </VisualBrush.Visual>
+                                            </VisualBrush>
+                                        </Rectangle.Fill>
+                                    </Rectangle>
 
-                                <!-- Grid Outer Boundary -->
-                                <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
-                                           Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}"
-                                           Stroke="#37474F" StrokeThickness="2" Fill="Transparent"/>
+                                    <!-- Grid Outer Boundary -->
+                                    <Rectangle Canvas.Left="{Binding GridState.WorldGridLeft}" Canvas.Top="{Binding GridState.WorldGridTop}"
+                                               Width="{Binding GridState.WorldGridWidth}" Height="{Binding GridState.WorldGridHeight}"
+                                               Stroke="#37474F" StrokeThickness="2" Fill="Transparent"/>
 
-                                <!-- Placed Rooms / Geomorph Meshes -->
-                                <ItemsControl ItemsSource="{Binding GridState.PlacedRooms}"
-                                              Canvas.Left="0" Canvas.Top="0"
-                                              ClipToBounds="False">
-                                    <ItemsControl.Template>
-                                        <ControlTemplate>
-                                            <ItemsPresenter Name="PART_ItemsPresenter"
-                                                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                                                            ClipToBounds="False"/>
-                                        </ControlTemplate>
-                                    </ItemsControl.Template>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas ClipToBounds="False"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemContainerTheme>
-                                        <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedRoomNode">
-                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
-                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
-                                            <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
-                                            <Setter Property="ClipToBounds" Value="False"/>
-                                        </ControlTheme>
-                                    </ItemsControl.ItemContainerTheme>
-                                    <ItemsControl.Styles>
-                                        <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedRoomNode">
-                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
-                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
-                                            <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
-                                            <Setter Property="ClipToBounds" Value="False"/>
-                                        </Style>
-                                    </ItemsControl.Styles>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="models:PlacedRoomNode">
-                                            <Path Data="{Binding Geometry}"
-                                                  Fill="{Binding FillBrush}"
-                                                  Stroke="{Binding StrokeBrush}"
-                                                  StrokeThickness="{Binding StrokeThickness}"
-                                                  IsVisible="{Binding HasGeometry}"
-                                                  ToolTip.Tip="{Binding DisplayName}"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
+                                    <!-- Placed Rooms / Geomorph Meshes -->
+                                    <ItemsControl ItemsSource="{Binding GridState.PlacedRooms}"
+                                                  Canvas.Left="0" Canvas.Top="0"
+                                                  ClipToBounds="False">
+                                        <ItemsControl.Template>
+                                            <ControlTemplate>
+                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                ClipToBounds="False"/>
+                                            </ControlTemplate>
+                                        </ItemsControl.Template>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas ClipToBounds="False"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemContainerTheme>
+                                            <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </ControlTheme>
+                                        </ItemsControl.ItemContainerTheme>
+                                        <ItemsControl.Styles>
+                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedRoomNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </Style>
+                                        </ItemsControl.Styles>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:PlacedRoomNode">
+                                                <Canvas IsVisible="{Binding HasGeometry}"
+                                                        ClipToBounds="False"
+                                                        ToolTip.Tip="{Binding DisplayName}">
+                                                    <!-- Multi-height geometry layers -->
+                                                    <ItemsControl ItemsSource="{Binding HeightLayers}"
+                                                                  IsVisible="{Binding HasHeightLayers}"
+                                                                  IsHitTestVisible="False"
+                                                                  ClipToBounds="False">
+                                                        <ItemsControl.Template>
+                                                            <ControlTemplate>
+                                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                                ClipToBounds="False"/>
+                                                            </ControlTemplate>
+                                                        </ItemsControl.Template>
+                                                        <ItemsControl.ItemsPanel>
+                                                            <ItemsPanelTemplate>
+                                                                <Canvas ClipToBounds="False"/>
+                                                            </ItemsPanelTemplate>
+                                                        </ItemsControl.ItemsPanel>
+                                                        <ItemsControl.ItemContainerTheme>
+                                                            <ControlTheme TargetType="ContentPresenter" x:DataType="models:RoomHeightLayer">
+                                                                <Setter Property="Canvas.Left" Value="0"/>
+                                                                <Setter Property="Canvas.Top" Value="0"/>
+                                                                <Setter Property="ClipToBounds" Value="False"/>
+                                                            </ControlTheme>
+                                                        </ItemsControl.ItemContainerTheme>
+                                                        <ItemsControl.Styles>
+                                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:RoomHeightLayer">
+                                                                <Setter Property="Canvas.Left" Value="0"/>
+                                                                <Setter Property="Canvas.Top" Value="0"/>
+                                                                <Setter Property="ClipToBounds" Value="False"/>
+                                                            </Style>
+                                                        </ItemsControl.Styles>
+                                                        <ItemsControl.ItemTemplate>
+                                                            <DataTemplate x:DataType="models:RoomHeightLayer">
+                                                                <Path Data="{Binding Geometry}"
+                                                                      Fill="{Binding FillBrush}"
+                                                                      StrokeThickness="0"
+                                                                      ClipToBounds="False"/>
+                                                            </DataTemplate>
+                                                        </ItemsControl.ItemTemplate>
+                                                    </ItemsControl>
 
-                                <!-- Placed Doors / Connectors -->
-                                <ItemsControl ItemsSource="{Binding GridState.PlacedDoors}"
-                                              Canvas.Left="0" Canvas.Top="0"
-                                              ClipToBounds="False">
-                                    <ItemsControl.Template>
-                                        <ControlTemplate>
-                                            <ItemsPresenter Name="PART_ItemsPresenter"
-                                                            ItemsPanel="{TemplateBinding ItemsPanel}"
-                                                            ClipToBounds="False"/>
-                                        </ControlTemplate>
-                                    </ItemsControl.Template>
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <Canvas ClipToBounds="False"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemContainerTheme>
-                                        <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedDoorNode">
-                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
-                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
-                                            <Setter Property="Canvas.ZIndex" Value="10"/>
-                                            <Setter Property="ClipToBounds" Value="False"/>
-                                        </ControlTheme>
-                                    </ItemsControl.ItemContainerTheme>
-                                    <ItemsControl.Styles>
-                                        <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedDoorNode">
-                                            <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
-                                            <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
-                                            <Setter Property="Canvas.ZIndex" Value="10"/>
-                                            <Setter Property="ClipToBounds" Value="False"/>
-                                        </Style>
-                                    </ItemsControl.Styles>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate x:DataType="models:PlacedDoorNode">
-                                            <Button Width="{Binding DoorWidth}"
-                                                    Height="{Binding DoorHeight}"
-                                                    Background="{Binding DoorBrush}"
-                                                    BorderBrush="#FFFFFF"
-                                                    BorderThickness="0"
-                                                    CornerRadius="0"
-                                                    Padding="0"
-                                                    Margin="0"
-                                                    Cursor="Hand"
-                                                    RenderTransformOrigin="50%,50%"
-                                                    ToolTip.Tip="{Binding TooltipText}"
-                                                    Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LevelLayout.OnDoorClicked}"
-                                                    CommandParameter="{Binding}"
-                                                    PointerPressed="OnDoorPointerPressed">
-                                                <Button.RenderTransform>
-                                                    <RotateTransform Angle="{Binding RotationAngle}"/>
-                                                </Button.RenderTransform>
-                                            </Button>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Canvas>
-                        </Border>
+                                                    <!-- Fallback full room geometry when height layers are not present -->
+                                                    <Path Data="{Binding Geometry}"
+                                                          Fill="{Binding FillBrush}"
+                                                          StrokeThickness="0"
+                                                          IsVisible="{Binding !HasHeightLayers}"
+                                                          IsHitTestVisible="False"
+                                                          ClipToBounds="False"/>
+                                                </Canvas>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Placed Doors / Connectors -->
+                                    <ItemsControl ItemsSource="{Binding GridState.PlacedDoors}"
+                                                  Canvas.Left="0" Canvas.Top="0"
+                                                  ClipToBounds="False">
+                                        <ItemsControl.Template>
+                                            <ControlTemplate>
+                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                ClipToBounds="False"/>
+                                            </ControlTemplate>
+                                        </ItemsControl.Template>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas ClipToBounds="False"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemContainerTheme>
+                                            <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="10"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </ControlTheme>
+                                        </ItemsControl.ItemContainerTheme>
+                                        <ItemsControl.Styles>
+                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedDoorNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="10"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </Style>
+                                        </ItemsControl.Styles>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:PlacedDoorNode">
+                                                <Button Width="{Binding DoorWidth}"
+                                                        Height="{Binding DoorHeight}"
+                                                        Background="{Binding DoorBrush}"
+                                                        BorderBrush="#FFFFFF"
+                                                        BorderThickness="0"
+                                                        CornerRadius="0"
+                                                        Padding="0"
+                                                        Margin="0"
+                                                        Cursor="Hand"
+                                                        RenderTransformOrigin="50%,50%"
+                                                        ToolTip.Tip="{Binding TooltipText}"
+                                                        Command="{Binding $parent[Window].((vm:MainWindowViewModel)DataContext).LevelLayout.OnDoorClicked}"
+                                                        CommandParameter="{Binding}"
+                                                        PointerPressed="OnDoorPointerPressed">
+                                                    <Button.RenderTransform>
+                                                        <RotateTransform Angle="{Binding RotationAngle}"/>
+                                                    </Button.RenderTransform>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Placed Triggers -->
+                                    <ItemsControl ItemsSource="{Binding GridState.PlacedTriggers}"
+                                                  IsVisible="{Binding IsAraEnabled}"
+                                                  Canvas.Left="0" Canvas.Top="0"
+                                                  ClipToBounds="False">
+                                        <ItemsControl.Template>
+                                            <ControlTemplate>
+                                                <ItemsPresenter Name="PART_ItemsPresenter"
+                                                                ItemsPanel="{TemplateBinding ItemsPanel}"
+                                                                ClipToBounds="False"/>
+                                            </ControlTemplate>
+                                        </ItemsControl.Template>
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <Canvas ClipToBounds="False"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemContainerTheme>
+                                            <ControlTheme TargetType="ContentPresenter" x:DataType="models:PlacedTriggerNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="15"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </ControlTheme>
+                                        </ItemsControl.ItemContainerTheme>
+                                        <ItemsControl.Styles>
+                                            <Style Selector="ItemsControl > ContentPresenter" x:DataType="models:PlacedTriggerNode">
+                                                <Setter Property="Canvas.Left" Value="{Binding CanvasLeft}"/>
+                                                <Setter Property="Canvas.Top" Value="{Binding CanvasTop}"/>
+                                                <Setter Property="Canvas.ZIndex" Value="15"/>
+                                                <Setter Property="ClipToBounds" Value="False"/>
+                                            </Style>
+                                        </ItemsControl.Styles>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate x:DataType="models:PlacedTriggerNode">
+                                                <Border Width="{Binding CanvasWidth}"
+                                                        Height="{Binding CanvasHeight}"
+                                                        CornerRadius="{Binding CanvasCornerRadius}"
+                                                        Background="{Binding FillBrush}"
+                                                        BorderBrush="{Binding StrokeBrush}"
+                                                        BorderThickness="1"
+                                                        Padding="0"
+                                                        Margin="0"
+                                                        Cursor="SizeAll"
+                                                        ToolTip.Tip="{Binding TooltipText}"
+                                                        PointerPressed="OnTriggerPointerPressed"
+                                                        PointerMoved="OnTriggerPointerMoved"
+                                                        PointerReleased="OnTriggerPointerReleased"
+                                                        PointerEntered="OnTriggerPointerEntered"
+                                                        PointerExited="OnTriggerPointerExited"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+
+                                    <!-- Drag Preview Trigger -->
+                                    <Border Canvas.Left="{Binding GridState.DragPreviewTrigger.CanvasLeft}"
+                                            Canvas.Top="{Binding GridState.DragPreviewTrigger.CanvasTop}"
+                                            Width="{Binding GridState.DragPreviewTrigger.CanvasWidth}"
+                                            Height="{Binding GridState.DragPreviewTrigger.CanvasHeight}"
+                                            CornerRadius="{Binding GridState.DragPreviewTrigger.CanvasCornerRadius}"
+                                            Background="{Binding GridState.DragPreviewTrigger.FillBrush}"
+                                            BorderBrush="{Binding GridState.DragPreviewTrigger.StrokeBrush}"
+                                            BorderThickness="1"
+                                            IsVisible="{Binding GridState.IsDraggingTriggerPreview}"
+                                            IsHitTestVisible="False"/>
+                                </Canvas>
+                            </Border>
+
+                            <!-- Mouse Hover Coordinates Overlay -->
+                            <Border HorizontalAlignment="Left"
+                                    VerticalAlignment="Top"
+                                    Margin="12"
+                                    Padding="8,4"
+                                    Background="#D0151518"
+                                    BorderBrush="#33FFFFFF"
+                                    BorderThickness="1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False"
+                                    IsVisible="{Binding GridState.HasHoverCoordinates}">
+                                <TextBlock Text="{Binding GridState.HoverCoordinatesText}"
+                                           FontSize="11"
+                                           FontFamily="Consolas,Cascadia Mono,Monospace,Courier New"
+                                           Foreground="#90CAF9"/>
+                            </Border>
+                        </Grid>
+                    </Grid>
+
+                        <!-- Right: Vertical Collapsible Items Bar -->
+                        <Panel Grid.Column="1" IsVisible="{Binding IsAraEnabled}">
+                            <!-- Expanded State -->
+                            <Border IsVisible="{Binding IsPaletteExpanded}"
+                                    Width="230"
+                                    Background="#1A1A1A"
+                                    BorderBrush="#333333"
+                                    BorderThickness="1,0,0,0">
+                                <Grid RowDefinitions="Auto,*">
+                                    <!-- Header -->
+                                    <Border Grid.Row="0" Background="#1F1F1F" BorderBrush="#2D2D2D" BorderThickness="0,0,0,1" Padding="10,8">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <TextBlock Grid.Column="0"
+                                                       Text="Objects"
+                                                       ToolTip.Tip="#todo"
+                                                       FontWeight="Bold"
+                                                       FontSize="13"
+                                                       Foreground="#FFFFFF"
+                                                       VerticalAlignment="Center"/>
+                                            <Button Grid.Column="1"
+                                                    Content="▶"
+                                                    Command="{Binding TogglePalette}"
+                                                    ToolTip.Tip="#todo"
+                                                    Padding="6,2"
+                                                    FontSize="11"
+                                                    Background="Transparent"
+                                                    Foreground="#AAAAAA"/>
+                                        </Grid>
+                                    </Border>
+
+                                    <!-- Categories and Items List -->
+                                    <ScrollViewer Grid.Row="1" Padding="8,8,8,8" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                        <ItemsControl ItemsSource="{Binding PaletteCategories}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate x:DataType="models:LayoutPaletteCategory">
+                                                    <StackPanel Spacing="6" Margin="0,0,0,12">
+                                                        <!-- Category Header -->
+                                                        <TextBlock Text="{Binding Name}"
+                                                                   ToolTip.Tip="#todo"
+                                                                   FontWeight="Bold"
+                                                                   FontSize="12"
+                                                                   Foreground="#00F2FF"
+                                                                   Margin="2,0,0,4"/>
+
+                                                        <!-- Items in this Category -->
+                                                        <ItemsControl ItemsSource="{Binding Items}">
+                                                            <ItemsControl.ItemTemplate>
+                                                                <DataTemplate x:DataType="models:LayoutPaletteItem">
+                                                                    <Border Background="#252526"
+                                                                            BorderBrush="#3E3E42"
+                                                                            BorderThickness="1"
+                                                                            CornerRadius="4"
+                                                                            Padding="10,8"
+                                                                            Margin="0,0,0,6"
+                                                                            Cursor="Hand"
+                                                                            ToolTip.Tip="#todo"
+                                                                            PointerPressed="OnPaletteItemPointerPressed">
+                                                                        <Grid ColumnDefinitions="Auto,*">
+                                                                            <TextBlock Grid.Column="0"
+                                                                                       Text="⋮⋮"
+                                                                                       ToolTip.Tip="#todo"
+                                                                                       FontSize="12"
+                                                                                       Foreground="#666666"
+                                                                                       VerticalAlignment="Center"
+                                                                                       Margin="0,0,8,0"/>
+                                                                            <TextBlock Grid.Column="1"
+                                                                                       Text="{Binding DisplayName}"
+                                                                                       ToolTip.Tip="#todo"
+                                                                                       FontWeight="SemiBold"
+                                                                                       FontSize="12"
+                                                                                       Foreground="#E0E0E0"
+                                                                                       VerticalAlignment="Center"/>
+                                                                        </Grid>
+                                                                    </Border>
+                                                                </DataTemplate>
+                                                            </ItemsControl.ItemTemplate>
+                                                        </ItemsControl>
+                                                    </StackPanel>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Border>
+
+                            <!-- Collapsed State -->
+                            <Border IsVisible="{Binding !IsPaletteExpanded}"
+                                    Width="36"
+                                    Background="#1A1A1A"
+                                    BorderBrush="#333333"
+                                    BorderThickness="1,0,0,0">
+                                <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,6,0,0">
+                                    <Button Content="◀"
+                                            Command="{Binding TogglePalette}"
+                                            ToolTip.Tip="#todo"
+                                            Padding="6,4"
+                                            FontSize="11"
+                                            Background="Transparent"
+                                            Foreground="#AAAAAA"
+                                            HorizontalAlignment="Center"/>
+                                    <TextBlock Text="O" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="B" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="J" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="E" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="C" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="T" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="S" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                        </Panel>
                     </Grid>
                 </Border>
             </Grid>
@@ -401,5 +645,8 @@
 
         <!-- Edit Sector Modal Overlay -->
         <dialogs:EditSectorDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsEditingSector}"/>
+
+        <!-- Edit Trigger Modal Overlay -->
+        <dialogs:TriggerConfigDialog Grid.Row="0" Grid.RowSpan="5" IsVisible="{Binding IsEditingTrigger}"/>
     </Grid>
 </UserControl>

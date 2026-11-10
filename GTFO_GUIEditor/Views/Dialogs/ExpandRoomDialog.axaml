@@ -15,7 +15,8 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="24"
-                Width="480"
+                Width="920"
+                MaxHeight="800"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Center"
                 BoxShadow="0 4 20 #80000000">
