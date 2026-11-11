@@ -234,7 +234,7 @@ The following datablocks are fully compatible with the import system:
 * `TextDataBlock`
 * `WardenObjectiveDataBlock`
 
-The following files have caveats with their importing behaviour:
+The following files have caveats with their importing behavior:
 * `LevelLayoutDataBlock`
   * As mentioned, the level layouts the editor uses rely entirely on LGTunerAdvanced config files. While this datablock *is* still needed for a rundown, it also needs these configs.
 
