@@ -53,6 +53,7 @@ public class ExportContext
     public List<JsonObject> VanillaExpeditionBalanceBlocks { get; private set; } = new();
     public List<JsonObject> VanillaChainedPuzzleBlocks { get; private set; } = new();
     public List<JsonObject> VanillaEnemyGroupBlocks { get; private set; } = new();
+    public List<JsonObject> VanillaEnemyPopulationBlocks { get; private set; } = new();
     public List<JsonObject> VanillaSurvivalWaveSettingsBlocks { get; private set; } = new();
     public List<JsonObject> VanillaSurvivalWavePopulationBlocks { get; private set; } = new();
     public List<JsonObject> VanillaAtmosphereBlocks { get; private set; } = new();
@@ -120,11 +121,12 @@ public class ExportContext
 
         VanillaChainedPuzzleBlocks = LoadVanillaBlocksArray("ChainedPuzzleDataBlock.json");
         RegisterExistingIds(VanillaChainedPuzzleBlocks, ChainedPuzzleAlloc);
-        ChainedPuzzleBlocks.AddRange(VanillaChainedPuzzleBlocks);
 
         VanillaEnemyGroupBlocks = LoadVanillaBlocksArray("EnemyGroupDataBlock.json");
         RegisterExistingIds(VanillaEnemyGroupBlocks, EnemyGroupAlloc);
         EnemyGroupBlocks.AddRange(VanillaEnemyGroupBlocks);
+
+        VanillaEnemyPopulationBlocks = LoadVanillaBlocksArray("EnemyPopulationDataBlock.json");
 
         VanillaSurvivalWaveSettingsBlocks = LoadVanillaBlocksArray("SurvivalWaveSettingsDataBlock.json");
         RegisterExistingIds(VanillaSurvivalWaveSettingsBlocks, SurvivalWaveSettingsAlloc);

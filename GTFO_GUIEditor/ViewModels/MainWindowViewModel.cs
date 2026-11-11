@@ -432,6 +432,19 @@ public class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        if (sender is PlacedTriggerNode &&
+            e.PropertyName == nameof(PlacedTriggerNode.IsHovered))
+        {
+            return;
+        }
+
+        if (sender is EnemyGroupRole &&
+            e.PropertyName is nameof(EnemyGroupRole.IsMissingPopulationRole)
+                or nameof(EnemyGroupRole.PopulationRoleWarning))
+        {
+            return;
+        }
+
         if (e.PropertyName is "IsExpanded" or "DisplayText")
         {
             return;
@@ -444,7 +457,9 @@ public class MainWindowViewModel : ViewModelBase
              e.PropertyName == nameof(LevelLayoutGridState.PanY) ||
              e.PropertyName == nameof(LevelLayoutGridState.ViewportWidth) ||
              e.PropertyName == nameof(LevelLayoutGridState.ViewportHeight) ||
-             e.PropertyName == nameof(LevelLayoutGridState.HoveredRoom)))
+             e.PropertyName == nameof(LevelLayoutGridState.HoveredRoom) ||
+             e.PropertyName == nameof(LevelLayoutGridState.HoverCoordinatesText) ||
+             e.PropertyName == nameof(LevelLayoutGridState.HasHoverCoordinates)))
         {
             return;
         }

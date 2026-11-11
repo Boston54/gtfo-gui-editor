@@ -26,6 +26,7 @@ public sealed class DatablockSaveQueue
         "GameData_SurvivalWavePopulationDataBlock_bin.json",
         "GameData_SurvivalWaveSettingsDataBlock_bin.json",
         "GameData_EnemyDataBlock_bin.json",
+        "GameData_EnemyPopulationDataBlock_bin.json",
         "GameData_EnemyGroupDataBlock_bin.json",
         "GameData_RundownDataBlock_bin.json",
         "GameData_GameSetupDataBlock_bin.json",

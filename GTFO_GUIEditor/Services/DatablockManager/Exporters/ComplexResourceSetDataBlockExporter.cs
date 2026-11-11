@@ -100,8 +100,11 @@ public class ComplexResourceSetDataBlockExporter : IDatablockExporter
         Dictionary<string, GeomorphEntry> geoLookup)
     {
         var geos1x1 = new JsonArray();
+        var geos2x1 = new JsonArray();
         var geos2x2 = new JsonArray();
         var elevators = new JsonArray();
+        var customChallenges = new JsonArray();
+        var customExits = new JsonArray();
         var customObjectives = new JsonArray();
 
         var subComplexCounts = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
@@ -201,7 +204,10 @@ public class ComplexResourceSetDataBlockExporter : IDatablockExporter
         }
 
         resultObj["GeomorphTiles_1x1"] = geos1x1;
+        resultObj["GeomorphTiles_2x1"] = geos2x1;
         resultObj["GeomorphTiles_2x2"] = geos2x2;
+        resultObj["CustomGeomorphs_Challenge_1x1"] = customChallenges;
+        resultObj["CustomGeomorphs_Exit_1x1"] = customExits;
         resultObj["ElevatorShafts_1x1"] = elevators;
         resultObj["CustomGeomorphs_Objective_1x1"] = customObjectives;
 

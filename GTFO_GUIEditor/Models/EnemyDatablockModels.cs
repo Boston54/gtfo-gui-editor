@@ -100,6 +100,7 @@ public class EnemyGroupRole : INotifyPropertyChanged
 {
     private string _role = string.Empty;
     private string _distribution = "Rel_100";
+    private bool _isMissingPopulationRole;
     public ObservableCollection<string> AvailableRoles { get; } = new();
 
     [JsonPropertyName("Role")]
@@ -107,6 +108,21 @@ public class EnemyGroupRole : INotifyPropertyChanged
 
     [JsonPropertyName("Distribution")]
     public string Distribution { get => _distribution; set => SetField(ref _distribution, value); }
+
+    [JsonIgnore]
+    public bool IsMissingPopulationRole
+    {
+        get => _isMissingPopulationRole;
+        set
+        {
+            if (!SetField(ref _isMissingPopulationRole, value)) return;
+            OnPropertyChanged(nameof(PopulationRoleWarning));
+        }
+    }
+
+    [JsonIgnore]
+    public string PopulationRoleWarning =>
+        IsMissingPopulationRole ? "Warning: no matching role/difficulty pair exists in Enemy Population." : string.Empty;
 
     public EnemyGroupRole Clone() => new() { Role = Role, Distribution = Distribution };
 
@@ -124,7 +140,7 @@ public class EnemyGroupRole : INotifyPropertyChanged
 
 public class EnemyGroupBlock : INotifyPropertyChanged
 {
-    private string _type = "genericType";
+    private string _type = "Hibernate";
     private string _difficulty = "Easy";
     private string _spawnPlacementType = "Default";
     private double _maxScore;
@@ -186,7 +202,7 @@ public class EnemyGroupBlock : INotifyPropertyChanged
     {
         var clone = new EnemyGroupBlock
         {
-            Type = "genericType",
+            Type = Type,
             Difficulty = Difficulty,
             SpawnPlacementType = SpawnPlacementType,
             MaxScore = MaxScore,

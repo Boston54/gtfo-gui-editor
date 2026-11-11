@@ -13,11 +13,14 @@ public class EnemyDistributionEntry
 
 public class EnemySpawningOption
 {
+    public string GroupName { get; set; } = string.Empty;
     public string GroupType { get; set; } = string.Empty;
     public string Difficulty { get; set; } = string.Empty;
     public List<EnemyDistributionEntry> Enemies { get; set; } = new();
 
-    public string DisplayName => string.Join(", ", Enemies.Select(e => e.Name));
+    public string DisplayName => string.IsNullOrWhiteSpace(GroupName)
+        ? $"{GroupType} {Difficulty}".Trim()
+        : GroupName;
 
     public string DistributionText => string.Join(", ", Enemies.Select(e => $"{e.Name}: {Math.Round(e.Proportion * 100, 1)}%"));
 

@@ -175,6 +175,7 @@ public class DatablockExportTests
                 "GameData_ComplexResourceSetDataBlock_bin.json",
                 "GameData_DimensionDataBlock_bin.json",
                 "GameData_EnemyDataBlock_bin.json",
+                "GameData_EnemyPopulationDataBlock_bin.json",
                 "GameData_EnemyGroupDataBlock_bin.json",
                 "GameData_ExpeditionBalanceDataBlock_bin.json",
                 "GameData_FogSettingsDataBlock_bin.json",
@@ -194,8 +195,78 @@ public class DatablockExportTests
                 Assert.True(File.Exists(fullPath), $"Expected file {expectedFile} was not found in export root.");
             }
 
-            Assert.False(File.Exists(Path.Combine(tempDir, "GameData_EnemyPopulationDataBlock_bin.json")),
-                "GameData_EnemyPopulationDataBlock_bin.json should not be exported as it is not part of vanilla datablocks and causes game crash on startup.");
+            Assert.True(File.Exists(Path.Combine(tempDir, "GameData_EnemyPopulationDataBlock_bin.json")));
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                try { Directory.Delete(tempDir, true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void ExportAll_WritesEditedEnemyPopulationRoles()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "GTFO_EnemyPopulation_Export_Test_" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            var vm = new MainWindowViewModel();
+            var population = vm.Enemies.Population;
+            population.RoleDatas.Clear();
+            population.RoleDatas.Add(new EnemyRoleData
+            {
+                Role = "Boss",
+                Difficulty = "Hard",
+                Enemy = 40,
+                Cost = 10,
+                Weight = 0.5
+            });
+
+            var exportResult = DatablockExportService.ExportAll(vm, tempDir);
+
+            Assert.True(exportResult.Success, exportResult.Message);
+            var exported = JsonNode.Parse(File.ReadAllText(
+                Path.Combine(tempDir, "GameData_EnemyPopulationDataBlock_bin.json")));
+            var roles = exported?["Blocks"]?[0]?["RoleDatas"]?.AsArray();
+            var role = Assert.Single(roles!);
+            Assert.Equal("Boss", role?["Role"]?.GetValue<string>());
+            Assert.Equal("Hard", role?["Difficulty"]?.GetValue<string>());
+            Assert.Equal((uint)40, role?["Enemy"]?.GetValue<uint>());
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                try { Directory.Delete(tempDir, true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void ChainedPuzzleExport_ContainsOnlyCreatedAlarms()
+    {
+        string tempDir = Path.Combine(Path.GetTempPath(), "GTFO_ChainedPuzzle_Export_Test_" + Guid.NewGuid().ToString("N"));
+        try
+        {
+            Directory.CreateDirectory(tempDir);
+            var vm = new MainWindowViewModel();
+            vm.Alarms.Alarms.Clear();
+            vm.Alarms.Alarms.Add(new AlarmBlock
+            {
+                Name = "Created Alarm",
+                PublicAlarmName = "Created Alarm"
+            });
+
+            var context = new ExportContext(vm, tempDir);
+            new ChainedPuzzleDataBlockExporter().Export(context);
+
+            var exported = JsonNode.Parse(File.ReadAllText(
+                Path.Combine(tempDir, "GameData_ChainedPuzzleDataBlock_bin.json")));
+            var blocks = exported?["Blocks"]?.AsArray();
+            var block = Assert.Single(blocks!);
+            Assert.Equal("Created Alarm", block?["name"]?.GetValue<string>());
         }
         finally
         {

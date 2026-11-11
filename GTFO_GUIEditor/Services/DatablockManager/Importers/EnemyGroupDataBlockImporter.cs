@@ -14,7 +14,7 @@ public class EnemyGroupDataBlockImporter : IDatablockImporter
         {
             var group = new EnemyGroupBlock
             {
-                Type = entry["Type"]?.GetValue<string>() ?? "genericType",
+                Type = entry["Type"]?.GetValue<string>() ?? "Hibernate",
                 Difficulty = entry["Difficulty"]?.GetValue<string>() ?? "Easy",
                 SpawnPlacementType = entry["SpawnPlacementType"]?.GetValue<string>() ?? "Default",
                 MaxScore = entry["MaxScore"]?.GetValue<double>() ?? 0,

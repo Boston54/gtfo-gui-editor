@@ -30,16 +30,22 @@ public class EnemiesViewModel : ViewModelBase
     public ICommand RemoveGroupCommand { get; }
 
     public static readonly string[] Difficulties = { "Easy", "Medium", "Hard", "Biss", "Buss" };
-    public static readonly string[] RoleNames = { "Melee", "Ranged", "Big", "Special", "Scout", "Boss" };
+    public static readonly string[] RoleNames =
+    {
+        "Melee", "Ranged", "Tank", "Lurker", "PureSneak", "Scout", "Patroller", "Hunter", "BirtherChild", "MiniBoss", "Boss"
+    };
     public static readonly string[] Distributions =
     {
-        "Rel_0","Rel_5","Rel_10","Rel_15","Rel_20","Rel_25","Rel_30","Rel_35","Rel_40",
-        "Rel_45","Rel_50","Rel_55","Rel_60","Rel_65","Rel_70","Rel_75","Rel_80","Rel_85",
-        "Rel_90","Rel_95","Rel_100","Force_One"
+        "None", "Force_One", "Rel_05", "Rel_10", "Rel_15", "Rel_25", "Rel_50", "Rel_75", "Rel_100"
+    };
+    public static readonly string[] GroupTypes =
+    {
+        "Hibernate", "PureSneak", "Detect", "PureDetect", "Patrol", "Awake", "Hunter"
     };
     public string[] AvailableDifficulties => Difficulties;
     public string[] AvailableRoleNames => RoleNames;
     public string[] AvailableDistributions => Distributions;
+    public string[] AvailableGroupTypes => GroupTypes;
 
     private string _populationSearchText = string.Empty;
     public string PopulationSearchText
@@ -68,6 +74,11 @@ public class EnemiesViewModel : ViewModelBase
     }
 
     private EnemyPopulationBlock? _population;
+    private bool _isRefreshingSpawningOptions;
+    private bool _isRefreshingRoleOptions;
+    private bool _isRefreshingPopulationSearch;
+    private bool _hasImportedPopulation;
+    private readonly HashSet<EnemyRoleData> _trackedPopulationRoles = new();
     public EnemyPopulationBlock Population
     {
         get => _population ??= PopulationBlocks.FirstOrDefault() ?? new EnemyPopulationBlock();
@@ -75,8 +86,10 @@ public class EnemiesViewModel : ViewModelBase
         {
             if (_population == value) return;
             _population = value;
+            _hasImportedPopulation = true;
             if (!PopulationBlocks.Contains(value)) PopulationBlocks.Clear();
             if (!PopulationBlocks.Contains(value)) PopulationBlocks.Add(value);
+            AttachPopulationTracking(value);
             OnPropertyChanged();
         }
     }
@@ -84,13 +97,39 @@ public class EnemiesViewModel : ViewModelBase
     public EnemiesViewModel()
     {
         LoadVanillaDatablocks();
-        if (PopulationBlocks.Count == 0) PopulationBlocks.Add(new EnemyPopulationBlock());
+        if (PopulationBlocks.Count == 0)
+        {
+            var emptyPopulation = new EnemyPopulationBlock();
+            emptyPopulation.RoleDatas.Add(new EnemyRoleData { Role = "Melee", Difficulty = "Easy" });
+            PopulationBlocks.Add(emptyPopulation);
+        }
         _population = PopulationBlocks[0];
 
         ToggleGroupCommand = new RelayCommand<EnemyGroupBlock>(g => { if (g != null) g.IsExpanded = !g.IsExpanded; });
-        AddRoleDataCommand = new RelayCommand(() => Population.RoleDatas.Add(new EnemyRoleData()));
-        RemoveRoleDataCommand = new RelayCommand<EnemyRoleData>(r => { if (r != null) Population.RoleDatas.Remove(r); });
-        AddGroupRoleCommand = new RelayCommand<EnemyGroupBlock>(g => g?.Roles.Add(new EnemyGroupRole()));
+        AddRoleDataCommand = new RelayCommand<object>(parameter =>
+        {
+            var population = parameter as EnemyPopulationBlock ?? Population;
+            Population = population;
+            population.RoleDatas.Add(new EnemyRoleData());
+            RefreshSpawningOptions();
+            RefreshPopulationSearch();
+        });
+        RemoveRoleDataCommand = new RelayCommand<object>(parameter =>
+        {
+            if (parameter is not EnemyRoleData role) return;
+
+            foreach (var population in PopulationBlocks)
+            {
+                if (!population.RoleDatas.Remove(role)) continue;
+                if (ReferenceEquals(Population, population))
+                {
+                    RefreshSpawningOptions();
+                    RefreshPopulationSearch();
+                }
+                break;
+            }
+        });
+        AddGroupRoleCommand = new RelayCommand<EnemyGroupBlock>(AddGroupRole);
         RemoveGroupRoleCommand = new RelayCommand<object>(parameter =>
         {
             if (parameter is not EnemyGroupRole role) return;
@@ -104,32 +143,23 @@ public class EnemiesViewModel : ViewModelBase
             if (e.NewItems != null)
             {
                 foreach (EnemyGroupBlock group in e.NewItems)
+                {
+                    AttachGroupRoleTracking(group);
                     group.PropertyChanged += (_, args) =>
                     {
+                        if (args.PropertyName == nameof(EnemyGroupBlock.IsExpanded)) return;
                         RefreshSpawningOptions();
-                        if (args.PropertyName == nameof(EnemyGroupBlock.Difficulty)) RefreshRoleOptions();
                         RefreshGroupSearch();
                     };
+                }
             }
             RefreshSpawningOptions();
             RefreshRoleOptions();
             RefreshGroupSearch();
         };
-        Population.RoleDatas.CollectionChanged += (_, e) =>
-        {
-            if (e.NewItems != null)
-            {
-                foreach (EnemyRoleData role in e.NewItems)
-                    role.PropertyChanged += (_, _) => RefreshPopulationSearch();
-            }
-            RefreshSpawningOptions();
-            RefreshRoleOptions();
-            RefreshPopulationSearch();
-        };
-        foreach (var role in Population.RoleDatas)
-        {
-            role.PropertyChanged += (_, _) => RefreshSpawningOptions();
-        }
+        foreach (var group in Groups)
+            AttachGroupRoleTracking(group);
+        AttachPopulationTracking(Population);
         RefreshSpawningOptions();
         RefreshPopulationSearch();
         RefreshGroupSearch();
@@ -138,37 +168,6 @@ public class EnemiesViewModel : ViewModelBase
     private void LoadVanillaDatablocks()
     {
         string dir = AlarmService.GetDatablocksDirectory();
-        string populationPath = Path.Combine(dir, "EnemyPopulationDataBlock.json");
-        if (File.Exists(populationPath))
-        {
-            try
-            {
-                if (JsonNode.Parse(File.ReadAllText(populationPath)) is JsonObject obj &&
-                    obj["Blocks"] is JsonArray blocks)
-                {
-                    foreach (var blockNode in blocks.OfType<JsonObject>())
-                    {
-                        var population = new EnemyPopulationBlock();
-                        if (blockNode["RoleDatas"] is JsonArray roles)
-                        {
-                            foreach (var roleNode in roles.OfType<JsonObject>())
-                                population.RoleDatas.Add(new EnemyRoleData
-                                {
-                                    Role = roleNode["Role"]?.GetValue<string>() ?? string.Empty,
-                                    Difficulty = roleNode["Difficulty"]?.GetValue<string>() ?? "Easy",
-                                    Enemy = roleNode["Enemy"]?.GetValue<uint>() ?? 0,
-                                    Cost = roleNode["Cost"]?.GetValue<double>() ?? 1,
-                                    Weight = roleNode["Weight"]?.GetValue<double>() ?? 1
-                                });
-                        }
-                        PopulationBlocks.Add(population);
-                        break;
-                    }
-                }
-            }
-            catch { }
-        }
-
         string groupsPath = Path.Combine(dir, "EnemyGroupDataBlock.json");
         if (File.Exists(groupsPath))
         {
@@ -181,7 +180,7 @@ public class EnemiesViewModel : ViewModelBase
                     {
                         var group = new EnemyGroupBlock
                         {
-                            Type = "genericType",
+                            Type = node["Type"]?.GetValue<string>() ?? "Hibernate",
                             Difficulty = node["Difficulty"]?.GetValue<string>() ?? "Easy",
                             SpawnPlacementType = node["SpawnPlacementType"]?.GetValue<string>() ?? "Default",
                             MaxScore = node["MaxScore"]?.GetValue<double>() ?? 0,
@@ -210,18 +209,62 @@ public class EnemiesViewModel : ViewModelBase
 
     public void RefreshSpawningOptions()
     {
-        EnemySpawningService.RefreshOptions(Groups, Population.RoleDatas, Enemies);
+        if (_isRefreshingSpawningOptions) return;
+        _isRefreshingSpawningOptions = true;
+        try
+        {
+            if (_hasImportedPopulation)
+                EnemySpawningService.RefreshOptions(Groups, Population.RoleDatas, Enemies);
+            RefreshRoleOptions();
+        }
+        finally
+        {
+            _isRefreshingSpawningOptions = false;
+        }
+    }
+
+    private void AddGroupRole(EnemyGroupBlock? group)
+    {
+        if (group == null) return;
+        group.Roles.Add(new EnemyGroupRole());
         RefreshRoleOptions();
+    }
+
+    private void AttachGroupRoleTracking(EnemyGroupBlock group)
+    {
+        foreach (var role in group.Roles)
+            role.PropertyChanged += (_, _) => RefreshSpawningOptions();
+
+        group.Roles.CollectionChanged += (_, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (EnemyGroupRole role in e.NewItems)
+                    role.PropertyChanged += (_, _) => RefreshSpawningOptions();
+            }
+            RefreshSpawningOptions();
+        };
     }
 
     private void RefreshPopulationSearch()
     {
-        PopulationSearchResults.Clear();
-        var query = PopulationSearchText?.Trim() ?? string.Empty;
-        foreach (var role in Population.RoleDatas)
+        if (_isRefreshingPopulationSearch) return;
+        _isRefreshingPopulationSearch = true;
+        try
         {
-            if (string.IsNullOrEmpty(query) || MatchesPopulationRole(role, query))
+            var query = PopulationSearchText?.Trim() ?? string.Empty;
+            var matches = Population.RoleDatas
+                .Where(role => string.IsNullOrEmpty(query) || MatchesPopulationRole(role, query))
+                .ToList();
+            if (PopulationSearchResults.SequenceEqual(matches)) return;
+
+            PopulationSearchResults.Clear();
+            foreach (var role in matches)
                 PopulationSearchResults.Add(role);
+        }
+        finally
+        {
+            _isRefreshingPopulationSearch = false;
         }
     }
 
@@ -267,36 +310,78 @@ public class EnemiesViewModel : ViewModelBase
 
     public void RefreshRoleOptions()
     {
-        foreach (var group in Groups)
+        if (_isRefreshingRoleOptions) return;
+        _isRefreshingRoleOptions = true;
+        try
         {
-            group.AvailableRoles.Clear();
-            var matchingRoles = Population.RoleDatas
-                         .Where(r => string.Equals(r.Difficulty, group.Difficulty, StringComparison.OrdinalIgnoreCase))
-                         .Select(r => r.Role)
-                         .Where(r => !string.IsNullOrWhiteSpace(r))
-                         .Distinct(StringComparer.OrdinalIgnoreCase)
-                         .ToList();
-            foreach (var role in matchingRoles)
+            foreach (var group in Groups)
             {
-                group.AvailableRoles.Add(role);
-            }
-            foreach (var groupRole in group.Roles)
-            {
-                groupRole.AvailableRoles.Clear();
-                foreach (var role in matchingRoles) groupRole.AvailableRoles.Add(role);
-                if (!matchingRoles.Contains(groupRole.Role, StringComparer.OrdinalIgnoreCase) &&
-                    !string.IsNullOrWhiteSpace(groupRole.Role))
+                SetRoleOptions(group.AvailableRoles);
+                foreach (var groupRole in group.Roles)
                 {
-                    groupRole.AvailableRoles.Add(groupRole.Role);
+                    SetRoleOptions(groupRole.AvailableRoles);
+                    groupRole.IsMissingPopulationRole = !Population.RoleDatas.Any(populationRole =>
+                        string.Equals(populationRole.Role, groupRole.Role, StringComparison.OrdinalIgnoreCase) &&
+                        string.Equals(populationRole.Difficulty, group.Difficulty, StringComparison.OrdinalIgnoreCase));
                 }
             }
+
+            foreach (var populationRole in Population.RoleDatas)
+            {
+                if (!populationRole.EnemyEntries.SequenceEqual(Enemies))
+                {
+                    populationRole.EnemyEntries.Clear();
+                    foreach (var enemy in Enemies) populationRole.EnemyEntries.Add(enemy);
+                }
+
+                var selectedEnemy = Enemies.FirstOrDefault(e => e.PersistentId == populationRole.Enemy);
+                if (!ReferenceEquals(populationRole.SelectedEnemy, selectedEnemy))
+                    populationRole.SelectedEnemy = selectedEnemy;
+            }
+            OnPropertyChanged(nameof(Groups));
         }
-        foreach (var populationRole in Population.RoleDatas)
+        finally
         {
-            populationRole.EnemyEntries.Clear();
-            foreach (var enemy in Enemies) populationRole.EnemyEntries.Add(enemy);
-            populationRole.SelectedEnemy = Enemies.FirstOrDefault(e => e.PersistentId == populationRole.Enemy);
+            _isRefreshingRoleOptions = false;
         }
-        OnPropertyChanged(nameof(Groups));
+    }
+
+    private void AttachPopulationTracking(EnemyPopulationBlock population)
+    {
+        population.RoleDatas.CollectionChanged += (_, e) =>
+        {
+            if (e.NewItems != null)
+            {
+                foreach (EnemyRoleData role in e.NewItems)
+                    AttachPopulationRoleTracking(role);
+            }
+
+            if (ReferenceEquals(Population, population))
+            {
+                RefreshSpawningOptions();
+                RefreshPopulationSearch();
+            }
+        };
+
+        foreach (var role in population.RoleDatas)
+            AttachPopulationRoleTracking(role);
+    }
+
+    private void AttachPopulationRoleTracking(EnemyRoleData role)
+    {
+        if (!_trackedPopulationRoles.Add(role)) return;
+        role.PropertyChanged += (_, _) =>
+        {
+            RefreshSpawningOptions();
+            RefreshPopulationSearch();
+        };
+    }
+
+    private static void SetRoleOptions(ObservableCollection<string> target)
+    {
+        if (target.SequenceEqual(RoleNames)) return;
+        target.Clear();
+        foreach (var role in RoleNames)
+            target.Add(role);
     }
 }

@@ -65,7 +65,48 @@ public class EnemyDataBlocksExporter : IDatablockExporter
             context.EnemyBlocks,
             ExportContext.LoadVanillaHeadersArray("EnemyDataBlock.json"));
 
-        context.DatablocksExportedCount += 2;
+        var populationBlocks = new List<JsonObject>();
+        foreach (var vanilla in context.VanillaEnemyPopulationBlocks)
+        {
+            var clone = JsonNode.Parse(vanilla.ToJsonString())?.AsObject();
+            if (clone != null) populationBlocks.Add(clone);
+        }
+
+        var populationRoles = new JsonArray();
+        foreach (var role in context.MainVm.Enemies.Population.RoleDatas)
+        {
+            populationRoles.Add(new JsonObject
+            {
+                ["Role"] = role.Role,
+                ["Difficulty"] = role.Difficulty,
+                ["Enemy"] = role.Enemy,
+                ["Cost"] = role.Cost,
+                ["Weight"] = role.Weight
+            });
+        }
+
+        if (populationBlocks.Count == 0)
+        {
+            populationBlocks.Add(new JsonObject
+            {
+                ["RoleDatas"] = populationRoles,
+                ["name"] = "DefaultPop",
+                ["internalEnabled"] = true,
+                ["persistentID"] = 1
+            });
+        }
+        else
+        {
+            populationBlocks[0]["RoleDatas"] = populationRoles;
+        }
+
+        context.EnemyPopulationBlocks.Clear();
+        context.EnemyPopulationBlocks.AddRange(populationBlocks);
+        ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyPopulationDataBlock_bin.json",
+            context.EnemyPopulationBlocks,
+            ExportContext.LoadVanillaHeadersArray("EnemyPopulationDataBlock.json"));
+
+        context.DatablocksExportedCount += 3;
     }
 
     private static List<JsonObject> SerializeGroups(ExportContext context, IEnumerable<EnemyGroupBlock> groups)
@@ -86,7 +127,7 @@ public class EnemyDataBlocksExporter : IDatablockExporter
 
             list.Add(new JsonObject
             {
-                ["Type"] = "genericType",
+                ["Type"] = string.IsNullOrWhiteSpace(group.Type) ? "Hibernate" : group.Type,
                 ["Difficulty"] = group.Difficulty,
                 ["SpawnPlacementType"] = group.SpawnPlacementType,
                 ["MaxScore"] = group.MaxScore,

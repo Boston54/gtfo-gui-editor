@@ -55,6 +55,9 @@ public static class EnemySpawningService
             if (mapping.Count == 0) continue;
             result.Add(new EnemySpawningOption
             {
+                GroupName = string.IsNullOrWhiteSpace(group.Name)
+                    ? $"{group.Type} {group.Difficulty}".Trim()
+                    : group.Name,
                 GroupType = group.Type,
                 Difficulty = group.Difficulty,
                 Enemies = mapping.Select(kvp => new EnemyDistributionEntry
@@ -175,7 +178,7 @@ public static class EnemySpawningService
             }
 
             // Key -> Dictionary of enemyName -> accumulated weight
-            var mapping = new Dictionary<(string GroupType, string Difficulty), Dictionary<string, double>>();
+            var mapping = new Dictionary<(string GroupName, string GroupType, string Difficulty), Dictionary<string, double>>();
 
             if (groupsJson?["Blocks"] is JsonArray groupBlocks)
             {
@@ -192,7 +195,11 @@ public static class EnemySpawningService
                     string difficulty = groupObj["Difficulty"]?.GetValue<string>() ?? string.Empty;
                     double relativeWeight = groupObj["RelativeWeight"]?.GetValue<double>() ?? 1.0;
 
-                    var key = (groupType, difficulty);
+                    string groupName = groupObj["name"]?.GetValue<string>() ?? string.Empty;
+                    if (string.IsNullOrWhiteSpace(groupName))
+                        groupName = $"{groupType} {difficulty}".Trim();
+
+                    var key = (groupName, groupType, difficulty);
 
                     if (groupObj["Roles"] is JsonArray rolesArr)
                     {
@@ -269,6 +276,7 @@ public static class EnemySpawningService
 
                 resultList.Add(new EnemySpawningOption
                 {
+                        GroupName = key.GroupName,
                     GroupType = key.GroupType,
                     Difficulty = key.Difficulty,
                     Enemies = entries

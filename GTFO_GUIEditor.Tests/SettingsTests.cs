@@ -236,10 +236,37 @@ public class SettingsTests : IDisposable
         vm.LevelLayout.GridState.ViewportWidth = 1000;
         vm.LevelLayout.GridState.ViewportHeight = 700;
         vm.LevelLayout.GridState.HoveredRoom = null;
+        vm.LevelLayout.GridState.UpdateHoverCoordinates(12.5, -4.25, 6.0);
+        vm.LevelLayout.GridState.ClearHoverCoordinates();
 
         Assert.False(vm.IsDirty);
         Assert.Empty(vm.EditedDatablockFiles);
         Assert.False(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public void EnemyPopulationAndGroupEdits_MarkProjectEdited()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        Assert.False(vm.HasUnsavedChanges);
+
+        var populationRole = vm.Enemies.Population.RoleDatas[0];
+        populationRole.Weight += 0.25;
+
+        Assert.True(vm.IsDirty);
+        Assert.True(vm.HasUnsavedChanges);
+    }
+
+    [Fact]
+    public void RemovingEnemyPopulationRole_MarksProjectEdited()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        var role = vm.Enemies.Population.RoleDatas[0];
+
+        vm.Enemies.RemoveRoleDataCommand.Execute(role);
+
+        Assert.True(vm.IsDirty);
+        Assert.True(vm.HasUnsavedChanges);
     }
 
     [Fact]
@@ -303,6 +330,13 @@ public class SettingsTests : IDisposable
 
             level.GridState.HoveredRoom = null;
             Assert.False(room.IsHovered);
+            Assert.False(vm.IsDirty);
+
+            level.GridState.UpdateHoverCoordinates(12.5, -4.25, 6.0);
+            Assert.False(vm.IsDirty);
+            Assert.False(vm.HasUnsavedChanges);
+
+            level.GridState.ClearHoverCoordinates();
             Assert.False(vm.IsDirty);
         }
         finally

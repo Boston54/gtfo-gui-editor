@@ -14,6 +14,103 @@ namespace GTFO_GUIEditor.Tests;
 public class EnemySpawningTests
 {
     [Fact]
+    public void EnemyPopulationRoleCommands_AddAndRemoveRoleData()
+    {
+        var enemies = new EnemiesViewModel();
+        var initialCount = enemies.Population.RoleDatas.Count;
+
+        enemies.AddRoleDataCommand.Execute(enemies.Population);
+
+        Assert.Equal(initialCount + 1, enemies.Population.RoleDatas.Count);
+        var addedRole = Assert.Single(enemies.Population.RoleDatas.Skip(initialCount));
+        Assert.Contains(addedRole, enemies.PopulationSearchResults);
+
+        enemies.RemoveRoleDataCommand.Execute(addedRole);
+
+        Assert.Equal(initialCount, enemies.Population.RoleDatas.Count);
+        Assert.DoesNotContain(addedRole, enemies.PopulationSearchResults);
+    }
+
+    [Fact]
+    public void EnemyPopulationRoleChange_DoesNotMutateCollectionsDuringNotification()
+    {
+        var enemies = new EnemiesViewModel();
+        var role = enemies.Population.RoleDatas[0];
+
+        role.Role = "Ranged";
+        role.Difficulty = "Hard";
+
+        Assert.Equal("Ranged", role.Role);
+        Assert.Equal("Hard", role.Difficulty);
+        Assert.Contains(role, enemies.PopulationSearchResults);
+    }
+
+    [Fact]
+    public void EnemyPopulationImport_UsesSpecifiedProjectPath()
+    {
+        string projectPath = Path.Combine(Path.GetTempPath(), "GTFO_EnemyPopulation_Import_Test_" + Guid.NewGuid().ToString("N"));
+        Directory.CreateDirectory(projectPath);
+        try
+        {
+            File.WriteAllText(
+                Path.Combine(projectPath, "EnemyPopulationDataBlock.json"),
+                """
+                {
+                  "Headers": [],
+                  "Blocks": [
+                    {
+                      "RoleDatas": [
+                        { "Role": "ProjectOnly", "Difficulty": "Hard", "Enemy": 24, "Cost": 2.0, "Weight": 0.5 }
+                      ],
+                      "name": "ProjectPopulation",
+                      "internalEnabled": true,
+                      "persistentID": 9001
+                    }
+                  ]
+                }
+                """);
+
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var result = DatablockManager.Instance.ImportDatablocks(vm, projectPath);
+
+            Assert.True(result.Success, result.Message);
+            var role = Assert.Single(vm.Enemies.Population.RoleDatas);
+            Assert.Equal("ProjectOnly", role.Role);
+            Assert.Equal("Hard", role.Difficulty);
+        }
+        finally
+        {
+            if (Directory.Exists(projectPath))
+            {
+                try { Directory.Delete(projectPath, true); } catch { }
+            }
+        }
+    }
+
+    [Fact]
+    public void EnemyGroupRoleSelection_SurvivesCollapseAndRefreshesPopulationWarning()
+    {
+        var enemies = new EnemiesViewModel();
+        var group = enemies.Groups[0];
+        var role = group.Roles[0];
+
+        Assert.Equal(EnemiesViewModel.RoleNames, role.AvailableRoles);
+
+        role.Role = "Melee";
+        group.IsExpanded = true;
+        group.IsExpanded = false;
+
+        Assert.Equal("Melee", role.Role);
+        Assert.False(role.IsMissingPopulationRole);
+
+        role.Role = "Boss";
+        Assert.True(role.IsMissingPopulationRole);
+
+        role.Role = "Melee";
+        Assert.False(role.IsMissingPopulationRole);
+    }
+
+    [Fact]
     public void EnemySpawningService_RefreshOptions_WeightsAndFiltersCandidates()
     {
         var group = new EnemyGroupBlock
@@ -109,6 +206,7 @@ public class EnemySpawningTests
 
         Assert.NotNull(hibernateEasy);
         Assert.NotEmpty(hibernateEasy.Enemies);
+        Assert.False(string.IsNullOrWhiteSpace(hibernateEasy.GroupName));
         Assert.False(string.IsNullOrEmpty(hibernateEasy.DisplayName));
         Assert.False(string.IsNullOrEmpty(hibernateEasy.DistributionText));
         Assert.DoesNotContain("(Hibernate)", hibernateEasy.DisplayName, StringComparison.OrdinalIgnoreCase);
@@ -159,6 +257,23 @@ public class EnemySpawningTests
             Assert.Equal(targetOption.GroupType, item.GroupType);
             Assert.Equal(targetOption.Difficulty, item.Difficulty);
         }
+    }
+
+    [Fact]
+    public void EnemySpawningOption_DisplayNameUsesEnemyGroupName()
+    {
+        var option = new EnemySpawningOption
+        {
+            GroupName = "Hibernate Easy Small Mix A",
+            GroupType = "Hibernate",
+            Difficulty = "Easy",
+            Enemies = new List<EnemyDistributionEntry>
+            {
+                new() { Name = "Striker", Proportion = 1.0 }
+            }
+        };
+
+        Assert.Equal("Hibernate Easy Small Mix A", option.DisplayName);
     }
 
     [Fact]

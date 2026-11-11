@@ -226,7 +226,7 @@
                                                                     <Border BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,2,0,4" Background="#252526">
                                                                         <StackPanel Spacing="6">
                                                                             <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto" RowDefinitions="Auto">
-                                                                                <TextBlock Grid.Column="0" Text="Enemy:" ToolTip.Tip="The enemy group to use for this zone's enemy spawns." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                                <TextBlock Grid.Column="0" Text="Group:" ToolTip.Tip="The enemy group to use for this zone's enemy spawns." VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                                 <ComboBox Grid.Column="1"
                                                                                           ItemsSource="{Binding #EditRoomDialogRoot.DataContext.AvailableEnemySpawningOptions}"
                                                                                           SelectedItem="{Binding SelectedOption, Mode=TwoWay}"
