@@ -507,7 +507,7 @@
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock Grid.Column="0"
                                                        Text="Objects"
-                                                       ToolTip.Tip="#todo"
+                                                       ToolTip.Tip="Drag-n-drop items for the level layout view."
                                                        FontWeight="Bold"
                                                        FontSize="13"
                                                        Foreground="#FFFFFF"
@@ -515,7 +515,7 @@
                                             <Button Grid.Column="1"
                                                     Content="▶"
                                                     Command="{Binding TogglePalette}"
-                                                    ToolTip.Tip="#todo"
+                                                    ToolTip.Tip="Drag-n-drop items for the level layout view."
                                                     Padding="6,2"
                                                     FontSize="11"
                                                     Background="Transparent"
@@ -531,7 +531,6 @@
                                                     <StackPanel Spacing="6" Margin="0,0,0,12">
                                                         <!-- Category Header -->
                                                         <TextBlock Text="{Binding Name}"
-                                                                   ToolTip.Tip="#todo"
                                                                    FontWeight="Bold"
                                                                    FontSize="12"
                                                                    Foreground="#00F2FF"
@@ -548,19 +547,16 @@
                                                                             Padding="10,8"
                                                                             Margin="0,0,0,6"
                                                                             Cursor="Hand"
-                                                                            ToolTip.Tip="#todo"
                                                                             PointerPressed="OnPaletteItemPointerPressed">
                                                                         <Grid ColumnDefinitions="Auto,*">
                                                                             <TextBlock Grid.Column="0"
                                                                                        Text="⋮⋮"
-                                                                                       ToolTip.Tip="#todo"
                                                                                        FontSize="12"
                                                                                        Foreground="#666666"
                                                                                        VerticalAlignment="Center"
                                                                                        Margin="0,0,8,0"/>
                                                                             <TextBlock Grid.Column="1"
                                                                                        Text="{Binding DisplayName}"
-                                                                                       ToolTip.Tip="#todo"
                                                                                        FontWeight="SemiBold"
                                                                                        FontSize="12"
                                                                                        Foreground="#E0E0E0"
@@ -587,19 +583,19 @@
                                 <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,6,0,0">
                                     <Button Content="◀"
                                             Command="{Binding TogglePalette}"
-                                            ToolTip.Tip="#todo"
+                                            ToolTip.Tip="Drag-n-drop items for the level layout view."
                                             Padding="6,4"
                                             FontSize="11"
                                             Background="Transparent"
                                             Foreground="#AAAAAA"
                                             HorizontalAlignment="Center"/>
-                                    <TextBlock Text="O" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="B" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="J" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="E" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="C" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="T" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
-                                    <TextBlock Text="S" ToolTip.Tip="#todo" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="O" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="B" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="J" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="E" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="C" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="T" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="S" FontWeight="Bold" FontSize="11" Foreground="#888888" HorizontalAlignment="Center"/>
                                 </StackPanel>
                             </Border>
                         </Panel>

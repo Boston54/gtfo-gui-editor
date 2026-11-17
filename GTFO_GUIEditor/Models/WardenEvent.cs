@@ -281,10 +281,9 @@ public static class WardenEventVisibilityConfig
         EventType.SetExpeditionEnvironment
     };
 
-    public static readonly HashSet<EventType> SpecialBoolTypes = new()
-    {
-        EventType.ClearWardenIntelQueue
-    };
+    public static readonly HashSet<EventType> SpecialBoolTypes = new(
+        Enum.GetValues<EventType>().Where(t => (int)t >= 10000)
+    );
 
     public static readonly HashSet<EventType> FadeScreenTypes = new()
     {

@@ -214,7 +214,7 @@
                                                     <DataTemplate x:DataType="models:BigPickupDistributionItem" x:CompileBindings="False">
                                                         <Border Background="#181818" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,6">
                                                             <Grid ColumnDefinitions="Auto,*,Auto">
-                                                                <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="#todo" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
+                                                                <TextBlock Grid.Column="0" Text="Big Pickup Item:" ToolTip.Tip="The item to spawn" VerticalAlignment="Center" Margin="0,0,8,0" Foreground="#CCCCCC"/>
                                                                 <ComboBox Grid.Column="1"
                                                                           ItemsSource="{x:Static vm:LevelLayoutViewModel.AvailableRetrieveBigItemOptionsList}"
                                                                           SelectedValue="{Binding ItemType, Mode=TwoWay}"

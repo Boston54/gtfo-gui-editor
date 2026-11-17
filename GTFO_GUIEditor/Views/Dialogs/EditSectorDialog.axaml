@@ -1799,7 +1799,7 @@
                                             <Grid ColumnDefinitions="*,Auto">
                                                 <TextBlock Grid.Column="0"
                                                            Text="Events on Item Pickups:"
-                                                           ToolTip.Tip="#todo"
+                                                           ToolTip.Tip="Events to execute when the item is picked up"
                                                            FontWeight="Bold"
                                                            FontSize="13"
                                                            Foreground="#FFFFFF"
@@ -1844,7 +1844,7 @@
                                                                        Text="{Binding SelectedGatherPickupEvent.DisplayTitle, StringFormat='Events on {0}'}"
                                                                        FontWeight="SemiBold"
                                                                        FontSize="13"
-                                                                       ToolTip.Tip="#todo"
+                                                                       ToolTip.Tip="The events to execute when this item is picked up. This is based on the number of items that have been picked up, not based on *which* is picked up."
                                                                        Foreground="#03C700"
                                                                        VerticalAlignment="Center"/>
                                                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" Margin="0,0,10,0">

@@ -77,6 +77,19 @@ public class AwoEventTests
     }
 
     [Fact]
+    public void WardenEvent_SpecialBoolVisibility_TrueForAwoEvents_FalseForVanillaEvents()
+    {
+        foreach (EventType evType in Enum.GetValues<EventType>())
+        {
+            bool isAwo = (int)evType >= 10000;
+            Assert.Equal(isAwo, WardenEventVisibilityConfig.IsSpecialBoolVisible(evType));
+
+            var ev = new WardenEvent { Type = evType };
+            Assert.Equal(isAwo, ev.IsSpecialBoolVisible);
+        }
+    }
+
+    [Fact]
     public void WardenEvents_AwoCustomFields_ExportAndImportRoundTrip()
     {
         var textMap = new Dictionary<uint, string>();
@@ -1010,7 +1023,7 @@ public class AwoEventTests
                 NavMarker = new AwoNavMarkerData
                 {
                     Index = 1,
-                    Style = 12,
+                    Style = (MarkerStyles)12,
                     Title = "OBJECTIVE NAV",
                     Color = "#FF00FF",
                     UsePin = true
@@ -1048,7 +1061,7 @@ public class AwoEventTests
                 {
                     HasSuccessScreen = true,
                     Type = AwoSuccessScreenType.FlashFakeScreen,
-                    CustomSuccessScreen = 101,
+                    Screen = SuccessScreen.Signal_Lost,
                     OverrideMusic = 202
                 }
             },
@@ -1074,7 +1087,7 @@ public class AwoEventTests
                             Priority = 2,
                             Layer = SectorType.Secondary,
                             IsLayerIndependent = false,
-                            OverrideTag = 77
+                            OverrideTag = MultiProgressionOverrideTag.Secondary
                         }
                     }
                 }
@@ -1361,6 +1374,7 @@ public class AwoEventTests
         var impNm = importedEvents[10];
         Assert.Equal(EventType.SpawnNavMarker, impNm.Type);
         Assert.Equal(1, impNm.NavMarker.Index);
+        Assert.Equal((MarkerStyles)12, impNm.NavMarker.Style);
         Assert.Equal("OBJECTIVE NAV", impNm.NavMarker.Title);
         Assert.Equal("#FF00FF", impNm.NavMarker.Color);
 
@@ -1390,7 +1404,8 @@ public class AwoEventTests
         Assert.Equal("VICTORY ACHIEVED", impSs.SpecialText);
         Assert.True(impSs.SuccessScreen.HasSuccessScreen);
         Assert.Equal(AwoSuccessScreenType.FlashFakeScreen, impSs.SuccessScreen.Type);
-        Assert.Equal(101u, impSs.SuccessScreen.CustomSuccessScreen);
+        Assert.Equal(SuccessScreen.Signal_Lost, impSs.SuccessScreen.Screen);
+        Assert.Equal(202u, impSs.SuccessScreen.OverrideMusic);
 
         // PlaySubtitles assertions
         var impSub = importedEvents[14];
@@ -1403,6 +1418,7 @@ public class AwoEventTests
         Assert.Single(impMp.MultiProgression.Items);
         Assert.Equal("MP Header 1", impMp.MultiProgression.Items[0].CustomSubObjectiveHeader);
         Assert.Equal(SectorType.Secondary, impMp.MultiProgression.Items[0].Layer);
+        Assert.Equal(MultiProgressionOverrideTag.Secondary, impMp.MultiProgression.Items[0].OverrideTag);
 
         // PlayWaveRoarSound assertions
         var impRoar = importedEvents[16];
@@ -1928,5 +1944,426 @@ public class AwoEventTests
         Assert.False(vm.LevelLayout.HasAnyAwoEventsInUse());
         ModManager.Instance.AdvancedWardenObjective = false;
         Assert.False(ModManager.Instance.AdvancedWardenObjective);
+    }
+
+    [Fact]
+    public void AwoNavMarkerData_DefaultStyle_IsWaypointDistance()
+    {
+        var navMarker = new AwoNavMarkerData();
+        Assert.Equal((MarkerStyles)10, navMarker.Style);
+        Assert.Equal(MarkerStyles.Waypoint | MarkerStyles.Distance, navMarker.Style);
+        Assert.Equal(MarkerStyles.WaypointDistance, navMarker.Style);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_AvailableMarkerStyles_ContainsExpectedValues()
+    {
+        var styles = LevelLayoutViewModel.AvailableMarkerStyles;
+        Assert.Contains(MarkerStyles.Empty, styles);
+        Assert.Contains(MarkerStyles.Waypoint, styles);
+        Assert.Contains(MarkerStyles.Distance, styles);
+        Assert.Contains(MarkerStyles.CautionDistance, styles);
+        Assert.Contains(MarkerStyles.BulkheadDCDistance, styles);
+    }
+
+    [Fact]
+    public void SpawnNavMarker_ExportAndImport_HandlesVariousStyleFormats()
+    {
+        uint nextTextId = 1000;
+        var textMap = new Dictionary<uint, string>();
+        Func<string?, string, uint> textSynth = (txt, desc) =>
+        {
+            var id = nextTextId++;
+            textMap[id] = txt ?? string.Empty;
+            return id;
+        };
+
+        var importContext = new ImportContext(new MainWindowViewModel(), AppContext.BaseDirectory);
+
+        // 1. Export with enum style CautionDistance
+        var events = new ObservableCollection<WardenEvent>
+        {
+            new()
+            {
+                Type = EventType.SpawnNavMarker,
+                NavMarker = new AwoNavMarkerData
+                {
+                    Index = 5,
+                    Style = MarkerStyles.CautionDistance,
+                    Title = "CAUTION_MARKER",
+                    Color = "#00FF00",
+                    UsePin = false
+                }
+            }
+        };
+
+        var exportedArray = WardenObjectiveDataBlockExporter.SerializeWardenEvents(events, textSynth, isTerminalCommand: false);
+        Assert.Single(exportedArray);
+
+        // Verify JSON representation has numeric style 16392
+        var markerObj = exportedArray[0]!["NavMarker"] as JsonObject;
+        Assert.NotNull(markerObj);
+        Assert.Equal(16392ul, markerObj["Style"]!.GetValue<ulong>());
+
+        // Populate context text blocks
+        foreach (var kvp in textMap)
+        {
+            importContext.TextBlocks[kvp.Key] = new JsonObject { ["English"] = kvp.Value };
+        }
+
+        // 2. Import JSON with numeric style
+        var importedEvents = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(exportedArray, importedEvents, importContext);
+        Assert.Single(importedEvents);
+        var importedEvent = importedEvents[0];
+        Assert.Equal(EventType.SpawnNavMarker, importedEvent.Type);
+        Assert.Equal(MarkerStyles.CautionDistance, importedEvent.NavMarker.Style);
+        Assert.Equal(5, importedEvent.NavMarker.Index);
+        Assert.Equal("CAUTION_MARKER", importedEvent.NavMarker.Title);
+        Assert.Equal("#00FF00", importedEvent.NavMarker.Color);
+        Assert.False(importedEvent.NavMarker.UsePin);
+
+        // 3. Import JSON with string enum name "CautionDistance"
+        var stringEnumArray = new JsonArray
+        {
+            new JsonObject
+            {
+                ["Type"] = "SpawnNavMarker",
+                ["NavMarker"] = new JsonObject
+                {
+                    ["Index"] = 5,
+                    ["Style"] = "CautionDistance",
+                    ["Title"] = 1000u,
+                    ["Color"] = "#00FF00",
+                    ["UsePin"] = false
+                }
+            }
+        };
+        var importedFromString = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(stringEnumArray, importedFromString, importContext);
+        Assert.Single(importedFromString);
+        Assert.Equal(MarkerStyles.CautionDistance, importedFromString[0].NavMarker.Style);
+
+        // 4. Import JSON with 64-bit integer flag style
+        var large64BitArray = new JsonArray
+        {
+            new JsonObject
+            {
+                ["Type"] = "SpawnNavMarker",
+                ["NavMarker"] = new JsonObject
+                {
+                    ["Index"] = 7,
+                    ["Style"] = 274877906968ul,
+                    ["Title"] = 0u,
+                    ["Color"] = "#FFFFFF",
+                    ["UsePin"] = true
+                }
+            }
+        };
+        var importedFromLarge = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(large64BitArray, importedFromLarge, importContext);
+        Assert.Single(importedFromLarge);
+        Assert.Equal(MarkerStyles.BulkheadDCDistance, importedFromLarge[0].NavMarker.Style);
+    }
+
+    [Fact]
+    public void AwoSuccessScreenData_DefaultScreen_IsDefault()
+    {
+        var ss = new AwoSuccessScreenData();
+        Assert.Equal(SuccessScreen.Default, ss.Screen);
+        Assert.False(ss.IsCustom);
+        Assert.False(ss.IsCustomScreen);
+
+        ss.Screen = SuccessScreen.Custom;
+        Assert.True(ss.IsCustom);
+        Assert.True(ss.IsCustomScreen);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_AvailableSuccessScreens_ContainsExpectedValues()
+    {
+        var screens = LevelLayoutViewModel.AvailableSuccessScreens;
+        Assert.Contains(SuccessScreen.Default, screens);
+        Assert.Contains(SuccessScreen.Resources_Expended, screens);
+        Assert.Contains(SuccessScreen.Signal_Lost, screens);
+        Assert.Contains(SuccessScreen.Stack_Empty, screens);
+        Assert.Contains(SuccessScreen.Custom, screens);
+    }
+
+    [Fact]
+    public void SetSuccessScreen_ExportAndImport_HandlesCustomPathAndEnumValues()
+    {
+        uint nextTextId = 2000;
+        var textMap = new Dictionary<uint, string>();
+        Func<string?, string, uint> textSynth = (txt, desc) =>
+        {
+            var id = nextTextId++;
+            textMap[id] = txt ?? string.Empty;
+            return id;
+        };
+
+        var importContext = new ImportContext(new MainWindowViewModel(), AppContext.BaseDirectory);
+
+        // 1. Export & Import with standard enum SuccessScreen (e.g. Signal_Lost = 2)
+        var eventsStandard = new ObservableCollection<WardenEvent>
+        {
+            new()
+            {
+                Type = EventType.SetSuccessScreen,
+                SpecialText = "STANDARD SUCCESS",
+                SuccessScreen = new AwoSuccessScreenData
+                {
+                    HasSuccessScreen = true,
+                    Type = AwoSuccessScreenType.SetSuccessScreen,
+                    Screen = SuccessScreen.Signal_Lost,
+                    OverrideMusic = 1234
+                }
+            }
+        };
+
+        var exportedStd = WardenObjectiveDataBlockExporter.SerializeWardenEvents(eventsStandard, textSynth, isTerminalCommand: false);
+        Assert.Single(exportedStd);
+        var ssObjStd = exportedStd[0]!["SuccessScreen"] as JsonObject;
+        Assert.NotNull(ssObjStd);
+        Assert.Equal(2u, ssObjStd["CustomSuccessScreen"]!.GetValue<uint>());
+
+        foreach (var kvp in textMap)
+        {
+            importContext.TextBlocks[kvp.Key] = new JsonObject { ["English"] = kvp.Value };
+        }
+
+        var importedStd = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(exportedStd, importedStd, importContext);
+        Assert.Single(importedStd);
+        Assert.Equal(SuccessScreen.Signal_Lost, importedStd[0].SuccessScreen.Screen);
+        Assert.False(importedStd[0].SuccessScreen.IsCustom);
+
+        // 2. Export & Import with Custom path
+        var eventsCustom = new ObservableCollection<WardenEvent>
+        {
+            new()
+            {
+                Type = EventType.SetSuccessScreen,
+                SpecialText = "CUSTOM SUCCESS",
+                SuccessScreen = new AwoSuccessScreenData
+                {
+                    HasSuccessScreen = true,
+                    Type = AwoSuccessScreenType.FlashFakeScreen,
+                    Screen = SuccessScreen.Custom,
+                    CustomPath = "Assets/CustomScreens/MyScreen.prefab",
+                    OverrideMusic = 5678
+                }
+            }
+        };
+
+        var exportedCustom = WardenObjectiveDataBlockExporter.SerializeWardenEvents(eventsCustom, textSynth, isTerminalCommand: false);
+        Assert.Single(exportedCustom);
+        var ssObjCustom = exportedCustom[0]!["SuccessScreen"] as JsonObject;
+        Assert.NotNull(ssObjCustom);
+        Assert.Equal("Assets/CustomScreens/MyScreen.prefab", ssObjCustom["CustomSuccessScreen"]!.ToString());
+
+        foreach (var kvp in textMap)
+        {
+            importContext.TextBlocks[kvp.Key] = new JsonObject { ["English"] = kvp.Value };
+        }
+
+        var importedCustom = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(exportedCustom, importedCustom, importContext);
+        Assert.Single(importedCustom);
+        Assert.Equal(SuccessScreen.Custom, importedCustom[0].SuccessScreen.Screen);
+        Assert.True(importedCustom[0].SuccessScreen.IsCustom);
+        Assert.Equal("Assets/CustomScreens/MyScreen.prefab", importedCustom[0].SuccessScreen.CustomPath);
+
+        // 3. Import with string enum name "Resources_Expended"
+        var stringEnumArray = new JsonArray
+        {
+            new JsonObject
+            {
+                ["Type"] = "SetSuccessScreen",
+                ["SuccessScreen"] = new JsonObject
+                {
+                    ["Type"] = "SetSuccessScreen",
+                    ["CustomSuccessScreen"] = "Resources_Expended",
+                    ["OverrideMusic"] = 0
+                }
+            }
+        };
+        var importedFromString = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(stringEnumArray, importedFromString, importContext);
+        Assert.Single(importedFromString);
+        Assert.Equal(SuccessScreen.Resources_Expended, importedFromString[0].SuccessScreen.Screen);
+    }
+
+    [Fact]
+    public void AwoMultiProgressionItem_DefaultOverrideTag_IsProgression()
+    {
+        var item = new AwoMultiProgressionItem();
+        Assert.Equal(MultiProgressionOverrideTag.Progression, item.OverrideTag);
+        Assert.False(item.IsCustom);
+        Assert.False(item.IsCustomOverrideTag);
+
+        item.OverrideTag = MultiProgressionOverrideTag.Custom;
+        Assert.True(item.IsCustom);
+        Assert.True(item.IsCustomOverrideTag);
+    }
+
+    [Fact]
+    public void LevelLayoutViewModel_AvailableMultiProgressionOverrideTags_ContainsExpectedValues()
+    {
+        var tags = LevelLayoutViewModel.AvailableMultiProgressionOverrideTags;
+        Assert.Contains(MultiProgressionOverrideTag.Progression, tags);
+        Assert.Contains(MultiProgressionOverrideTag.Main, tags);
+        Assert.Contains(MultiProgressionOverrideTag.Secondary, tags);
+        Assert.Contains(MultiProgressionOverrideTag.Overload, tags);
+        Assert.Contains(MultiProgressionOverrideTag.Custom, tags);
+    }
+
+    [Fact]
+    public void MultiProgression_ExportAndImport_HandlesCustomTextAndEnumValues()
+    {
+        uint nextTextId = 3000;
+        var textMap = new Dictionary<uint, string>();
+        Func<string?, string, uint> textSynth = (txt, desc) =>
+        {
+            var id = nextTextId++;
+            textMap[id] = txt ?? string.Empty;
+            return id;
+        };
+
+        var importContext = new ImportContext(new MainWindowViewModel(), AppContext.BaseDirectory);
+
+        // 1. Export with standard preset OverrideTags (Progression = 0, Main = 1729980802, Secondary = 3356421220, Overload = 192007757)
+        var eventsPreset = new ObservableCollection<WardenEvent>
+        {
+            new()
+            {
+                Type = EventType.MultiProgression,
+                MultiProgression = new AwoMultiProgressionData
+                {
+                    Items = new ObservableCollection<AwoMultiProgressionItem>
+                    {
+                        new()
+                        {
+                            CustomSubObjectiveHeader = "Header 1",
+                            CustomSubObjective = "SubObj 1",
+                            OverrideTag = MultiProgressionOverrideTag.Progression
+                        },
+                        new()
+                        {
+                            CustomSubObjectiveHeader = "Header 2",
+                            CustomSubObjective = "SubObj 2",
+                            OverrideTag = MultiProgressionOverrideTag.Main
+                        },
+                        new()
+                        {
+                            CustomSubObjectiveHeader = "Header 3",
+                            CustomSubObjective = "SubObj 3",
+                            OverrideTag = MultiProgressionOverrideTag.Secondary
+                        },
+                        new()
+                        {
+                            CustomSubObjectiveHeader = "Header 4",
+                            CustomSubObjective = "SubObj 4",
+                            OverrideTag = MultiProgressionOverrideTag.Overload
+                        }
+                    }
+                }
+            }
+        };
+
+        var exportedPreset = WardenObjectiveDataBlockExporter.SerializeWardenEvents(eventsPreset, textSynth, isTerminalCommand: false);
+        Assert.Single(exportedPreset);
+        var mpArrPreset = exportedPreset[0]!["MultiProgression"] as JsonArray;
+        Assert.NotNull(mpArrPreset);
+        Assert.Equal(4, mpArrPreset.Count);
+        Assert.Equal(0u, mpArrPreset[0]!["OverrideTag"]!.GetValue<uint>());
+        Assert.Equal(1729980802u, mpArrPreset[1]!["OverrideTag"]!.GetValue<uint>());
+        Assert.Equal(3356421220u, mpArrPreset[2]!["OverrideTag"]!.GetValue<uint>());
+        Assert.Equal(192007757u, mpArrPreset[3]!["OverrideTag"]!.GetValue<uint>());
+
+        foreach (var kvp in textMap)
+        {
+            importContext.TextBlocks[kvp.Key] = new JsonObject { ["English"] = kvp.Value };
+        }
+
+        var importedPreset = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(exportedPreset, importedPreset, importContext);
+        Assert.Single(importedPreset);
+        Assert.Equal(4, importedPreset[0].MultiProgression.Items.Count);
+        Assert.Equal(MultiProgressionOverrideTag.Progression, importedPreset[0].MultiProgression.Items[0].OverrideTag);
+        Assert.Equal(MultiProgressionOverrideTag.Main, importedPreset[0].MultiProgression.Items[1].OverrideTag);
+        Assert.Equal(MultiProgressionOverrideTag.Secondary, importedPreset[0].MultiProgression.Items[2].OverrideTag);
+        Assert.Equal(MultiProgressionOverrideTag.Overload, importedPreset[0].MultiProgression.Items[3].OverrideTag);
+
+        // 2. Export with Custom string OverrideTag
+        var eventsCustom = new ObservableCollection<WardenEvent>
+        {
+            new()
+            {
+                Type = EventType.MultiProgression,
+                MultiProgression = new AwoMultiProgressionData
+                {
+                    Items = new ObservableCollection<AwoMultiProgressionItem>
+                    {
+                        new()
+                        {
+                            CustomSubObjectiveHeader = "Custom Tag Objective",
+                            CustomSubObjective = "Do custom thing",
+                            OverrideTag = MultiProgressionOverrideTag.Custom,
+                            CustomOverrideTag = "BONUS PROTOCOL"
+                        }
+                    }
+                }
+            }
+        };
+
+        var exportedCustom = WardenObjectiveDataBlockExporter.SerializeWardenEvents(eventsCustom, textSynth, isTerminalCommand: false);
+        Assert.Single(exportedCustom);
+        var mpArrCustom = exportedCustom[0]!["MultiProgression"] as JsonArray;
+        Assert.NotNull(mpArrCustom);
+        Assert.Single(mpArrCustom);
+        uint generatedTagId = mpArrCustom[0]!["OverrideTag"]!.GetValue<uint>();
+        Assert.True(generatedTagId >= 3000);
+        Assert.Equal("BONUS PROTOCOL", textMap[generatedTagId]);
+
+        foreach (var kvp in textMap)
+        {
+            importContext.TextBlocks[kvp.Key] = new JsonObject { ["English"] = kvp.Value };
+        }
+
+        var importedCustom = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(exportedCustom, importedCustom, importContext);
+        Assert.Single(importedCustom);
+        Assert.Single(importedCustom[0].MultiProgression.Items);
+        var customItem = importedCustom[0].MultiProgression.Items[0];
+        Assert.Equal(MultiProgressionOverrideTag.Custom, customItem.OverrideTag);
+        Assert.True(customItem.IsCustom);
+        Assert.Equal("BONUS PROTOCOL", customItem.CustomOverrideTag);
+
+        // 3. Import from string enum name (e.g. "Overload")
+        var stringEnumArray = new JsonArray
+        {
+            new JsonObject
+            {
+                ["Type"] = "MultiProgression",
+                ["MultiProgression"] = new JsonArray
+                {
+                    new JsonObject
+                    {
+                        ["CustomSubObjectiveHeader"] = 0,
+                        ["CustomSubObjective"] = 0,
+                        ["Index"] = 1,
+                        ["Priority"] = 1,
+                        ["Layer"] = 0,
+                        ["IsLayerIndependent"] = true,
+                        ["OverrideTag"] = "Overload"
+                    }
+                }
+            }
+        };
+        var importedFromString = new ObservableCollection<WardenEvent>();
+        LevelLayoutDataBlockImporter.ImportWardenEvents(stringEnumArray, importedFromString, importContext);
+        Assert.Single(importedFromString);
+        Assert.Equal(MultiProgressionOverrideTag.Overload, importedFromString[0].MultiProgression.Items[0].OverrideTag);
     }
 }

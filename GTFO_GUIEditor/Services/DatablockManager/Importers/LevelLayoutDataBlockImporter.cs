@@ -3366,7 +3366,36 @@ public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext?
             if (evObj["NavMarker"] is JsonObject nmObj)
             {
                 wardenEvent.NavMarker.Index = nmObj["Index"]?.GetValue<int>() ?? 0;
-                wardenEvent.NavMarker.Style = nmObj["Style"]?.GetValue<int>() ?? 10;
+
+                var styleNode = nmObj["Style"];
+                if (styleNode != null)
+                {
+                    if (styleNode is JsonValue jVal && jVal.TryGetValue<ulong>(out var ulongVal))
+                    {
+                        wardenEvent.NavMarker.Style = (MarkerStyles)ulongVal;
+                    }
+                    else
+                    {
+                        string styleStr = styleNode.ToString();
+                        if (ulong.TryParse(styleStr, out var parsedUlong))
+                        {
+                            wardenEvent.NavMarker.Style = (MarkerStyles)parsedUlong;
+                        }
+                        else if (Enum.TryParse<MarkerStyles>(styleStr, true, out var parsedEnum))
+                        {
+                            wardenEvent.NavMarker.Style = parsedEnum;
+                        }
+                        else
+                        {
+                            wardenEvent.NavMarker.Style = (MarkerStyles)10;
+                        }
+                    }
+                }
+                else
+                {
+                    wardenEvent.NavMarker.Style = (MarkerStyles)10;
+                }
+
                 wardenEvent.NavMarker.Title = context.ResolveText(GetUintValue(nmObj["Title"]));
                 wardenEvent.NavMarker.Color = nmObj["Color"]?.ToString() ?? "#B36FF6";
                 wardenEvent.NavMarker.UsePin = nmObj["UsePin"]?.GetValue<bool>() ?? true;
@@ -3387,8 +3416,50 @@ public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext?
                 string ssTypeStr = ssObj["Type"]?.ToString() ?? "SetSuccessScreen";
                 Enum.TryParse<AwoSuccessScreenType>(ssTypeStr, true, out var ssType);
                 wardenEvent.SuccessScreen.Type = ssType;
-                wardenEvent.SuccessScreen.CustomSuccessScreen = ssObj["CustomSuccessScreen"]?.GetValue<uint>() ?? 0;
-                wardenEvent.SuccessScreen.OverrideMusic = ssObj["OverrideMusic"]?.GetValue<uint>() ?? 0;
+                wardenEvent.SuccessScreen.OverrideMusic = GetUintValue(ssObj["OverrideMusic"]);
+
+                var cssNode = ssObj["CustomSuccessScreen"] ?? ssObj["CustomScreenID"] ?? ssObj["Screen"];
+                if (cssNode != null)
+                {
+                    if (cssNode is JsonValue jVal && jVal.TryGetValue<uint>(out var numVal))
+                    {
+                        if (Enum.IsDefined(typeof(SuccessScreen), numVal))
+                        {
+                            wardenEvent.SuccessScreen.Screen = (SuccessScreen)numVal;
+                        }
+                        else
+                        {
+                            wardenEvent.SuccessScreen.Screen = SuccessScreen.Custom;
+                            wardenEvent.SuccessScreen.CustomPath = numVal.ToString();
+                        }
+                    }
+                    else
+                    {
+                        string strVal = cssNode.ToString();
+                        if (uint.TryParse(strVal, out var parsedNum) && Enum.IsDefined(typeof(SuccessScreen), parsedNum))
+                        {
+                            wardenEvent.SuccessScreen.Screen = (SuccessScreen)parsedNum;
+                        }
+                        else if (Enum.TryParse<SuccessScreen>(strVal, true, out var parsedEnum))
+                        {
+                            wardenEvent.SuccessScreen.Screen = parsedEnum;
+                        }
+                        else if (Enum.TryParse<SuccessScreen>(strVal.Replace(" ", "_"), true, out var parsedEnum2))
+                        {
+                            wardenEvent.SuccessScreen.Screen = parsedEnum2;
+                        }
+                        else
+                        {
+                            wardenEvent.SuccessScreen.Screen = SuccessScreen.Custom;
+                            wardenEvent.SuccessScreen.CustomPath = strVal;
+                        }
+                    }
+                }
+
+                if (ssObj["CustomPath"] is JsonNode cpNode)
+                {
+                    wardenEvent.SuccessScreen.CustomPath = cpNode.ToString();
+                }
             }
 
             // CameraShake object
@@ -3408,16 +3479,90 @@ public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext?
                 {
                     if (itemNode is not JsonObject itemObj) continue;
                     int layerInt = itemObj["Layer"]?.GetValue<int>() ?? 0;
-                    wardenEvent.MultiProgression.Items.Add(new AwoMultiProgressionItem
+                    var mpItem = new AwoMultiProgressionItem
                     {
                         CustomSubObjectiveHeader = context.ResolveText(GetUintValue(itemObj["CustomSubObjectiveHeader"])),
                         CustomSubObjective = context.ResolveText(GetUintValue(itemObj["CustomSubObjective"])),
                         Index = itemObj["Index"]?.GetValue<int>() ?? 0,
                         Priority = itemObj["Priority"]?.GetValue<int>() ?? 1,
                         Layer = (SectorType)layerInt,
-                        IsLayerIndependent = itemObj["IsLayerIndependent"]?.GetValue<bool>() ?? true,
-                        OverrideTag = itemObj["OverrideTag"]?.GetValue<uint>() ?? 0
-                    });
+                        IsLayerIndependent = itemObj["IsLayerIndependent"]?.GetValue<bool>() ?? true
+                    };
+
+                    var otNode = itemObj["OverrideTag"] ?? itemObj["Tag"];
+                    if (otNode != null)
+                    {
+                        if (otNode is JsonValue jVal && jVal.TryGetValue<uint>(out var numVal))
+                        {
+                            if (numVal == (uint)MultiProgressionOverrideTag.Progression)
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Progression;
+                            }
+                            else if (numVal == (uint)MultiProgressionOverrideTag.Main)
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Main;
+                            }
+                            else if (numVal == (uint)MultiProgressionOverrideTag.Secondary)
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Secondary;
+                            }
+                            else if (numVal == (uint)MultiProgressionOverrideTag.Overload)
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Overload;
+                            }
+                            else
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Custom;
+                                string resolved = context.ResolveText(numVal);
+                                mpItem.CustomOverrideTag = !string.IsNullOrEmpty(resolved) ? resolved : numVal.ToString();
+                            }
+                        }
+                        else
+                        {
+                            string strVal = otNode.ToString();
+                            if (uint.TryParse(strVal, out var parsedNum))
+                            {
+                                if (parsedNum == (uint)MultiProgressionOverrideTag.Progression)
+                                {
+                                    mpItem.OverrideTag = MultiProgressionOverrideTag.Progression;
+                                }
+                                else if (parsedNum == (uint)MultiProgressionOverrideTag.Main)
+                                {
+                                    mpItem.OverrideTag = MultiProgressionOverrideTag.Main;
+                                }
+                                else if (parsedNum == (uint)MultiProgressionOverrideTag.Secondary)
+                                {
+                                    mpItem.OverrideTag = MultiProgressionOverrideTag.Secondary;
+                                }
+                                else if (parsedNum == (uint)MultiProgressionOverrideTag.Overload)
+                                {
+                                    mpItem.OverrideTag = MultiProgressionOverrideTag.Overload;
+                                }
+                                else
+                                {
+                                    mpItem.OverrideTag = MultiProgressionOverrideTag.Custom;
+                                    string resolved = context.ResolveText(parsedNum);
+                                    mpItem.CustomOverrideTag = !string.IsNullOrEmpty(resolved) ? resolved : strVal;
+                                }
+                            }
+                            else if (Enum.TryParse<MultiProgressionOverrideTag>(strVal, true, out var parsedEnum))
+                            {
+                                mpItem.OverrideTag = parsedEnum;
+                            }
+                            else
+                            {
+                                mpItem.OverrideTag = MultiProgressionOverrideTag.Custom;
+                                mpItem.CustomOverrideTag = strVal;
+                            }
+                        }
+                    }
+
+                    if (itemObj["CustomOverrideTag"] is JsonNode cotNode)
+                    {
+                        mpItem.CustomOverrideTag = cotNode.ToString();
+                    }
+
+                    wardenEvent.MultiProgression.Items.Add(mpItem);
                 }
             }
 

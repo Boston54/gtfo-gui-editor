@@ -11,7 +11,7 @@
         <Border Grid.Row="0" Background="#252526" Padding="12" Margin="0,0,0,10" CornerRadius="4">
             <StackPanel Spacing="4">
                 <TextBlock Text="Modded Support" FontWeight="Bold" FontSize="15" Foreground="#E0E0E0"/>
-                <TextBlock Text="Configure community mod support for this rundown. Enabled mods reveal additional config settings throughout the editor."
+                <TextBlock Text="Configure mod support for this rundown. Enabled mods will enable additional config settings throughout the editor. Please note that the fields in some of these mods will not be as thoroughly documented inside the editor as the vanilla fields. It is recommended to read the Wiki for each of the fields to see known bugs, incompatibilities, or tips for using certain features."
                            Foreground="#888888" FontSize="12" TextWrapping="Wrap"/>
             </StackPanel>
         </Border>

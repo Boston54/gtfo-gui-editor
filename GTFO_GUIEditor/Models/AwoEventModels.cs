@@ -2220,7 +2220,7 @@ public class AwoCountupData : INotifyPropertyChanged
 public class AwoNavMarkerData : INotifyPropertyChanged
 {
     private int _index = 0;
-    private int _style = 10;
+    private MarkerStyles _style = (MarkerStyles)10;
     private string _title = string.Empty;
     private string _color = "#B36FF6";
     private bool _usePin = true;
@@ -2231,7 +2231,7 @@ public class AwoNavMarkerData : INotifyPropertyChanged
         set => SetField(ref _index, value);
     }
 
-    public int Style
+    public MarkerStyles Style
     {
         get => _style;
         set => SetField(ref _style, value);
@@ -2329,7 +2329,8 @@ public class AwoSuccessScreenData : INotifyPropertyChanged
 {
     private bool _hasSuccessScreen = false;
     private AwoSuccessScreenType _type = AwoSuccessScreenType.SetSuccessScreen;
-    private uint _customSuccessScreen = 0;
+    private SuccessScreen _screen = SuccessScreen.Default;
+    private string _customPath = string.Empty;
     private uint _overrideMusic = 0;
 
     public bool HasSuccessScreen
@@ -2344,11 +2345,44 @@ public class AwoSuccessScreenData : INotifyPropertyChanged
         set => SetField(ref _type, value);
     }
 
-    public uint CustomSuccessScreen
+    public SuccessScreen Screen
     {
-        get => _customSuccessScreen;
-        set => SetField(ref _customSuccessScreen, value);
+        get => _screen;
+        set
+        {
+            if (SetField(ref _screen, value))
+            {
+                OnPropertyChanged(nameof(IsCustom));
+                OnPropertyChanged(nameof(IsCustomScreen));
+            }
+        }
     }
+
+    [JsonIgnore]
+    public SuccessScreen CustomScreen
+    {
+        get => Screen;
+        set => Screen = value;
+    }
+
+    [JsonIgnore]
+    public SuccessScreen CustomScreenID
+    {
+        get => Screen;
+        set => Screen = value;
+    }
+
+    public string CustomPath
+    {
+        get => _customPath;
+        set => SetField(ref _customPath, value);
+    }
+
+    [JsonIgnore]
+    public bool IsCustom => _screen == SuccessScreen.Custom;
+
+    [JsonIgnore]
+    public bool IsCustomScreen => _screen == SuccessScreen.Custom;
 
     public uint OverrideMusic
     {
@@ -2362,7 +2396,8 @@ public class AwoSuccessScreenData : INotifyPropertyChanged
         {
             HasSuccessScreen = HasSuccessScreen,
             Type = Type,
-            CustomSuccessScreen = CustomSuccessScreen,
+            Screen = Screen,
+            CustomPath = CustomPath,
             OverrideMusic = OverrideMusic
         };
     }
@@ -2387,7 +2422,8 @@ public class AwoMultiProgressionItem : INotifyPropertyChanged
     private int _priority = 1;
     private SectorType _layer = SectorType.Main;
     private bool _isLayerIndependent = true;
-    private uint _overrideTag = 0;
+    private MultiProgressionOverrideTag _overrideTag = MultiProgressionOverrideTag.Progression;
+    private string _customOverrideTag = string.Empty;
 
     public string CustomSubObjectiveHeader
     {
@@ -2425,11 +2461,37 @@ public class AwoMultiProgressionItem : INotifyPropertyChanged
         set => SetField(ref _isLayerIndependent, value);
     }
 
-    public uint OverrideTag
+    public MultiProgressionOverrideTag OverrideTag
     {
         get => _overrideTag;
-        set => SetField(ref _overrideTag, value);
+        set
+        {
+            if (SetField(ref _overrideTag, value))
+            {
+                OnPropertyChanged(nameof(IsCustom));
+                OnPropertyChanged(nameof(IsCustomOverrideTag));
+            }
+        }
     }
+
+    public string CustomOverrideTag
+    {
+        get => _customOverrideTag;
+        set => SetField(ref _customOverrideTag, value);
+    }
+
+    [JsonIgnore]
+    public string CustomTag
+    {
+        get => CustomOverrideTag;
+        set => CustomOverrideTag = value;
+    }
+
+    [JsonIgnore]
+    public bool IsCustom => _overrideTag == MultiProgressionOverrideTag.Custom;
+
+    [JsonIgnore]
+    public bool IsCustomOverrideTag => _overrideTag == MultiProgressionOverrideTag.Custom;
 
     public AwoMultiProgressionItem Clone()
     {
@@ -2441,7 +2503,8 @@ public class AwoMultiProgressionItem : INotifyPropertyChanged
             Priority = Priority,
             Layer = Layer,
             IsLayerIndependent = IsLayerIndependent,
-            OverrideTag = OverrideTag
+            OverrideTag = OverrideTag,
+            CustomOverrideTag = CustomOverrideTag
         };
     }
 

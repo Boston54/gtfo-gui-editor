@@ -536,6 +536,11 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             }
 
             // AWO Custom Payloads
+            if ((int)ev.Type >= 10000)
+            {
+                evObj["SpecialBool"] = ev.SpecialBool;
+            }
+
             switch (ev.Type)
             {
                 case EventType.CloseSecurityDoor:
@@ -550,12 +555,22 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                         : textSynth(ev.SpecialText, "Special Text");
                     if (ev.Type == EventType.SetSuccessScreen && ev.SuccessScreen.HasSuccessScreen)
                     {
-                        evObj["SuccessScreen"] = new JsonObject
+                        var ssObj = new JsonObject
                         {
                             ["Type"] = ev.SuccessScreen.Type.ToString(),
-                            ["CustomSuccessScreen"] = ev.SuccessScreen.CustomSuccessScreen,
                             ["OverrideMusic"] = ev.SuccessScreen.OverrideMusic
                         };
+
+                        if (ev.SuccessScreen.Screen == SuccessScreen.Custom)
+                        {
+                            ssObj["CustomSuccessScreen"] = ev.SuccessScreen.CustomPath ?? string.Empty;
+                        }
+                        else
+                        {
+                            ssObj["CustomSuccessScreen"] = (uint)ev.SuccessScreen.Screen;
+                        }
+
+                        evObj["SuccessScreen"] = ssObj;
                     }
                     break;
 
@@ -934,7 +949,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     evObj["NavMarker"] = new JsonObject
                     {
                         ["Index"] = ev.NavMarker.Index,
-                        ["Style"] = ev.NavMarker.Style,
+                        ["Style"] = (ulong)ev.NavMarker.Style,
                         ["Title"] = string.IsNullOrWhiteSpace(ev.NavMarker.Title)
                             ? 0
                             : textSynth(ev.NavMarker.Title, "Nav Marker Title"),
@@ -967,6 +982,18 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     foreach (var item in ev.MultiProgression.Items)
                     {
                         if (item == null) continue;
+                        uint overrideTagValue = 0;
+                        if (item.OverrideTag == MultiProgressionOverrideTag.Custom)
+                        {
+                            overrideTagValue = string.IsNullOrWhiteSpace(item.CustomOverrideTag)
+                                ? 0
+                                : textSynth(item.CustomOverrideTag, "MP Override Tag");
+                        }
+                        else
+                        {
+                            overrideTagValue = (uint)item.OverrideTag;
+                        }
+
                         mpArr.Add(new JsonObject
                         {
                             ["CustomSubObjectiveHeader"] = string.IsNullOrWhiteSpace(item.CustomSubObjectiveHeader)
@@ -979,7 +1006,7 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                             ["Priority"] = item.Priority,
                             ["Layer"] = (int)item.Layer,
                             ["IsLayerIndependent"] = item.IsLayerIndependent,
-                            ["OverrideTag"] = item.OverrideTag
+                            ["OverrideTag"] = overrideTagValue
                         });
                     }
                     evObj["MultiProgression"] = mpArr;
@@ -1103,9 +1130,6 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     };
                     break;
 
-                case EventType.ClearWardenIntelQueue:
-                    evObj["SpecialBool"] = ev.SpecialBool;
-                    break;
 
                 case EventType.FadeScreenInOut:
                     evObj["FadeScreen"] = new JsonObject

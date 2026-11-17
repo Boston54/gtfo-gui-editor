@@ -242,7 +242,11 @@ public class LevelLayoutViewModel : ViewModelBase
         Enum.GetValues<AwoTeleportLookDirection>();
 
     public static AwoSuccessScreenType[] AvailableSuccessScreenTypes => Enum.GetValues<AwoSuccessScreenType>();
+    public static SuccessScreen[] AvailableSuccessScreens => Enum.GetValues<SuccessScreen>();
+    public static MultiProgressionOverrideTag[] AvailableMultiProgressionOverrideTags => Enum.GetValues<MultiProgressionOverrideTag>();
+    public static MultiProgressionOverrideTag[] AvailableOverrideTags => Enum.GetValues<MultiProgressionOverrideTag>();
     public static AwoPlayerCharacter[] AvailablePlayerCharacters => Enum.GetValues<AwoPlayerCharacter>();
+    public static MarkerStyles[] AvailableMarkerStyles => Enum.GetValues<MarkerStyles>();
 
     public ObservableCollection<EventType> InstanceAvailableEventTypes => new(AvailableEventTypes);
 

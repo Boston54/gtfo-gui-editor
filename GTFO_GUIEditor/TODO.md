@@ -11,6 +11,7 @@
   * There are a fair few fields here that havent been included, but a lot of them are just like random shit - VoxelCoverageAreaMultiplier ??? Might be able to just ignore these fields.
 * **Blood Doors**
   * Waiting on a custom mod
+  * Note that when this is implemented, the AWO event for SetActiveEnemyWave will need to be updated as well
 * **Imports should automatically detect what mods the datablocks are relying on and enable them**
 * **Export as Thunderstore Profile**
   * Will need to integrate quite a bit for this - thunderstore API for downloading the rundown's dependencies, etc

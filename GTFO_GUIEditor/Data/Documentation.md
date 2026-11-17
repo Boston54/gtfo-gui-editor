@@ -44,6 +44,7 @@ This section is divided into four sections:
 | Boss Aligns | Some geomorphs contain a Boss Align point which defines static points where 'boss' enemeis (such as Tanks or Mothers) will spawn if they are spawned in this tile.|
 | Weighted Probability | Weighted probability used to determine the probability of something happening relative to other options. For example, if you have two options, one with a 2 weight and one with a 5 weight, then option one has probability 2/7, and option two has probability 5/7. The probability of each option is calculated as the weight of the given option divided by the sum of all weights. |
 | Placement Weights | #TODO |
+| Big Pickups | Big Pickups is the name given to the items that players pick up with both hands. This includes Power Cells, Fog Turbines, Data Spheres, etc.|
 
 ## Tiles, Rooms & Zones
 The connectors at the edge of a geomorph can be clicked by the user to create a new tile for the expedition. This prompts the user to select a geomorph to place, alongside a rotation and altitude.

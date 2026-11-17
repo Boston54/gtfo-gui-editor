@@ -532,6 +532,127 @@ public enum TERM_Command : uint
     MAX_COUNT = 44
 }
 
+[Flags]
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum MarkerStyles : ulong
+{
+    Empty = 0,
+    Player = 1,
+    Waypoint = 2,
+    EdgeArrow = 4,
+    Distance = 8,
+    WaypointDistance = 10,
+    Title = 16,
+    Selection = 32,
+    Ping = 64,
+    Enemy = 128,
+    DroneDiscovery = 256,
+    LookAt = 512,
+    Ammo = 1024,
+    Health = 2048,
+    Loot = 4096,
+    Terminal = 8192,
+    Caution = 16384,
+    HSU = 32768,
+    Door = 65536,
+    PlayerInCompass = 131072,
+    Sign = 262144,
+    ResourceLocker = 524288,
+    ResourceBox = 1048576,
+    Generator = 2097152,
+    Disinfection = 4194304,
+    CarryItem = 8388608,
+    BulkheadMain = 16777216,
+    BulkheadSecondary = 33554432,
+    BulkheadThird = 67108864,
+    Consumables = 134217728,
+    ObjectivePickup = 268435456,
+    ToolRefill = 536870912,
+    SecurityDoor = 1073741824,
+    BulkheadDoor = 2147483648,
+    ApexDoor = 4294967296,
+    BloodDoor = 8589934592,
+    SecurityDoorCheckpoint = 17179869184,
+    BulkheadDoorCheckpoint = 34359738368,
+    ApexDoorCheckpoint = 68719476736,
+    BloodDoorCheckpoint = 137438953472,
+    BulkheadDC = 274877906944,
+    PlayerTitle = 17,
+    EdgeArrowTitle = 20,
+    EdgeArrowTitlePing = 84,
+    PlayerTitleDistance = 25,
+    WaypointTitle = 18,
+    WaypointTitleDistance = 26,
+    WaypointTitleDistancePing = 90,
+    WaypointPing = 66,
+    SelectionTitleDistance = 56,
+    LookatDistance = 520,
+    LookatTitleDistance = 536,
+    EnemyDistance = 136,
+    EnemyTitleDistance = 152,
+    AmmoDistance = 1032,
+    AmmoTitleDistance = 1048,
+    HealthDistance = 2056,
+    HealthTitleDistance = 2072,
+    LootDistance = 4104,
+    LootTitleDistance = 4120,
+    TerminalDistance = 8200,
+    TerminalTitleDistance = 8216,
+    CautionDistance = 16392,
+    CautionTitleDistance = 16408,
+    HSUDistance = 32776,
+    HSUTitleDistance = 32792,
+    DoorDistance = 65544,
+    DoorTitleDistance = 65560,
+    SignDistance = 262152,
+    SignTitleDistance = 262168,
+    ResourceLockerDistance = 524296,
+    ResourceLockerTitleDistance = 524312,
+    ResourceBoxDistance = 1048584,
+    ResourceBoxTitleDistance = 1048600,
+    GeneratorDistance = 2097160,
+    GeneratorTitleDistance = 2097176,
+    DisinfectionDistance = 4194312,
+    DisinfectionTitleDistance = 4194328,
+    CarryItemDistance = 8388616,
+    CarryItemTitleDistance = 8388632,
+    BulkheadMainTitleDistance = 16777240,
+    BulkheadSecondaryTitleDistance = 33554456,
+    BulkheadThirdTitleDistance = 67108888,
+    ConsumableTitleDistance = 134217752,
+    ObjectivePickupDistance = 268435480,
+    ToolRefillDistance = 536870936,
+    SecurityDoorDistance = 1073741848,
+    BulkheadDoorDistance = 2147483672,
+    ApexDoorDistance = 4294967320,
+    BloodDoorDistance = 8589934616,
+    SecurityDoorCheckpointDistance = 17179869208,
+    BulkheadDoorCheckpointDistance = 34359738392,
+    ApexDoorCheckpointDistance = 68719476760,
+    BloodDoorCheckpointDistance = 137438953496,
+    BulkheadDCDistance = 274877906968
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum SuccessScreen : uint
+{
+    Default = 0,
+    Resources_Expended = 1,
+    Signal_Lost = 2,
+    Stack_Empty = 3,
+    Custom = 4
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
+public enum MultiProgressionOverrideTag : uint
+{
+    Progression = 0,
+    Main = 1729980802,
+    Secondary = 3356421220,
+    Overload = 192007757,
+    Custom = 1
+}
+
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ScoutType
 {
