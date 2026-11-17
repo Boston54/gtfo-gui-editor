@@ -1,4 +1,4 @@
-﻿{
+{
   "Headers": [
     {
       "AboveBlockID": 1,
@@ -54,13 +54,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -80,13 +80,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -106,11 +106,11 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -130,13 +130,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -156,13 +156,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 13.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -182,13 +182,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -208,13 +208,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 20.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -234,15 +234,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Boss"
+        0,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.8,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 40.0,
@@ -262,15 +262,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Standard",
-        "MiniBoss"
+        0,
+        1,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.8,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 40.0,
@@ -290,13 +290,13 @@
       "m_wavePauseMin": 4.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -316,13 +316,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -342,13 +342,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 14.0,
       "m_populationPointsPerWaveEnd": 23.0,
@@ -368,13 +368,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -394,15 +394,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -422,15 +422,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -450,15 +450,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling",
-        "Weakling"
+        0,
+        0,
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -478,13 +478,13 @@
       "m_wavePauseMin": 10.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -504,15 +504,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Boss"
+        0,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -532,15 +532,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Boss"
+        0,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -560,13 +560,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -586,13 +586,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -612,13 +612,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -638,15 +638,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 13.0,
       "m_populationPointsPerWaveEnd": 21.0,
@@ -666,15 +666,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -694,14 +694,14 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss"
+        0,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 13.0,
       "m_populationPointsPerWaveEnd": 21.0,
@@ -721,15 +721,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Boss"
+        0,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 11.0,
       "m_populationPointsPerWaveEnd": 19.0,
@@ -749,13 +749,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 900.0,
       "m_populationPointsPerWaveEnd": 900.0,
@@ -775,15 +775,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling",
-        "Weakling"
+        0,
+        0,
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 13.0,
       "m_populationPointsPerWaveEnd": 21.0,
@@ -803,15 +803,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 11.0,
       "m_populationPointsPerWaveEnd": 17.0,
@@ -831,13 +831,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -857,13 +857,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -883,11 +883,11 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 7.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -907,16 +907,16 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling",
-        "Special",
-        "MiniBoss",
-        "Boss"
+        0,
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -936,11 +936,11 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -960,16 +960,16 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling",
-        "Special",
-        "MiniBoss",
-        "Boss"
+        0,
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -989,16 +989,16 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Special",
-        "MiniBoss",
-        "Boss"
+        0,
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -1018,16 +1018,16 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Special",
-        "MiniBoss",
-        "Boss"
+        0,
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 14.0,
       "m_populationPointsPerWaveEnd": 19.0,
@@ -1047,13 +1047,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 7.0,
@@ -1073,13 +1073,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1099,13 +1099,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1125,13 +1125,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 14.0,
@@ -1151,11 +1151,11 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 35.0,
       "m_populationFilter": [],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -1175,15 +1175,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Standard",
-        "Boss"
+        0,
+        1,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1203,15 +1203,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Special",
-        "MiniBoss",
-        "Boss"
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 17.0,
@@ -1231,11 +1231,11 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 9.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -1255,13 +1255,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1281,13 +1281,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1307,13 +1307,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1333,13 +1333,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.3,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1359,13 +1359,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -1385,15 +1385,15 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "MiniBoss"
+        0,
+        4,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -1413,13 +1413,13 @@
       "m_wavePauseMin": 2.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.5,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1439,13 +1439,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -1465,13 +1465,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -1491,15 +1491,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Boss"
+        0,
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.8,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 40.0,
@@ -1519,13 +1519,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 2.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -1545,13 +1545,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 17.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -1571,13 +1571,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -1597,13 +1597,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -1623,15 +1623,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -1651,15 +1651,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -1679,17 +1679,17 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling",
-        "Standard",
-        "Special",
-        "MiniBoss",
-        "Boss"
+        0,
+        1,
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 25.0,
       "m_populationPointsPerWaveEnd": 25.0,
@@ -1709,13 +1709,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -1735,13 +1735,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 9.0,
       "m_populationPointsPerWaveStart": 9.0,
       "m_populationPointsPerWaveEnd": 9.0,
@@ -1761,13 +1761,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 5.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -1787,13 +1787,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 7.0,
       "m_populationPointsPerWaveStart": 7.0,
       "m_populationPointsPerWaveEnd": 7.0,
@@ -1813,13 +1813,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -1839,14 +1839,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -1866,13 +1866,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -1892,13 +1892,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -1918,13 +1918,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -1944,13 +1944,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 48.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -1970,13 +1970,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 40.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -1996,13 +1996,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 14.0,
       "m_populationPointsPerWaveStart": 14.0,
       "m_populationPointsPerWaveEnd": 14.0,
@@ -2022,14 +2022,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -2049,13 +2049,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 0.75,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2075,13 +2075,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2101,13 +2101,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 0.75,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2127,11 +2127,11 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2151,13 +2151,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 2.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -2177,13 +2177,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2203,13 +2203,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -2229,13 +2229,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 2.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -2255,13 +2255,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 0.75,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2281,14 +2281,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Standard"
+        3,
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -2308,13 +2308,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 9.0,
       "m_populationPointsPerWaveStart": 9.0,
       "m_populationPointsPerWaveEnd": 9.0,
@@ -2334,13 +2334,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special"
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2360,13 +2360,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2386,15 +2386,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 35.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -2414,13 +2414,13 @@
       "m_wavePauseMin": 15.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 5.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -2440,14 +2440,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2467,13 +2467,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2493,13 +2493,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2519,14 +2519,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2546,13 +2546,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special"
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2572,13 +2572,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2598,13 +2598,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2624,13 +2624,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2650,13 +2650,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -2676,13 +2676,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -2702,13 +2702,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -2728,13 +2728,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2754,13 +2754,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2780,13 +2780,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2806,13 +2806,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2832,13 +2832,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2858,13 +2858,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2884,13 +2884,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -2910,13 +2910,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2936,13 +2936,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2962,13 +2962,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -2988,13 +2988,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -3014,13 +3014,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 900.0,
       "m_populationPointsPerWaveEnd": 900.0,
@@ -3040,13 +3040,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -3066,13 +3066,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -3092,14 +3092,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -3119,14 +3119,14 @@
       "m_wavePauseMin": 12.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling"
+        0,
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -3146,13 +3146,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -3172,13 +3172,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -3198,13 +3198,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3224,13 +3224,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3250,15 +3250,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3278,14 +3278,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 10.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss"
+        0,
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 7.0,
       "m_populationPointsPerWaveEnd": 14.0,
@@ -3305,15 +3305,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3333,14 +3333,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "Boss",
-        "Special"
+        4,
+        2
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3360,15 +3360,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 7.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling",
-        "Weakling"
+        0,
+        0,
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3388,13 +3388,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -3414,15 +3414,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -3442,15 +3442,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling",
-        "Boss",
-        "Special"
+        0,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -3470,15 +3470,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -3498,15 +3498,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -3526,14 +3526,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss",
-        "Special"
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -3553,13 +3553,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -3579,15 +3579,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -3607,15 +3607,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss",
-        "Standard",
-        "Special"
+        4,
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -3635,15 +3635,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -3663,14 +3663,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -3690,15 +3690,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -3718,15 +3718,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special",
-        "MiniBoss",
-        "Boss"
+        2,
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -3746,13 +3746,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special"
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -3772,15 +3772,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -3800,14 +3800,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -3827,14 +3827,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -3854,15 +3854,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -3882,13 +3882,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -3908,11 +3908,11 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 10.0,
       "m_populationFilter": [],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -3932,15 +3932,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -3960,15 +3960,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -3988,15 +3988,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -4016,15 +4016,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -4044,14 +4044,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss",
-        "MiniBoss"
+        4,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -4071,15 +4071,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 100.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 100.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 15.0,
       "m_populationPointsPerWaveEnd": 15.0,
@@ -4099,15 +4099,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -4127,15 +4127,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4155,15 +4155,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -4183,15 +4183,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4211,15 +4211,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4239,15 +4239,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4267,15 +4267,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -4295,15 +4295,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4323,15 +4323,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Boss",
-        "Special"
+        1,
+        4,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4351,13 +4351,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4377,13 +4377,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4403,13 +4403,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -4429,13 +4429,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -4455,14 +4455,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4482,14 +4482,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "Standard",
-        "MiniBoss"
+        1,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4509,14 +4509,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 15.0,
       "m_populationFilter": [
-        "Standard",
-        "MiniBoss"
+        1,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4536,14 +4536,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4563,14 +4563,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4590,14 +4590,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4617,14 +4617,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4644,13 +4644,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4670,13 +4670,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4696,14 +4696,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4723,14 +4723,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling"
+        0,
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4750,13 +4750,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -4776,13 +4776,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4802,13 +4802,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4828,13 +4828,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 25.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -4854,13 +4854,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -4880,13 +4880,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -4906,13 +4906,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4932,13 +4932,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -4958,13 +4958,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -4984,13 +4984,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -5010,13 +5010,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5036,13 +5036,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5062,14 +5062,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Standard"
+        3,
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5089,13 +5089,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5115,15 +5115,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss",
-        "Standard"
+        0,
+        3,
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5143,13 +5143,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5169,13 +5169,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.5,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5195,13 +5195,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "ClosestToSuppliedNodeButNoBetweenPlayers",
+      "m_survivalWaveSpawnType": 4,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5221,14 +5221,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -5248,13 +5248,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5274,13 +5274,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5300,13 +5300,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5326,13 +5326,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5352,13 +5352,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5378,14 +5378,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Boss",
-        "Weakling"
+        4,
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5405,13 +5405,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5431,13 +5431,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5457,13 +5457,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5483,13 +5483,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5509,13 +5509,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5535,14 +5535,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -5562,14 +5562,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 50.0,
       "m_populationPointsPerWaveStart": 50.0,
       "m_populationPointsPerWaveEnd": 50.0,
@@ -5589,13 +5589,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 24.0,
       "m_populationPointsPerWaveStart": 24.0,
       "m_populationPointsPerWaveEnd": 24.0,
@@ -5615,13 +5615,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -5641,13 +5641,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -5667,13 +5667,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 24.0,
       "m_populationPointsPerWaveStart": 24.0,
       "m_populationPointsPerWaveEnd": 24.0,
@@ -5693,13 +5693,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 5.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -5719,13 +5719,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 55.0,
       "m_populationPointsPerWaveStart": 55.0,
       "m_populationPointsPerWaveEnd": 55.0,
@@ -5745,13 +5745,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -5771,13 +5771,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 200.0,
       "m_populationPointsPerWaveEnd": 200.0,
@@ -5797,13 +5797,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 200.0,
       "m_populationPointsPerWaveEnd": 200.0,
@@ -5823,13 +5823,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 200.0,
       "m_populationPointsPerWaveEnd": 200.0,
@@ -5849,13 +5849,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": -1.0,
       "m_populationPointsPerWaveEnd": -1.0,
@@ -5875,13 +5875,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": -1.0,
       "m_populationPointsPerWaveEnd": -1.0,
@@ -5901,13 +5901,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2000.0,
       "m_populationPointsPerWaveEnd": 2000.0,
@@ -5927,13 +5927,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2000.0,
       "m_populationPointsPerWaveEnd": 2000.0,
@@ -5953,13 +5953,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2000.0,
       "m_populationPointsPerWaveEnd": 2000.0,
@@ -5979,13 +5979,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2000.0,
       "m_populationPointsPerWaveEnd": 2000.0,
@@ -6005,13 +6005,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 1.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 2000.0,
       "m_populationPointsPerWaveEnd": 2000.0,
@@ -6031,13 +6031,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": -1.0,
       "m_populationPointsPerWaveEnd": -1.0,
@@ -6057,13 +6057,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": -1.0,
       "m_populationPointsPerWaveEnd": -1.0,
@@ -6083,13 +6083,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": -1.0,
       "m_populationPointsPerWaveEnd": -1.0,
@@ -6109,13 +6109,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6135,13 +6135,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6161,13 +6161,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6187,13 +6187,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6213,13 +6213,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6239,13 +6239,13 @@
       "m_wavePauseMin": 20.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6265,13 +6265,13 @@
       "m_wavePauseMin": 20.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6291,13 +6291,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6317,13 +6317,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6343,13 +6343,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -6369,13 +6369,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -6395,13 +6395,13 @@
       "m_wavePauseMin": 5.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6421,13 +6421,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -6447,14 +6447,14 @@
       "m_wavePauseMin": 25.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "Weakling"
+        0,
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 75.0,
       "m_populationPointsPerWaveStart": 75.0,
       "m_populationPointsPerWaveEnd": 75.0,
@@ -6474,13 +6474,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 20.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -6500,13 +6500,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -6526,13 +6526,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -6552,13 +6552,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 20.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -6578,13 +6578,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 1000.0,
       "m_populationPointsPerWaveEnd": 1000.0,
@@ -6604,13 +6604,13 @@
       "m_wavePauseMin": 25.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 0.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 60.0,
       "m_populationPointsPerWaveEnd": 60.0,
@@ -6630,14 +6630,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -6657,14 +6657,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 65.0,
       "m_populationPointsPerWaveStart": 65.0,
       "m_populationPointsPerWaveEnd": 65.0,
@@ -6684,13 +6684,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.7,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 30.0,
       "m_populationPointsPerWaveStart": 30.0,
       "m_populationPointsPerWaveEnd": 30.0,
@@ -6710,14 +6710,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 28.0,
       "m_populationPointsPerWaveStart": 28.0,
       "m_populationPointsPerWaveEnd": 28.0,
@@ -6737,14 +6737,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "MiniBoss"
+        1,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 50.0,
       "m_populationPointsPerWaveStart": 50.0,
       "m_populationPointsPerWaveEnd": 50.0,
@@ -6764,14 +6764,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 24.0,
       "m_populationPointsPerWaveStart": 24.0,
       "m_populationPointsPerWaveEnd": 24.0,
@@ -6791,16 +6791,16 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling",
-        "Standard",
-        "Special",
-        "MiniBoss"
+        0,
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 22.0,
       "m_populationPointsPerWaveStart": 22.0,
       "m_populationPointsPerWaveEnd": 22.0,
@@ -6820,14 +6820,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 50.0,
       "m_populationPointsPerWaveStart": 50.0,
       "m_populationPointsPerWaveEnd": 50.0,
@@ -6847,14 +6847,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 45.0,
       "m_populationPointsPerWaveStart": 45.0,
       "m_populationPointsPerWaveEnd": 45.0,
@@ -6874,14 +6874,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 90.0,
       "m_populationPointsPerWaveStart": 75.0,
       "m_populationPointsPerWaveEnd": 90.0,
@@ -6901,14 +6901,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 70.0,
       "m_populationPointsPerWaveStart": 70.0,
       "m_populationPointsPerWaveEnd": 70.0,
@@ -6928,13 +6928,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 5.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -6954,15 +6954,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 100.0,
       "m_populationPointsPerWaveStart": 100.0,
       "m_populationPointsPerWaveEnd": 100.0,
@@ -6982,14 +6982,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 90.0,
       "m_populationPointsPerWaveStart": 90.0,
       "m_populationPointsPerWaveEnd": 90.0,
@@ -7009,14 +7009,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10000.0,
       "m_populationPointsPerWaveEnd": 10000.0,
@@ -7036,13 +7036,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -7062,13 +7062,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 90.0,
       "m_populationPointsPerWaveStart": 90.0,
       "m_populationPointsPerWaveEnd": 90.0,
@@ -7088,13 +7088,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 80.0,
@@ -7114,14 +7114,14 @@
       "m_wavePauseMin": 25.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling",
-        "MiniBoss"
+        0,
+        3
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 30.0,
       "m_populationPointsPerWaveEnd": 30.0,
@@ -7141,13 +7141,13 @@
       "m_wavePauseMin": 25.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Boss"
+        4
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 30.0,
       "m_populationPointsPerWaveEnd": 30.0,
@@ -7167,13 +7167,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 80.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 80.0,
@@ -7193,15 +7193,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 100.0,
       "m_populationPointsPerWaveStart": 100.0,
       "m_populationPointsPerWaveEnd": 100.0,
@@ -7221,15 +7221,15 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard",
-        "Special",
-        "MiniBoss"
+        1,
+        2,
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 30.0,
       "m_populationPointsPerWaveStart": 100.0,
       "m_populationPointsPerWaveEnd": 100.0,
@@ -7249,14 +7249,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Special"
+        3,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -7276,14 +7276,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Special"
+        3,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -7303,13 +7303,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 2.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -7329,14 +7329,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special",
-        "Standard"
+        2,
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -7356,14 +7356,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Special",
-        "Standard"
+        2,
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 2.5,
       "m_populationPointsPerWaveStart": 2.5,
       "m_populationPointsPerWaveEnd": 2.5,
@@ -7383,13 +7383,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -7409,14 +7409,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Special"
+        3,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -7436,13 +7436,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Special"
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 2.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -7462,13 +7462,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Special"
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 2.0,
       "m_populationPointsPerWaveStart": 2.0,
       "m_populationPointsPerWaveEnd": 2.0,
@@ -7488,13 +7488,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.75,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 24.0,
       "m_populationPointsPerWaveStart": 24.0,
       "m_populationPointsPerWaveEnd": 24.0,
@@ -7514,13 +7514,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.75,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -7540,13 +7540,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 22.0,
       "m_populationPointsPerWaveStart": 22.0,
       "m_populationPointsPerWaveEnd": 22.0,
@@ -7566,13 +7566,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.75,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 24.0,
       "m_populationPointsPerWaveStart": 24.0,
       "m_populationPointsPerWaveEnd": 24.0,
@@ -7592,13 +7592,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -7618,13 +7618,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 20.0,
       "m_populationPointsPerWaveStart": 20.0,
       "m_populationPointsPerWaveEnd": 20.0,
@@ -7644,13 +7644,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -7670,13 +7670,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -7696,13 +7696,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -7722,13 +7722,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -7748,13 +7748,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -7774,14 +7774,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -7801,14 +7801,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -7828,14 +7828,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -7855,14 +7855,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -7882,14 +7882,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -7909,14 +7909,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -7936,14 +7936,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -7963,14 +7963,14 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss",
-        "Boss"
+        3,
+        4
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -7990,13 +7990,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -8016,13 +8016,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,
@@ -8042,13 +8042,13 @@
       "m_wavePauseMin": 3.0,
       "m_wavePauseMax": 30.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Exclude",
+      "m_filterType": 1,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.1,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -8068,13 +8068,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 4.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 4.0,
@@ -8094,13 +8094,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -8120,13 +8120,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 1.0,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -8146,13 +8146,13 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 5.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -8172,13 +8172,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Weakling"
+        0
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "OnSpawnPoints",
+      "m_survivalWaveSpawnType": 5,
       "m_populationPointsTotal": -1.0,
       "m_populationPointsPerWaveStart": 5.0,
       "m_populationPointsPerWaveEnd": 5.0,
@@ -8198,14 +8198,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 6.0,
       "m_populationPointsPerWaveStart": 6.0,
       "m_populationPointsPerWaveEnd": 6.0,
@@ -8225,14 +8225,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -8252,14 +8252,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -8279,14 +8279,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -8306,14 +8306,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 8.0,
       "m_populationPointsPerWaveStart": 8.0,
       "m_populationPointsPerWaveEnd": 8.0,
@@ -8333,14 +8333,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 9.0,
       "m_populationPointsPerWaveStart": 4.0,
       "m_populationPointsPerWaveEnd": 9.0,
@@ -8360,14 +8360,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 10.0,
       "m_populationPointsPerWaveStart": 10.0,
       "m_populationPointsPerWaveEnd": 10.0,
@@ -8387,14 +8387,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 12.0,
       "m_populationPointsPerWaveStart": 12.0,
       "m_populationPointsPerWaveEnd": 12.0,
@@ -8414,14 +8414,14 @@
       "m_wavePauseMin": 0.0,
       "m_wavePauseMax": 0.0,
       "m_populationFilter": [
-        "Standard",
-        "Special"
+        1,
+        2
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.8,
       "m_overrideWaveSpawnType": false,
-      "m_survivalWaveSpawnType": "InRelationToClosestAlivePlayer",
+      "m_survivalWaveSpawnType": 0,
       "m_populationPointsTotal": 11.0,
       "m_populationPointsPerWaveStart": 11.0,
       "m_populationPointsPerWaveEnd": 11.0,
@@ -8441,13 +8441,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "MiniBoss"
+        3
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 1.0,
       "m_populationPointsPerWaveStart": 1.0,
       "m_populationPointsPerWaveEnd": 1.0,
@@ -8467,13 +8467,13 @@
       "m_wavePauseMin": 1.0,
       "m_wavePauseMax": 20.0,
       "m_populationFilter": [
-        "Standard"
+        1
       ],
-      "m_filterType": "Include",
+      "m_filterType": 0,
       "m_chanceToRandomizeSpawnDirectionPerWave": 1.0,
       "m_chanceToRandomizeSpawnDirectionPerGroup": 0.2,
       "m_overrideWaveSpawnType": true,
-      "m_survivalWaveSpawnType": "FromElevatorDirection",
+      "m_survivalWaveSpawnType": 6,
       "m_populationPointsTotal": 3.0,
       "m_populationPointsPerWaveStart": 3.0,
       "m_populationPointsPerWaveEnd": 3.0,

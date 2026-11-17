@@ -1,4 +1,4 @@
-﻿{
+{
   "Headers": [
     {
       "AboveBlockID": 42,
@@ -43,20 +43,20 @@
   ],
   "Blocks": [
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Easy Mix",
@@ -64,20 +64,20 @@
       "persistentID": 1
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 0.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_50"
+          "Role": 0,
+          "Distribution": 3
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_50"
+          "Role": 1,
+          "Distribution": 3
         }
       ],
       "name": "Hibernate Easy Small Mix A",
@@ -85,20 +85,20 @@
       "persistentID": 8
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 0.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Easy Small Mix B",
@@ -106,20 +106,20 @@
       "persistentID": 9
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 0.75,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Easy Tiny Mix A",
@@ -127,20 +127,20 @@
       "persistentID": 12
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 0.75,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_50"
+          "Role": 0,
+          "Distribution": 3
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_50"
+          "Role": 1,
+          "Distribution": 3
         }
       ],
       "name": "Hibernate Easy Tiny Mix B",
@@ -148,16 +148,16 @@
       "persistentID": 11
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 2.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Easy Tiny Melee",
@@ -165,20 +165,20 @@
       "persistentID": 10
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Medium Mix B",
@@ -186,20 +186,20 @@
       "persistentID": 16
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_50"
+          "Role": 0,
+          "Distribution": 3
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_50"
+          "Role": 1,
+          "Distribution": 3
         }
       ],
       "name": "Hibernate Medium Small Mix A",
@@ -207,20 +207,20 @@
       "persistentID": 13
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Medium Small Mix B",
@@ -228,20 +228,20 @@
       "persistentID": 55
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Medium Tiny Mix A",
@@ -249,20 +249,20 @@
       "persistentID": 14
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.5,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_50"
+          "Role": 0,
+          "Distribution": 3
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_50"
+          "Role": 1,
+          "Distribution": 3
         }
       ],
       "name": "Hibernate Medium Tiny Mix B",
@@ -270,24 +270,24 @@
       "persistentID": 15
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         },
         {
-          "Role": "Scout",
-          "Distribution": "Force_One"
+          "Role": 5,
+          "Distribution": 1
         },
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         }
       ],
       "name": "Hibernate Hard Large Mix Scout",
@@ -295,20 +295,20 @@
       "persistentID": 19
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         },
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         }
       ],
       "name": "Hibernate Hard Large Mix",
@@ -316,24 +316,24 @@
       "persistentID": 57
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.2,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         },
         {
-          "Role": "Scout",
-          "Distribution": "Force_One"
+          "Role": 5,
+          "Distribution": 1
         }
       ],
       "name": "Hibernate Hard Mix Scout",
@@ -341,20 +341,20 @@
       "persistentID": 17
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 2.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Hard Small Mix A",
@@ -362,24 +362,24 @@
       "persistentID": 58
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 2.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         },
         {
-          "Role": "Scout",
-          "Distribution": "Force_One"
+          "Role": 5,
+          "Distribution": 1
         }
       ],
       "name": "Hibernate Hard Small Mix Scout",
@@ -387,20 +387,20 @@
       "persistentID": 18
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 5.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hibernate Hard Small Mix B",
@@ -408,16 +408,16 @@
       "persistentID": 59
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Biss Large Melee Shadows",
@@ -425,16 +425,16 @@
       "persistentID": 7
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Biss Melee Shadows",
@@ -442,16 +442,16 @@
       "persistentID": 60
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 3.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Biss Small Melee Shadows",
@@ -459,16 +459,16 @@
       "persistentID": 61
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 4.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Biss Tiny Melee Shadows",
@@ -476,16 +476,16 @@
       "persistentID": 62
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 8.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 2.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Buss Melee Big Shadows",
@@ -493,16 +493,16 @@
       "persistentID": 63
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 0,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 3.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Buss Small Melee Big Shadows",
@@ -510,16 +510,16 @@
       "persistentID": 64
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Easy",
@@ -527,16 +527,16 @@
       "persistentID": 20
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Medium",
@@ -544,16 +544,16 @@
       "persistentID": 21
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Align_1",
+      "Type": 1,
+      "Difficulty": 2,
+      "SpawnPlacementType": 2,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Hard Birther Align_1",
@@ -561,16 +561,16 @@
       "persistentID": 22
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 3.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Biss Hybrids",
@@ -578,16 +578,16 @@
       "persistentID": 50
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Buss Large BirtherChild",
@@ -595,16 +595,16 @@
       "persistentID": 52
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 2.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Buss BirtherChild",
@@ -612,16 +612,16 @@
       "persistentID": 65
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 3.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Buss Small BirtherChild",
@@ -629,16 +629,16 @@
       "persistentID": 66
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "MiniBoss",
-      "SpawnPlacementType": "Align_0",
+      "Type": 0,
+      "Difficulty": 3,
+      "SpawnPlacementType": 1,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "MiniBoss",
-          "Distribution": "Rel_100"
+          "Role": 9,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Miniboss Minibos Birther Align_0",
@@ -646,16 +646,16 @@
       "persistentID": 40
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "MegaBoss",
-      "SpawnPlacementType": "Align_0",
+      "Type": 0,
+      "Difficulty": 5,
+      "SpawnPlacementType": 1,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "MiniBoss",
-          "Distribution": "Rel_100"
+          "Role": 9,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Miniboss Megaboss Tank Align_0",
@@ -663,16 +663,16 @@
       "persistentID": 44
     },
     {
-      "Type": "Hibernate",
-      "Difficulty": "Boss",
-      "SpawnPlacementType": "Align_1",
+      "Type": 0,
+      "Difficulty": 4,
+      "SpawnPlacementType": 2,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Boss Boss BirtherBoss Align_1",
@@ -680,16 +680,16 @@
       "persistentID": 41
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "MiniBoss",
-      "SpawnPlacementType": "Align_1",
+      "Type": 1,
+      "Difficulty": 3,
+      "SpawnPlacementType": 2,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Hibernate Pure Sneak Miniboss BirtherBoss Align_1",
@@ -697,16 +697,16 @@
       "persistentID": 71
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "Boss",
-      "SpawnPlacementType": "Align_0",
+      "Type": 1,
+      "Difficulty": 4,
+      "SpawnPlacementType": 1,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Boss Boss Squidward Align_0",
@@ -714,16 +714,16 @@
       "persistentID": 69
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "MegaBoss",
-      "SpawnPlacementType": "Default",
+      "Type": 1,
+      "Difficulty": 5,
+      "SpawnPlacementType": 0,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Pure Sneak Megaboss Tank",
@@ -731,16 +731,16 @@
       "persistentID": 70
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Easy Scout",
@@ -748,16 +748,16 @@
       "persistentID": 26
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Medium Scout",
@@ -765,16 +765,16 @@
       "persistentID": 27
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Hard Scout",
@@ -782,16 +782,16 @@
       "persistentID": 28
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Boss",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 4,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Boss Shadow Scout",
@@ -799,16 +799,16 @@
       "persistentID": 45
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "MiniBoss",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 3,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect MiniBoss Bullrush Scout",
@@ -816,16 +816,16 @@
       "persistentID": 54
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "MegaBoss",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 5,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect MegaBoss Scout R8B1",
@@ -833,16 +833,16 @@
       "persistentID": 82
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 3,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 10.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Biss Nightmare Scout",
@@ -850,16 +850,16 @@
       "persistentID": 83
     },
     {
-      "Type": "PureDetect",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Align_1",
+      "Type": 3,
+      "Difficulty": 7,
+      "SpawnPlacementType": 2,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 10.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Scout",
-          "Distribution": "Rel_100"
+          "Role": 5,
+          "Distribution": 5
         }
       ],
       "name": "Pure Detect Buss Nightmare Scout",
@@ -867,16 +867,16 @@
       "persistentID": 85
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 6.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Bullrush Striker",
@@ -884,16 +884,16 @@
       "persistentID": 23
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 3.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Small Bullrush Striker",
@@ -901,16 +901,16 @@
       "persistentID": 67
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Medium Bullrush Striker",
@@ -918,16 +918,16 @@
       "persistentID": 43
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Hard Small Bullrush Bigs",
@@ -935,16 +935,16 @@
       "persistentID": 34
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 2,
+      "SpawnPlacementType": 0,
       "MaxScore": 8.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Hard Large Bullrush Bigs",
@@ -952,16 +952,16 @@
       "persistentID": 73
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Striker Berserks",
@@ -969,16 +969,16 @@
       "persistentID": 80
     },
     {
-      "Type": "Detect",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 2,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 3.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Cluster Shooter",
@@ -986,16 +986,16 @@
       "persistentID": 81
     },
     {
-      "Type": "PureSneak",
-      "Difficulty": "MiniBoss",
-      "SpawnPlacementType": "Align_0",
+      "Type": 1,
+      "Difficulty": 3,
+      "SpawnPlacementType": 1,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "PureSneak",
-          "Distribution": "Rel_100"
+          "Role": 4,
+          "Distribution": 5
         }
       ],
       "name": "Detect Lurker Megaboss_Align0",
@@ -1003,20 +1003,20 @@
       "persistentID": 84
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hunter Easy Infront strikers shooters",
@@ -1024,20 +1024,20 @@
       "persistentID": 30
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 15.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_25"
+          "Role": 1,
+          "Distribution": 2
         }
       ],
       "name": "Hunter Medium Inback strikers shooters",
@@ -1045,16 +1045,16 @@
       "persistentID": 76
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Align_0",
+      "Type": 6,
+      "Difficulty": 2,
+      "SpawnPlacementType": 1,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_100"
+          "Role": 7,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Boss Birther",
@@ -1062,16 +1062,16 @@
       "persistentID": 36
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Hard",
-      "SpawnPlacementType": "Align_0",
+      "Type": 6,
+      "Difficulty": 2,
+      "SpawnPlacementType": 1,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_100"
+          "Role": 7,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Boss Birther Only One",
@@ -1079,16 +1079,16 @@
       "persistentID": 49
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "MegaBoss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 5,
+      "SpawnPlacementType": 0,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Boss Tank",
@@ -1096,16 +1096,16 @@
       "persistentID": 46
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "MegaBoss",
-      "SpawnPlacementType": "Align_1",
+      "Type": 6,
+      "Difficulty": 5,
+      "SpawnPlacementType": 2,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Boss Tank_R4C3_L3",
@@ -1113,16 +1113,16 @@
       "persistentID": 79
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Buss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 7,
+      "SpawnPlacementType": 0,
       "MaxScore": 12.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_100"
+          "Role": 7,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Bigs",
@@ -1130,16 +1130,16 @@
       "persistentID": 74
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "MiniBoss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 3,
+      "SpawnPlacementType": 0,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_100"
+          "Role": 7,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Miniboss BirtherBoss",
@@ -1147,24 +1147,24 @@
       "persistentID": 47
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 12.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_75"
+          "Role": 7,
+          "Distribution": 4
         },
         {
-          "Role": "Melee",
-          "Distribution": "Rel_15"
+          "Role": 0,
+          "Distribution": 6
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_10"
+          "Role": 1,
+          "Distribution": 7
         }
       ],
       "name": "Hunter Easy Inback StrikersShootersHybrids",
@@ -1172,24 +1172,24 @@
       "persistentID": 31
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 8.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Force_One"
+          "Role": 7,
+          "Distribution": 1
         },
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_10"
+          "Role": 1,
+          "Distribution": 7
         }
       ],
       "name": "Hunter Easy Inback StrikersShootersHybrids V2",
@@ -1197,28 +1197,28 @@
       "persistentID": 51
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Medium",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 1,
+      "SpawnPlacementType": 0,
       "MaxScore": 16.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_75"
+          "Role": 7,
+          "Distribution": 4
         },
         {
-          "Role": "Hunter",
-          "Distribution": "Rel_10"
+          "Role": 7,
+          "Distribution": 7
         },
         {
-          "Role": "Ranged",
-          "Distribution": "Rel_05"
+          "Role": 1,
+          "Distribution": 8
         },
         {
-          "Role": "Melee",
-          "Distribution": "Rel_10"
+          "Role": 0,
+          "Distribution": 7
         }
       ],
       "name": "Hunter Medium Inback StrikersShootersHybrids",
@@ -1226,16 +1226,16 @@
       "persistentID": 33
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 8.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Easy Bullrush",
@@ -1243,16 +1243,16 @@
       "persistentID": 32
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 4.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Easy Shadows R2E1",
@@ -1260,16 +1260,16 @@
       "persistentID": 77
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 20.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Lurker",
-          "Distribution": "Rel_100"
+          "Role": 3,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Easy Large Bullrush",
@@ -1277,16 +1277,16 @@
       "persistentID": 72
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 13.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_100"
+          "Role": 0,
+          "Distribution": 5
         }
       ],
       "name": "Hunter Medium Biss Melee Shadows",
@@ -1294,16 +1294,16 @@
       "persistentID": 35
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 5.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Melee",
-          "Distribution": "Rel_75"
+          "Role": 0,
+          "Distribution": 4
         }
       ],
       "name": "Hunter Medium Melee Shadows R2C1",
@@ -1311,16 +1311,16 @@
       "persistentID": 78
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 30.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Birther Boss Children",
@@ -1328,16 +1328,16 @@
       "persistentID": 38
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 20.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Birther Children",
@@ -1345,16 +1345,16 @@
       "persistentID": 37
     },
     {
-      "Type": "Patrol",
-      "Difficulty": "Easy",
-      "SpawnPlacementType": "Default",
+      "Type": 4,
+      "Difficulty": 0,
+      "SpawnPlacementType": 0,
       "MaxScore": 10.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Patroller",
-          "Distribution": "Rel_100"
+          "Role": 6,
+          "Distribution": 5
         }
       ],
       "name": "PatrolTest",
@@ -1362,16 +1362,16 @@
       "persistentID": 29
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 2.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "BirtherChild",
-          "Distribution": "Rel_100"
+          "Role": 8,
+          "Distribution": 5
         }
       ],
       "name": "Squid Boss Children",
@@ -1379,16 +1379,16 @@
       "persistentID": 68
     },
     {
-      "Type": "Hunter",
-      "Difficulty": "Biss",
-      "SpawnPlacementType": "Default",
+      "Type": 6,
+      "Difficulty": 6,
+      "SpawnPlacementType": 0,
       "MaxScore": 1.0,
       "ScoreInAreaPaddingMulti": 1.0,
       "RelativeWeight": 1.0,
       "Roles": [
         {
-          "Role": "Hunter",
-          "Distribution": "Force_One"
+          "Role": 7,
+          "Distribution": 1
         }
       ],
       "name": "Hunter Biss Pouncer",

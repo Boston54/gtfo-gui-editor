@@ -1,4 +1,4 @@
-﻿{
+{
   "Headers": [],
   "Blocks": [
     {
@@ -12,7 +12,7 @@
         41,
         35
       ],
-      "StartupScreenToLoad": "StartupScreenData_3",
+      "StartupScreenToLoad": 3,
       "name": "Default",
       "internalEnabled": true,
       "persistentID": 1

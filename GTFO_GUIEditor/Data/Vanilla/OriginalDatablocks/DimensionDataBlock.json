@@ -1,4 +1,4 @@
-﻿{
+{
   "Headers": [],
   "Blocks": [
     {
@@ -36,7 +36,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -69,8 +69,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Test",
       "internalEnabled": true,
@@ -110,7 +110,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -143,8 +143,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Generated_Test",
       "internalEnabled": true,
@@ -184,7 +184,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -217,8 +217,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "Rundown006_D4_2",
       "internalEnabled": true,
@@ -258,7 +258,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -291,8 +291,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "Rundown006_D4_3",
       "internalEnabled": true,
@@ -332,7 +332,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -365,8 +365,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "Rundown006_D4_4",
       "internalEnabled": true,
@@ -406,7 +406,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -423,7 +423,7 @@
             "LocalLogFiles": [],
             "UniqueCommands": [],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -467,8 +467,8 @@
         "SandstormEdgeA": 0.25,
         "SandstormEdgeB": 1.0,
         "SandstormMinFog": 0.006,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_Vista_R6B1",
       "internalEnabled": true,
@@ -509,7 +509,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -530,24 +530,24 @@
                 "CommandDesc": 0,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "Warning",
+                    "LineType": 5,
                     "Output": 1665414206,
                     "Time": 7.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyOnPoint",
+                    "Type": 16,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -571,12 +571,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -584,17 +586,17 @@
                     "WorldEventObjectFilter": "FrankSpawner2"
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -618,29 +620,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 55.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -664,29 +668,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_1",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 1,
                     "Delay": 75.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -710,23 +716,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -770,8 +778,8 @@
         "SandstormEdgeA": 0.25,
         "SandstormEdgeB": 1.0,
         "SandstormMinFog": 0.006,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_Vista_R7E1",
       "internalEnabled": true,
@@ -811,7 +819,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -845,8 +853,8 @@
         "SandstormEdgeA": 0.5,
         "SandstormEdgeB": 0.75,
         "SandstormMinFog": 0.005,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_02_flash",
       "internalEnabled": true,
@@ -886,7 +894,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -904,7 +912,7 @@
               {
                 "FileName": "D3T-INI-FNI",
                 "FileContent": 3979312916,
-                "FileContentOriginalLanguage": "English",
+                "FileContentOriginalLanguage": 1,
                 "AttachedAudioFile": 3887080436,
                 "AttachedAudioByteSize": 755983,
                 "PlayerDialogToTriggerAfterAudio": 0
@@ -916,24 +924,24 @@
                 "CommandDesc": "Download local extension of genome database",
                 "PostCommandOutputs": [
                   {
-                    "LineType": "SpinningWaitDone",
+                    "LineType": 2,
                     "Output": 0,
                     "Time": 5.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnStart",
+                    "Trigger": 1,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -957,29 +965,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 2.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1003,29 +1013,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnStart",
+                    "Trigger": 1,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 3.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -1049,29 +1061,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnEnd",
+                    "Trigger": 3,
                     "ChainPuzzle": 173,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1095,29 +1109,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "EventBreak",
+                    "Type": 999,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1141,29 +1157,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "ForceCompleteObjective",
+                    "Type": 12,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnEnd",
+                    "Trigger": 3,
                     "ChainPuzzle": 174,
                     "UseStaticBioscanPoints": true,
-                    "Layer": "SecondaryLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 1,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1187,29 +1205,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnEnd",
+                    "Trigger": 3,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 4.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -1233,29 +1253,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "OnEnd",
+                    "Trigger": 3,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1279,29 +1301,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1325,23 +1349,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "Normal"
+                "SpecialCommandRule": 0
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -1385,8 +1411,8 @@
         "SandstormEdgeA": 0.5,
         "SandstormEdgeB": 0.7583,
         "SandstormMinFog": 0.0063,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_dune_camp_01",
       "internalEnabled": true,
@@ -1427,7 +1453,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -1460,8 +1486,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Flyer_Arena",
       "internalEnabled": true,
@@ -1502,7 +1528,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -1535,8 +1561,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_R8A1_Complex_Flash",
       "internalEnabled": true,
@@ -1577,7 +1603,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -1610,8 +1636,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Pouncer_Arena",
       "internalEnabled": true,
@@ -1652,7 +1678,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -1685,8 +1711,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_R7B3",
       "internalEnabled": true,
@@ -1727,7 +1753,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 1.4,
         "StaticToolAmmoMulti": 1.2,
         "StaticWeaponAmmoMulti": 1.4,
@@ -1748,34 +1774,34 @@
                 "CommandDesc": 2254024123,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "SpinningWaitNoDone",
+                    "LineType": 3,
                     "Output": "<color=red>EMERGENCY SHUTDOWN PROTOCOL ACTIVATED</color>",
                     "Time": 25.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": "",
                     "Time": 0.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": "",
                     "Time": 0.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 2.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1799,29 +1825,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1845,29 +1873,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1891,29 +1921,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 160,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1937,29 +1969,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "ForceCompleteObjective",
+                    "Type": 12,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -1983,29 +2017,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -2029,29 +2065,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_6",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 6,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -2075,23 +2113,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -2136,8 +2176,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_R6A2",
       "internalEnabled": true,
@@ -2178,7 +2218,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 4.0,
         "StaticToolAmmoMulti": 3.0,
         "StaticWeaponAmmoMulti": 14.0,
@@ -2200,17 +2240,17 @@
                 "PostCommandOutputs": [],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 4,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_1",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 1,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -2234,29 +2274,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -2280,23 +2322,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -2315,17 +2359,17 @@
         "ForbidTerminalsInDimension": false,
         "EventsOnBossDeath": [
           {
-            "Type": "SetFogSetting",
+            "Type": 6,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -2349,29 +2393,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "DimensionWarpTeam",
+            "Type": 8,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 16.0,
             "Duration": 0.0,
             "ClearDimension": true,
@@ -2395,29 +2441,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "ForceCompleteObjective",
+            "Type": 12,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 18.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -2441,12 +2489,14 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
@@ -2480,8 +2530,8 @@
         "SandstormEdgeA": 0.25,
         "SandstormEdgeB": 1.0,
         "SandstormMinFog": 0.013,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_R6D1_Boss",
       "internalEnabled": true,
@@ -2522,7 +2572,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 5,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 2.4,
         "StaticToolAmmoMulti": 2.4,
         "StaticWeaponAmmoMulti": 3.8,
@@ -2539,7 +2589,7 @@
             "LocalLogFiles": [],
             "UniqueCommands": [],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -2565,7 +2615,7 @@
             "LocalLogFiles": [],
             "UniqueCommands": [],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -2591,7 +2641,7 @@
             "LocalLogFiles": [],
             "UniqueCommands": [],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -2636,8 +2686,8 @@
         "SandstormEdgeA": 0.25,
         "SandstormEdgeB": 1.0,
         "SandstormMinFog": 0.013,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Mining_Shaft",
       "internalEnabled": true,
@@ -2678,7 +2728,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -2711,8 +2761,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_Flash_A1",
       "internalEnabled": true,
@@ -2753,7 +2803,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -2786,8 +2836,8 @@
         "SandstormEdgeA": 0.2,
         "SandstormEdgeB": 0.5,
         "SandstormMinFog": 0.015,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Boss_Flash_test",
       "internalEnabled": true,
@@ -2827,7 +2877,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -2860,8 +2910,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "D4_Second_dimension",
       "internalEnabled": true,
@@ -2901,7 +2951,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -2934,8 +2984,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "R8B1_dimension",
       "internalEnabled": true,
@@ -2975,7 +3025,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -3008,8 +3058,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "D4_Third_dimension",
       "internalEnabled": true,
@@ -3049,7 +3099,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -3082,8 +3132,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Independent",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 2,
+        "LinkedToLayer": 0
       },
       "name": "D4_Fourth_dimension",
       "internalEnabled": true,
@@ -3124,7 +3174,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 1.0,
         "StaticToolAmmoMulti": 1.0,
         "StaticWeaponAmmoMulti": 1.0,
@@ -3145,29 +3195,29 @@
                 "CommandDesc": 0,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "SpinningWaitNoDone",
+                    "LineType": 3,
                     "Output": "...",
                     "Time": 15.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": "SECRET_COMMAND_1",
                     "Time": 0.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "ActivateChainedPuzzle",
+                    "Type": 22,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3191,12 +3241,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -3204,17 +3256,17 @@
                     "WorldEventObjectFilter": "CustomSpawn3-1"
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3238,29 +3290,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3284,12 +3338,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -3297,17 +3353,17 @@
                     "WorldEventObjectFilter": "Evt_DesertComplexPing"
                   },
                   {
-                    "Type": "ClearDimension",
+                    "Type": 30,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3331,23 +3387,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -3391,8 +3449,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Complex_R8_01",
       "internalEnabled": true,
@@ -3432,7 +3490,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -3454,17 +3512,17 @@
                 "PostCommandOutputs": [],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3489,29 +3547,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "PlaySound",
+                    "Type": 5,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 258,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3535,29 +3595,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3581,29 +3643,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -3627,29 +3691,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 2.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3673,29 +3739,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 10.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3719,29 +3787,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 6.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3765,12 +3835,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -3778,11 +3850,11 @@
                     "WorldEventObjectFilter": "Evt_DoorPing"
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -3826,8 +3898,8 @@
         "SandstormEdgeA": 0.8331,
         "SandstormEdgeB": 0.7703,
         "SandstormMinFog": 0.0318,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_R8_01",
       "internalEnabled": true,
@@ -3868,7 +3940,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 3.2,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 4.0,
@@ -3889,29 +3961,29 @@
                 "CommandDesc": 0,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "SpinningWaitNoDone",
+                    "LineType": 3,
                     "Output": "...",
                     "Time": 15.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": "SECRET_COMMAND_2",
                     "Time": 0.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3935,29 +4007,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetFogSetting",
+                    "Type": 6,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 4,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_4",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 4,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -3981,29 +4055,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4028,29 +4104,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 15.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4075,29 +4153,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4121,23 +4201,25 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -4156,17 +4238,17 @@
         "ForbidTerminalsInDimension": false,
         "EventsOnBossDeath": [
           {
-            "Type": "UpdateCustomSubObjective",
+            "Type": 11,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4190,29 +4272,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "AnimationTrigger",
+            "Type": 15,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4236,12 +4320,14 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
@@ -4249,17 +4335,17 @@
             "WorldEventObjectFilter": "Evt_ComplexSand1"
           },
           {
-            "Type": "DimensionWarpTeam",
+            "Type": 8,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 16.0,
             "Duration": 0.0,
             "ClearDimension": true,
@@ -4283,29 +4369,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "StopEnemyWaves",
+            "Type": 10,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4329,29 +4417,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "ForceCompleteObjective",
+            "Type": 12,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "SecondaryLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 1,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 16.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4375,29 +4465,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "AnimationTrigger",
+            "Type": 15,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4421,12 +4513,14 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": true,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
@@ -4434,17 +4528,17 @@
             "WorldEventObjectFilter": "Evt_RemoveSand2"
           },
           {
-            "Type": "AnimationTrigger",
+            "Type": 15,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4468,12 +4562,14 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
@@ -4481,17 +4577,17 @@
             "WorldEventObjectFilter": "Evt_ComplexSand2"
           },
           {
-            "Type": "UpdateCustomSubObjective",
+            "Type": 11,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 18.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4515,29 +4611,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "UnlockSecurityDoor",
+            "Type": 2,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_6",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 6,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4561,29 +4659,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "ForceCompleteObjective",
+            "Type": 12,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 16.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4607,29 +4707,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "SetFogSetting",
+            "Type": 6,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 0.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4653,29 +4755,31 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
             "SustainedEventDelay": 0.0
           },
           {
-            "Type": "PlaySound",
+            "Type": 5,
             "Condition": {
               "ConditionIndex": -1,
               "IsTrue": false
             },
-            "Trigger": "None",
+            "Trigger": 0,
             "ChainPuzzle": 0,
             "UseStaticBioscanPoints": false,
-            "Layer": "MainLayer",
-            "DimensionIndex": "Reality",
-            "LocalIndex": "Zone_0",
+            "Layer": 0,
+            "DimensionIndex": 0,
+            "LocalIndex": 0,
             "Delay": 16.0,
             "Duration": 0.0,
             "ClearDimension": false,
@@ -4699,12 +4803,14 @@
             "Position": {
               "x": 0.0,
               "y": 0.0,
-              "z": 0.0
+              "z": 0.0,
+              "magnitude": 0.0,
+              "sqrMagnitude": 0.0
             },
             "Count": 0,
             "Enabled": false,
-            "TerminalCommand": "None",
-            "TerminalCommandRule": "Normal",
+            "TerminalCommand": 0,
+            "TerminalCommandRule": 0,
             "SustainedEventSlotIndex": 0,
             "SustainedEventStateCount": 0,
             "SustainedEventStateDuration": 0.0,
@@ -4738,8 +4844,8 @@
         "SandstormEdgeA": 0.8331,
         "SandstormEdgeB": 0.7703,
         "SandstormMinFog": 0.0318,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_R8_02",
       "internalEnabled": true,
@@ -4779,7 +4885,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -4800,29 +4906,29 @@
                 "CommandDesc": 564623344,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "SpinningWaitDone",
+                    "LineType": 2,
                     "Output": 3756446720,
                     "Time": 1.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": 151450606,
                     "Time": 0.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4847,29 +4953,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 15.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4893,29 +5001,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "PlaySound",
+                    "Type": 5,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 258,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -4939,29 +5049,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_2",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 2,
                     "Delay": 0.5,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -4985,29 +5097,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetTerminalCommand",
+                    "Type": 21,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5031,12 +5145,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "UniqueCommand1",
-                    "TerminalCommandRule": "OnlyOnceDelete",
+                    "TerminalCommand": 38,
+                    "TerminalCommandRule": 2,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5044,17 +5160,17 @@
                     "WorldEventObjectFilter": "CaveDimensionTerminalMarker2"
                   },
                   {
-                    "Type": "ActivateChainedPuzzle",
+                    "Type": 22,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.5,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5078,12 +5194,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5091,17 +5209,17 @@
                     "WorldEventObjectFilter": "CustomSpawn1-1"
                   },
                   {
-                    "Type": "AnimationTrigger",
+                    "Type": 15,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5125,12 +5243,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5138,17 +5258,17 @@
                     "WorldEventObjectFilter": "Evt_ActivateBrokenTerminal02"
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5172,29 +5292,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "ClearDimension",
+                    "Type": 30,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_3",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 3,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5218,29 +5340,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetFogSetting",
+                    "Type": 6,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5264,29 +5388,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5310,12 +5436,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5323,11 +5451,11 @@
                     "WorldEventObjectFilter": "Evt_CaveTerminalPing01"
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -5357,29 +5485,29 @@
                 "CommandDesc": 564623344,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "ProgressWait",
+                    "LineType": 4,
                     "Output": 3756446720,
                     "Time": 1.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": 151450606,
                     "Time": 0.0
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5403,29 +5531,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 15.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5449,29 +5579,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 258,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -5495,29 +5627,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetTerminalCommand",
+                    "Type": 21,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5541,12 +5675,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "UniqueCommand1",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 38,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5554,17 +5690,17 @@
                     "WorldEventObjectFilter": "CaveDimensionTerminalMarker3"
                   },
                   {
-                    "Type": "ActivateChainedPuzzle",
+                    "Type": 22,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 1.5,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5588,12 +5724,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5601,17 +5739,17 @@
                     "WorldEventObjectFilter": "CustomSpawn2-1"
                   },
                   {
-                    "Type": "AnimationTrigger",
+                    "Type": 15,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5635,12 +5773,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5648,17 +5788,17 @@
                     "WorldEventObjectFilter": "Evt_ComplexSand2"
                   },
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 3.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5683,29 +5823,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "AnimationTrigger",
+                    "Type": 15,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5729,12 +5871,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5742,17 +5886,17 @@
                     "WorldEventObjectFilter": "Evt_ActivateBrokenTerminal03"
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5776,29 +5920,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "ClearDimension",
+                    "Type": 30,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_3",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 3,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5822,29 +5968,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5868,12 +6016,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -5881,11 +6031,11 @@
                     "WorldEventObjectFilter": "Evt_CaveTerminalPing02"
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -5915,49 +6065,49 @@
                 "CommandDesc": 3201784925,
                 "PostCommandOutputs": [
                   {
-                    "LineType": "Warning",
+                    "LineType": 5,
                     "Output": 3778298481,
                     "Time": 0.0
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": 2876489136,
                     "Time": 0.5
                   },
                   {
-                    "LineType": "Normal",
+                    "LineType": 0,
                     "Output": 2876489136,
                     "Time": 0.5
                   },
                   {
-                    "LineType": "Fail",
+                    "LineType": 1,
                     "Output": 4063330206,
                     "Time": 0.5
                   },
                   {
-                    "LineType": "Fail",
+                    "LineType": 1,
                     "Output": 4063330206,
                     "Time": 0.5
                   },
                   {
-                    "LineType": "Fail",
+                    "LineType": 1,
                     "Output": 4063330206,
                     "Time": 0.5
                   }
                 ],
                 "CommandEvents": [
                   {
-                    "Type": "SpawnEnemyWave",
+                    "Type": 9,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -5982,29 +6132,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "StopEnemyWaves",
+                    "Type": 10,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 15.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6028,29 +6180,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "PlaySound",
+                    "Type": 5,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 258,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6074,29 +6228,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": 1,
                       "IsTrue": true
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_2",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 2,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -6120,29 +6276,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "DimensionWarpTeam",
+                    "Type": 8,
                     "Condition": {
                       "ConditionIndex": 2,
                       "IsTrue": true
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_4",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 4,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": true,
@@ -6166,29 +6324,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "UpdateCustomSubObjective",
+                    "Type": 11,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 3.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6212,29 +6372,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 5.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6258,12 +6420,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -6271,17 +6435,17 @@
                     "WorldEventObjectFilter": "Evt_DesertComplexPing"
                   },
                   {
-                    "Type": "AnimationTrigger",
+                    "Type": 15,
                     "Condition": {
                       "ConditionIndex": 2,
                       "IsTrue": true
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6305,12 +6469,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -6318,17 +6484,17 @@
                     "WorldEventObjectFilter": "Evt_ActivateSquids"
                   },
                   {
-                    "Type": "ClearDimension",
+                    "Type": 30,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_3",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 3,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6352,29 +6518,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "PlaySound",
+                    "Type": 5,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6398,29 +6566,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetFogSetting",
+                    "Type": 6,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Dimension_3",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 3,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6444,29 +6614,31 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
                     "SustainedEventDelay": 0.0
                   },
                   {
-                    "Type": "SetNavMarker",
+                    "Type": 17,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6490,12 +6662,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": false,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -6503,17 +6677,17 @@
                     "WorldEventObjectFilter": "Evt_CaveTerminalPing03"
                   },
                   {
-                    "Type": "AnimationTrigger",
+                    "Type": 15,
                     "Condition": {
                       "ConditionIndex": -1,
                       "IsTrue": false
                     },
-                    "Trigger": "None",
+                    "Trigger": 0,
                     "ChainPuzzle": 0,
                     "UseStaticBioscanPoints": false,
-                    "Layer": "MainLayer",
-                    "DimensionIndex": "Reality",
-                    "LocalIndex": "Zone_0",
+                    "Layer": 0,
+                    "DimensionIndex": 0,
+                    "LocalIndex": 0,
                     "Delay": 0.0,
                     "Duration": 0.0,
                     "ClearDimension": false,
@@ -6537,12 +6711,14 @@
                     "Position": {
                       "x": 0.0,
                       "y": 0.0,
-                      "z": 0.0
+                      "z": 0.0,
+                      "magnitude": 0.0,
+                      "sqrMagnitude": 0.0
                     },
                     "Count": 0,
                     "Enabled": true,
-                    "TerminalCommand": "None",
-                    "TerminalCommandRule": "Normal",
+                    "TerminalCommand": 0,
+                    "TerminalCommandRule": 0,
                     "SustainedEventSlotIndex": 0,
                     "SustainedEventStateCount": 0,
                     "SustainedEventStateDuration": 0.0,
@@ -6550,11 +6726,11 @@
                     "WorldEventObjectFilter": "Evt_TriggerBoxON"
                   }
                 ],
-                "SpecialCommandRule": "OnlyOnceDelete"
+                "SpecialCommandRule": 2
               }
             ],
             "StartingStateData": {
-              "StartingState": "Sleeping",
+              "StartingState": 0,
               "UseCustomInfoText": false,
               "CustomInfoText": 0,
               "KeepShowingLocalLogCount": false,
@@ -6598,8 +6774,8 @@
         "SandstormEdgeA": 0.8389,
         "SandstormEdgeB": 0.7277,
         "SandstormMinFog": 0.1389,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Desert_R8_03",
       "internalEnabled": true,
@@ -6639,7 +6815,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 0.0,
         "StaticToolAmmoMulti": 0.0,
         "StaticWeaponAmmoMulti": 0.0,
@@ -6672,8 +6848,8 @@
         "SandstormEdgeA": 0.0878,
         "SandstormEdgeB": 0.3967,
         "SandstormMinFog": 0.0074,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Jungle_r8E2",
       "internalEnabled": true,
@@ -6714,7 +6890,7 @@
         "StaticForceBigPickupsAllocation": false,
         "StaticConsumableDistributionInZone": 0,
         "StaticBigPickupDistributionInZone": 0,
-        "StaticGroundSpawnersInZone": "None_0",
+        "StaticGroundSpawnersInZone": 0,
         "StaticHealthMulti": 1.0,
         "StaticToolAmmoMulti": 1.0,
         "StaticWeaponAmmoMulti": 1.0,
@@ -6748,8 +6924,8 @@
         "SandstormEdgeA": 0.4,
         "SandstormEdgeB": 0.6,
         "SandstormMinFog": 0.01,
-        "ObjectiveType": "Ignore",
-        "LinkedToLayer": "MainLayer"
+        "ObjectiveType": 0,
+        "LinkedToLayer": 0
       },
       "name": "Dimension_Secret",
       "internalEnabled": true,
