@@ -96,6 +96,9 @@ public class RundownLoader : IRundownLoader
                 OverloadSector = level.OverloadSector.Clone(),
                 ExpeditionBalance = level.ExpeditionBalance.Clone(),
                 SnatcherBoxes = level.SnatcherBoxes,
+                SurvivalWaveSettings = level.SurvivalWaveSettings,
+                SurvivalWavePopulation = level.SurvivalWavePopulation,
+                LevelSurvivalWave = level.LevelSurvivalWave.Clone(),
                 GridState = level.GridState.ExportStateData()
             };
             project.Levels.Add(levelData);
@@ -243,7 +246,10 @@ public class RundownLoader : IRundownLoader
                     SecondarySector = levelData.SecondarySector?.Clone() ?? new SectorSettings { ZoneAliasStart = 100 },
                     OverloadSector = levelData.OverloadSector?.Clone() ?? new SectorSettings { ZoneAliasStart = 200 },
                     ExpeditionBalance = levelData.ExpeditionBalance?.Clone() ?? new ExpeditionBalanceSettings(),
-                    SnatcherBoxes = levelData.SnatcherBoxes
+                    SnatcherBoxes = levelData.SnatcherBoxes,
+                    SurvivalWaveSettings = levelData.SurvivalWaveSettings,
+                    SurvivalWavePopulation = levelData.SurvivalWavePopulation,
+                    LevelSurvivalWave = levelData.LevelSurvivalWave?.Clone() ?? new AlarmBlock()
                 };
 
                 if (levelData.GridState != null)

@@ -558,6 +558,29 @@
                             </StackPanel>
                         </Border>
                         
+                        <!-- Player Starting State -->
+                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
+                            <StackPanel Spacing="10">
+                                <TextBlock Text="Player Starting State" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
+                                <TextBlock Text="{Binding SelectedEditingExpeditionLevelWarning}"
+                                           IsVisible="{Binding IsSelectedEditingExpeditionLevelUnassigned}"
+                                           Foreground="#FFB74D"
+                                           TextWrapping="Wrap"/>
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" IsEnabled="{Binding HasSelectedEditingExpeditionLevel}">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Infection (%):" ToolTip.Tip="Infection level at the start of the expedition, stored internally as a decimal from 0 to 1." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.InfectionLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Health (%):" ToolTip.Tip="Health at the start of the expedition, stored internally as a decimal from 0 to 1." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.HealthLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Primary Ammo:" ToolTip.Tip="Primary weapon ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.StandardAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Special Ammo:" ToolTip.Tip="Special weapon ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.SpecialAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool Ammo:" ToolTip.Tip="Tool ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.ToolAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
                         <!-- Unlocked By Expedition Requirement -->
                         <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12"
                                 IsVisible="{Binding ActiveEditingExpedition.IsUnlockedByExpedition}">

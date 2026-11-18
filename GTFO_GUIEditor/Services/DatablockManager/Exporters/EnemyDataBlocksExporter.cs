@@ -61,6 +61,10 @@ public class EnemyDataBlocksExporter : IDatablockExporter
 
         context.EnemyBlocks.Clear();
         context.EnemyBlocks.AddRange(enemyBlocks);
+        foreach (var enemyBlock in context.EnemyBlocks)
+        {
+            EnsureModelDataVectorMetrics(enemyBlock);
+        }
         ExportContext.WriteDatablockFile(context.ExportRootPath, "GameData_EnemyDataBlock_bin.json",
             context.EnemyBlocks,
             ExportContext.LoadVanillaHeadersArray("EnemyDataBlock.json"));
@@ -140,5 +144,141 @@ public class EnemyDataBlocksExporter : IDatablockExporter
             });
         }
         return list;
+    }
+
+    private static void EnsureModelDataVectorMetrics(JsonObject enemyBlock)
+    {
+        if (enemyBlock["ModelDatas"] is not JsonArray modelDatas) return;
+
+        foreach (var modelData in modelDatas)
+        {
+            AddVectorMetrics(modelData);
+        }
+    }
+
+    private static void AddVectorMetrics(JsonNode? node, string? propertyName = null)
+    {
+        if (node is JsonObject obj)
+        {
+            bool hasX = TryGetDouble(obj["x"], out double x);
+            bool hasY = TryGetDouble(obj["y"], out double y);
+            bool hasZ = TryGetDouble(obj["z"], out double z);
+
+            if (hasX && hasY)
+            {
+                if (!hasZ) z = 0.0;
+                double sqrMagnitude = (x * x) + (y * y) + (z * z);
+
+                obj["magnitude"] ??= System.Math.Sqrt(sqrMagnitude);
+                obj["sqrMagnitude"] ??= sqrMagnitude;
+
+                if (IsScaleProperty(propertyName))
+                {
+                    EnsureNormalized(obj, x, y, z, hasZ, sqrMagnitude);
+                }
+            }
+
+            foreach (var property in obj.ToList())
+            {
+                AddVectorMetrics(property.Value, property.Key);
+            }
+        }
+        else if (node is JsonArray array)
+        {
+            foreach (var child in array)
+            {
+                AddVectorMetrics(child, propertyName);
+            }
+        }
+    }
+
+    private static bool IsScaleProperty(string? propertyName)
+    {
+        return propertyName is "NeckScale" or "HeadScale" or "ChestScale" or
+            "ArmScale" or "LegScale" or "SizeRange";
+    }
+
+    private static void EnsureNormalized(
+        JsonObject obj,
+        double x,
+        double y,
+        double z,
+        bool hasZ,
+        double sqrMagnitude)
+    {
+        if (obj["normalized"] is JsonObject existingNormalized)
+        {
+            ReorderNormalized(obj, existingNormalized);
+            return;
+        }
+
+        double magnitude = System.Math.Sqrt(sqrMagnitude);
+        double normalizedX = magnitude > double.Epsilon ? x / magnitude : 0.0;
+        double normalizedY = magnitude > double.Epsilon ? y / magnitude : 0.0;
+        double normalizedZ = magnitude > double.Epsilon ? z / magnitude : 0.0;
+        double normalizedSqrMagnitude = (normalizedX * normalizedX) +
+            (normalizedY * normalizedY) + (hasZ ? normalizedZ * normalizedZ : 0.0);
+
+        var normalized = new JsonObject
+        {
+            ["x"] = normalizedX,
+            ["y"] = normalizedY
+        };
+
+        if (hasZ)
+        {
+            normalized["z"] = normalizedZ;
+        }
+
+        normalized["magnitude"] = System.Math.Sqrt(normalizedSqrMagnitude);
+        normalized["sqrMagnitude"] = normalizedSqrMagnitude;
+
+        obj["normalized"] = normalized;
+    }
+
+    private static void ReorderNormalized(JsonObject parent, JsonObject existing)
+    {
+        var reordered = new JsonObject();
+        AddClonedProperty(existing, reordered, "x");
+        AddClonedProperty(existing, reordered, "y");
+        AddClonedProperty(existing, reordered, "z");
+        AddClonedProperty(existing, reordered, "magnitude");
+        AddClonedProperty(existing, reordered, "sqrMagnitude");
+
+        foreach (var property in existing)
+        {
+            if (property.Key is "x" or "y" or "z" or "magnitude" or "sqrMagnitude")
+            {
+                continue;
+            }
+
+            reordered[property.Key] = CloneNode(property.Value);
+        }
+
+        parent["normalized"] = reordered;
+    }
+
+    private static void AddClonedProperty(JsonObject source, JsonObject destination, string propertyName)
+    {
+        if (source.TryGetPropertyValue(propertyName, out var value))
+        {
+            destination[propertyName] = CloneNode(value);
+        }
+    }
+
+    private static JsonNode? CloneNode(JsonNode? node)
+    {
+        return node == null ? null : JsonNode.Parse(node.ToJsonString());
+    }
+
+    private static bool TryGetDouble(JsonNode? node, out double value)
+    {
+        if (node is JsonValue jsonValue && jsonValue.TryGetValue<double>(out value))
+        {
+            return true;
+        }
+
+        value = 0.0;
+        return false;
     }
 }

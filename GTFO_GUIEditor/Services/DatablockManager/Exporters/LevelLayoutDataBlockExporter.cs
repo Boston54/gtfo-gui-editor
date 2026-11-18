@@ -166,6 +166,8 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
         {
             if (level == null) continue;
 
+            EnsureLevelSurvivalWaveBlocks(context, level);
+
             var gridState = level.GridState ?? new LevelLayoutGridState();
 
             // Build tree of room connections via BFS starting from root geomorph
@@ -467,7 +469,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                         ["BulkheadDCScanSeed"] = zoneSettings.DcScanSeed,
                         ["SubComplex"] = subComplexStr,
                         ["IgnoreRandomGeomorphRotation"] = false,
-                        ["CoverageMinMax"] = new JsonObject { ["x"] = 1.0, ["y"] = 1.0 },
+                        ["CoverageMinMax"] = CreateCoverageMinMax(1.0, 1.0),
                         ["BuildFromLocalIndex"] = zIdx == 0 ? $"Zone_{sectorZones[0]}" : $"Zone_{sectorZones[zIdx - 1]}",
                         ["StartPosition"] = "From_AverageCenter",
                         ["StartPosition_IndexWeight"] = 0.0,
@@ -680,6 +682,7 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
                     ["internalEnabled"] = level.InternalEnabled,
                     ["persistentID"] = sectorCfg.LayoutId
                 };
+
                 levelLayoutBlocks.Add(layoutObj);
 
                 // Compile LGTunerAdvanced schema for this sector level layout
@@ -921,6 +924,90 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
             "GameData_DimensionDataBlock_bin.json",
             context.DimensionBlocks);
         context.DatablocksExportedCount++;
+    }
+
+    private static JsonObject CreateCoverageMinMax(double x, double y)
+    {
+        double sqrMagnitude = (x * x) + (y * y);
+        double magnitude = System.Math.Sqrt(sqrMagnitude);
+        double normalizedX = magnitude > double.Epsilon ? x / magnitude : 0.0;
+        double normalizedY = magnitude > double.Epsilon ? y / magnitude : 0.0;
+        double normalizedSqrMagnitude = (normalizedX * normalizedX) +
+            (normalizedY * normalizedY);
+
+        return new JsonObject
+        {
+            ["x"] = x,
+            ["y"] = y,
+            ["normalized"] = new JsonObject
+            {
+                ["x"] = normalizedX,
+                ["y"] = normalizedY,
+                ["magnitude"] = System.Math.Sqrt(normalizedSqrMagnitude),
+                ["sqrMagnitude"] = normalizedSqrMagnitude
+            },
+            ["magnitude"] = magnitude,
+            ["sqrMagnitude"] = sqrMagnitude
+        };
+    }
+
+    private static void EnsureLevelSurvivalWaveBlocks(ExportContext context, LevelLayoutBlock level)
+    {
+        AlarmBlock wave = level.LevelSurvivalWave;
+        uint levelId = level.PersistentId > 0
+            ? level.PersistentId
+            : context.LevelLayoutAlloc.Allocate();
+        level.PersistentId = levelId;
+        uint populationId = levelId;
+        uint settingsId = levelId;
+
+        level.SurvivalWavePopulation = populationId;
+        level.SurvivalWaveSettings = settingsId;
+
+        context.SurvivalWavePopulationBlocks.Add(new JsonObject
+        {
+            ["WaveRoleWeakling"] = wave.WaveRoleWeakling,
+            ["WaveRoleStandard"] = wave.WaveRoleStandard,
+            ["WaveRoleSpecial"] = wave.WaveRoleSpecial,
+            ["WaveRoleMiniBoss"] = wave.WaveRoleMiniBoss,
+            ["WaveRoleBoss"] = wave.WaveRoleBoss,
+            ["name"] = $"{level.Name}_ScoutPopulation",
+            ["internalEnabled"] = true,
+            ["persistentID"] = populationId
+        });
+
+        var filter = new JsonArray();
+        if (wave.FilterWeakling) filter.Add("Weakling");
+        if (wave.FilterStandard) filter.Add("Standard");
+        if (wave.FilterSpecial) filter.Add("Special");
+        if (wave.FilterMiniBoss) filter.Add("MiniBoss");
+        if (wave.FilterBoss) filter.Add("Boss");
+
+        context.SurvivalWaveSettingsBlocks.Add(new JsonObject
+        {
+            ["m_pauseBeforeStart"] = wave.PauseBeforeStart,
+            ["m_pauseBetweenGroups"] = wave.PauseBetweenGroups,
+            ["m_wavePauseMin_atCost"] = wave.WavePauseMin_AtCost,
+            ["m_wavePauseMax_atCost"] = wave.WavePauseMax_AtCost,
+            ["m_wavePauseMin"] = wave.WavePauseMin,
+            ["m_wavePauseMax"] = wave.WavePauseMax,
+            ["m_populationFilter"] = filter,
+            ["m_filterType"] = wave.FilterType.ToString(),
+            ["m_chanceToRandomizeSpawnDirectionPerWave"] = wave.ChanceToRandomizeSpawnDirectionPerWave,
+            ["m_chanceToRandomizeSpawnDirectionPerGroup"] = wave.ChanceToRandomizeSpawnDirectionPerGroup,
+            ["m_overrideWaveSpawnType"] = wave.OverrideWaveSpawnType,
+            ["m_survivalWaveSpawnType"] = wave.SurvivalWaveSpawnType.ToString(),
+            ["m_populationPointsTotal"] = wave.PopulationPointsTotal,
+            ["m_populationPointsPerWaveStart"] = wave.PopulationPointsPerWaveStart,
+            ["m_populationPointsPerWaveEnd"] = wave.PopulationPointsPerWaveEnd,
+            ["m_populationPointsMinPerGroup"] = wave.PopulationPointsMinPerGroup,
+            ["m_populationPointsPerGroupStart"] = wave.PopulationPointsPerGroupStart,
+            ["m_populationPointsPerGroupEnd"] = wave.PopulationPointsPerGroupEnd,
+            ["m_populationRampOverTime"] = wave.PopulationRampOverTime,
+            ["name"] = $"{level.Name}_ScoutSettings",
+            ["internalEnabled"] = true,
+            ["persistentID"] = settingsId
+        });
     }
 
     private static void ExportDimensionLayout(

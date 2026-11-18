@@ -160,8 +160,8 @@ public static class EnemySpawningService
                     {
                         if (rd is JsonObject rdObj)
                         {
-                            string role = rdObj["Role"]?.GetValue<string>() ?? string.Empty;
-                            string difficulty = rdObj["Difficulty"]?.GetValue<string>() ?? string.Empty;
+                            string role = DatablockValueReader.GetEnemyRole(rdObj["Role"]);
+                            string difficulty = DatablockValueReader.GetDifficulty(rdObj["Difficulty"]);
                             uint enemyId = rdObj["Enemy"]?.GetValue<uint>() ?? 0;
                             double weight = rdObj["Weight"]?.GetValue<double>() ?? 1.0;
 
@@ -189,10 +189,10 @@ public static class EnemySpawningService
                     bool internalEnabled = groupObj["internalEnabled"]?.GetValue<bool>() ?? true;
                     if (!internalEnabled) continue;
 
-                    string groupType = groupObj["Type"]?.GetValue<string>() ?? string.Empty;
+                    string groupType = DatablockValueReader.GetGroupType(groupObj["Type"]);
                     if (string.Equals(groupType, "Hunter", StringComparison.OrdinalIgnoreCase)) continue;
 
-                    string difficulty = groupObj["Difficulty"]?.GetValue<string>() ?? string.Empty;
+                    string difficulty = DatablockValueReader.GetDifficulty(groupObj["Difficulty"]);
                     double relativeWeight = groupObj["RelativeWeight"]?.GetValue<double>() ?? 1.0;
 
                     string groupName = groupObj["name"]?.GetValue<string>() ?? string.Empty;
@@ -207,8 +207,8 @@ public static class EnemySpawningService
                         {
                             if (rNode is not JsonObject rObj) continue;
 
-                            string role = rObj["Role"]?.GetValue<string>() ?? string.Empty;
-                            string distribution = rObj["Distribution"]?.GetValue<string>() ?? string.Empty;
+                            string role = DatablockValueReader.GetEnemyRole(rObj["Role"]);
+                            string distribution = DatablockValueReader.GetDistribution(rObj["Distribution"]);
 
                             if (!distribution.StartsWith("Rel_", StringComparison.OrdinalIgnoreCase)) continue;
 

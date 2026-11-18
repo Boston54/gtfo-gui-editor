@@ -14,9 +14,9 @@ public class EnemyGroupDataBlockImporter : IDatablockImporter
         {
             var group = new EnemyGroupBlock
             {
-                Type = entry["Type"]?.GetValue<string>() ?? "Hibernate",
-                Difficulty = entry["Difficulty"]?.GetValue<string>() ?? "Easy",
-                SpawnPlacementType = entry["SpawnPlacementType"]?.GetValue<string>() ?? "Default",
+                Type = DatablockValueReader.GetGroupType(entry["Type"]),
+                Difficulty = DatablockValueReader.GetDifficulty(entry["Difficulty"]),
+                SpawnPlacementType = DatablockValueReader.GetSpawnPlacementType(entry["SpawnPlacementType"]),
                 MaxScore = entry["MaxScore"]?.GetValue<double>() ?? 0,
                 ScoreInAreaPaddingMulti = entry["ScoreInAreaPaddingMulti"]?.GetValue<double>() ?? 3,
                 RelativeWeight = entry["RelativeWeight"]?.GetValue<double>() ?? 1,
@@ -29,8 +29,8 @@ public class EnemyGroupDataBlockImporter : IDatablockImporter
                 foreach (var role in roles.OfType<JsonObject>())
                     group.Roles.Add(new EnemyGroupRole
                     {
-                        Role = role["Role"]?.GetValue<string>() ?? string.Empty,
-                        Distribution = role["Distribution"]?.GetValue<string>() ?? "Rel_100"
+                        Role = DatablockValueReader.GetEnemyRole(role["Role"]),
+                        Distribution = DatablockValueReader.GetDistribution(role["Distribution"])
                     });
             }
             groups.Add(group);

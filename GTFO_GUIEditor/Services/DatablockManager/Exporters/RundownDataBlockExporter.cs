@@ -34,11 +34,7 @@ public class RundownDataBlockExporter : IDatablockExporter
                         ? context.SynthesizeText(rundown.StorytellingData.Title, "Rundown Title")
                         : 0,
                     ["TextLog"] = rundown.StorytellingData?.TextLog ?? 0,
-                    ["TextLogPos"] = new JsonObject
-                    {
-                        ["x"] = rundown.StorytellingData?.TextLogPos?.X ?? 0.0,
-                        ["y"] = rundown.StorytellingData?.TextLogPos?.Y ?? 0.0
-                    },
+                    ["TextLogPos"] = SerializeTextLogPosition(rundown.StorytellingData?.TextLogPos),
                     ["Visuals"] = new JsonObject
                     {
                         ["ColorBackground"] = SerializeColor(rundown.StorytellingData?.Visuals?.ColorBackground),
@@ -48,11 +44,8 @@ public class RundownDataBlockExporter : IDatablockExporter
                         ["TierDVisuals"] = SerializeTierVisuals(rundown.StorytellingData?.Visuals?.TierDVisuals),
                         ["TierEVisuals"] = SerializeTierVisuals(rundown.StorytellingData?.Visuals?.TierEVisuals)
                     },
-                    ["SurfaceIconPosition"] = new JsonObject
-                    {
-                        ["x"] = rundown.StorytellingData?.SurfaceIconPosition?.X ?? 0.0,
-                        ["y"] = rundown.StorytellingData?.SurfaceIconPosition?.Y ?? 0.0
-                    },
+                    ["SurfaceIconPosition"] = SerializeVector2WithMetrics(
+                        rundown.StorytellingData?.SurfaceIconPosition),
                     ["SurfaceDescription"] =
                         !string.IsNullOrWhiteSpace(rundown.StorytellingData?.SurfaceDescription)
                             ? context.SynthesizeText(rundown.StorytellingData.SurfaceDescription, "Surface Description")
@@ -85,6 +78,26 @@ public class RundownDataBlockExporter : IDatablockExporter
             vanillaRundownHeaders);
 
         context.DatablocksExportedCount++;
+    }
+
+    private static JsonObject SerializeTextLogPosition(Vector2Data? position)
+    {
+        return SerializeVector2WithMetrics(position);
+    }
+
+    private static JsonObject SerializeVector2WithMetrics(Vector2Data? position)
+    {
+        double x = position?.X ?? 0.0;
+        double y = position?.Y ?? 0.0;
+        double sqrMagnitude = (x * x) + (y * y);
+
+        return new JsonObject
+        {
+            ["x"] = x,
+            ["y"] = y,
+            ["magnitude"] = System.Math.Sqrt(sqrMagnitude),
+            ["sqrMagnitude"] = sqrMagnitude
+        };
     }
 
     private static JsonObject SerializeTierRequirements(TierRequirements? req)
@@ -135,9 +148,9 @@ public class RundownDataBlockExporter : IDatablockExporter
         {
             if (exp == null) continue;
 
-            var matchingLevel = (exp.LevelLayoutData > 0 ? levelList.FirstOrDefault(l => l.PersistentId == exp.LevelLayoutData) : null) ??
-                                (!string.IsNullOrWhiteSpace(exp.Descriptive?.PublicName) ? levelList.FirstOrDefault(l => string.Equals(l.Name, exp.Descriptive.PublicName, StringComparison.OrdinalIgnoreCase)) : null) ??
-                                levelList.FirstOrDefault();
+            var matchingLevel = exp.LevelLayoutData > 0
+                ? levelList.FirstOrDefault(l => l.PersistentId == exp.LevelLayoutData)
+                : null;
 
             uint expLevelLayoutId = 0;
             if (matchingLevel != null)
@@ -272,6 +285,15 @@ public class RundownDataBlockExporter : IDatablockExporter
             {
                 expSettingsObj["ComplexResourceData"] = complexSetId;
                 expSettingsObj["ExpeditionBalance"] = expBalId;
+                expSettingsObj["EnemyPopulation"] = 1;
+
+                if (matchingLevel != null)
+                {
+                    expSettingsObj["FogSettings"] = matchingLevel.FogSettings;
+                    expSettingsObj["LightSettings"] = GetFirstZoneLightSettings(matchingLevel, context);
+                    expSettingsObj["ScoutWaveSettings"] = matchingLevel.SurvivalWaveSettings;
+                    expSettingsObj["ScoutWavePopulation"] = matchingLevel.SurvivalWavePopulation;
+                }
             }
 
             if (expLevelLayoutId > 0)
@@ -284,6 +306,14 @@ public class RundownDataBlockExporter : IDatablockExporter
                 if (!string.IsNullOrWhiteSpace(exp.Descriptive?.PublicName))
                 {
                     descObj["PublicName"] = context.SynthesizeText(exp.Descriptive.PublicName, "Expedition Public Name");
+                }
+                if (!string.IsNullOrWhiteSpace(exp.Descriptive?.ExpeditionDescription))
+                {
+                    descObj["ExpeditionDescription"] = context.SynthesizeText(exp.Descriptive.ExpeditionDescription, "Expedition Description");
+                }
+                if (!string.IsNullOrWhiteSpace(exp.Descriptive?.RoleplayedWardenIntel))
+                {
+                    descObj["RoleplayedWardenIntel"] = context.SynthesizeText(exp.Descriptive.RoleplayedWardenIntel, "Roleplayed Warden Intel");
                 }
             }
 
@@ -386,6 +416,16 @@ public class RundownDataBlockExporter : IDatablockExporter
         }
 
         return array;
+    }
+
+    private static uint GetFirstZoneLightSettings(LevelLayoutBlock level, ExportContext context)
+    {
+        var gridState = level.GridState;
+        int firstZone = gridState.GetZonesForSector(SectorType.Main).OrderBy(z => z).FirstOrDefault();
+        uint zoneLight = gridState.GetOrCreateZoneSettings(SectorType.Main, firstZone).Lighting;
+        return zoneLight > 0
+            ? zoneLight
+            : (context.MainVm.Lighting.Blocks.FirstOrDefault()?.PersistentId ?? 1);
     }
 
     private static JsonObject SerializeLayerData(

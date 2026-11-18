@@ -51,6 +51,7 @@ public class LevelLayoutViewModel : ViewModelBase
     private ObservableCollection<ElevatorTileOption> _availableElevatorTiles = new();
     private ElevatorTileOption? _selectedElevatorTile;
     private string _creationErrorMessage = string.Empty;
+    private AlarmBlock _editingLevelSurvivalWave = new();
 
     // Delete Level modal state
     private bool _isConfirmingDelete;
@@ -4249,6 +4250,12 @@ public class LevelLayoutViewModel : ViewModelBase
         set => SetField(ref _editingExpeditionBalance, value ?? new ExpeditionBalanceSettings());
     }
 
+    public AlarmBlock EditingLevelSurvivalWave
+    {
+        get => _editingLevelSurvivalWave;
+        set => SetField(ref _editingLevelSurvivalWave, value ?? new AlarmBlock());
+    }
+
     public string CreationErrorMessage
     {
         get => _creationErrorMessage;
@@ -4291,6 +4298,8 @@ public class LevelLayoutViewModel : ViewModelBase
 
         CreationErrorMessage = string.Empty;
         EditingExpeditionBalance = new ExpeditionBalanceSettings();
+        EditingLevelSurvivalWave = new AlarmBlock();
+        EditorDefaultsService.ApplyAlarmDefaults(EditingLevelSurvivalWave);
         NewLevelSnatcherBoxes = levelDefaults.SnatcherBoxes;
         IsCreatingLevel = true;
     }
@@ -4317,6 +4326,7 @@ public class LevelLayoutViewModel : ViewModelBase
 
         CreationErrorMessage = string.Empty;
         EditingExpeditionBalance = _selectedLevel.ExpeditionBalance.Clone();
+        EditingLevelSurvivalWave = _selectedLevel.LevelSurvivalWave.Clone();
         NewLevelSnatcherBoxes = _selectedLevel.SnatcherBoxes;
         IsCreatingLevel = true;
     }
@@ -4379,13 +4389,25 @@ public class LevelLayoutViewModel : ViewModelBase
 
             if (_selectedLevel != null)
             {
+                bool levelWaveChanged = JsonSerializer.Serialize(_selectedLevel.LevelSurvivalWave) !=
+                    JsonSerializer.Serialize(EditingLevelSurvivalWave);
                 _selectedLevel.Name = NewLevelName.Trim();
                 _selectedLevel.PersistentId = NewLevelPersistentId;
                 _selectedLevel.ComplexType = SelectedComplexType;
                 _selectedLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
                 _selectedLevel.ElevatorTile = SelectedElevatorTile.Prefab;
                 _selectedLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
+                _selectedLevel.LevelSurvivalWave = EditingLevelSurvivalWave.Clone();
                 _selectedLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
+
+                if (levelWaveChanged)
+                {
+                    DatablockSaveQueue.Instance.MarkDirty(new[]
+                    {
+                        "GameData_SurvivalWavePopulationDataBlock_bin.json",
+                        "GameData_SurvivalWaveSettingsDataBlock_bin.json"
+                    });
+                }
 
                 var reality = _selectedLevel.GetDimension("Reality");
                 if (reality != null)
@@ -4425,6 +4447,7 @@ public class LevelLayoutViewModel : ViewModelBase
         );
         newLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
         newLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
+        newLevel.LevelSurvivalWave = EditingLevelSurvivalWave.Clone();
         newLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
 
         _levels.Add(newLevel);

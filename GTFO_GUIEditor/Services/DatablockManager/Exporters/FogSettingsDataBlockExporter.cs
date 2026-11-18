@@ -55,6 +55,24 @@ public class FogSettingsDataBlockExporter : IDatablockExporter
             }
         }
 
+        var elevatorRainFog = fogBlocks.FirstOrDefault(b =>
+            b.TryGetPropertyValue("persistentID", out var pid) && pid != null &&
+            uint.TryParse(pid.ToString(), out uint id) && id == 96);
+        if (elevatorRainFog == null)
+        {
+            var vanillaFog = ExportContext.LoadVanillaBlocksArray("FogSettingsDataBlock.json");
+            elevatorRainFog = vanillaFog.FirstOrDefault(b =>
+                b.TryGetPropertyValue("persistentID", out var pid) && pid != null &&
+                uint.TryParse(pid.ToString(), out uint id) && id == 96) ??
+                SerializeFogBlocks(new[]
+                {
+                    EditorDefaultsService.CreateDefaultFogBlock(96, "FOG_ELEVATOR_RAIN")
+                })[0];
+            fogBlocks.Add(elevatorRainFog);
+        }
+        elevatorRainFog["persistentID"] = 96;
+        elevatorRainFog["name"] = "FOG_ELEVATOR_RAIN";
+
         context.FogSettingsBlocks.Clear();
         context.FogSettingsBlocks.AddRange(fogBlocks);
 
@@ -88,7 +106,9 @@ public class FogSettingsDataBlockExporter : IDatablockExporter
                 {
                     ["x"] = b.DensityNoiseDirection?.X ?? 0.0,
                     ["y"] = b.DensityNoiseDirection?.Y ?? 0.0,
-                    ["z"] = b.DensityNoiseDirection?.Z ?? 0.0
+                    ["z"] = b.DensityNoiseDirection?.Z ?? 0.0,
+                    ["magnitude"] = GetDensityNoiseDirectionMagnitude(b),
+                    ["sqrMagnitude"] = GetDensityNoiseDirectionSqrMagnitude(b)
                 },
                 ["DensityNoiseSpeed"] = b.DensityNoiseSpeed,
                 ["DensityNoiseScale"] = b.DensityNoiseScale,
@@ -103,5 +123,18 @@ public class FogSettingsDataBlockExporter : IDatablockExporter
         }
 
         return list;
+    }
+
+    private static double GetDensityNoiseDirectionSqrMagnitude(FogSettingsBlock block)
+    {
+        double x = block.DensityNoiseDirection?.X ?? 0.0;
+        double y = block.DensityNoiseDirection?.Y ?? 0.0;
+        double z = block.DensityNoiseDirection?.Z ?? 0.0;
+        return (x * x) + (y * y) + (z * z);
+    }
+
+    private static double GetDensityNoiseDirectionMagnitude(FogSettingsBlock block)
+    {
+        return System.Math.Sqrt(GetDensityNoiseDirectionSqrMagnitude(block));
     }
 }

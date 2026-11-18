@@ -100,6 +100,8 @@ public class RundownViewModel : ViewModelBase
             OnPropertyChanged();
             SyncAllExpeditionsWithLevelLayouts();
             OnPropertyChanged(nameof(SelectedEditingExpeditionLevel));
+            OnPropertyChanged(nameof(HasSelectedEditingExpeditionLevel));
+            OnPropertyChanged(nameof(IsSelectedEditingExpeditionLevelUnassigned));
         }
     }
 
@@ -138,6 +140,17 @@ public class RundownViewModel : ViewModelBase
         var level = _availableLevelLayouts.FirstOrDefault(l => l.PersistentId == expedition.LevelLayoutData);
         if (level != null)
         {
+            expedition.Expedition.EnemyPopulation = 1;
+            expedition.Expedition.FogSettings = level.FogSettings;
+            expedition.Expedition.ScoutWaveSettings = level.SurvivalWaveSettings;
+            expedition.Expedition.ScoutWavePopulation = level.SurvivalWavePopulation;
+
+            int firstZone = level.GridState.GetZonesForSector(SectorType.Main)
+                .OrderBy(z => z)
+                .FirstOrDefault();
+            expedition.Expedition.LightSettings = level.GridState
+                .GetOrCreateZoneSettings(SectorType.Main, firstZone).Lighting;
+
             expedition.SecondaryLayerEnabled = level.HasSecondaryDoor;
             expedition.ThirdLayerEnabled = level.HasOverloadDoor;
             if (level.GridState != null)
@@ -249,8 +262,12 @@ public class RundownViewModel : ViewModelBase
                 IsEditingExpedition = _activeEditingExpedition != null;
                 OnPropertyChanged(nameof(IsEditingExpedition));
                 OnPropertyChanged(nameof(SelectedEditingExpeditionLevel));
+                OnPropertyChanged(nameof(HasSelectedEditingExpeditionLevel));
+                OnPropertyChanged(nameof(IsSelectedEditingExpeditionLevelUnassigned));
+                OnPropertyChanged(nameof(SelectedEditingExpeditionLevelWarning));
                 OnPropertyChanged(nameof(IsUnlockedByExpeditionSelected));
                 RefreshAvailableOtherExpeditions();
+                SyncExpeditionSectorsWithLevel(_activeEditingExpedition);
             }
         }
     }
@@ -268,6 +285,9 @@ public class RundownViewModel : ViewModelBase
         else if (e.PropertyName == nameof(ExpeditionBlock.LevelLayoutData))
         {
             OnPropertyChanged(nameof(SelectedEditingExpeditionLevel));
+            OnPropertyChanged(nameof(HasSelectedEditingExpeditionLevel));
+            OnPropertyChanged(nameof(IsSelectedEditingExpeditionLevelUnassigned));
+            OnPropertyChanged(nameof(SelectedEditingExpeditionLevelWarning));
         }
     }
 
@@ -281,9 +301,21 @@ public class RundownViewModel : ViewModelBase
                 ActiveEditingExpedition.LevelLayoutData = value.PersistentId;
                 SyncExpeditionSectorsWithLevel(ActiveEditingExpedition);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HasSelectedEditingExpeditionLevel));
+                OnPropertyChanged(nameof(IsSelectedEditingExpeditionLevelUnassigned));
+                OnPropertyChanged(nameof(SelectedEditingExpeditionLevelWarning));
             }
         }
     }
+
+    public bool HasSelectedEditingExpeditionLevel => SelectedEditingExpeditionLevel != null;
+
+    public bool IsSelectedEditingExpeditionLevelUnassigned => !HasSelectedEditingExpeditionLevel;
+
+    public string SelectedEditingExpeditionLevelWarning =>
+        HasSelectedEditingExpeditionLevel
+            ? string.Empty
+            : "Assign a level layout before editing player starting state.";
 
     public ObservableCollection<ExpeditionLookupItem> AvailableOtherExpeditions
     {

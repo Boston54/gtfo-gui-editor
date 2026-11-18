@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
@@ -24,6 +25,9 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private SectorSettings _overloadSector = new() { ArtifactAmountMultiplier = 1.0, ZoneAliasStart = 200 };
     private ExpeditionBalanceSettings _expeditionBalance = new();
     private bool _snatcherBoxes;
+    private uint _survivalWaveSettings;
+    private uint _survivalWavePopulation;
+    private AlarmBlock _levelSurvivalWave = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -148,6 +152,27 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _snatcherBoxes;
         set => SetField(ref _snatcherBoxes, value);
+    }
+
+    [JsonPropertyName("SurvivalWaveSettings")]
+    public uint SurvivalWaveSettings
+    {
+        get => _survivalWaveSettings;
+        set => SetField(ref _survivalWaveSettings, value);
+    }
+
+    [JsonPropertyName("SurvivalWavePopulation")]
+    public uint SurvivalWavePopulation
+    {
+        get => _survivalWavePopulation;
+        set => SetField(ref _survivalWavePopulation, value);
+    }
+
+    [JsonPropertyName("LevelSurvivalWave")]
+    public AlarmBlock LevelSurvivalWave
+    {
+        get => _levelSurvivalWave;
+        set => SetField(ref _levelSurvivalWave, value ?? new AlarmBlock());
     }
 
     public SectorSettings GetSectorSettings(SectorType sectorType)
@@ -328,7 +353,10 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             SecondarySector = SecondarySector.Clone(),
             OverloadSector = OverloadSector.Clone(),
             ExpeditionBalance = ExpeditionBalance.Clone(),
-            SnatcherBoxes = SnatcherBoxes
+            SnatcherBoxes = SnatcherBoxes,
+            SurvivalWaveSettings = SurvivalWaveSettings,
+            SurvivalWavePopulation = SurvivalWavePopulation,
+            LevelSurvivalWave = LevelSurvivalWave.Clone()
         };
         if (_gridState != null)
         {

@@ -499,8 +499,11 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         var level = new LevelLayoutBlock
         {
             Name = levelName,
-            PersistentId = exp.LevelLayoutData
+            PersistentId = exp.LevelLayoutData,
+            FogSettings = exp.Expedition.FogSettings
         };
+
+        LoadLevelSpecificSettings(level, context);
 
         // 1. Complex Resource Set & Elevator Tile
         uint crsId = exp.Expedition.ComplexResourceData > 0 ? exp.Expedition.ComplexResourceData : 1;
@@ -705,6 +708,92 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
         }
 
         return level;
+    }
+
+    private static void LoadLevelSpecificSettings(
+        LevelLayoutBlock level,
+        ImportContext context)
+    {
+        uint levelId = level.PersistentId;
+        uint settingsId = levelId;
+        uint populationId = levelId;
+
+        if (context.SurvivalWaveSettingsBlocks.TryGetValue(levelId, out var settingsByLevelId))
+        {
+            settingsId = levelId;
+            ApplyWaveSettings(level.LevelSurvivalWave, settingsByLevelId);
+        }
+        else if (context.SurvivalWaveSettingsBlocks.TryGetValue(settingsId, out var settings))
+        {
+            ApplyWaveSettings(level.LevelSurvivalWave, settings);
+        }
+
+        if (context.SurvivalWavePopulationBlocks.TryGetValue(levelId, out var populationByLevelId))
+        {
+            populationId = levelId;
+            ApplyWavePopulation(level.LevelSurvivalWave, populationByLevelId);
+        }
+        else if (context.SurvivalWavePopulationBlocks.TryGetValue(populationId, out var population))
+        {
+            ApplyWavePopulation(level.LevelSurvivalWave, population);
+        }
+
+        level.SurvivalWaveSettings = settingsId;
+        level.SurvivalWavePopulation = populationId;
+    }
+
+    private static void ApplyWavePopulation(AlarmBlock target, JsonObject source)
+    {
+        target.WaveRoleWeakling = source["WaveRoleWeakling"]?.GetValue<uint>() ?? target.WaveRoleWeakling;
+        target.WaveRoleStandard = source["WaveRoleStandard"]?.GetValue<uint>() ?? target.WaveRoleStandard;
+        target.WaveRoleSpecial = source["WaveRoleSpecial"]?.GetValue<uint>() ?? target.WaveRoleSpecial;
+        target.WaveRoleMiniBoss = source["WaveRoleMiniBoss"]?.GetValue<uint>() ?? target.WaveRoleMiniBoss;
+        target.WaveRoleBoss = source["WaveRoleBoss"]?.GetValue<uint>() ?? target.WaveRoleBoss;
+    }
+
+    private static void ApplyWaveSettings(AlarmBlock target, JsonObject source)
+    {
+        target.PauseBeforeStart = source["m_pauseBeforeStart"]?.GetValue<double>() ?? target.PauseBeforeStart;
+        target.PauseBetweenGroups = source["m_pauseBetweenGroups"]?.GetValue<double>() ?? target.PauseBetweenGroups;
+        target.WavePauseMin_AtCost = source["m_wavePauseMin_atCost"]?.GetValue<double>() ?? target.WavePauseMin_AtCost;
+        target.WavePauseMax_AtCost = source["m_wavePauseMax_atCost"]?.GetValue<double>() ?? target.WavePauseMax_AtCost;
+        target.WavePauseMin = source["m_wavePauseMin"]?.GetValue<double>() ?? target.WavePauseMin;
+        target.WavePauseMax = source["m_wavePauseMax"]?.GetValue<double>() ?? target.WavePauseMax;
+        target.ChanceToRandomizeSpawnDirectionPerWave = source["m_chanceToRandomizeSpawnDirectionPerWave"]?.GetValue<double>() ?? target.ChanceToRandomizeSpawnDirectionPerWave;
+        target.ChanceToRandomizeSpawnDirectionPerGroup = source["m_chanceToRandomizeSpawnDirectionPerGroup"]?.GetValue<double>() ?? target.ChanceToRandomizeSpawnDirectionPerGroup;
+        target.OverrideWaveSpawnType = source["m_overrideWaveSpawnType"]?.GetValue<bool>() ?? target.OverrideWaveSpawnType;
+        target.PopulationPointsTotal = source["m_populationPointsTotal"]?.GetValue<double>() ?? target.PopulationPointsTotal;
+        target.PopulationPointsPerWaveStart = source["m_populationPointsPerWaveStart"]?.GetValue<double>() ?? target.PopulationPointsPerWaveStart;
+        target.PopulationPointsPerWaveEnd = source["m_populationPointsPerWaveEnd"]?.GetValue<double>() ?? target.PopulationPointsPerWaveEnd;
+        target.PopulationPointsMinPerGroup = source["m_populationPointsMinPerGroup"]?.GetValue<double>() ?? target.PopulationPointsMinPerGroup;
+        target.PopulationPointsPerGroupStart = source["m_populationPointsPerGroupStart"]?.GetValue<double>() ?? target.PopulationPointsPerGroupStart;
+        target.PopulationPointsPerGroupEnd = source["m_populationPointsPerGroupEnd"]?.GetValue<double>() ?? target.PopulationPointsPerGroupEnd;
+        target.PopulationRampOverTime = source["m_populationRampOverTime"]?.GetValue<double>() ?? target.PopulationRampOverTime;
+
+        if (source["m_populationFilter"] is JsonArray filter)
+        {
+            target.PopulationFilter = filter.Select(n => n?.ToString() ?? string.Empty).ToList();
+        }
+
+        string filterType = source["m_filterType"]?.ToString() ?? string.Empty;
+        if (int.TryParse(filterType, out int filterValue))
+        {
+            target.FilterType = (WaveFilterType)filterValue;
+        }
+        else if (Enum.TryParse<WaveFilterType>(filterType, true, out var parsedFilter))
+        {
+            target.FilterType = parsedFilter;
+        }
+
+        string spawnType = source["m_survivalWaveSpawnType"]?.ToString() ?? string.Empty;
+        if (int.TryParse(spawnType, out int spawnValue))
+        {
+            target.SurvivalWaveSpawnType = (SurvivalWaveSpawnType)spawnValue;
+        }
+        else if (Enum.TryParse<SurvivalWaveSpawnType>(spawnType, true, out var parsedSpawn))
+        {
+            target.SurvivalWaveSpawnType = parsedSpawn;
+        }
     }
 
     private List<DimensionLayoutBlock> GetDimensionDatasFromExpedition(ExpeditionBlock exp, ImportContext context)

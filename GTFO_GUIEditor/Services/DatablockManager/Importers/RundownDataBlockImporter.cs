@@ -181,6 +181,14 @@ public class RundownDataBlockImporter : IDatablockImporter
                 }
 
                 descData.IsExtraExpedition = descObj["IsExtraExpedition"]?.GetValue<bool>() ?? false;
+                descData.SkipExpNumberInName = descObj["SkipExpNumberInName"]?.GetValue<bool>() ?? false;
+                descData.UseCustomMatchmakingTier = descObj["UseCustomMatchmakingTier"]?.GetValue<bool>() ?? false;
+                descData.CustomMatchmakingTier = descObj["CustomMatchmakingTier"]?.ToString() ?? "TierA";
+                descData.ProgressionVisualStyle = descObj["ProgressionVisualStyle"]?.ToString() ?? "Normal";
+                descData.ExpeditionDepth = descObj["ExpeditionDepth"]?.GetValue<int>() ?? 0;
+                descData.EstimatedDuration = descObj["EstimatedDuration"]?.GetValue<int>() ?? 900;
+                descData.ExpeditionDescription = ResolveTextValue(descObj["ExpeditionDescription"], context);
+                descData.RoleplayedWardenIntel = ResolveTextValue(descObj["RoleplayedWardenIntel"], context);
             }
 
             var expData = new ExpeditionSettings();
@@ -245,6 +253,17 @@ public class RundownDataBlockImporter : IDatablockImporter
                 Accessibility = accessibility
             };
 
+            if (expObj["SpecialOverrideData"] is JsonObject specialObj)
+            {
+                expBlock.SpecialOverrideData.InfectionLevelAtExpeditionStart = specialObj["InfectionLevelAtExpeditionStart"]?.GetValue<double>() ?? 0.0;
+                expBlock.SpecialOverrideData.HealthLevelAtExpeditionStart = specialObj["HealthLevelAtExpeditionStart"]?.GetValue<double>() ?? 1.0;
+                expBlock.SpecialOverrideData.StandardAmmoAtExpeditionStart = specialObj["StandardAmmoAtExpeditionStart"]?.GetValue<double>() ?? 1.0;
+                expBlock.SpecialOverrideData.SpecialAmmoAtExpeditionStart = specialObj["SpecialAmmoAtExpeditionStart"]?.GetValue<double>() ?? 1.0;
+                expBlock.SpecialOverrideData.ToolAmmoAtExpeditionStart = specialObj["ToolAmmoAtExpeditionStart"]?.GetValue<double>() ?? 1.0;
+                expBlock.SpecialOverrideData.WeakResourceContainerWithPackChanceForLocked = specialObj["WeakResourceContainerWithPackChanceForLocked"]?.GetValue<double>() ?? -1.0;
+                expBlock.SpecialOverrideData.ShowCreditsAfterSuccess = specialObj["ShowCreditsAfterSuccess"]?.GetValue<bool>() ?? false;
+            }
+
             expBlock.MainLayerData.ObjectiveData.DataBlockId = mainWardenObj;
 
             if (expObj["MainLayerData"] is JsonObject mainLayerObj)
@@ -307,5 +326,17 @@ public class RundownDataBlockImporter : IDatablockImporter
     {
         if (node == null) return null;
         return JsonSerializer.Deserialize<JsonElement>(node.ToJsonString());
+    }
+
+    private static string ResolveTextValue(JsonNode? node, ImportContext context)
+    {
+        if (node == null) return string.Empty;
+        if (node is JsonValue value && value.TryGetValue<uint>(out uint textId) && textId > 0)
+        {
+            string resolved = context.ResolveText(textId);
+            if (!string.IsNullOrEmpty(resolved)) return resolved;
+        }
+
+        return node.ToString();
     }
 }

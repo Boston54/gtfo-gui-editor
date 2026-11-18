@@ -17,8 +17,8 @@ public class EnemyPopulationDataBlockImporter : IDatablockImporter
             {
                 population.RoleDatas.Add(new EnemyRoleData
                 {
-                    Role = node["Role"]?.GetValue<string>() ?? string.Empty,
-                    Difficulty = node["Difficulty"]?.GetValue<string>() ?? "Easy",
+                    Role = DatablockValueReader.GetEnemyRole(node["Role"]),
+                    Difficulty = DatablockValueReader.GetDifficulty(node["Difficulty"]),
                     Enemy = node["Enemy"]?.GetValue<uint>() ?? 0,
                     Cost = node["Cost"]?.GetValue<double>() ?? 1.0,
                     Weight = node["Weight"]?.GetValue<double>() ?? 1.0

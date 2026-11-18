@@ -27,7 +27,7 @@ public class EnemyDataBlockImporter : IDatablockImporter
             {
                 PersistentId = persistentId,
                 Name = entry["name"]?.GetValue<string>() ?? string.Empty,
-                EnemyType = entry["EnemyType"]?.GetValue<string>() ?? string.Empty,
+                EnemyType = DatablockValueReader.GetEnemyType(entry["EnemyType"]),
                 InternalEnabled = entry["internalEnabled"]?.GetValue<bool>() ?? true
             };
             var existing = enemies.FirstOrDefault(e => e.PersistentId == enemy.PersistentId);

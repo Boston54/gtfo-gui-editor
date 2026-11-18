@@ -84,6 +84,13 @@ public class LevelLayoutBlockData
 
     [JsonPropertyName("snatcherBoxes")] public bool SnatcherBoxes { get; set; }
 
+    [JsonPropertyName("survivalWaveSettings")] public uint SurvivalWaveSettings { get; set; }
+
+    [JsonPropertyName("survivalWavePopulation")] public uint SurvivalWavePopulation { get; set; }
+
+    [JsonPropertyName("levelSurvivalWave")] public AlarmBlock LevelSurvivalWave { get; set; } = new();
+
+
     [JsonPropertyName("gridState")] public LevelLayoutGridStateData GridState { get; set; } = new();
 }
 

@@ -221,7 +221,7 @@ public class ExportContext
     public static List<JsonObject> LoadVanillaBlocksArray(string fileName)
     {
         var list = new List<JsonObject>();
-        string dir = AlarmService.GetDatablocksDirectory();
+        string dir = GetOriginalDatablocksDirectory();
         string fullPath = Path.Combine(dir, fileName);
         if (!File.Exists(fullPath)) return list;
 
@@ -248,7 +248,7 @@ public class ExportContext
 
     public static JsonArray? LoadVanillaHeadersArray(string fileName)
     {
-        string dir = AlarmService.GetDatablocksDirectory();
+        string dir = GetOriginalDatablocksDirectory();
         string fullPath = Path.Combine(dir, fileName);
         if (!File.Exists(fullPath)) return null;
 
@@ -268,6 +268,32 @@ public class ExportContext
         }
 
         return null;
+    }
+
+    private static string GetOriginalDatablocksDirectory()
+    {
+        string outputDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "OriginalDatablocks");
+        if (Directory.Exists(outputDir)) return outputDir;
+
+        string cwdDir = Path.Combine(Directory.GetCurrentDirectory(), "Data", "Vanilla", "OriginalDatablocks");
+        if (Directory.Exists(cwdDir)) return cwdDir;
+
+        string cwdProjectDir = Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "OriginalDatablocks");
+        if (Directory.Exists(cwdProjectDir)) return cwdProjectDir;
+
+        var dir = new DirectoryInfo(AppDomain.CurrentDomain.BaseDirectory);
+        while (dir != null)
+        {
+            string candidateProject = Path.Combine(dir.FullName, "GTFO_GUIEditor", "Data", "Vanilla", "OriginalDatablocks");
+            if (Directory.Exists(candidateProject)) return candidateProject;
+
+            string candidateVanilla = Path.Combine(dir.FullName, "Data", "Vanilla", "OriginalDatablocks");
+            if (Directory.Exists(candidateVanilla)) return candidateVanilla;
+
+            dir = dir.Parent;
+        }
+
+        return AlarmService.GetDatablocksDirectory();
     }
 
     public static void RegisterExistingIds(IEnumerable<JsonObject> blocks, PersistentIdAllocator allocator)
