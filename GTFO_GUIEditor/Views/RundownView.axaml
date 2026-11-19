@@ -558,29 +558,6 @@
                             </StackPanel>
                         </Border>
                         
-                        <!-- Player Starting State -->
-                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="Player Starting State" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
-                                <TextBlock Text="{Binding SelectedEditingExpeditionLevelWarning}"
-                                           IsVisible="{Binding IsSelectedEditingExpeditionLevelUnassigned}"
-                                           Foreground="#FFB74D"
-                                           TextWrapping="Wrap"/>
-                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" IsEnabled="{Binding HasSelectedEditingExpeditionLevel}">
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Infection (%):" ToolTip.Tip="Infection level at the start of the expedition, stored internally as a decimal from 0 to 1." VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.InfectionLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
-                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Health (%):" ToolTip.Tip="Health at the start of the expedition, stored internally as a decimal from 0 to 1." VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.HealthLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Primary Ammo:" ToolTip.Tip="Primary weapon ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.StandardAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
-                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Special Ammo:" ToolTip.Tip="Special weapon ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,8"/>
-                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.SpecialAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
-                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool Ammo:" ToolTip.Tip="Tool ammo multiplier at the start of the expedition, such as 1 or 1.3." VerticalAlignment="Center" Margin="0,0,8,0"/>
-                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding ActiveEditingExpedition.SpecialOverrideData.ToolAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,0"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
-
                         <!-- Unlocked By Expedition Requirement -->
                         <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12"
                                 IsVisible="{Binding ActiveEditingExpedition.IsUnlockedByExpedition}">
@@ -628,52 +605,6 @@
                                     <CheckBox Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" Content="Hide Roleplay Data On Locked" ToolTip.Tip="If true, the roleplay data (the 'interrupted comms' text) is hidden until the level is unlocked."
                                               IsChecked="{Binding ActiveEditingExpedition.HideRolePlayDataOnLocked, Mode=TwoWay}" Margin="0,0,0,0"/>
                                 </Grid>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Description & Warden Intel -->
-                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="Description &amp; Warden Intel" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
-
-                                <TextBlock Text="Expedition Description:" ToolTip.Tip="Description of the expedition. This is what is shown to the user in the rundown menu." Margin="0,4,0,2" Foreground="#CCCCCC"/>
-                                <TextBox Text="{Binding ActiveEditingExpedition.Descriptive.ExpeditionDescription, Mode=TwoWay}"
-                                         AcceptsReturn="True"
-                                         TextWrapping="Wrap"
-                                         Height="65"
-                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                         FontFamily="Consolas, Menlo, Monaco, monospace"
-                                         FontSize="12"/>
-
-                                <TextBlock Text="Roleplayed Warden Intel:" ToolTip.Tip="Roleplayed warden intel of the description. Also known as the 'interrupted comms'.&#x0a;If you want colored text, use `&lt;color=red>text&lt;/color>`, and for size, `&lt;size=200%>text&lt;/size>`" Margin="0,4,0,2" Foreground="#CCCCCC"/>
-                                <TextBox Text="{Binding ActiveEditingExpedition.Descriptive.RoleplayedWardenIntel, Mode=TwoWay}"
-                                         AcceptsReturn="True"
-                                         TextWrapping="Wrap"
-                                         Height="65"
-                                         ScrollViewer.VerticalScrollBarVisibility="Auto"
-                                         FontFamily="Consolas, Menlo, Monaco, monospace"
-                                         FontSize="12"/>
-                            </StackPanel>
-                        </Border>
-
-                        <!-- Sectors -->
-                        <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="12">
-                            <StackPanel Spacing="10">
-                                <TextBlock Text="Sectors" FontWeight="Bold" FontSize="14" Foreground="#E0E0E0"/>
-                                <TextBlock Text="Main sector is always enabled. Secondary and Overload sectors are automatically enabled when a secondary or overload door is present in the level layout." FontSize="11" Foreground="#888888" TextWrapping="Wrap"/>
-
-                                <StackPanel Orientation="Horizontal" Spacing="24" Margin="0,4,0,0">
-                                    <CheckBox Content="Secondary Sector" ToolTip.Tip="Enabled when a Secondary Door is present in the level layout."
-                                              IsChecked="{Binding ActiveEditingExpedition.SecondaryLayerEnabled, Mode=OneWay}"
-                                              IsEnabled="False"
-                                              FontWeight="SemiBold"
-                                              Foreground="#FFA200"/>
-                                    <CheckBox Content="Overload Sector" ToolTip.Tip="Enabled when an Overload Door is present in the level layout."
-                                              IsChecked="{Binding ActiveEditingExpedition.ThirdLayerEnabled, Mode=OneWay}"
-                                              IsEnabled="False"
-                                              FontWeight="SemiBold"
-                                              Foreground="#00F2FF"/>
-                                </StackPanel>
                             </StackPanel>
                         </Border>
 

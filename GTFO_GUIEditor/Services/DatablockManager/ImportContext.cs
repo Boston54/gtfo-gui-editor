@@ -39,6 +39,7 @@ public class ImportContext
     public Dictionary<uint, JsonObject> AtmosphereBlocks { get; } = new();
     public Dictionary<uint, JsonObject> RundownBlocks { get; } = new();
     public Dictionary<uint, JsonObject> GameSetupBlocks { get; } = new();
+    public Dictionary<uint, LevelRefData> LevelRefs { get; } = new();
 
     public int DatablocksImportedCount { get; set; }
     public int LevelsImportedCount { get; set; }
@@ -55,6 +56,7 @@ public class ImportContext
         SchemasDirectory = Path.Combine(importRootPath, ".schemas");
 
         LoadAllDatablocks();
+        foreach (var pair in LevelRefsService.Load(importRootPath)) LevelRefs[pair.Key] = pair.Value;
     }
 
     private void LoadAllDatablocks()

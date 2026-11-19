@@ -17,7 +17,9 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
         {
             if (level == null) continue;
 
-            uint mainObjId = context.WardenObjectiveAlloc.Allocate();
+            uint mainObjId = level.PersistentId > 0 ? level.PersistentId : context.WardenObjectiveAlloc.Allocate();
+            context.WardenObjectiveAlloc.RegisterExisting(mainObjId);
+            level.LevelRef.MainObjectiveId = mainObjId;
             var mainChainedIds = new List<uint> { mainObjId };
 
             var roomEnemyEvents = new List<WardenEvent>();
@@ -69,7 +71,11 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             uint secObjId = 0;
             if (secExists && level.SecondarySector?.PrimaryObjective != null)
             {
-                secObjId = context.WardenObjectiveAlloc.Allocate();
+                secObjId = level.LevelRef.SecondaryObjectiveId > 0
+                    ? level.LevelRef.SecondaryObjectiveId
+                    : context.WardenObjectiveAlloc.Allocate();
+                context.WardenObjectiveAlloc.RegisterExisting(secObjId);
+                level.LevelRef.SecondaryObjectiveId = secObjId;
                 var secObj = CompileWardenObjective(
                     level.SecondarySector.PrimaryObjective,
                     secObjId,
@@ -97,6 +103,10 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                     }
                 }
             }
+            else
+            {
+                level.LevelRef.SecondaryObjectiveId = 0;
+            }
 
             var thirdZones = level.GridState?.GetZonesForSector(SectorType.Overload) ?? new List<int>();
             bool thirdExists = thirdZones.Count > 0 || level.HasOverloadDoor || (level.GridState?.HasOverloadDoor == true) ||
@@ -105,7 +115,11 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             uint thirdObjId = 0;
             if (thirdExists && level.OverloadSector?.PrimaryObjective != null)
             {
-                thirdObjId = context.WardenObjectiveAlloc.Allocate();
+                thirdObjId = level.LevelRef.OverloadObjectiveId > 0
+                    ? level.LevelRef.OverloadObjectiveId
+                    : context.WardenObjectiveAlloc.Allocate();
+                context.WardenObjectiveAlloc.RegisterExisting(thirdObjId);
+                level.LevelRef.OverloadObjectiveId = thirdObjId;
                 var thirdObj = CompileWardenObjective(
                     level.OverloadSector.PrimaryObjective,
                     thirdObjId,
@@ -132,6 +146,10 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
                         wardenObjectiveBlocks.Add(chainedObj);
                     }
                 }
+            }
+            else
+            {
+                level.LevelRef.OverloadObjectiveId = 0;
             }
 
             context.ObjectiveIds[level] = (mainObjId, secObjId, thirdObjId, mainChainedIds);
@@ -235,18 +253,18 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             ["FindLocationInfo"] = textSynth(sector.FindLocationInfo, "Find Location Info"),
             ["FindLocationInfoHelp"] = textSynth(sector.FindLocationInfoHelp, "Find Location Info Help"),
             ["GoToZone"] = textSynth(sector.GoToZone, "Go To Zone"),
-            ["GoToZoneHelp"] = 0,
+            ["GoToZoneHelp"] = textSynth(sector.GoToZoneHelp, "Go To Zone Help"),
             ["InZoneFindItem"] = textSynth(sector.InZoneFindItem, "In Zone Find Item"),
-            ["InZoneFindItemHelp"] = 0,
+            ["InZoneFindItemHelp"] = textSynth(sector.InZoneFindItemHelp, "In Zone Find Item Help"),
             ["SolveItem"] = textSynth(sector.SolveItem, "Solve Item"),
-            ["SolveItemHelp"] = 0,
-            ["GoToWinCondition_Elevator"] = textSynth("Return to the elevator", "Win Condition Elevator"),
-            ["GoToWinConditionHelp_Elevator"] = 0,
-            ["GoToWinCondition_CustomGeo"] = textSynth("Reach the extraction zone", "Win Condition Geo"),
-            ["GoToWinConditionHelp_CustomGeo"] = 0,
-            ["GoToWinCondition_ToMainLayer"] = 0,
-            ["GoToWinConditionHelp_ToMainLayer"] = 0,
-            ["ShowHelpDelay"] = 180.0,
+            ["SolveItemHelp"] = textSynth(sector.SolveItemHelp, "Solve Item Help"),
+            ["GoToWinCondition_Elevator"] = textSynth(string.IsNullOrWhiteSpace(sector.GoToWinCondition_Elevator) ? "Return to the elevator" : sector.GoToWinCondition_Elevator, "Win Condition Elevator"),
+            ["GoToWinConditionHelp_Elevator"] = textSynth(sector.GoToWinConditionHelp_Elevator, "Win Condition Elevator Help"),
+            ["GoToWinCondition_CustomGeo"] = textSynth(string.IsNullOrWhiteSpace(sector.GoToWinCondition_CustomGeo) ? "Reach the extraction zone" : sector.GoToWinCondition_CustomGeo, "Win Condition Geo"),
+            ["GoToWinConditionHelp_CustomGeo"] = textSynth(sector.GoToWinConditionHelp_CustomGeo, "Win Condition Geo Help"),
+            ["GoToWinCondition_ToMainLayer"] = textSynth(sector.GoToWinCondition_ToMainLayer, "Win Condition Main Layer"),
+            ["GoToWinConditionHelp_ToMainLayer"] = textSynth(sector.GoToWinConditionHelp_ToMainLayer, "Win Condition Main Layer Help"),
+            ["ShowHelpDelay"] = sector.ShowHelpDelay,
             ["WavesOnElevatorLand"] = SerializeGenericWaveList(sector.WavesOnElevatorLand, $"Obj_{persistentId}_ElevatorLand", waveSettingsAlloc, wavePopAlloc, waveSettingsBlocks, wavePopBlocks),
             ["EventsOnElevatorLand"] = SerializeWardenEvents(allElevatorLandEvents, textSynth),
             ["WaveOnElevatorWardenIntel"] = 0,
@@ -267,12 +285,12 @@ public class WardenObjectiveDataBlockExporter : IDatablockExporter
             ["FogTransitionDurationOnGotoWin"] = sector.FogTransitionDataOnGotoWinDuration,
             ["ChainedPuzzleToActive"] = sector.ChainedPuzzleToActive,
             ["ChainedPuzzleMidObjective"] = sector.ChainedPuzzleMidObjective,
-            ["ChainedPuzzleAtExit"] = 11,
-            ["ChainedPuzzleAtExitScanSpeedMultiplier"] = 1.0,
+            ["ChainedPuzzleAtExit"] = sector.ChainedPuzzleAtExit,
+            ["ChainedPuzzleAtExitScanSpeedMultiplier"] = sector.ChainedPuzzleAtExitScanSpeedMultiplier,
             ["Gather_RequiredCount"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems
-                ? Math.Max(1, sector.GatherItemPlacements.Count)
+                ? sector.GatherRequiredCount
                 : -1,
-            ["Gather_ItemId"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems ? (int)sector.GatherItem : 0,
+            ["Gather_ItemId"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems ? sector.GatherItemId : 0,
             ["Gather_SpawnCount"] = sector.ObjectiveType == ObjectiveType.GatherSmallItems
                 ? Math.Max(1, sector.GatherItemPlacements.Count)
                 : 0,

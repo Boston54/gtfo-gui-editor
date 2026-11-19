@@ -52,6 +52,14 @@ public class LevelLayoutViewModel : ViewModelBase
     private ElevatorTileOption? _selectedElevatorTile;
     private string _creationErrorMessage = string.Empty;
     private AlarmBlock _editingLevelSurvivalWave = new();
+    private LevelRefData _editingLevelRef = new();
+    private int _objectiveTabIndex;
+    private int _flavorTextTabIndex;
+    private readonly WardenObjective[] _editingLevelObjectives =
+        { new(), new(), new() };
+    private readonly LevelObjectiveRefData[] _editingLevelObjectiveRefs =
+        { new(), new(), new() };
+    private ZonePlacementData? _selectedLevelObjectiveZonePlacement;
 
     // Delete Level modal state
     private bool _isConfirmingDelete;
@@ -176,6 +184,8 @@ public class LevelLayoutViewModel : ViewModelBase
     public ICommand RemoveDoorCandidateZoneCommand { get; }
     public ICommand AddRoomEnemyCommand { get; }
     public ICommand RemoveRoomEnemyCommand { get; }
+    public ICommand AddLevelObjectiveZonePlacementCommand { get; }
+    public ICommand RemoveLevelObjectiveZonePlacementCommand { get; }
     public event Action<object>? ProjectModelCreated;
 
     // Edit Door modal state
@@ -528,6 +538,8 @@ public class LevelLayoutViewModel : ViewModelBase
         RemoveDoorCandidateZoneCommand = new RelayCommand<CandidateZonePlacement>(RemoveDoorCandidateZone);
         AddRoomEnemyCommand = new RelayCommand(AddRoomEnemy);
         RemoveRoomEnemyCommand = new RelayCommand<RoomEnemySpawningItem>(RemoveRoomEnemy);
+        AddLevelObjectiveZonePlacementCommand = new RelayCommand(AddLevelObjectiveZonePlacement);
+        RemoveLevelObjectiveZonePlacementCommand = new RelayCommand<ZonePlacementData>(RemoveLevelObjectiveZonePlacement);
 
         ModManager.Instance.RegisterFeature(
             ModManager.AdvancedWardenObjectiveModId,
@@ -4198,7 +4210,19 @@ public class LevelLayoutViewModel : ViewModelBase
     public bool IsCreatingLevel
     {
         get => _isCreatingLevel;
-        set => SetField(ref _isCreatingLevel, value);
+        set
+        {
+            if (SetField(ref _isCreatingLevel, value))
+            {
+                OnPropertyChanged(nameof(EditingLevelObjective));
+                OnPropertyChanged(nameof(EditingLevelObjectiveRef));
+                OnPropertyChanged(nameof(SelectedLevelWinCondition));
+                OnPropertyChanged(nameof(EditingGatherZonePlacements));
+                OnPropertyChanged(nameof(EditingGatherZonePlacement));
+                OnPropertyChanged(nameof(SelectedSectorObjectiveType));
+                NotifyObjectiveTypeFlagsChanged();
+            }
+        }
     }
 
     public bool IsEditingExistingLevel
@@ -4256,6 +4280,113 @@ public class LevelLayoutViewModel : ViewModelBase
         set => SetField(ref _editingLevelSurvivalWave, value ?? new AlarmBlock());
     }
 
+    public LevelRefData EditingLevelRef
+    {
+        get => _editingLevelRef;
+        set => SetField(ref _editingLevelRef, value ?? new LevelRefData());
+    }
+
+    public int ObjectiveTabIndex
+    {
+        get => _objectiveTabIndex;
+        set
+        {
+            int normalized = Math.Clamp(value, 0, 2);
+            if (SetField(ref _objectiveTabIndex, normalized))
+            {
+                OnPropertyChanged(nameof(EditingLevelObjective));
+                OnPropertyChanged(nameof(EditingLevelObjectiveRef));
+                OnPropertyChanged(nameof(SelectedLevelWinCondition));
+                OnPropertyChanged(nameof(EditingGatherZonePlacements));
+                OnPropertyChanged(nameof(EditingGatherZonePlacement));
+                OnPropertyChanged(nameof(SelectedSectorObjectiveType));
+                NotifyObjectiveTypeFlagsChanged();
+            }
+        }
+    }
+
+    public int FlavorTextTabIndex
+    {
+        get => _flavorTextTabIndex;
+        set => SetField(ref _flavorTextTabIndex, Math.Clamp(value, 0, 1));
+    }
+
+    public WardenObjective? EditingLevelObjective => IsCreatingLevel
+        ? _editingLevelObjectives[ObjectiveTabIndex]
+        : null;
+
+    public LevelObjectiveRefData? EditingLevelObjectiveRef => IsCreatingLevel
+        ? _editingLevelObjectiveRefs[ObjectiveTabIndex]
+        : null;
+
+    public ObjectiveWinConditionOption? SelectedLevelWinCondition
+    {
+        get => AvailableLevelWinConditions.FirstOrDefault(option =>
+            option.Value == (EditingLevelObjectiveRef?.WinCondition ?? WinCondition.GoToElevator));
+        set
+        {
+            if (value != null && EditingLevelObjectiveRef != null &&
+                EditingLevelObjectiveRef.WinCondition != value.Value)
+            {
+                EditingLevelObjectiveRef.WinCondition = value.Value;
+                OnPropertyChanged(nameof(SelectedLevelWinCondition));
+            }
+        }
+    }
+
+    public ZonePlacementData? EditingGatherZonePlacement
+    {
+        get
+        {
+            return _selectedLevelObjectiveZonePlacement ?? EditingGatherZonePlacements.FirstOrDefault();
+        }
+    }
+
+    public ObservableCollection<ZonePlacementData> EditingGatherZonePlacements
+    {
+        get
+        {
+            var objectiveRef = EditingLevelObjectiveRef;
+            if (objectiveRef == null) return new ObservableCollection<ZonePlacementData>();
+            if (objectiveRef.ZonePlacementDatas.Count == 0)
+            {
+                objectiveRef.ZonePlacementDatas.Add(new ObservableCollection<ZonePlacementData>());
+            }
+
+            return objectiveRef.ZonePlacementDatas[0];
+        }
+    }
+
+    public ZonePlacementData? SelectedLevelObjectiveZonePlacement
+    {
+        get => _selectedLevelObjectiveZonePlacement;
+        set
+        {
+            if (SetField(ref _selectedLevelObjectiveZonePlacement, value))
+            {
+                OnPropertyChanged(nameof(EditingGatherZonePlacement));
+            }
+        }
+    }
+
+    public bool HasSelectedLevelObjectiveZonePlacement => SelectedLevelObjectiveZonePlacement != null;
+
+    public void AddLevelObjectiveZonePlacement()
+    {
+        var placements = EditingGatherZonePlacements;
+        var placement = new ZonePlacementData();
+        placements.Add(placement);
+        SelectedLevelObjectiveZonePlacement = placement;
+    }
+
+    public void RemoveLevelObjectiveZonePlacement(ZonePlacementData? placement = null)
+    {
+        var placements = EditingGatherZonePlacements;
+        placement ??= SelectedLevelObjectiveZonePlacement;
+        if (placement == null || !placements.Remove(placement)) return;
+        SelectedLevelObjectiveZonePlacement = placements.FirstOrDefault();
+    }
+
     public string CreationErrorMessage
     {
         get => _creationErrorMessage;
@@ -4300,6 +4431,20 @@ public class LevelLayoutViewModel : ViewModelBase
         EditingExpeditionBalance = new ExpeditionBalanceSettings();
         EditingLevelSurvivalWave = new AlarmBlock();
         EditorDefaultsService.ApplyAlarmDefaults(EditingLevelSurvivalWave);
+        EditingLevelRef = new LevelRefData
+        {
+            PersistentId = NewLevelPersistentId,
+            MainObjectiveId = NewLevelPersistentId
+        };
+        _editingLevelObjectives[0] = new WardenObjective();
+        _editingLevelObjectives[1] = new WardenObjective();
+        _editingLevelObjectives[2] = new WardenObjective();
+        _editingLevelObjectiveRefs[0] = new LevelObjectiveRefData();
+        _editingLevelObjectiveRefs[1] = new LevelObjectiveRefData();
+        _editingLevelObjectiveRefs[2] = new LevelObjectiveRefData();
+        SelectedLevelObjectiveZonePlacement = null;
+        PopulateLevelObjectivePlacementOptions();
+        ObjectiveTabIndex = 0;
         NewLevelSnatcherBoxes = levelDefaults.SnatcherBoxes;
         IsCreatingLevel = true;
     }
@@ -4327,6 +4472,19 @@ public class LevelLayoutViewModel : ViewModelBase
         CreationErrorMessage = string.Empty;
         EditingExpeditionBalance = _selectedLevel.ExpeditionBalance.Clone();
         EditingLevelSurvivalWave = _selectedLevel.LevelSurvivalWave.Clone();
+        EditingLevelRef = _selectedLevel.LevelRef.Clone();
+        EditingLevelRef.PersistentId = _selectedLevel.PersistentId;
+        if (EditingLevelRef.MainObjectiveId == 0) EditingLevelRef.MainObjectiveId = _selectedLevel.PersistentId;
+        ObjectiveTabIndex = 0;
+        _editingLevelObjectives[0] = _selectedLevel.MainSector.PrimaryObjective.Clone();
+        _editingLevelObjectives[1] = _selectedLevel.SecondarySector.PrimaryObjective.Clone();
+        _editingLevelObjectives[2] = _selectedLevel.OverloadSector.PrimaryObjective.Clone();
+        _editingLevelObjectiveRefs[0] = _selectedLevel.LevelRef.MainObjective.Clone();
+        _editingLevelObjectiveRefs[1] = _selectedLevel.LevelRef.SecondaryObjective.Clone();
+        _editingLevelObjectiveRefs[2] = _selectedLevel.LevelRef.OverloadObjective.Clone();
+        SelectedLevelObjectiveZonePlacement = null;
+        RefreshAvailableDimensions();
+        PopulateLevelObjectivePlacementOptions();
         NewLevelSnatcherBoxes = _selectedLevel.SnatcherBoxes;
         IsCreatingLevel = true;
     }
@@ -4393,12 +4551,21 @@ public class LevelLayoutViewModel : ViewModelBase
                     JsonSerializer.Serialize(EditingLevelSurvivalWave);
                 _selectedLevel.Name = NewLevelName.Trim();
                 _selectedLevel.PersistentId = NewLevelPersistentId;
+                _selectedLevel.LevelRef = EditingLevelRef.Clone();
+                _selectedLevel.LevelRef.PersistentId = NewLevelPersistentId;
+                _selectedLevel.LevelRef.MainObjective = _editingLevelObjectiveRefs[0].Clone();
+                _selectedLevel.LevelRef.SecondaryObjective = _editingLevelObjectiveRefs[1].Clone();
+                _selectedLevel.LevelRef.OverloadObjective = _editingLevelObjectiveRefs[2].Clone();
                 _selectedLevel.ComplexType = SelectedComplexType;
                 _selectedLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
+                _selectedLevel.LevelRef.FogSetting = _selectedLevel.FogSettings;
                 _selectedLevel.ElevatorTile = SelectedElevatorTile.Prefab;
                 _selectedLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
                 _selectedLevel.LevelSurvivalWave = EditingLevelSurvivalWave.Clone();
                 _selectedLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
+                _selectedLevel.MainSector.Objectives[0] = _editingLevelObjectives[0].Clone();
+                _selectedLevel.SecondarySector.Objectives[0] = _editingLevelObjectives[1].Clone();
+                _selectedLevel.OverloadSector.Objectives[0] = _editingLevelObjectives[2].Clone();
 
                 if (levelWaveChanged)
                 {
@@ -4446,9 +4613,21 @@ public class LevelLayoutViewModel : ViewModelBase
             SelectedElevatorTile.Prefab
         );
         newLevel.FogSettings = SelectedFogSetting?.PersistentId ?? 0;
+        newLevel.LevelRef.PersistentId = NewLevelPersistentId;
+        newLevel.LevelRef.FogSetting = newLevel.FogSettings;
+        newLevel.LevelRef = EditingLevelRef.Clone();
+        newLevel.LevelRef.PersistentId = NewLevelPersistentId;
+        newLevel.LevelRef.MainObjectiveId = NewLevelPersistentId;
+        newLevel.LevelRef.MainObjective = _editingLevelObjectiveRefs[0].Clone();
+        newLevel.LevelRef.SecondaryObjective = _editingLevelObjectiveRefs[1].Clone();
+        newLevel.LevelRef.OverloadObjective = _editingLevelObjectiveRefs[2].Clone();
+        newLevel.LevelRef.FogSetting = newLevel.FogSettings;
         newLevel.ExpeditionBalance = EditingExpeditionBalance.Clone();
         newLevel.LevelSurvivalWave = EditingLevelSurvivalWave.Clone();
         newLevel.SnatcherBoxes = NewLevelSnatcherBoxes;
+        newLevel.MainSector.Objectives[0] = _editingLevelObjectives[0].Clone();
+        newLevel.SecondarySector.Objectives[0] = _editingLevelObjectives[1].Clone();
+        newLevel.OverloadSector.Objectives[0] = _editingLevelObjectives[2].Clone();
 
         _levels.Add(newLevel);
         SelectedLevel = newLevel;
@@ -4463,6 +4642,7 @@ public class LevelLayoutViewModel : ViewModelBase
     public void CancelCreateLevel()
     {
         IsCreatingLevel = false;
+        OnPropertyChanged(nameof(EditingLevelObjective));
         CreationErrorMessage = string.Empty;
     }
 
@@ -4596,7 +4776,7 @@ public class LevelLayoutViewModel : ViewModelBase
         }
     }
 
-    public WardenObjective? CurrentObjective => ActiveEditingObjective ?? EditingSectorSettings?.PrimaryObjective;
+    public WardenObjective? CurrentObjective => ActiveEditingObjective ?? EditingLevelObjective ?? EditingSectorSettings?.PrimaryObjective;
 
     private void ActiveEditingObjective_PropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -4798,10 +4978,19 @@ public class LevelLayoutViewModel : ViewModelBase
     }
 
     public ObservableCollection<WinCondition> AvailableWinConditions { get; } = new(Enum.GetValues<WinCondition>());
-    public ObservableCollection<ObjectiveType> AvailableObjectiveTypes { get; } = new(Enum.GetValues<ObjectiveType>());
+    public ObservableCollection<ObjectiveType> AvailableObjectiveTypes { get; } = new(Enum.GetValues<ObjectiveType>().Distinct());
+    public ObservableCollection<ChainedPuzzleTypeEntry> ChainedPuzzleTypes { get; } = new(AlarmService.LoadChainedPuzzleTypes());
+    public ObservableCollection<ItemDataBlockEntry> Items { get; } = new(AlarmService.LoadItems());
 
     public ObservableCollection<ZoneOption> AvailableMainExitZones { get; } = new();
     public ObservableCollection<ZoneOption> AvailableObjectiveZones { get; } = new();
+    public ObservableCollection<ObjectiveDimensionOption> AvailableObjectiveDimensions { get; } = new();
+    public ObservableCollection<ZoneOption> AvailableLevelObjectiveZones { get; } = new();
+    public ObservableCollection<ObjectiveWinConditionOption> AvailableLevelWinConditions { get; } = new()
+    {
+        new ObjectiveWinConditionOption(WinCondition.GoToElevator, "Extract at spawn"),
+        new ObjectiveWinConditionOption(WinCondition.GoToExitGeo, "Forward extract")
+    };
 
     public ObservableCollection<EnemyEntry> Enemies { get; } = new(AlarmService.LoadEnemies());
     public static SurvivalWaveSpawnType[] AvailableWaveSpawnTypes => Enum.GetValues<SurvivalWaveSpawnType>();
@@ -4880,6 +5069,7 @@ public class LevelLayoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsGatherTerminalObjective));
         OnPropertyChanged(nameof(IsCorruptedTerminalUplinkObjective));
         OnPropertyChanged(nameof(IsTimedTerminalSequenceObjective));
+        OnPropertyChanged(nameof(IsEmptyObjective));
         OnPropertyChanged(nameof(EventsOnActivateHeaderTitle));
     }
 
@@ -5123,6 +5313,9 @@ public class LevelLayoutViewModel : ViewModelBase
 
     public bool IsTimedTerminalSequenceObjective =>
         (CurrentObjective?.ObjectiveType ?? ObjectiveType.HSU_FindTakeSample) == ObjectiveType.TimedTerminalSequence;
+
+    public bool IsEmptyObjective =>
+        (CurrentObjective?.ObjectiveType ?? ObjectiveType.HSU_FindTakeSample) == ObjectiveType.Empty;
 
     public ZoneOption? SelectedActivateSmallHsuZoneOption
     {
@@ -7796,6 +7989,47 @@ public class LevelLayoutViewModel : ViewModelBase
         OnPropertyChanged(nameof(SelectedGatherTerminalCandidateZoneOption));
         OnPropertyChanged(nameof(SelectedTimedTerminalSequencePlacementZoneOption));
         OnPropertyChanged(nameof(SelectedTimedTerminalSequenceCandidateZoneOption));
+    }
+
+    private void PopulateLevelObjectivePlacementOptions()
+    {
+        AvailableObjectiveDimensions.Clear();
+        for (int i = 0; i < AvailableDimensions.Count; i++)
+        {
+            AvailableObjectiveDimensions.Add(new ObjectiveDimensionOption(i, AvailableDimensions[i].DisplayName));
+        }
+
+        if (AvailableObjectiveDimensions.Count == 0)
+        {
+            AvailableObjectiveDimensions.Add(new ObjectiveDimensionOption(0, "Reality"));
+        }
+
+        AvailableLevelObjectiveZones.Clear();
+        var zoneIndexes = new HashSet<int>();
+        if (SelectedLevel != null)
+        {
+            foreach (var sector in new[] { SectorType.Main, SectorType.Secondary, SectorType.Overload })
+            {
+                foreach (int zone in GridState.GetZonesForSector(sector))
+                {
+                    zoneIndexes.Add(zone);
+                }
+            }
+        }
+
+        if (zoneIndexes.Count == 0) zoneIndexes.Add(0);
+        foreach (int zone in zoneIndexes.OrderBy(index => index))
+        {
+            AvailableLevelObjectiveZones.Add(new ZoneOption
+            {
+                ZoneIndex = zone,
+                DisplayName = SelectedLevel?.MainSector.GetZoneDisplayName(zone) ?? $"Zone {zone}"
+            });
+        }
+
+        OnPropertyChanged(nameof(AvailableObjectiveDimensions));
+        OnPropertyChanged(nameof(AvailableLevelObjectiveZones));
+        OnPropertyChanged(nameof(EditingGatherZonePlacement));
     }
 
     private void EditingSectorSettings_PropertyChanged(object? sender, PropertyChangedEventArgs e)

@@ -90,6 +90,8 @@ public class LevelLayoutBlockData
 
     [JsonPropertyName("levelSurvivalWave")] public AlarmBlock LevelSurvivalWave { get; set; } = new();
 
+    [JsonPropertyName("levelRef")] public LevelRefData LevelRef { get; set; } = new();
+
 
     [JsonPropertyName("gridState")] public LevelLayoutGridStateData GridState { get; set; } = new();
 }

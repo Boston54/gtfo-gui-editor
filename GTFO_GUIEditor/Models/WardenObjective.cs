@@ -38,11 +38,13 @@ public class WardenObjective : INotifyPropertyChanged
 
     // Items
     private GatherSmallItemType _gatherItem = GatherSmallItemType.PersonnelID;
+    private int _gatherItemId = (int)GatherSmallItemType.PersonnelID;
     private RetrieveBigItemType _retrieveItem = RetrieveBigItemType.PowerCell;
     private ObservableCollection<GatherItemPlacement> _gatherItemPlacements = new()
     {
         new GatherItemPlacement()
     };
+    private int _gatherRequiredCount = 1;
     private ObservableCollection<GatherItemPlacement> _retrieveItemPlacements = new()
     {
         new GatherItemPlacement()
@@ -126,6 +128,18 @@ public class WardenObjective : INotifyPropertyChanged
     private string _goToZone = string.Empty;
     private string _inZoneFindItem = string.Empty;
     private string _solveItem = string.Empty;
+    private string _goToZoneHelp = string.Empty;
+    private string _inZoneFindItemHelp = string.Empty;
+    private string _solveItemHelp = string.Empty;
+    private string _goToWinConditionElevator = string.Empty;
+    private string _goToWinConditionHelpElevator = string.Empty;
+    private string _goToWinConditionCustomGeo = string.Empty;
+    private string _goToWinConditionHelpCustomGeo = string.Empty;
+    private string _goToWinConditionToMainLayer = string.Empty;
+    private string _goToWinConditionHelpToMainLayer = string.Empty;
+    private int _showHelpDelay = 180;
+    private uint _chainedPuzzleAtExit = 11;
+    private double _chainedPuzzleAtExitScanSpeedMultiplier = 1.0;
 
     // Waves / Triggers
     private GenericWaveSettings _wavesOnGotoWin = new();
@@ -304,7 +318,27 @@ public class WardenObjective : INotifyPropertyChanged
     public GatherSmallItemType GatherItem
     {
         get => _gatherItem;
-        set => SetField(ref _gatherItem, value);
+        set
+        {
+            if (SetField(ref _gatherItem, value))
+            {
+                _gatherItemId = (int)value;
+                OnPropertyChanged(nameof(GatherItemId));
+            }
+        }
+    }
+
+    public int GatherItemId
+    {
+        get => _gatherItemId;
+        set
+        {
+            if (SetField(ref _gatherItemId, value) && Enum.IsDefined(typeof(GatherSmallItemType), value))
+            {
+                _gatherItem = (GatherSmallItemType)value;
+                OnPropertyChanged(nameof(GatherItem));
+            }
+        }
     }
 
     public RetrieveBigItemType RetrieveItem
@@ -317,6 +351,12 @@ public class WardenObjective : INotifyPropertyChanged
     {
         get => _gatherItemPlacements;
         set => SetField(ref _gatherItemPlacements, value ?? new ObservableCollection<GatherItemPlacement>());
+    }
+
+    public int GatherRequiredCount
+    {
+        get => _gatherRequiredCount;
+        set => SetField(ref _gatherRequiredCount, Math.Max(1, value));
     }
 
     [JsonIgnore]
@@ -755,6 +795,19 @@ public class WardenObjective : INotifyPropertyChanged
         set => SetField(ref _solveItem, value ?? string.Empty);
     }
 
+    public string GoToZoneHelp { get => _goToZoneHelp; set => SetField(ref _goToZoneHelp, value ?? string.Empty); }
+    public string InZoneFindItemHelp { get => _inZoneFindItemHelp; set => SetField(ref _inZoneFindItemHelp, value ?? string.Empty); }
+    public string SolveItemHelp { get => _solveItemHelp; set => SetField(ref _solveItemHelp, value ?? string.Empty); }
+    public string GoToWinCondition_Elevator { get => _goToWinConditionElevator; set => SetField(ref _goToWinConditionElevator, value ?? string.Empty); }
+    public string GoToWinConditionHelp_Elevator { get => _goToWinConditionHelpElevator; set => SetField(ref _goToWinConditionHelpElevator, value ?? string.Empty); }
+    public string GoToWinCondition_CustomGeo { get => _goToWinConditionCustomGeo; set => SetField(ref _goToWinConditionCustomGeo, value ?? string.Empty); }
+    public string GoToWinConditionHelp_CustomGeo { get => _goToWinConditionHelpCustomGeo; set => SetField(ref _goToWinConditionHelpCustomGeo, value ?? string.Empty); }
+    public string GoToWinCondition_ToMainLayer { get => _goToWinConditionToMainLayer; set => SetField(ref _goToWinConditionToMainLayer, value ?? string.Empty); }
+    public string GoToWinConditionHelp_ToMainLayer { get => _goToWinConditionHelpToMainLayer; set => SetField(ref _goToWinConditionHelpToMainLayer, value ?? string.Empty); }
+    public int ShowHelpDelay { get => _showHelpDelay; set => SetField(ref _showHelpDelay, Math.Max(0, value)); }
+    public uint ChainedPuzzleAtExit { get => _chainedPuzzleAtExit; set => SetField(ref _chainedPuzzleAtExit, value); }
+    public double ChainedPuzzleAtExitScanSpeedMultiplier { get => _chainedPuzzleAtExitScanSpeedMultiplier; set => SetField(ref _chainedPuzzleAtExitScanSpeedMultiplier, Math.Max(0, value)); }
+
     public GenericWaveSettings WavesOnGotoWin
     {
         get => _wavesOnGotoWin;
@@ -906,6 +959,8 @@ public class WardenObjective : INotifyPropertyChanged
             PostCommandOutput = PostCommandOutput,
             SpecialCommandRule = SpecialCommandRule,
             GatherItem = GatherItem,
+            GatherItemId = GatherItemId,
+            GatherRequiredCount = GatherRequiredCount,
             GatherMaxPerZone = GatherMaxPerZone,
             RetrieveItem = RetrieveItem,
             RetrieveMaxPerZone = RetrieveMaxPerZone,
@@ -916,6 +971,18 @@ public class WardenObjective : INotifyPropertyChanged
             GoToZone = GoToZone,
             InZoneFindItem = InZoneFindItem,
             SolveItem = SolveItem,
+            GoToZoneHelp = GoToZoneHelp,
+            InZoneFindItemHelp = InZoneFindItemHelp,
+            SolveItemHelp = SolveItemHelp,
+            GoToWinCondition_Elevator = GoToWinCondition_Elevator,
+            GoToWinConditionHelp_Elevator = GoToWinConditionHelp_Elevator,
+            GoToWinCondition_CustomGeo = GoToWinCondition_CustomGeo,
+            GoToWinConditionHelp_CustomGeo = GoToWinConditionHelp_CustomGeo,
+            GoToWinCondition_ToMainLayer = GoToWinCondition_ToMainLayer,
+            GoToWinConditionHelp_ToMainLayer = GoToWinConditionHelp_ToMainLayer,
+            ShowHelpDelay = ShowHelpDelay,
+            ChainedPuzzleAtExit = ChainedPuzzleAtExit,
+            ChainedPuzzleAtExitScanSpeedMultiplier = ChainedPuzzleAtExitScanSpeedMultiplier,
             WaveOnGotoWinTrigger = WaveOnGotoWinTrigger,
             StopAllWavesBeforeGotoWin = StopAllWavesBeforeGotoWin,
             WavesOnGotoWin = WavesOnGotoWin.Clone(),

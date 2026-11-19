@@ -268,6 +268,10 @@ public class RundownDataBlockImporter : IDatablockImporter
 
             if (expObj["MainLayerData"] is JsonObject mainLayerObj)
             {
+                if (mainLayerObj["ObjectiveData"] is JsonObject mainObjectiveObj)
+                {
+                    PopulateObjectiveData(expBlock.MainLayerData.ObjectiveData, mainObjectiveObj);
+                }
                 expBlock.MainLayerData.BulkheadDoorControllerPlacements = DeserializeJsonElement(mainLayerObj["BulkheadDoorControllerPlacements"]);
                 expBlock.MainLayerData.BulkheadKeyPlacements = DeserializeJsonElement(mainLayerObj["BulkheadKeyPlacements"]);
                 expBlock.MainLayerData.ZonesWithBulkheadEntrance = DeserializeJsonElement(mainLayerObj["ZonesWithBulkheadEntrance"]);
@@ -277,6 +281,10 @@ public class RundownDataBlockImporter : IDatablockImporter
 
             if (expObj["SecondaryLayerData"] is JsonObject secLayerObj)
             {
+                if (secLayerObj["ObjectiveData"] is JsonObject secondaryObjectiveObj)
+                {
+                    PopulateObjectiveData(expBlock.SecondaryLayerData.ObjectiveData, secondaryObjectiveObj);
+                }
                 expBlock.SecondaryLayerData.BulkheadDoorControllerPlacements = DeserializeJsonElement(secLayerObj["BulkheadDoorControllerPlacements"]);
                 expBlock.SecondaryLayerData.BulkheadKeyPlacements = DeserializeJsonElement(secLayerObj["BulkheadKeyPlacements"]);
                 expBlock.SecondaryLayerData.ZonesWithBulkheadEntrance = DeserializeJsonElement(secLayerObj["ZonesWithBulkheadEntrance"]);
@@ -286,6 +294,10 @@ public class RundownDataBlockImporter : IDatablockImporter
 
             if (expObj["ThirdLayerData"] is JsonObject thirdLayerObj)
             {
+                if (thirdLayerObj["ObjectiveData"] is JsonObject overloadObjectiveObj)
+                {
+                    PopulateObjectiveData(expBlock.ThirdLayerData.ObjectiveData, overloadObjectiveObj);
+                }
                 expBlock.ThirdLayerData.BulkheadDoorControllerPlacements = DeserializeJsonElement(thirdLayerObj["BulkheadDoorControllerPlacements"]);
                 expBlock.ThirdLayerData.BulkheadKeyPlacements = DeserializeJsonElement(thirdLayerObj["BulkheadKeyPlacements"]);
                 expBlock.ThirdLayerData.ZonesWithBulkheadEntrance = DeserializeJsonElement(thirdLayerObj["ZonesWithBulkheadEntrance"]);
@@ -326,6 +338,25 @@ public class RundownDataBlockImporter : IDatablockImporter
     {
         if (node == null) return null;
         return JsonSerializer.Deserialize<JsonElement>(node.ToJsonString());
+    }
+
+    private static void PopulateObjectiveData(ExpeditionObjectiveData target, JsonObject source)
+    {
+        WinCondition parsedCondition = WinCondition.GoToElevator;
+        if (source["WinCondition"] is JsonValue winConditionValue &&
+            winConditionValue.TryGetValue<int>(out int numericWinCondition))
+        {
+            parsedCondition = numericWinCondition == (int)WinCondition.GoToExitGeo
+                ? WinCondition.GoToExitGeo
+                : WinCondition.GoToElevator;
+        }
+        else if (Enum.TryParse(source["WinCondition"]?.ToString(), true, out WinCondition stringWinCondition))
+        {
+            parsedCondition = stringWinCondition;
+        }
+
+        target.WinCondition = parsedCondition.ToString();
+        target.ZonePlacementDatas = DeserializeJsonElement(source["ZonePlacementDatas"]);
     }
 
     private static string ResolveTextValue(JsonNode? node, ImportContext context)

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GTFO_GUIEditor.Models;
 using GTFO_GUIEditor.ViewModels;
@@ -87,6 +88,20 @@ public class DatablockManager : IDatablockManager
             {
                 exporter.Export(context);
             }
+
+            foreach (var level in vm.LevelLayout.Levels)
+            {
+                level.LevelRef.PersistentId = level.PersistentId;
+                level.LevelRef.FogSetting = level.FogSettings;
+                if (level.LevelRef.DefaultLightSetting == 0)
+                {
+                    int firstZone = level.GridState.GetZonesForSector(SectorType.Main).OrderBy(z => z).FirstOrDefault();
+                    uint zoneLight = level.GridState.GetOrCreateZoneSettings(SectorType.Main, firstZone).Lighting;
+                    level.LevelRef.DefaultLightSetting = zoneLight > 0
+                        ? zoneLight : (vm.Lighting.Blocks.FirstOrDefault()?.PersistentId ?? 1);
+                }
+            }
+            LevelRefsService.Write(outputDirectory, vm.LevelLayout.Levels);
 
             return new ExportResult
             {

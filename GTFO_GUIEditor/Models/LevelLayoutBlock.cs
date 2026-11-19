@@ -28,6 +28,7 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     private uint _survivalWaveSettings;
     private uint _survivalWavePopulation;
     private AlarmBlock _levelSurvivalWave = new();
+    private LevelRefData _levelRef = new();
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -173,6 +174,13 @@ public class LevelLayoutBlock : INotifyPropertyChanged
     {
         get => _levelSurvivalWave;
         set => SetField(ref _levelSurvivalWave, value ?? new AlarmBlock());
+    }
+
+    [JsonIgnore]
+    public LevelRefData LevelRef
+    {
+        get => _levelRef;
+        set => SetField(ref _levelRef, value ?? new LevelRefData());
     }
 
     public SectorSettings GetSectorSettings(SectorType sectorType)
@@ -356,7 +364,8 @@ public class LevelLayoutBlock : INotifyPropertyChanged
             SnatcherBoxes = SnatcherBoxes,
             SurvivalWaveSettings = SurvivalWaveSettings,
             SurvivalWavePopulation = SurvivalWavePopulation,
-            LevelSurvivalWave = LevelSurvivalWave.Clone()
+            LevelSurvivalWave = LevelSurvivalWave.Clone(),
+            LevelRef = LevelRef.Clone()
         };
         if (_gridState != null)
         {

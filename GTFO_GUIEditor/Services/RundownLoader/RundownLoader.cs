@@ -99,6 +99,7 @@ public class RundownLoader : IRundownLoader
                 SurvivalWaveSettings = level.SurvivalWaveSettings,
                 SurvivalWavePopulation = level.SurvivalWavePopulation,
                 LevelSurvivalWave = level.LevelSurvivalWave.Clone(),
+                LevelRef = level.LevelRef.Clone(),
                 GridState = level.GridState.ExportStateData()
             };
             project.Levels.Add(levelData);
@@ -249,7 +250,8 @@ public class RundownLoader : IRundownLoader
                     SnatcherBoxes = levelData.SnatcherBoxes,
                     SurvivalWaveSettings = levelData.SurvivalWaveSettings,
                     SurvivalWavePopulation = levelData.SurvivalWavePopulation,
-                    LevelSurvivalWave = levelData.LevelSurvivalWave?.Clone() ?? new AlarmBlock()
+                    LevelSurvivalWave = levelData.LevelSurvivalWave?.Clone() ?? new AlarmBlock(),
+                    LevelRef = levelData.LevelRef?.Clone() ?? new LevelRefData { PersistentId = levelData.PersistentId }
                 };
 
                 if (levelData.GridState != null)

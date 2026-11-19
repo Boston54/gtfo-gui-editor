@@ -96,6 +96,50 @@ public static class AlarmService
         return File.Exists(directPath) ? directPath : null;
     }
 
+    public static string? FindItemDataBlockFile()
+    {
+        string runtimePath = Path.Combine(GetDatablocksDirectory(), "ItemDataBlock.json");
+        if (File.Exists(runtimePath)) return runtimePath;
+
+        string[] fallbackPaths =
+        {
+            Path.Combine(GetDatablocksDirectory(), "..", "OriginalDatablocks", "GameData_ItemDataBlock_bin.json"),
+            Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Data", "Vanilla", "OriginalDatablocks", "GameData_ItemDataBlock_bin.json"),
+            Path.Combine(Directory.GetCurrentDirectory(), "GTFO_GUIEditor", "Data", "Vanilla", "OriginalDatablocks", "GameData_ItemDataBlock_bin.json")
+        };
+
+        return fallbackPaths.FirstOrDefault(File.Exists);
+    }
+
+    public static List<ItemDataBlockEntry> LoadItems(string? filePath = null)
+    {
+        filePath ??= FindItemDataBlockFile();
+        var list = new List<ItemDataBlockEntry>();
+
+        if (!string.IsNullOrWhiteSpace(filePath) && File.Exists(filePath))
+        {
+            try
+            {
+                string json = File.ReadAllText(filePath);
+                var data = JsonSerializer.Deserialize<ItemDataBlockFile>(json, JsonOptions);
+                if (data?.Blocks != null)
+                {
+                    list.AddRange(data.Blocks.Where(item => item.PersistentId != 0));
+                }
+            }
+            catch
+            {
+                // Return the empty list when the source datablock cannot be read.
+            }
+        }
+
+        return list
+            .GroupBy(item => item.PersistentId)
+            .Select(group => group.First())
+            .OrderBy(item => item.PersistentId)
+            .ToList();
+    }
+
     public static List<ChainedPuzzleTypeEntry> LoadChainedPuzzleTypes(string? filePath = null)
     {
         filePath ??= FindChainedPuzzleTypeFile();
@@ -207,6 +251,12 @@ public static class AlarmService
     {
         [JsonPropertyName("Blocks")]
         public List<ChainedPuzzleTypeEntry> Blocks { get; set; } = new();
+    }
+
+    private class ItemDataBlockFile
+    {
+        [JsonPropertyName("Blocks")]
+        public List<ItemDataBlockEntry> Blocks { get; set; } = new();
     }
 
     private class ChainedPuzzleBlock

@@ -34,11 +34,10 @@
                 <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Padding="0,0,16,0">
                     <StackPanel Spacing="16">
                         <!-- General Level Settings -->
-                        <Border Background="#1E1E1E"
-                                BorderBrush="#3E3E42"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="14">
+                        <Expander Header="General Settings" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
                             <StackPanel Spacing="10">
                                 <TextBlock Text="General Settings"
                                            FontSize="14"
@@ -88,10 +87,152 @@
                                     <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding NewLevelSnatcherBoxes, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
-                        </Border>
+                        </Expander>
+
+                        <!-- Level-owned rundown reference data -->
+                        <Expander Header="Level Information" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
+                            <StackPanel Spacing="10">
+                                <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
+                                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Infection:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingLevelRef.PlayerStartingState.InfectionLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+                                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Health:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding EditingLevelRef.PlayerStartingState.HealthLevelAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="0" Text="Primary Ammo:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding EditingLevelRef.PlayerStartingState.StandardAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,8"/>
+                                    <TextBlock Grid.Row="1" Grid.Column="2" Text="Special Ammo:" VerticalAlignment="Center" Margin="0,0,8,8"/>
+                                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding EditingLevelRef.PlayerStartingState.SpecialAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,0,8"/>
+                                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Tool Ammo:" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                                    <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditingLevelRef.PlayerStartingState.ToolAmmoAtExpeditionStart, Mode=TwoWay}" Margin="0,0,16,0"/>
+                                </Grid>
+                                <TextBlock Text="Description:" Margin="0,4,0,0"/>
+                                <TextBox Text="{Binding EditingLevelRef.Description, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="65"/>
+                                <TextBlock Text="Warden Intel:" Margin="0,4,0,0"/>
+                                <TextBox Text="{Binding EditingLevelRef.WardenIntel, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="65"/>
+                            </StackPanel>
+                        </Expander>
+
+                        <!-- Level-owned objectives -->
+                        <Expander Header="Objective" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
+                            <StackPanel Spacing="10" HorizontalAlignment="Stretch">
+                                <TextBlock Text="Objective Layer" FontSize="14" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                <TabControl SelectedIndex="{Binding ObjectiveTabIndex, Mode=TwoWay}" HorizontalAlignment="Stretch">
+                                    <TabItem Header="Main">
+                                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                                            <TextBlock Text="Persistent ID"/><TextBox Text="{Binding EditingLevelRef.MainObjectiveId, Mode=TwoWay}" IsEnabled="False"/>
+                                            <TextBlock Text="Type"/><ComboBox ItemsSource="{Binding AvailableObjectiveTypes}" SelectedItem="{Binding SelectedSectorObjectiveType, Mode=TwoWay}"/>
+                                            <TextBlock Text="Win Condition"/><ComboBox ItemsSource="{Binding AvailableLevelWinConditions}" SelectedItem="{Binding SelectedLevelWinCondition, Mode=TwoWay}" DisplayMemberBinding="{Binding DisplayName}"/>
+                                            <StackPanel Spacing="6" Margin="0,6,0,0">
+                                                    <TextBlock Text="No additional fields for this type." IsVisible="{Binding IsEmptyObjective}"/>
+                                                    <TextBlock Text="Placement Zone" IsVisible="{Binding IsHsuObjective}"/><TextBox Text="{Binding EditingLevelObjective.HsuPlacementZone, Mode=TwoWay}" IsVisible="{Binding IsHsuObjective}"/>
+                                                    <TextBlock Text="Placement Zone" IsVisible="{Binding IsReactorObjective}"/><TextBox Text="{Binding EditingLevelObjective.ReactorPlacementZone, Mode=TwoWay}" IsVisible="{Binding IsReactorObjective}"/>
+                                                    <TextBlock Text="Gather Item" IsVisible="{Binding IsGatherSmallItemsObjective}"/><ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding EditingLevelObjective.GatherItemId, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" IsVisible="{Binding IsGatherSmallItemsObjective}" DisplayMemberBinding="{Binding DisplayName}"/>
+                                                    <TextBlock Text="Gather Spawn Count" IsVisible="{Binding IsGatherSmallItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.GatherSpawnCount, Mode=TwoWay}" IsVisible="{Binding IsGatherSmallItemsObjective}"/>
+                                                    <TextBlock Text="Gather Max Per Zone" IsVisible="{Binding IsGatherSmallItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.GatherMaxPerZone, Mode=TwoWay}" IsVisible="{Binding IsGatherSmallItemsObjective}"/>
+                                                    <TextBlock Text="Gather Required Count" IsVisible="{Binding IsGatherSmallItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.GatherRequiredCount, Mode=TwoWay}" IsVisible="{Binding IsGatherSmallItemsObjective}"/>
+                                                    <Border BorderBrush="#333333" BorderThickness="1" CornerRadius="4" Padding="8" IsVisible="{Binding IsGatherSmallItemsObjective}">
+                                                        <StackPanel Spacing="6">
+                                                            <Grid ColumnDefinitions="*,Auto">
+                                                                <TextBlock Text="Zone Placement Datas" FontWeight="Bold" Foreground="#FFFFFF"/>
+                                                                <Button Grid.Column="1" Content="+ Add Placement" Command="{Binding #LevelConfigRoot.DataContext.AddLevelObjectiveZonePlacementCommand}" Background="#3E3E42" Foreground="White" Padding="8,3"/>
+                                                            </Grid>
+                                                            <ItemsControl ItemsSource="{Binding EditingGatherZonePlacements}">
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate x:DataType="models:ZonePlacementData" x:CompileBindings="False">
+                                                                        <Border BorderBrush="#444444" BorderThickness="1" CornerRadius="3" Padding="6" Margin="0,3">
+                                                                            <Grid ColumnDefinitions="*,*,*,*,Auto" RowDefinitions="Auto,Auto">
+                                                                                <ComboBox Grid.Column="0" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableObjectiveDimensions}" SelectedValue="{Binding DimensionIndex, Mode=TwoWay}" SelectedValueBinding="{Binding DimensionIndex}" DisplayMemberBinding="{Binding DisplayName}"/>
+                                                                                <ComboBox Grid.Column="1" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableLevelObjectiveZones}" SelectedValue="{Binding LocalIndex, Mode=TwoWay}" SelectedValueBinding="{Binding ZoneIndex}" DisplayMemberBinding="{Binding DisplayName}" Margin="6,0,0,0"/>
+                                                                                <TextBox Grid.Column="2" Text="{Binding Weights.Start, Mode=TwoWay}" Watermark="Start" Margin="6,0,0,0"/>
+                                                                                <TextBox Grid.Column="3" Text="{Binding Weights.Middle, Mode=TwoWay}" Watermark="Middle" Margin="6,0,0,0"/>
+                                                                                <TextBox Grid.Column="4" Text="{Binding Weights.End, Mode=TwoWay}" Watermark="End" Margin="6,0,0,0"/>
+                                                                                <Button Grid.Row="1" Grid.Column="4" Content="Remove" Command="{Binding #LevelConfigRoot.DataContext.RemoveLevelObjectiveZonePlacementCommand}" CommandParameter="{Binding}" Background="#4A1C1C" Foreground="#FF6B6B" Padding="6,2" Margin="6,5,0,0"/>
+                                                                            </Grid>
+                                                                        </Border>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </StackPanel>
+                                                    </Border>
+                                                    <TextBlock Text="Command Zone" IsVisible="{Binding IsSpecialTerminalCommandObjective}"/><TextBox Text="{Binding EditingLevelObjective.SpecialTerminalCommandZone, Mode=TwoWay}" IsVisible="{Binding IsSpecialTerminalCommandObjective}"/>
+                                                    <TextBlock Text="Command" IsVisible="{Binding IsSpecialTerminalCommandObjective}"/><TextBox Text="{Binding EditingLevelObjective.SpecialTerminalCommand, Mode=TwoWay}" IsVisible="{Binding IsSpecialTerminalCommandObjective}"/>
+                                                    <TextBlock Text="Retrieve Item" IsVisible="{Binding IsRetrieveBigItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.RetrieveItem, Mode=TwoWay}" IsVisible="{Binding IsRetrieveBigItemsObjective}"/>
+                                                    <TextBlock Text="Retrieve Spawn Count" IsVisible="{Binding IsRetrieveBigItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.RetrieveSpawnCount, Mode=TwoWay}" IsVisible="{Binding IsRetrieveBigItemsObjective}"/>
+                                                    <TextBlock Text="Retrieve Max Per Zone" IsVisible="{Binding IsRetrieveBigItemsObjective}"/><TextBox Text="{Binding EditingLevelObjective.RetrieveMaxPerZone, Mode=TwoWay}" IsVisible="{Binding IsRetrieveBigItemsObjective}"/>
+                                                    <TextBlock Text="Generator Count" IsVisible="{Binding IsDistributePowerCellsObjective}"/><TextBox Text="{Binding EditingLevelObjective.DistributeGeneratorCount, Mode=TwoWay}" IsVisible="{Binding IsDistributePowerCellsObjective}"/>
+                                                    <TextBlock Text="Verification Rounds" IsVisible="{Binding IsTerminalUplinkObjective}"/><TextBox Text="{Binding EditingLevelObjective.UplinkNumberOfVerificationRounds, Mode=TwoWay}" IsVisible="{Binding IsTerminalUplinkObjective}"/>
+                                                    <TextBlock Text="Terminal Count" IsVisible="{Binding IsTerminalUplinkObjective}"/><TextBox Text="{Binding EditingLevelObjective.UplinkNumberOfTerminals, Mode=TwoWay}" IsVisible="{Binding IsTerminalUplinkObjective}"/>
+                                                    <TextBlock Text="Generator Cluster Zone" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/><TextBox Text="{Binding EditingLevelObjective.CentralGeneratorClusterZone, Mode=TwoWay}" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/>
+                                                    <TextBlock Text="Generator Count" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/><TextBox Text="{Binding EditingLevelObjective.CentralGeneratorClusterGeneratorCount, Mode=TwoWay}" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/>
+                                                    <TextBlock Text="Power Cell Count" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/><TextBox Text="{Binding EditingLevelObjective.CentralGeneratorClusterPowerCellCount, Mode=TwoWay}" IsVisible="{Binding IsCentralGeneratorClusterObjective}"/>
+                                                    <TextBlock Text="HSU Zone" IsVisible="{Binding IsActivateSmallHsuObjective}"/><TextBox Text="{Binding EditingLevelObjective.ActivateSmallHsuZone, Mode=TwoWay}" IsVisible="{Binding IsActivateSmallHsuObjective}"/>
+                                                    <TextBlock Text="Time To Activate" IsVisible="{Binding IsSurvivalObjective}"/><TextBox Text="{Binding EditingLevelObjective.TimeToActivate, Mode=TwoWay}" IsVisible="{Binding IsSurvivalObjective}"/>
+                                                    <TextBlock Text="Time To Survive" IsVisible="{Binding IsSurvivalObjective}"/><TextBox Text="{Binding EditingLevelObjective.TimeToSurvive, Mode=TwoWay}" IsVisible="{Binding IsSurvivalObjective}"/>
+                                                    <TextBlock Text="Gather Terminal Required Count" IsVisible="{Binding IsGatherTerminalObjective}"/><TextBox Text="{Binding EditingLevelObjective.GatherTerminalRequiredCount, Mode=TwoWay}" IsVisible="{Binding IsGatherTerminalObjective}"/>
+                                                    <TextBlock Text="Gather Terminal Download Time" IsVisible="{Binding IsGatherTerminalObjective}"/><TextBox Text="{Binding EditingLevelObjective.GatherTerminalDownloadTime, Mode=TwoWay}" IsVisible="{Binding IsGatherTerminalObjective}"/>
+                                                    <TextBlock Text="Rounds" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/><TextBox Text="{Binding EditingLevelObjective.TimedTerminalSequenceNumberOfRounds, Mode=TwoWay}" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/>
+                                                    <TextBlock Text="Terminals" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/><TextBox Text="{Binding EditingLevelObjective.TimedTerminalSequenceNumberOfTerminals, Mode=TwoWay}" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/>
+                                                    <TextBlock Text="Time Per Round" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/><TextBox Text="{Binding EditingLevelObjective.TimedTerminalSequenceTimePerRound, Mode=TwoWay}" IsVisible="{Binding IsTimedTerminalSequenceObjective}"/>
+                                            </StackPanel>
+                                            <Border Height="1" Background="#555555" HorizontalAlignment="Stretch" Margin="0,8"/>
+                                            <StackPanel Spacing="6" Margin="0,6,0,0">
+                                                <Expander Header="Flavor text" IsExpanded="False" HorizontalContentAlignment="Stretch">
+                                                    <StackPanel Spacing="6" Margin="0,6,0,0">
+                                                    <TabControl SelectedIndex="{Binding FlavorTextTabIndex, Mode=TwoWay}">
+                                                        <TabItem Header="Header"><TextBox Text="{Binding EditingLevelObjective.Header, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="70"/></TabItem>
+                                                        <TabItem Header="MainObjective"><TextBox Text="{Binding EditingLevelObjective.MainObjective, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" Height="70"/></TabItem>
+                                                    </TabControl>
+                                                    <TextBlock Text="FindLocationInfo"/><TextBox Text="{Binding EditingLevelObjective.FindLocationInfo, Mode=TwoWay}"/>
+                                                    <TextBlock Text="FindLocationInfoHelp"/><TextBox Text="{Binding EditingLevelObjective.FindLocationInfoHelp, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToZone"/><TextBox Text="{Binding EditingLevelObjective.GoToZone, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToZoneHelp"/><TextBox Text="{Binding EditingLevelObjective.GoToZoneHelp, Mode=TwoWay}"/>
+                                                    <TextBlock Text="InZoneFindItem"/><TextBox Text="{Binding EditingLevelObjective.InZoneFindItem, Mode=TwoWay}"/>
+                                                    <TextBlock Text="InZoneFindItemHelp"/><TextBox Text="{Binding EditingLevelObjective.InZoneFindItemHelp, Mode=TwoWay}"/>
+                                                    <TextBlock Text="SolveItem"/><TextBox Text="{Binding EditingLevelObjective.SolveItem, Mode=TwoWay}"/>
+                                                    <TextBlock Text="SolveItemHelp"/><TextBox Text="{Binding EditingLevelObjective.SolveItemHelp, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinCondition_Elevator"/><TextBox Text="{Binding EditingLevelObjective.GoToWinCondition_Elevator, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinConditionHelp_Elevator"/><TextBox Text="{Binding EditingLevelObjective.GoToWinConditionHelp_Elevator, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinCondition_CustomGeo"/><TextBox Text="{Binding EditingLevelObjective.GoToWinCondition_CustomGeo, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinConditionHelp_CustomGeo"/><TextBox Text="{Binding EditingLevelObjective.GoToWinConditionHelp_CustomGeo, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinCondition_ToMainLayer"/><TextBox Text="{Binding EditingLevelObjective.GoToWinCondition_ToMainLayer, Mode=TwoWay}"/>
+                                                    <TextBlock Text="GoToWinConditionHelp_ToMainLayer"/><TextBox Text="{Binding EditingLevelObjective.GoToWinConditionHelp_ToMainLayer, Mode=TwoWay}"/>
+                                                    </StackPanel>
+                                                </Expander>
+                                                <TextBlock Text="ShowHelpDelay"/><TextBox Text="{Binding EditingLevelObjective.ShowHelpDelay, Mode=TwoWay}"/>
+                                                    <TextBlock Text="ChainedPuzzleAtExit"/><ComboBox ItemsSource="{Binding ChainedPuzzleTypes}" SelectedValue="{Binding EditingLevelObjective.ChainedPuzzleAtExit, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" DisplayMemberBinding="{Binding Name}"/>
+                                                    <TextBlock Text="ChainedPuzzleAtExitScanSpeedMultiplier"/><TextBox Text="{Binding EditingLevelObjective.ChainedPuzzleAtExitScanSpeedMultiplier, Mode=TwoWay}"/>
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </TabItem>
+                                    <TabItem Header="Secondary" IsEnabled="{Binding HasSecondarySector}">
+                                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                                            <TextBlock Text="Persistent ID"/><TextBox Text="{Binding EditingLevelRef.SecondaryObjectiveId, Mode=TwoWay}" IsEnabled="False"/>
+                                            <TextBlock Text="Type"/><ComboBox ItemsSource="{Binding AvailableObjectiveTypes}" SelectedItem="{Binding SelectedSectorObjectiveType, Mode=TwoWay}"/>
+                                            <TextBlock Text="Win Condition"/><ComboBox ItemsSource="{Binding AvailableLevelWinConditions}" SelectedItem="{Binding SelectedLevelWinCondition, Mode=TwoWay}" DisplayMemberBinding="{Binding DisplayName}"/>
+                                            <TextBlock Text="Gather Item" IsVisible="{Binding IsGatherSmallItemsObjective}"/><ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding EditingLevelObjective.GatherItemId, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" DisplayMemberBinding="{Binding DisplayName}" IsVisible="{Binding IsGatherSmallItemsObjective}"/>
+                                            <StackPanel IsVisible="{Binding IsGatherSmallItemsObjective}" Spacing="5"><Grid ColumnDefinitions="*,Auto"><TextBlock Text="Zone Placement Datas" FontWeight="Bold"/><Button Grid.Column="1" Content="+ Add" Command="{Binding #LevelConfigRoot.DataContext.AddLevelObjectiveZonePlacement}" Padding="6,2"/></Grid><ItemsControl ItemsSource="{Binding EditingGatherZonePlacements}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="models:ZonePlacementData" x:CompileBindings="False"><Grid ColumnDefinitions="*,*,*,*,Auto" Margin="0,2"><ComboBox Grid.Column="0" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableObjectiveDimensions}" SelectedValue="{Binding DimensionIndex, Mode=TwoWay}" SelectedValueBinding="{Binding DimensionIndex}" DisplayMemberBinding="{Binding DisplayName}"/><ComboBox Grid.Column="1" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableLevelObjectiveZones}" SelectedValue="{Binding LocalIndex, Mode=TwoWay}" SelectedValueBinding="{Binding ZoneIndex}" DisplayMemberBinding="{Binding DisplayName}" Margin="4,0,0,0"/><TextBox Grid.Column="2" Text="{Binding Weights.Start, Mode=TwoWay}" Watermark="Start" Margin="4,0,0,0"/><TextBox Grid.Column="3" Text="{Binding Weights.Middle, Mode=TwoWay}" Watermark="Middle" Margin="4,0,0,0"/><TextBox Grid.Column="4" Text="{Binding Weights.End, Mode=TwoWay}" Watermark="End" Margin="4,0,0,0"/></Grid></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></StackPanel>
+                                        </StackPanel>
+                                    </TabItem>
+                                    <TabItem Header="Overload" IsEnabled="{Binding HasOverloadSector}">
+                                        <StackPanel Spacing="8" Margin="0,8,0,0">
+                                            <TextBlock Text="Persistent ID"/><TextBox Text="{Binding EditingLevelRef.OverloadObjectiveId, Mode=TwoWay}" IsEnabled="False"/>
+                                            <TextBlock Text="Type"/><ComboBox ItemsSource="{Binding AvailableObjectiveTypes}" SelectedItem="{Binding SelectedSectorObjectiveType, Mode=TwoWay}"/>
+                                            <TextBlock Text="Win Condition"/><ComboBox ItemsSource="{Binding AvailableLevelWinConditions}" SelectedItem="{Binding SelectedLevelWinCondition, Mode=TwoWay}" DisplayMemberBinding="{Binding DisplayName}"/>
+                                            <TextBlock Text="Gather Item" IsVisible="{Binding IsGatherSmallItemsObjective}"/><ComboBox ItemsSource="{Binding Items}" SelectedValue="{Binding EditingLevelObjective.GatherItemId, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" DisplayMemberBinding="{Binding DisplayName}" IsVisible="{Binding IsGatherSmallItemsObjective}"/>
+                                            <StackPanel IsVisible="{Binding IsGatherSmallItemsObjective}" Spacing="5"><Grid ColumnDefinitions="*,Auto"><TextBlock Text="Zone Placement Datas" FontWeight="Bold"/><Button Grid.Column="1" Content="+ Add" Command="{Binding #LevelConfigRoot.DataContext.AddLevelObjectiveZonePlacement}" Padding="6,2"/></Grid><ItemsControl ItemsSource="{Binding EditingGatherZonePlacements}"><ItemsControl.ItemTemplate><DataTemplate x:DataType="models:ZonePlacementData" x:CompileBindings="False"><Grid ColumnDefinitions="*,*,*,*,Auto" Margin="0,2"><ComboBox Grid.Column="0" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableObjectiveDimensions}" SelectedValue="{Binding DimensionIndex, Mode=TwoWay}" SelectedValueBinding="{Binding DimensionIndex}" DisplayMemberBinding="{Binding DisplayName}"/><ComboBox Grid.Column="1" ItemsSource="{Binding #LevelConfigRoot.DataContext.AvailableLevelObjectiveZones}" SelectedValue="{Binding LocalIndex, Mode=TwoWay}" SelectedValueBinding="{Binding ZoneIndex}" DisplayMemberBinding="{Binding DisplayName}" Margin="4,0,0,0"/><TextBox Grid.Column="2" Text="{Binding Weights.Start, Mode=TwoWay}" Watermark="Start" Margin="4,0,0,0"/><TextBox Grid.Column="3" Text="{Binding Weights.Middle, Mode=TwoWay}" Watermark="Middle" Margin="4,0,0,0"/><TextBox Grid.Column="4" Text="{Binding Weights.End, Mode=TwoWay}" Watermark="End" Margin="4,0,0,0"/></Grid></DataTemplate></ItemsControl.ItemTemplate></ItemsControl></StackPanel>
+                                        </StackPanel>
+                                    </TabItem>
+                                </TabControl>
+                            </StackPanel>
+                        </Expander>
 
                         <!-- Level-specific survival wave and starting player state -->
-                        <Expander Header="Scout Settings" IsExpanded="False" Padding="14" Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" x:CompileBindings="False">
+                        <Expander Header="Scout Settings" IsExpanded="False" Padding="14" Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1" CornerRadius="6" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" x:CompileBindings="False">
                             <StackPanel Spacing="12">
                                 <TextBlock Text="Wave Roles (Enemy Selection)" FontWeight="Bold" Foreground="#FFFFFF" />
                                 <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto">
@@ -145,17 +286,11 @@
                             </StackPanel>
                         </Expander>
                         <!-- Resource Containers Section -->
-                        <Border Background="#1E1E1E"
-                                BorderBrush="#3E3E42"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="14">
+                        <Expander Header="Resource Containers" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
                             <StackPanel Spacing="10">
-                                <TextBlock Text="Resource Containers"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="#FFFFFF"/>
-
                                 <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
                                     <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="0-1 chance to put new loot spawns in existing resource containers instead of making a new one. Higher chances will cause thre to be less boxes/lockers, but each will have more loot on average." Text="Chance To Re-Use Resource Container:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ChanceToReUseResourceContainer, Mode=TwoWay}" Margin="0,4"/>
@@ -173,20 +308,14 @@
                                     <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakResourceContainerWithPackChanceForLocked, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
-                        </Border>
+                        </Expander>
 
                         <!-- Weak Doors Section -->
-                        <Border Background="#1E1E1E"
-                                BorderBrush="#3E3E42"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="14">
+                        <Expander Header="Room Doors" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
                             <StackPanel Spacing="10">
-                                <TextBlock Text="Room Doors"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="#FFFFFF"/>
-
                                 <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto">
                                     <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="The health of small (4x4) room doors" Text="Small Door Health:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.WeakDoor4x4Health, Mode=TwoWay}" Margin="0,4"/>
@@ -213,20 +342,14 @@
                                     <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding EditingExpeditionBalance.GlueVolumeForDoorGlueMaxState, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
-                        </Border>
+                        </Expander>
 
                         <!-- Artifacts Section -->
-                        <Border Background="#1E1E1E"
-                                BorderBrush="#3E3E42"
-                                BorderThickness="1"
-                                CornerRadius="6"
-                                Padding="14">
+                        <Expander Header="Artifacts" IsExpanded="False" Padding="14"
+                                  Background="#1E1E1E" BorderBrush="#3E3E42" BorderThickness="1"
+                                  CornerRadius="6" HorizontalAlignment="Stretch"
+                                  HorizontalContentAlignment="Stretch" x:CompileBindings="False">
                             <StackPanel Spacing="10">
-                                <TextBlock Text="Artifacts"
-                                           FontSize="14"
-                                           FontWeight="Bold"
-                                           Foreground="#FFFFFF"/>
-
                                 <Grid ColumnDefinitions="*,120" RowDefinitions="Auto,Auto,Auto">
                                     <TextBlock Grid.Row="0" Grid.Column="0" ToolTip.Tip="The number of artifacts to spawn per segment" Text="Artifacts Per Segment:" FontSize="13" Foreground="#CCCCCC" VerticalAlignment="Center" Margin="0,4"/>
                                     <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ArtifactsPerSegment, Mode=TwoWay}" Margin="0,4"/>
@@ -238,7 +361,7 @@
                                     <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding EditingExpeditionBalance.ChanceToPutArtifactInResourceContainer, Mode=TwoWay}" Margin="0,4"/>
                                 </Grid>
                             </StackPanel>
-                        </Border>
+                        </Expander>
                     </StackPanel>
                 </ScrollViewer>
 

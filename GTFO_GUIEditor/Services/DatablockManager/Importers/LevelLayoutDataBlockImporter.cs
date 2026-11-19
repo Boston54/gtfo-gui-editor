@@ -503,6 +503,15 @@ public class LevelLayoutDataBlockImporter : IDatablockImporter
             FogSettings = exp.Expedition.FogSettings
         };
 
+        if (context.LevelRefs.TryGetValue(level.PersistentId, out var levelRef))
+        {
+            LevelRefsService.ApplyToLevel(level, levelRef);
+        }
+        else
+        {
+            LevelRefsService.ImportLegacyRundownValues(level, exp);
+        }
+
         LoadLevelSpecificSettings(level, context);
 
         // 1. Complex Resource Set & Elevator Tile
@@ -2492,6 +2501,18 @@ public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext?
         objective.FindLocationInfo = context?.ResolveText(obj["FindLocationInfo"]?.GetValue<uint>() ?? 0) ?? string.Empty;
         objective.FindLocationInfoHelp = context?.ResolveText(obj["FindLocationInfoHelp"]?.GetValue<uint>() ?? 0) ?? string.Empty;
         objective.GoToZone = context?.ResolveText(obj["GoToZone"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToZoneHelp = context?.ResolveText(obj["GoToZoneHelp"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.InZoneFindItemHelp = context?.ResolveText(obj["InZoneFindItemHelp"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.SolveItemHelp = context?.ResolveText(obj["SolveItemHelp"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinCondition_Elevator = context?.ResolveText(obj["GoToWinCondition_Elevator"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinConditionHelp_Elevator = context?.ResolveText(obj["GoToWinConditionHelp_Elevator"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinCondition_CustomGeo = context?.ResolveText(obj["GoToWinCondition_CustomGeo"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinConditionHelp_CustomGeo = context?.ResolveText(obj["GoToWinConditionHelp_CustomGeo"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinCondition_ToMainLayer = context?.ResolveText(obj["GoToWinCondition_ToMainLayer"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.GoToWinConditionHelp_ToMainLayer = context?.ResolveText(obj["GoToWinConditionHelp_ToMainLayer"]?.GetValue<uint>() ?? 0) ?? string.Empty;
+        objective.ShowHelpDelay = obj["ShowHelpDelay"]?.GetValue<int>() ?? 180;
+        objective.ChainedPuzzleAtExit = obj["ChainedPuzzleAtExit"]?.GetValue<uint>() ?? 11;
+        objective.ChainedPuzzleAtExitScanSpeedMultiplier = obj["ChainedPuzzleAtExitScanSpeedMultiplier"]?.GetValue<double>() ?? 1.0;
         objective.InZoneFindItem = context?.ResolveText(obj["InZoneFindItem"]?.GetValue<uint>() ?? 0) ?? string.Empty;
         objective.SolveItem = context?.ResolveText(obj["SolveItem"]?.GetValue<uint>() ?? 0) ?? string.Empty;
 
@@ -2524,12 +2545,10 @@ public WardenObjective DeserializeWardenObjective(JsonObject obj, ImportContext?
 
         // Gather small items
         int gatherItemId = obj["Gather_ItemId"]?.GetValue<int>() ?? 0;
-        if (Enum.IsDefined(typeof(GatherSmallItemType), gatherItemId))
-        {
-            objective.GatherItem = (GatherSmallItemType)gatherItemId;
-        }
+        objective.GatherItemId = gatherItemId;
         objective.GatherMaxPerZone = obj["Gather_MaxPerZone"]?.GetValue<int>() ?? 0;
         int gatherReqCount = obj["Gather_RequiredCount"]?.GetValue<int>() ?? 0;
+        objective.GatherRequiredCount = Math.Max(1, gatherReqCount);
         if (gatherReqCount > 0)
         {
             objective.GatherItemPlacements.Clear();

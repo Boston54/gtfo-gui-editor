@@ -191,14 +191,17 @@ public enum ObjectiveType
     ClearAPath,
     SpecialTerminalCommand,
     RetrieveBigItems,
-    DistributePowerCells,
+    PowerCellDistribution,
+    // Backward-compatible name used by older editor data.
+    DistributePowerCells = PowerCellDistribution,
     TerminalUplink,
     CentralGeneratorCluster,
     ActivateSmallHSU,
     Survival,
     GatherTerminal,
     CorruptedTerminalUplink,
-    TimedTerminalSequence
+    TimedTerminalSequence,
+    Empty
 }
 
 [JsonConverter(typeof(JsonStringEnumConverter))]

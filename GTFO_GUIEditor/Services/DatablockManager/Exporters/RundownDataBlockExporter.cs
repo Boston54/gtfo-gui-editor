@@ -11,6 +11,16 @@ public class RundownDataBlockExporter : IDatablockExporter
 {
     public void Export(ExportContext context)
     {
+        foreach (var level in context.MainVm.LevelLayout.Levels)
+        {
+            var expedition = context.MainVm.Rundown.SelectedRundown?.Expeditions
+                .FirstOrDefault(e => e.LevelLayoutData == level.PersistentId);
+            if (expedition != null)
+            {
+                LevelRefsService.ImportLegacyRundownValues(level, expedition, importObjectiveData: false);
+            }
+        }
+
         var rundownBlocks = new List<JsonObject>();
         var rundown = context.MainVm.Rundown.SelectedRundown;
 
@@ -196,9 +206,9 @@ public class RundownDataBlockExporter : IDatablockExporter
 
             if (matchingLevel != null && context.ObjectiveIds.TryGetValue(matchingLevel, out var objTuple))
             {
-                defaultMainObjId = objTuple.Main;
-                defaultSecObjId = objTuple.Secondary;
-                defaultThirdObjId = objTuple.Overload;
+                defaultMainObjId = matchingLevel.LevelRef.MainObjectiveId > 0 ? matchingLevel.LevelRef.MainObjectiveId : objTuple.Main;
+                defaultSecObjId = matchingLevel.LevelRef.SecondaryObjectiveId;
+                defaultThirdObjId = matchingLevel.LevelRef.OverloadObjectiveId;
                 defaultMainObjIds = objTuple.Chained;
             }
 
@@ -289,11 +299,19 @@ public class RundownDataBlockExporter : IDatablockExporter
 
                 if (matchingLevel != null)
                 {
-                    expSettingsObj["FogSettings"] = matchingLevel.FogSettings;
-                    expSettingsObj["LightSettings"] = GetFirstZoneLightSettings(matchingLevel, context);
+                    expSettingsObj["FogSettings"] = matchingLevel.LevelRef.FogSetting > 0
+                        ? matchingLevel.LevelRef.FogSetting : matchingLevel.FogSettings;
+                    expSettingsObj["LightSettings"] = matchingLevel.LevelRef.DefaultLightSetting > 0
+                        ? matchingLevel.LevelRef.DefaultLightSetting : GetFirstZoneLightSettings(matchingLevel, context);
                     expSettingsObj["ScoutWaveSettings"] = matchingLevel.SurvivalWaveSettings;
                     expSettingsObj["ScoutWavePopulation"] = matchingLevel.SurvivalWavePopulation;
                 }
+            }
+
+            if (matchingLevel != null)
+            {
+                expObj["SpecialOverrideData"] = JsonSerializer.SerializeToNode(
+                    matchingLevel.LevelRef.PlayerStartingState, ExportContext.JsonOptions);
             }
 
             if (expLevelLayoutId > 0)
@@ -307,13 +325,15 @@ public class RundownDataBlockExporter : IDatablockExporter
                 {
                     descObj["PublicName"] = context.SynthesizeText(exp.Descriptive.PublicName, "Expedition Public Name");
                 }
-                if (!string.IsNullOrWhiteSpace(exp.Descriptive?.ExpeditionDescription))
+                string description = matchingLevel?.LevelRef.Description ?? exp.Descriptive?.ExpeditionDescription ?? string.Empty;
+                string intel = matchingLevel?.LevelRef.WardenIntel ?? exp.Descriptive?.RoleplayedWardenIntel ?? string.Empty;
+                if (!string.IsNullOrWhiteSpace(description))
                 {
-                    descObj["ExpeditionDescription"] = context.SynthesizeText(exp.Descriptive.ExpeditionDescription, "Expedition Description");
+                    descObj["ExpeditionDescription"] = context.SynthesizeText(description, "Expedition Description");
                 }
-                if (!string.IsNullOrWhiteSpace(exp.Descriptive?.RoleplayedWardenIntel))
+                if (!string.IsNullOrWhiteSpace(intel))
                 {
-                    descObj["RoleplayedWardenIntel"] = context.SynthesizeText(exp.Descriptive.RoleplayedWardenIntel, "Roleplayed Warden Intel");
+                    descObj["RoleplayedWardenIntel"] = context.SynthesizeText(intel, "Roleplayed Warden Intel");
                 }
             }
 
@@ -324,7 +344,8 @@ public class RundownDataBlockExporter : IDatablockExporter
                 matchingLevel?.MainSector,
                 matchingLevel?.GridState,
                 SectorType.Main,
-                defaultMainObjIds);
+                defaultMainObjIds,
+                matchingLevel);
 
             expObj["SecondaryLayerEnabled"] = secEnabled;
             expObj["SecondaryLayerData"] = SerializeLayerData(
@@ -333,7 +354,8 @@ public class RundownDataBlockExporter : IDatablockExporter
                 secBulkheadZones,
                 matchingLevel?.SecondarySector,
                 matchingLevel?.GridState,
-                SectorType.Secondary);
+                SectorType.Secondary,
+                level: matchingLevel);
             expObj["SecondaryLayout"] = secLayoutId;
             expObj["BuildSecondaryFrom"] = new JsonObject
             {
@@ -348,7 +370,8 @@ public class RundownDataBlockExporter : IDatablockExporter
                 thirdBulkheadZones,
                 matchingLevel?.OverloadSector,
                 matchingLevel?.GridState,
-                SectorType.Overload);
+                SectorType.Overload,
+                level: matchingLevel);
             expObj["ThirdLayout"] = thirdLayoutId;
             expObj["BuildThirdFrom"] = new JsonObject
             {
@@ -435,7 +458,8 @@ public class RundownDataBlockExporter : IDatablockExporter
         SectorSettings? sectorSettings = null,
         LevelLayoutGridState? gridState = null,
         SectorType sectorType = SectorType.Main,
-        List<uint>? chainedObjectiveIds = null)
+        List<uint>? chainedObjectiveIds = null,
+        LevelLayoutBlock? level = null)
     {
         layer ??= new ExpeditionLayerData();
         uint objId = layer.ObjectiveData?.DataBlockId > 0 ? layer.ObjectiveData.DataBlockId : defaultObjectiveId;
@@ -524,8 +548,20 @@ public class RundownDataBlockExporter : IDatablockExporter
             keyPlacementsArray = ConvertToJsonArrayOrEmpty(layer.BulkheadKeyPlacements);
         }
 
-        string winCondition = sectorSettings?.PrimaryObjective != null
-            ? sectorSettings.PrimaryObjective.WinCondition.ToString()
+        LevelObjectiveRefData? levelObjective = level == null
+            ? null
+            : sectorType switch
+            {
+                SectorType.Main => level.LevelRef.MainObjective,
+                SectorType.Secondary => level.LevelRef.SecondaryObjective,
+                SectorType.Overload => level.LevelRef.OverloadObjective,
+                _ => null
+            };
+
+        string winCondition = levelObjective != null
+            ? levelObjective.WinCondition.ToString()
+            : sectorSettings?.PrimaryObjective != null
+                ? sectorSettings.PrimaryObjective.WinCondition.ToString()
             : (!string.IsNullOrWhiteSpace(layer.ObjectiveData?.WinCondition)
                 ? layer.ObjectiveData.WinCondition
                 : "GoToElevator");
@@ -582,7 +618,9 @@ public class RundownDataBlockExporter : IDatablockExporter
             {
                 ["DataBlockId"] = objId,
                 ["WinCondition"] = winCondition,
-                ["ZonePlacementDatas"] = ConvertToJsonArrayOrEmpty(layer.ObjectiveData?.ZonePlacementDatas)
+                ["ZonePlacementDatas"] = levelObjective != null
+                    ? JsonSerializer.SerializeToNode(levelObjective.ZonePlacementDatas, ExportContext.JsonOptions) ?? new JsonArray()
+                    : ConvertToJsonArrayOrEmpty(layer.ObjectiveData?.ZonePlacementDatas)
             },
             ["ChainedObjectiveData"] = chainedObjectivesArray,
             ["ArtifactData"] = artifactDataNode
