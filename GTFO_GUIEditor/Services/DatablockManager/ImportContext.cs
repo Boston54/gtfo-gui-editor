@@ -51,9 +51,10 @@ public class ImportContext
     {
         MainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         ImportRootPath = importRootPath ?? throw new ArgumentNullException(nameof(importRootPath));
-        LgTunerDirectory = Path.Combine(importRootPath, "Custom", "LGTunerAdvanced");
-        AraLevelLayoutDirectory = Path.Combine(importRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout");
-        SchemasDirectory = Path.Combine(importRootPath, ".schemas");
+        string customRootPath = DatablockPathResolver.GetCustomDirectory(importRootPath);
+        LgTunerDirectory = Path.Combine(customRootPath, "LGTunerAdvanced");
+        AraLevelLayoutDirectory = Path.Combine(customRootPath, "AdditionalRundownAdvancements", "LevelLayout");
+        SchemasDirectory = string.Empty;
 
         LoadAllDatablocks();
         foreach (var pair in LevelRefsService.Load(importRootPath)) LevelRefs[pair.Key] = pair.Value;

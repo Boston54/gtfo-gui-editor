@@ -154,10 +154,6 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
     public void Export(ExportContext context)
     {
         Directory.CreateDirectory(context.LgTunerDirectory);
-        Directory.CreateDirectory(context.SchemasDirectory);
-
-        // Write schema file in .schemas
-        File.WriteAllText(Path.Combine(context.SchemasDirectory, "LGTunerAdvanced.json"), LGTunerAdvancedSchema);
 
         var levelLayoutBlocks = new List<JsonObject>();
         var dimensionBlocks = new List<JsonObject>();
@@ -749,7 +745,6 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
 
                 var levelGenOverrideObj = new JsonObject
                 {
-                    ["$schema"] = "../../.schemas/LGTunerAdvanced.json",
                     ["LevelLayoutID"] = sectorCfg.LayoutId,
                     ["ZoneOverrides"] = zoneOverridesArray,
                     ["GeoOverrides"] = geoOverridesArray,
@@ -1189,7 +1184,6 @@ public class LevelLayoutDataBlockExporter : IDatablockExporter
 
         var levelGenOverrideObj = new JsonObject
         {
-            ["$schema"] = "../../.schemas/LGTunerAdvanced.json",
             ["LevelLayoutID"] = layoutId,
             ["ZoneOverrides"] = zoneOverridesArray,
             ["GeoOverrides"] = geoOverridesArray,

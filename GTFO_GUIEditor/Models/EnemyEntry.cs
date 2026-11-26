@@ -23,13 +23,7 @@ public class EnemyEntry
         get
         {
             if (PersistentId == 0) return "(None)";
-            if (string.IsNullOrWhiteSpace(Name))
-            {
-                return string.IsNullOrWhiteSpace(EnemyType) ? "Enemy" : EnemyType;
-            }
-
-            if (string.IsNullOrWhiteSpace(EnemyType)) return Name;
-            return $"{Name} ({EnemyType})";
+            return Name;
         }
     }
 

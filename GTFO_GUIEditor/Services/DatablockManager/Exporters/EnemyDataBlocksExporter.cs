@@ -9,23 +9,18 @@ public class EnemyDataBlocksExporter : IDatablockExporter
 {
     public void Export(ExportContext context)
     {
-        var groupBlocks = SerializeGroups(context, context.MainVm.Enemies.Groups);
+        var vanillaGroupIds = context.VanillaEnemyGroupBlocks
+            .Select(block => block["persistentID"]?.GetValue<uint>() ?? 0)
+            .ToHashSet();
+        var groupBlocks = SerializeGroups(context, context.MainVm.Enemies.Groups)
+            .Where(block => !vanillaGroupIds.Contains(block["persistentID"]?.GetValue<uint>() ?? 0))
+            .ToList();
         foreach (var synthesized in context.EnemyGroupBlocks)
         {
             uint id = synthesized["persistentID"]?.GetValue<uint>() ?? 0;
-            if (id > 0 && !groupBlocks.Any(b => b["persistentID"]?.GetValue<uint>() == id))
+            if (id > 0 && !vanillaGroupIds.Contains(id) && !groupBlocks.Any(b => b["persistentID"]?.GetValue<uint>() == id))
             {
                 var clone = JsonNode.Parse(synthesized.ToJsonString());
-                if (clone is JsonObject cloneObj) groupBlocks.Add(cloneObj);
-            }
-        }
-
-        foreach (var vanilla in context.VanillaEnemyGroupBlocks)
-        {
-            uint id = vanilla["persistentID"]?.GetValue<uint>() ?? 0;
-            if (!groupBlocks.Any(b => b["persistentID"]?.GetValue<uint>() == id))
-            {
-                var clone = JsonNode.Parse(vanilla.ToJsonString());
                 if (clone is JsonObject cloneObj) groupBlocks.Add(cloneObj);
             }
         }

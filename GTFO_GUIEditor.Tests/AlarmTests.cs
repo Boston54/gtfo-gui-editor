@@ -20,7 +20,55 @@ public class AlarmTests
         Assert.NotNull(striker);
         Assert.Equal("Striker (Wave)", striker.Name);
         Assert.Equal("Standard", striker.EnemyType);
-        Assert.Equal("Striker (Wave) (Standard)", striker.DisplayText);
+        Assert.Equal("Striker (Wave)", striker.DisplayText);
+    }
+
+    [Fact]
+    public void AlarmsViewModel_ReplaceEnemies_RefreshesWaveRoleOptions()
+    {
+        var vm = new AlarmsViewModel();
+        var alarm = new AlarmBlock { WaveRoleStandard = 9001 };
+        vm.Alarms.Add(alarm);
+        vm.ReplaceEnemies(new[]
+        {
+            new EnemyEntry { PersistentId = 9001, Name = "Custom Wave Enemy", EnemyType = "Standard" }
+        });
+
+        var option = Assert.Single(vm.Enemies);
+        Assert.Equal((uint)9001, option.PersistentId);
+        Assert.Equal("Custom Wave Enemy", option.Name);
+        Assert.Same(option, alarm.WaveRoleStandardEnemy);
+    }
+
+    [Fact]
+    public void RundownProjectService_SaveAndLoad_PreservesEnemyDefinitionsAndWaveRoleIds()
+    {
+        string tempFile = Path.Combine(Path.GetTempPath(), $"gtfo_wave_enemy_defs_{Guid.NewGuid():N}.rundown");
+        try
+        {
+            var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var enemy = new EnemyEntry
+            {
+                PersistentId = 9001,
+                Name = "Custom Striker",
+                EnemyType = "Standard"
+            };
+            vm.Enemies.ReplaceEnemies(vm.Enemies.Enemies.Append(enemy).ToList());
+            vm.Alarms.Alarms.Add(new AlarmBlock { WaveRoleStandard = enemy.PersistentId });
+
+            RundownProjectService.SaveProject(vm, tempFile);
+            var loaded = RundownProjectService.LoadProject(tempFile);
+            var loadedVm = new MainWindowViewModel(autoReopenLastRundown: false);
+            RundownProjectService.ApplyProject(loadedVm, loaded);
+
+            Assert.Contains(loadedVm.Enemies.Enemies, e => e.PersistentId == 9001 && e.Name == "Custom Striker");
+            Assert.Equal((uint)9001, loadedVm.Alarms.Alarms.Single().WaveRoleStandard);
+            Assert.Contains(loadedVm.LevelLayout.Enemies, e => e.PersistentId == 9001);
+        }
+        finally
+        {
+            if (File.Exists(tempFile)) File.Delete(tempFile);
+        }
     }
 
     [Fact]

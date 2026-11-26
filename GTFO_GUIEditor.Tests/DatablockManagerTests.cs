@@ -50,10 +50,10 @@ public class DatablockManagerTests
             Assert.True(File.Exists(Path.Combine(tempDir, "GameData_GameSetupDataBlock_bin.json")));
             Assert.True(File.Exists(Path.Combine(tempDir, "GameData_TextDataBlock_bin.json")));
 
-            // Verify LGTuner config and schema
+            // Verify LGTuner config; schemas are intentionally not exported.
             string lgTunerDir = Path.Combine(tempDir, "Custom", "LGTunerAdvanced");
             Assert.True(Directory.Exists(lgTunerDir));
-            Assert.True(File.Exists(Path.Combine(tempDir, ".schemas", "LGTunerAdvanced.json")));
+            Assert.False(Directory.Exists(Path.Combine(tempDir, ".schemas")));
         }
         finally
         {
@@ -61,6 +61,33 @@ public class DatablockManagerTests
             {
                 Directory.Delete(tempDir, true);
             }
+        }
+    }
+
+    [Fact]
+    public void ExportDatablocks_WhenRootIsUnderPlugins_PlacesCustomAtPluginRoot()
+    {
+        var vm = new MainWindowViewModel(autoReopenLastRundown: false);
+        string tempRoot = Path.Combine(Path.GetTempPath(), $"datablock_plugins_test_{Guid.NewGuid():N}");
+        string exportDir = Path.Combine(tempRoot, "plugins", "folder2");
+
+        try
+        {
+            var result = DatablockManager.Instance.ExportDatablocks(vm, exportDir);
+
+            Assert.True(result.Success, result.Message);
+            Assert.True(File.Exists(Path.Combine(exportDir, "GameData_SurvivalWavePopulationDataBlock_bin.json")));
+            Assert.True(Directory.Exists(Path.Combine(tempRoot, "plugins", "Custom", "LGTunerAdvanced")));
+            Assert.False(Directory.Exists(Path.Combine(exportDir, "Custom")));
+            Assert.False(Directory.Exists(Path.Combine(tempRoot, ".schemas")));
+
+            var importedVm = new MainWindowViewModel(autoReopenLastRundown: false);
+            var importResult = DatablockManager.Instance.ImportDatablocks(importedVm, exportDir);
+            Assert.True(importResult.Success, importResult.Message);
+        }
+        finally
+        {
+            if (Directory.Exists(tempRoot)) Directory.Delete(tempRoot, true);
         }
     }
 

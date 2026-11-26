@@ -149,6 +149,7 @@ public class ChainedPuzzleDataBlockImporter : IDatablockImporter
                 alarm.PopulationRampOverTime = waveObj["m_populationRampOverTime"]?.GetValue<double>() ?? 0;
             }
 
+            alarm.RefreshWaveRoleOptions(context.MainVm.Alarms.Enemies);
             alarms.Add(alarm);
         }
 

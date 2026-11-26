@@ -33,6 +33,11 @@ public class AlarmBlock : INotifyPropertyChanged
     private uint _waveRoleSpecial = 0;
     private uint _waveRoleMiniBoss = 0;
     private uint _waveRoleBoss = 0;
+    private EnemyEntry? _waveRoleWeaklingEnemy;
+    private EnemyEntry? _waveRoleStandardEnemy;
+    private EnemyEntry? _waveRoleSpecialEnemy;
+    private EnemyEntry? _waveRoleMiniBossEnemy;
+    private EnemyEntry? _waveRoleBossEnemy;
 
     // Survival Wave Settings
     private double _pauseBeforeStart = 0;
@@ -208,11 +213,31 @@ public class AlarmBlock : INotifyPropertyChanged
         set => SetField(ref _waveRoleWeakling, value);
     }
 
+    [JsonIgnore]
+    public EnemyEntry? WaveRoleWeaklingEnemy
+    {
+        get => _waveRoleWeaklingEnemy;
+        set
+        {
+            if (SetField(ref _waveRoleWeaklingEnemy, value)) WaveRoleWeakling = value?.PersistentId ?? 0;
+        }
+    }
+
     [JsonPropertyName("WaveRoleStandard")]
     public uint WaveRoleStandard
     {
         get => _waveRoleStandard;
         set => SetField(ref _waveRoleStandard, value);
+    }
+
+    [JsonIgnore]
+    public EnemyEntry? WaveRoleStandardEnemy
+    {
+        get => _waveRoleStandardEnemy;
+        set
+        {
+            if (SetField(ref _waveRoleStandardEnemy, value)) WaveRoleStandard = value?.PersistentId ?? 0;
+        }
     }
 
     [JsonPropertyName("WaveRoleSpecial")]
@@ -222,6 +247,16 @@ public class AlarmBlock : INotifyPropertyChanged
         set => SetField(ref _waveRoleSpecial, value);
     }
 
+    [JsonIgnore]
+    public EnemyEntry? WaveRoleSpecialEnemy
+    {
+        get => _waveRoleSpecialEnemy;
+        set
+        {
+            if (SetField(ref _waveRoleSpecialEnemy, value)) WaveRoleSpecial = value?.PersistentId ?? 0;
+        }
+    }
+
     [JsonPropertyName("WaveRoleMiniBoss")]
     public uint WaveRoleMiniBoss
     {
@@ -229,11 +264,46 @@ public class AlarmBlock : INotifyPropertyChanged
         set => SetField(ref _waveRoleMiniBoss, value);
     }
 
+    [JsonIgnore]
+    public EnemyEntry? WaveRoleMiniBossEnemy
+    {
+        get => _waveRoleMiniBossEnemy;
+        set
+        {
+            if (SetField(ref _waveRoleMiniBossEnemy, value)) WaveRoleMiniBoss = value?.PersistentId ?? 0;
+        }
+    }
+
     [JsonPropertyName("WaveRoleBoss")]
     public uint WaveRoleBoss
     {
         get => _waveRoleBoss;
         set => SetField(ref _waveRoleBoss, value);
+    }
+
+    [JsonIgnore]
+    public EnemyEntry? WaveRoleBossEnemy
+    {
+        get => _waveRoleBossEnemy;
+        set
+        {
+            if (SetField(ref _waveRoleBossEnemy, value)) WaveRoleBoss = value?.PersistentId ?? 0;
+        }
+    }
+
+    public void RefreshWaveRoleOptions(IEnumerable<EnemyEntry> enemies)
+    {
+        var options = enemies?.ToList() ?? new List<EnemyEntry>();
+        _waveRoleWeaklingEnemy = options.FirstOrDefault(e => e.PersistentId == WaveRoleWeakling);
+        _waveRoleStandardEnemy = options.FirstOrDefault(e => e.PersistentId == WaveRoleStandard);
+        _waveRoleSpecialEnemy = options.FirstOrDefault(e => e.PersistentId == WaveRoleSpecial);
+        _waveRoleMiniBossEnemy = options.FirstOrDefault(e => e.PersistentId == WaveRoleMiniBoss);
+        _waveRoleBossEnemy = options.FirstOrDefault(e => e.PersistentId == WaveRoleBoss);
+        OnPropertyChanged(nameof(WaveRoleWeaklingEnemy));
+        OnPropertyChanged(nameof(WaveRoleStandardEnemy));
+        OnPropertyChanged(nameof(WaveRoleSpecialEnemy));
+        OnPropertyChanged(nameof(WaveRoleMiniBossEnemy));
+        OnPropertyChanged(nameof(WaveRoleBossEnemy));
     }
 
     // Timing

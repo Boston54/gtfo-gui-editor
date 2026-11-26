@@ -38,6 +38,13 @@ public class EnemyDataBlockImporter : IDatablockImporter
         context.MainVm.Enemies.Enemies.Clear();
         foreach (var enemy in enemies) context.MainVm.Enemies.Enemies.Add(enemy);
 
+        // Level-layout selectors (including scout/wave settings) use this
+        // collection as their shared enemy lookup source.
+        context.MainVm.LevelLayout.Enemies.Clear();
+        foreach (var enemy in enemies) context.MainVm.LevelLayout.Enemies.Add(enemy);
+
+        context.MainVm.Alarms.ReplaceEnemies(enemies);
+
         context.MainVm.Enemies.RefreshSpawningOptions();
     }
 }

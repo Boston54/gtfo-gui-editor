@@ -100,9 +100,8 @@ public class DatablockExportTests
             Assert.False(Directory.Exists(Path.Combine(tempDir, "GameData_Rules")));
             Assert.True(Directory.Exists(Path.Combine(tempDir, "Custom", "LGTunerAdvanced")));
 
-            // Check .schemas/LGTunerAdvanced.json and LevelGen file
-            string schemaPath = Path.Combine(tempDir, ".schemas", "LGTunerAdvanced.json");
-            Assert.True(File.Exists(schemaPath));
+            // Check LevelGen file; .schemas is intentionally not exported.
+            Assert.False(Directory.Exists(Path.Combine(tempDir, ".schemas")));
 
             string levelGenPath = Path.Combine(tempDir, "Custom", "LGTunerAdvanced", "LevelGen_101.json");
             Assert.True(File.Exists(levelGenPath));
@@ -1052,13 +1051,13 @@ public class DatablockExportTests
             var result = DatablockExportService.ExportAll(mainVm, tempDir);
             Assert.True(result.Success, result.Message);
 
-            // 1. Schema file exists in .schemas
+            // 1. No schema folder is exported.
             string rootSchemaPath = Path.Combine(tempDir, ".schemas", "LGTunerAdvanced.json");
             string customSchemaPath = Path.Combine(tempDir, "Custom", "LGTunerAdvanced", "schema.json");
-            Assert.True(File.Exists(rootSchemaPath), "Expected .schemas/LGTunerAdvanced.json to exist");
+            Assert.False(File.Exists(rootSchemaPath), "The .schemas folder should not be exported");
             Assert.False(File.Exists(customSchemaPath), "Custom/LGTunerAdvanced/schema.json should not exist to prevent mod loader conflicts");
 
-            // 2. LevelGen file is valid and contains $schema
+            // 2. LevelGen file is valid and does not depend on a saved schema
             string levelGenPath = Path.Combine(tempDir, "Custom", "LGTunerAdvanced", "LevelGen_1.json");
             Assert.True(File.Exists(levelGenPath), "Expected LevelGen_1.json to exist");
 
@@ -1066,7 +1065,7 @@ public class DatablockExportTests
             var levelGenObj = JsonNode.Parse(levelGenContent)?.AsObject();
             Assert.NotNull(levelGenObj);
 
-            Assert.Equal("../../.schemas/LGTunerAdvanced.json", levelGenObj["$schema"]?.GetValue<string>());
+            Assert.Null(levelGenObj["$schema"]);
             Assert.Equal(1, levelGenObj["LevelLayoutID"]?.GetValue<int>());
 
             // 3. Elevator at (0, 0) should not be in GeoOverrides; geo1 at (0, -1) grid -> (0, 1) LGTuner, geo2 at (0, -2) grid -> (0, 2) LGTuner

@@ -72,6 +72,13 @@ public class RundownLoader : IRundownLoader
             LastExportDirectory = vm.LastExportDirectory,
             Rundown = vm.Rundown.SelectedRundown?.Clone() ?? new RundownBlock(),
             Alarms = vm.Alarms.Alarms.Select(a => a.Clone()).ToList(),
+            EnemyDefinitions = vm.Enemies.Enemies.Select(e => new EnemyEntry
+            {
+                PersistentId = e.PersistentId,
+                Name = e.Name,
+                EnemyType = e.EnemyType,
+                InternalEnabled = e.InternalEnabled
+            }).ToList(),
             Lighting = vm.Lighting.Blocks.Select(b => b.Clone()).ToList(),
             FogSettings = vm.FogSettings.Blocks.Select(b => b.Clone()).ToList(),
             ConsumableDistributions = vm.Consumables.Blocks.Select(b => b.Clone()).ToList(),
@@ -166,6 +173,19 @@ public class RundownLoader : IRundownLoader
 
         vm.CurrentFilePath = filePath;
         vm.LastExportDirectory = project.LastExportDirectory;
+
+        // Restore enemy definitions before alarms so wave-role IDs have a
+        // matching display entry when the alarms view is materialized.
+        if (project.EnemyDefinitions is { Count: > 0 })
+        {
+            vm.Enemies.ReplaceEnemies(project.EnemyDefinitions);
+            vm.LevelLayout.Enemies.Clear();
+            foreach (var enemy in project.EnemyDefinitions)
+            {
+                vm.LevelLayout.Enemies.Add(enemy);
+            }
+            vm.Alarms.ReplaceEnemies(project.EnemyDefinitions);
+        }
 
         // Apply Rundown
         vm.Rundown.SelectedRundown = project.Rundown?.Clone() ?? Services.RundownService.CreateFreshBlock(1, "New Rundown");

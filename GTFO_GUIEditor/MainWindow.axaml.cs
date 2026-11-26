@@ -12,8 +12,8 @@ public partial class MainWindow : Window
     private bool _isPromptingForUnsavedChanges;
     public MainWindow()
     {
-        InitializeComponent();
         DataContext = new MainWindowViewModel(autoReopenLastRundown: true);
+        InitializeComponent();
         if (DataContext is MainWindowViewModel viewModel)
         {
             viewModel.ApplyWindowDisplayMode(this);

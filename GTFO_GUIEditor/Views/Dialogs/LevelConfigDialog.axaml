@@ -204,7 +204,7 @@
                                                     </StackPanel>
                                                 </Expander>
                                                 <TextBlock Text="ShowHelpDelay"/><TextBox Text="{Binding EditingLevelObjective.ShowHelpDelay, Mode=TwoWay}"/>
-                                                    <TextBlock Text="ChainedPuzzleAtExit"/><ComboBox ItemsSource="{Binding ChainedPuzzleTypes}" SelectedValue="{Binding EditingLevelObjective.ChainedPuzzleAtExit, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" DisplayMemberBinding="{Binding Name}"/>
+                                                    <TextBlock Text="Chained Puzzle At Exit"/><ComboBox ItemsSource="{Binding AvailableAlarms}" SelectedValue="{Binding EditingLevelObjective.ChainedPuzzleAtExit, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" DisplayMemberBinding="{Binding DisplayText}"/>
                                                     <TextBlock Text="ChainedPuzzleAtExitScanSpeedMultiplier"/><TextBox Text="{Binding EditingLevelObjective.ChainedPuzzleAtExitScanSpeedMultiplier, Mode=TwoWay}"/>
                                             </StackPanel>
                                         </StackPanel>

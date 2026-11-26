@@ -59,6 +59,23 @@ public class AlarmsViewModel : ViewModelBase
 
     public ObservableCollection<AlarmBlock> AvailableTemplates { get; }
 
+    /// <summary>
+    /// Replaces the enemy options used by the alarm wave-role ComboBoxes.
+    /// Datablock imports can add custom enemies after this view model is constructed.
+    /// </summary>
+    public void ReplaceEnemies(IEnumerable<EnemyEntry> enemies)
+    {
+        Enemies.Clear();
+        foreach (var enemy in enemies)
+        {
+            Enemies.Add(enemy);
+        }
+        foreach (var alarm in Alarms)
+        {
+            alarm.RefreshWaveRoleOptions(Enemies);
+        }
+    }
+
     public AlarmsViewModel()
         : this(new List<AlarmBlock>(), AlarmService.LoadEnemies(), AlarmService.LoadChainedPuzzleTypes())
     {
@@ -81,6 +98,10 @@ public class AlarmsViewModel : ViewModelBase
 
         var enemyList = (enemies ?? AlarmService.LoadEnemies()).ToList();
         Enemies = new ObservableCollection<EnemyEntry>(enemyList);
+        foreach (var alarm in _alarms)
+        {
+            alarm.RefreshWaveRoleOptions(Enemies);
+        }
 
         var puzzleTypesList = (chainedPuzzleTypes ?? AlarmService.LoadChainedPuzzleTypes()).ToList();
         ChainedPuzzleTypes = new ObservableCollection<ChainedPuzzleTypeEntry>(puzzleTypesList);
@@ -462,6 +483,7 @@ public class AlarmsViewModel : ViewModelBase
         }
 
         newAlarm.PublicAlarmName = NewAlarmPublicAlarmName?.Trim() ?? string.Empty;
+        newAlarm.RefreshWaveRoleOptions(Enemies);
 
         _alarms.Add(newAlarm);
         SelectedAlarm = newAlarm;

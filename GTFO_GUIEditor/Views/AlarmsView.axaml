@@ -103,7 +103,7 @@
                             <Grid ColumnDefinitions="Auto,*,Auto,*" RowDefinitions="Auto,Auto,Auto" Margin="0,5,0,0">
                               <!-- Row 0: Weakling & Standard -->
                               <TextBlock Grid.Row="0" Grid.Column="0" Text="Weakling:" ToolTip.Tip="The 'weakling' type enemy for this alarm. This enemy will cost 0.75 points to spawn, with a total points soft cap of 25. Many vanilla alarms opt to filter this out by excluding it in the population filter, instead using the standard and special slots for their small enemies as they cost 1 point instead of 0.75." VerticalAlignment="Center" Margin="0,0,8,8" />
-                              <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding $parent[UserControl].((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleWeakling, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,8">
+                              <ComboBox Grid.Row="0" Grid.Column="1" ItemsSource="{Binding #AlarmsTabRoot.((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleWeakling, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,8">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="models:EnemyEntry">
                                     <TextBlock Text="{Binding DisplayText}" />
@@ -111,7 +111,7 @@
                                 </ComboBox.ItemTemplate>
                               </ComboBox>
                               <TextBlock Grid.Row="0" Grid.Column="2" Text="Standard:" ToolTip.Tip="The 'standard' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8" />
-                              <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding $parent[UserControl].((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleStandard, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,0,8">
+                              <ComboBox Grid.Row="0" Grid.Column="3" ItemsSource="{Binding #AlarmsTabRoot.((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleStandard, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,0,8">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="models:EnemyEntry">
                                     <TextBlock Text="{Binding DisplayText}" />
@@ -120,7 +120,7 @@
                               </ComboBox>
                               <!-- Row 1: Special & MiniBoss -->
                               <TextBlock Grid.Row="1" Grid.Column="0" Text="Special:" ToolTip.Tip="The 'special' type enemy for this alarm. This enemy will cost 1 point to spawn, with a total points soft cap of 25. Generally, this is going to be your strikers/shooters." VerticalAlignment="Center" Margin="0,0,8,8" />
-                              <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding $parent[UserControl].((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleSpecial, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,8">
+                              <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding #AlarmsTabRoot.((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleSpecial, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,8">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="models:EnemyEntry">
                                     <TextBlock Text="{Binding DisplayText}" />
@@ -128,7 +128,7 @@
                                 </ComboBox.ItemTemplate>
                               </ComboBox>
                               <TextBlock Grid.Row="1" Grid.Column="2" Text="MiniBoss:" ToolTip.Tip="The 'miniboss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army." VerticalAlignment="Center" Margin="0,0,8,8" />
-                              <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding $parent[UserControl].((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleMiniBoss, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,0,8">
+                              <ComboBox Grid.Row="1" Grid.Column="3" ItemsSource="{Binding #AlarmsTabRoot.((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleMiniBoss, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,0,8">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="models:EnemyEntry">
                                     <TextBlock Text="{Binding DisplayText}" />
@@ -137,7 +137,7 @@
                               </ComboBox>
                               <!-- Row 2: Boss -->
                               <TextBlock Grid.Row="2" Grid.Column="0" Text="Boss:" ToolTip.Tip="The 'boss' type enemy for this alarm. This enemy will cost 2 points to spawn, with a total points soft cap of 25. Generally, this is going to be your hybrids/giants. Do not put something like a Tank in here; lest you fight an army. NOTE: THIS ENEMY TYPE IS BROKEN IN VANILLA." VerticalAlignment="Center" Margin="0,0,8,0" />
-                              <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding $parent[UserControl].((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleBoss, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,0">
+                              <ComboBox Grid.Row="2" Grid.Column="1" ItemsSource="{Binding #AlarmsTabRoot.((vm:AlarmsViewModel)DataContext).Enemies}" SelectedValue="{Binding WaveRoleBoss, Mode=TwoWay}" SelectedValueBinding="{Binding PersistentId}" HorizontalAlignment="Stretch" Margin="0,0,16,0">
                                 <ComboBox.ItemTemplate>
                                   <DataTemplate x:DataType="models:EnemyEntry">
                                     <TextBlock Text="{Binding DisplayText}" />

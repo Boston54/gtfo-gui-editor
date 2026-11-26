@@ -20,6 +20,11 @@ public class RundownProjectFile
 
     [JsonPropertyName("alarms")] public List<AlarmBlock> Alarms { get; set; } = new();
 
+    // Persist the enemy lookup records used to resolve wave-role IDs in the UI.
+    // Datablock projects get these from EnemyDataBlock; rundown files must carry
+    // them so the same IDs remain displayable after a standalone reload.
+    [JsonPropertyName("enemyDefinitions")] public List<EnemyEntry>? EnemyDefinitions { get; set; }
+
     [JsonPropertyName("lighting")] public List<LightSettingsBlock> Lighting { get; set; } = new();
 
     [JsonPropertyName("complexResourceSets")]

@@ -100,9 +100,10 @@ public class ExportContext
     {
         MainVm = mainVm ?? throw new ArgumentNullException(nameof(mainVm));
         ExportRootPath = exportRootPath ?? throw new ArgumentNullException(nameof(exportRootPath));
-        LgTunerDirectory = Path.Combine(exportRootPath, "Custom", "LGTunerAdvanced");
-        AraLevelLayoutDirectory = Path.Combine(exportRootPath, "Custom", "AdditionalRundownAdvancements", "LevelLayout");
-        SchemasDirectory = Path.Combine(exportRootPath, ".schemas");
+        string customRootPath = DatablockPathResolver.GetCustomDirectory(exportRootPath);
+        LgTunerDirectory = Path.Combine(customRootPath, "LGTunerAdvanced");
+        AraLevelLayoutDirectory = Path.Combine(customRootPath, "AdditionalRundownAdvancements", "LevelLayout");
+        SchemasDirectory = string.Empty;
 
         InitializeVanillaData();
     }

@@ -165,6 +165,15 @@ public class EnemiesViewModel : ViewModelBase
         RefreshGroupSearch();
     }
 
+    public void ReplaceEnemies(IEnumerable<EnemyEntry> enemies)
+    {
+        Enemies.Clear();
+        foreach (var enemy in enemies)
+        {
+            Enemies.Add(enemy);
+        }
+    }
+
     private void LoadVanillaDatablocks()
     {
         string dir = AlarmService.GetDatablocksDirectory();
